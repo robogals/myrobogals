@@ -1,0 +1,274 @@
+    <!--Begin Header-->
+    <div id="header-bg">
+        <!--Begin Horizontal Menu-->
+                <div id="horiz-menu" class="fusion">
+            <div class="wrapper">
+                <div class="padding">
+
+                    <div id="horizmenu-surround">
+                                            <ul class="menutop level1" >
+            <li class="item1 root" >
+            <a class="orphan item bullet" href="/"  >
+            <span>
+                        Home               
+            </span>
+        </a>
+        
+        
+</li>   
+            <li class="item53 parent root" >
+
+            <a class="daddy item bullet subtext" href="/profile/"  >
+            <span>
+                        Profile                        <em>Manage personal info</em>    
+               
+            </span>
+        </a>
+        
+            <div class="fusion-submenu-wrapper level2">
+            <div class="drop-top"></div>
+            <ul class="level2">
+
+                            
+                    <li class="item54" >
+            <a class="orphan item bullet" href="/profile/"  >
+            <span>
+                        View Profile           
+            </span>
+        </a>
+        
+        
+</li>   
+                            
+                    <li class="item146" >
+            <a class="orphan item bullet" href="/profile/edit/"  >
+            <span>
+
+                        Edit Profile               
+            </span>
+        </a>
+        
+        
+</li>   
+                            
+                            </ul>
+        </div>
+        
+</li>   
+            <li class="item64 parent root" >
+            <a class="daddy item bullet subtext" href="/chapters/"  >
+
+            <span>
+                        Chapters                      <em>Find your local</em>    
+               
+            </span>
+        </a>
+
+            <div class="fusion-submenu-wrapper level2">
+            <div class="drop-top"></div>
+            <ul class="level2">
+{% if request.user.is_authenticated %}
+                <li class="item158">
+                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/">
+                        <span>View my chapter</span>
+                    </a>
+                </li>
+{% endif %}
+
+                <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/">
+                        <span>List all chapters</span>
+                    <a>
+                </li>
+
+{% if request.user.is_staff %}
+                <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
+                        <span>Edit my chapter</span>
+                    <a>
+                </li>
+                <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/users/">
+                        <span>Manage members</span>
+                    <a>
+                </li>
+                <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/lists/">
+                        <span>Manage lists</span>
+                    <a>
+                </li>
+{% endif %}
+
+            </ul>
+            </div>
+        
+</li>   
+            <li class="item65 parent root" >
+
+            <a class="daddy item bullet subtext" href="/teaching/"  >
+            <span>
+                        Teaching                       <em>Training &amp;
+                        school visits</em>    
+               
+            </span>
+        </a>
+        
+            <div class="fusion-submenu-wrapper level2">
+            <div class="drop-top"></div>
+            <ul class="level2">
+
+<!--                            
+                    <li class="item66" >
+            <a class="orphan item bullet" href="/teaching/availability/"  >
+            <span>
+                        Availability               
+            </span>
+        </a>
+        
+        
+</li>   
+-->
+<!--
+                            
+                    <li class="item67" >
+            <a class="orphan item bullet" href="/teaching/training/"  >
+            <span>
+
+                        Training sessions        
+            </span>
+        </a>
+        
+        
+</li>   
+-->                            
+
+                    <li class="item68" >
+            <a class="orphan item bullet" href="/teaching/list/"  >
+            <span>
+                        List school visits          
+            </span>
+        </a>
+
+        
+        
+</li>   
+                            
+{% if request.user.is_staff %}
+                    <li class="item71" >
+            <a class="orphan item bullet" href="/teaching/new/"  >
+            <span>
+                        Create new               
+            </span>
+
+        </a>
+        
+        
+</li>   
+                    <li class="item71" >
+            <a class="orphan item bullet" href="/teaching/schools/"  >
+            <span>
+                        List schools              
+            </span>
+
+        </a>
+        
+        
+</li>   
+                    <li class="item71" >
+            <a class="orphan item bullet" href="/teaching/schools/new/"  >
+            <span>
+                        Add new school
+            </span>
+
+        </a>
+        
+        
+</li>   
+{% endif %}
+                            </ul>
+        </div>
+        
+</li>   
+            <li class="item73 parent root" >
+            <a class="daddy item bullet subtext" href="#"  >
+            <span>
+                        Email/SMS                    <em>Message administration</em>    
+               
+            </span>
+
+        </a>
+        
+            <div class="fusion-submenu-wrapper level2">
+            <div class="drop-top"></div>
+            <ul class="level2">
+{% if request.user.is_staff %}
+                            
+                    <li class="item82" >
+            <a class="orphan item bullet" href="/messages/email/write/"  >
+            <span>
+                        Send email         
+            </span>
+
+        </a>
+        
+        
+</li>   
+                            
+                    <li class="item83" >
+            <a class="orphan item bullet" href="#"  >
+            <span>
+                        Send SMS           
+            </span>
+        </a>
+</li>   
+{% endif %}        
+                    <li class="item89" >
+            <a class="orphan item bullet" href="#"  >
+            <span>
+                        Message history    
+            </span>
+        </a>
+        
+        
+</li>   
+                            
+                            </ul>
+        </div>
+        
+</li>   
+            <li class="item152 root" >
+            <a class="orphan item bullet subtext" href="/files/"  >
+            <span>
+
+                        Files                        <em>Manage files and
+                        uploads</em>    
+               
+            </span>
+        </a>
+        
+        
+</li>   
+    </ul>
+
+                                        </div>
+                <div class="clr"></div>
+                </div>
+            </div>
+        </div>
+                <!--End Horizontal Menu-->
+        <!--Begin Showcase-->
+                <div class="wrapper">
+            <div id="showcase-section">
+
+                <!--Begin Logo-->
+                                <div class="logo-module">
+                                        <a href="/" id="logo"></a>
+                                                        </div>
+                                <!--End Logo-->
+                                                <div class="clr"></div>
+                            </div>
+        </div>
+                <!--End Showcase-->
+
+    </div>
+    <!--End Header-->

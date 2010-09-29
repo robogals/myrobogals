@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Robogals Chapters{% endblock %}
+
+{% block pagetitle %}Robogals Chapters{% endblock %}
+
+{% block content %}
+<ul>
+    <li>
+        <a href="/chapters/global/">Global</a>
+        <ul>
+        {% for item in listing %}
+            <li>
+                <a href="/chapters/{{item.super.myrobogals_url}}/">{{item.super.short}}</a>
+                <ul>
+                {% for chapter in item.chapters %}
+                    <li><a href="/chapters/{{chapter.myrobogals_url}}/">{{chapter.short}}</a><br><em>{{chapter.university}}</em></li>
+                {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% endblock %}

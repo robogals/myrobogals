@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% blocktrans with c.name as chapter %}Edit chapter: {{chapter}}{% endblocktrans %}{% endblock %}
+
+{% block pagetitle %}{% blocktrans with c.name as chapter %}Edit chapter: {{chapter}}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<form action="/chapters/{{c.myrobogals_url}}/edit/" method="POST">
+<a href="/chapters/{{c.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{c.myrobogals_url}}/edit/users/">Manage members</a>
+<table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>
+  </tr>
+  <tr>
+    <td>{% trans "Chapter name" %}</td>
+    <td>{{c.name}}<td>
+  </tr>
+  <tr>
+    <td>{% trans "University" %}</td>
+    <td>{{c.university}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Location (city only)" %}</td>
+    <td>{{c.short}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Location (full)" %}</td>
+    <td>{{c.location}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "myRobogals URL" %}</td>
+    <td>{{c.myrobogals_url}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Established" %}</td>
+    <td>{{c.creation_date|date:"j F Y"}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Parent" %}</td>
+    <td>{{c.parent}}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Timezone" %}</td>
+    <td>{{c.timezone}}</td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Chapter page information" %}</strong></td>
+  </tr>
+{% for field in formpart1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Faculty contact person" %}</strong></td>
+  </tr>
+{% for field in formpart2 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td>{{ field }}<br /><span style="font-size: 8pt">{{field.help_text}}</span></td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Postal address" %}</strong></td>
+  </tr>
+{% for field in formpart3 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td>{{ field }}{% if field.help_text %}<br /><span style="font-size: 8pt">{{field.help_text}}</span>{% endif %}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Settings" %}</strong></td>
+  </tr>
+  <tr>
+    <td colspan="2">{{formpart4.is_joinable}} {{formpart4.is_joinable.label_tag}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">{{ formpart4.emailtext.label_tag }}</td>
+    <td>{{ formpart4.emailtext }}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">{{ formpart4.smstext.label_tag }}</td>
+    <td>{{ formpart4.smstext }}</td>
+  </tr>
+</table>
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

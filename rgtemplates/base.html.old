@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb" >
+    <head>
+
+        <title>myRobogals {% if user.username %} - {% block title %}{% endblock %}{% endif %}</title>
+          <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content="joomla, Joomla" />
+  <meta name="title" content="Style Variations" />
+  <meta name="author" content="Administrator" />
+  <meta name="description" content="My Robogals portal" />
+
+  <meta name="generator" content="Joomla! 1.5 - Open Source Content Management" />
+  <title>Style Variations</title>
+  <link rel="stylesheet" href="{{media_root_url}}/plugins/system/rokbox/themes/light/rokbox-style.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/rt_moxy_j15/css/template.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/rt_moxy_j15/css/header-style7.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/rt_moxy_j15/css/body-light.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/rt_moxy_j15/css/typography.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/system/css/system.css" type="text/css" />
+
+  <link rel="stylesheet" href="{{media_root_url}}/templates/system/css/general.css" type="text/css" />
+  <link rel="stylesheet" href="{{media_root_url}}/templates/rt_moxy_j15/css/menu-fusion.css" type="text/css" />
+  <style type="text/css">
+    <!--
+
+    div.wrapper { margin: 0 auto; width: 982px;padding:0;}
+    body { min-width:982px;}
+    #inset-block-left { width:0px;padding:0;}
+    #inset-block-right { width:0px;padding:0;}
+    #maincontent-block { margin-right:0px;margin-left:0px;}
+    
+    .s-c-s .colmid { left:280px;}
+    .s-c-s .colright { margin-left:-280px;}
+    .s-c-s .col1pad { margin-left:280px;}
+    .s-c-s .col2 { left:0px;width:280px;}
+    .s-c-s .col3 { width:0px;}
+    
+    .s-c-x .colright { left:280px;}
+    .s-c-x .col1wrap { right:280px;}
+    .s-c-x .col1 { margin-left:280px;}
+    .s-c-x .col2 { right:280px;width:280px;}
+    
+    .x-c-s .colright { margin-left:-0px;}
+    .x-c-s .col1 { margin-left:0px;}
+    .x-c-s .col3 { left:0px;width:0px;}
+    -->
+  </style>
+  <script type="text/javascript" src="{{media_root_url}}/media/system/js/mootools.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/media/system/js/caption.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/plugins/system/rokbox/rokbox.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/plugins/system/rokbox/themes/light/rokbox-config.js"></script>
+
+  <script type="text/javascript" src="{{media_root_url}}/modules/mod_roknavmenu/themes/fusion/js/fusion.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/templates/rt_moxy_j15/js/rokfonts.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/templates/rt_moxy_j15/js/rokutils.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/templates/rt_moxy_j15/js/rokutils.inputs.js"></script>
+  <script type="text/javascript" src="{{media_root_url}}/modules/mod_rokajaxsearch/js/rokajaxsearch.js"></script>
+  <script type="text/javascript">
+var rokboxPath = '{{media_root_url}}/plugins/system/rokbox/';
+                window.addEvent('domready', function() {
+                    new Fusion('ul.menutop', {
+                        pill: 1,
+                        effect: 'slide and fade',
+                        opacity: 1,
+                        hideDelay: 500,
+                        tweakInitial: {'x': -20, 'y': 6},
+                        tweakSubsequent: {'x': -12, 'y': -14},
+                        menuFx: {duration: 400, transition: Fx.Transitions.Quint.easeOut},
+                        pillFx: {duration: 400, transition: Fx.Transitions.Quint.easeOut}
+                    });
+                });
+        window.templatePath = '{{media_root_url}}/templates/rt_moxy_j15';
+        window.uri = '';
+        window.currentStyle = 'style7';
+    
+window.addEvent('domready', function() {
+        var modules = ['side-mod', 'showcase-panel', 'moduletable', 'article-rel-wrapper'];
+        var header = ['h3','h2','h1'];
+        RokBuildSpans(modules, header);
+    });
+InputsExclusion.push('.content_vote')
+window.addEvent((window.webkit) ? 'load' : 'domready', function() {
+                window.rokajaxsearch = new RokAjaxSearch({
+                    'results': ' Results',
+                    'close': '',
+                    'websearch': 0,
+                    'blogsearch': 0,
+                    'imagesearch': 0,
+                    'videosearch': 0,
+                    'imagesize': 'MEDIUM',
+                    'safesearch': 'MODERATE',
+                    'search': ' Search...',
+                    'readmore': ' Read more...',
+                    'noresults': ' No results',
+                    'advsearch': ' Advanced search',
+                    'page': ' Page',
+                    'page_of': ' of',
+                    'searchlink': 'http://new.robogals.org/index.php?option=com_search&amp;view=search&amp;tmpl=component',
+                    'advsearchlink': 'http://new.robogals.org/index.php?option=com_search&amp;view=search',
+                    'uribase': 'http://new.robogals.org/',
+                    'limit': '10',
+                    'perpage': '3',
+                    'ordering': 'newest',
+                    'phrase': 'any',
+                    'hidedivs': '',
+                    'includelink': 1,
+                    'viewall': ' View all results',
+                    'estimated': ' estimated',
+                    'showestimated': 1,
+                    'showpagination': 1,
+                    'showcategory': 1,
+                    'showreadmore': 1,
+                    'showdescription': 1
+                });
+            });
+  </script>
+
+        
+    </head>
+    <body id="ff-optima" class="f-default style7 body-light head-style7  iehandle">
+    <!-- Begin top section (header/top bar) -->
+        {% include "includes/header.html" %}
+    <!--End top section-->
+    <!--Begin Main Body-->
+    <div id="main-body">
+        <div id="main-content" class="s-c-x">
+            <div class="colmask leftmenu "><div class="wrapper">                <div class="colmid">
+                    <div class="colright">
+                       <!--Begin Main Column (col1wrap)-->   
+                        <div class="col1wrap">
+
+                            <div class="col1pad">
+                                <div class="col1">
+                                    <div id="maincol">
+                                                                                <div id="breadcrumbs">
+                                            <a href="/" id="breadcrumbs-home"></a>
+                                            <span class="breadcrumbs pathway">
+<a href="/index.php?option=com_content&amp;view=article&amp;id=46&amp;Itemid=53" class="pathway">Features</a> <img src="/templates/rt_moxy_j15/images/arrow.png" alt=""  /> <span class="no-link">Style Variations</span></span>
+
+                                        </div> <!-- breadcrumbs -->
+                                                                                                                        <div class="bodycontent">
+                                                                                                                                    <div id="maincontent-block">
+                                                                                                                                    
+                                                
+                                                                                                <div class="">
+    <div id="page" class="full-article">
+        
+                <div class="article-rel-wrapper">
+                        <h2 class="contentheading">
+                {% block pagetitle %}{% endblock %}            </h2>
+
+                    </div> <!-- article-rel-wrapper -->
+                
+        {% block content %}
+        
+        {% endblock %}
+
+                  </div> <!-- page -->
+
+</div> <!-- "" -->
+                                                                                            </div>
+                                        </div>
+                                        <div class="clr"></div>
+                                                                            </div>    
+                                </div>
+                            </div>
+                        </div>
+                        <!--End Main Column (col1wrap)-->
+                        <!--Begin Left Column (col2)-->
+                            {% include "includes/left.html" %}
+
+                        <!--End Left Column (col2)-->
+                        <!--Begin Right Column (col3)-->
+
+                         
+                        <!--End Right Column (col3)-->
+                    </div>
+                </div>
+            </div></div>        </div>
+        <!--Begin Main Bottom-->
+            
+        <!--End Main Bottom-->
+    </div>
+    <!--End Main Body-->
+
+    <!--Begin Bottom Section-->
+        <!--End Bottom Section-->
+    <!--Begin Footer-->
+        {% include "includes/footer.html" %}
+    <!--End Footer-->   
+        </body>
+
+</html>

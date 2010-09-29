@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<item>
+ 	<params addpath="/templates/rt_moxy_j15/elements">
+		<param name="splitmenu_item_subtext" type="text" default="" label="Subtext Line" description="You can put a second line here"></param>
+ 	</params>
+</item>

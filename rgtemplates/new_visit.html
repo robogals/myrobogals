@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+
+{% block pagetitle %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+
+{% block content %}
+<form action="/teaching/schoolvisit/new/" method="POST">
+<table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
+  </tr>
+{% for field in formpart1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }} <span style="color: #ff0000">*</span></td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Info for volunteers" %}</strong></td>
+  </tr>
+{% for field in formpart2 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Reminders" %}</strong><br />{% trans "This section is optional. It allows you to send reminders to people who have RSVPed for a school visit" %}</td>
+  </tr>
+{% for field in formpart3 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Extra info" %}</strong><br />{% trans "This section is optional" %}</td>
+  </tr>
+{% for field in formpart4 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+</table>
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

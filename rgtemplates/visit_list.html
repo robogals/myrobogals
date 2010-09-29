@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}School visits{% endblock %}
+
+{% block pagetitle %}School visits{% endblock %}
+
+{% block content %}
+<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/new/">Create new school visit</a></p>
+<table cellspacing="3">
+  <tr>
+    <td><strong>{% trans "School" %}</strong></td>
+    <td><strong>{% trans "Date" %}</strong></td>
+    <td><strong>{% trans "Location" %}</strong></td>
+    <td></td>
+  </tr>
+{% for v in visits %}
+  <tr>
+    <td>{{v.school}}</td>
+    <td>{{v.start_date_formatted}}</td>
+    <td>{{v.location}}</td>
+    <td><a href="/teaching/{{v.pk}}/">View</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

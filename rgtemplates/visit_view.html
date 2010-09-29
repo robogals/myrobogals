@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Lesson for {{v.school}} on {{v.start_date_formatted}}{% endblock %}
+
+{% block pagetitle %}Lesson for {{v.school}} on {{v.start_date_formatted}}{% endblock %}
+
+{% block content %}
+<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a>
+{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">Edit visit</a>  | <a href="/teaching/{{v.pk}}/invite/">Invite/add to visit</a>
+{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/close/">Close visit</a>  | <a href="/teaching/{{v.pk}}/cancel/">Cancel visit</a>{% endifequal %}
+{% endifequal %}{% endif %}
+</p>
+{% ifequal v.status 0 %}
+{% ifequal user_rsvp_status 0 %}
+  {% ifequal v.allow_rsvp 0 %}
+    <p class="attend-unconf">You have not RSVP'd to this event. Your RSVP: <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">not attending</a></p>
+  {% else %}
+    <p class="attend-unconf">This is a closed event. You must be invited to RSVP.</p>
+  {% endifequal %}
+{% else %}
+  {% ifequal user_rsvp_status 1 %}
+    <p class="attend-unconf">You have been invited to this event but have not yet RSVP'd. Your RSVP: <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">not attending</a></p>
+  {% else %}
+    {% ifequal user_rsvp_status 2 %}
+      <p class="attend-yes">Your RSVP status is <strong>attending</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">Change to not attending</a></p>
+    {% else %}
+      {% ifequal user_rsvp_status 4 %}
+        <p class="attend-no">Your RSVP status is <strong>not attending</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">Change to attending</a></p>
+      {% endifequal %}
+    {% endifequal %}
+  {% endifequal %}
+{% endifequal %}
+{% else %}
+  {% ifequal v.status 1 %}
+  	{% if user_attended %}
+      <p class="attend-yes">This event is over. You attended this event.</p>
+    {% else %}
+      <p class="attend-unconf">This event is over.</p>
+    {% endif %}
+  {% else %}
+    {% ifequal v.status 2 %}
+      <p class="attend-no">This event has been cancelled</p>
+    {% endifequal %}
+  {% endifequal %}
+{% endifequal %}
+<table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; width: 150px">School</td>
+    <td>{{v.school}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Date</td>
+    <td>{{v.start_date_formatted}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Time</td>
+    <td>{{v.visit_start.time}} - {{v.visit_end.time}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Location</td>
+    <td>{{v.location}}</td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Info for volunteers" %}</strong></td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Meeting location</td>
+    <td>{{v.meeting_location}}<br /><span style="font-size: 8pt">Where people will meet at university to go as a group to the school, if applicable</span></td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Meeting time</td>
+    <td>{{v.meeting_time.time}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Contact person</td>
+    <td>{{v.contact}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Email</td>
+    <td>{{v.contact_email}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">Phone</td>
+    <td>{{v.contact_phone}}<br /><span style="font-size: 8pt">Call this number if you get lost!</span></td>
+  </tr>
+{% ifequal v.status 0 %}
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Attending" %}</strong></td>
+  </tr>
+  {% for user in attending %}
+  <tr>
+    <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
+    <td>
+    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">change RSVP to not attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    {% endifequal %}{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Not Attending" %}</strong></td>
+  </tr>
+  {% for user in notattending %}
+  <tr>
+    <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
+    <td>
+    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">change RSVP to attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    {% endifequal %}{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Awaiting Reply" %}</strong></td>
+  </tr>
+  {% for user in waitingreply %}
+  <tr>
+    <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
+    <td>
+    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">change RSVP to attending</a>
+    | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">change RSVP to not attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    {% endifequal %}{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+{% else %}
+{% ifequal v.status 1 %}
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Attended" %}</strong></td>
+  </tr>
+  {% for user in attended %}
+  <tr>
+    <td colspan="2"><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
+  </tr>
+  {% endfor %}
+{% endifequal %}
+{% endifequal %}
+</table>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Welcome to Robogals{% endblock %}
+
+{% block pagetitle %}Welcome to Robogals{% endblock %}
+
+{% block content %}
+Congratulations on becoming a member of {{chapter}}! Your member account has been created - simply log in using the form to the left<br>
+<br>
+{% if chapter.website_url or chapter.facebook_url %}
+Some useful links for new members:<br>
+{% if chapter.website_url %}<a href="{{chapter.website_url}}">{% blocktrans %}Visit {{chapter}}'s website{% endblocktrans %}</a><br />{% endif %}
+{% if chapter.facebook_url %}<a href="{{chapter.facebook_url}}">{% blocktrans %}Join {{chapter}} on Facebook{% endblocktrans %}</a>{% endif %}
+{% endif %}
+{% endblock %}

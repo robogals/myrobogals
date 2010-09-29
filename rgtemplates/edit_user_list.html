@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{% if new %}Create new list{% else %}Edit list: {{userlist}}{% endif %}{% endblock %}
+
+{% block pagetitle %}{% if new %}Create new list{% else %}Edit list: {{userlist}}{% endif %}{% endblock %}
+
+{% block content %}
+{% if new %}
+<form action="/chapters/{{chapter.myrobogals_url}}/lists/add/" method="POST">
+{% else %}
+<form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/" method="POST">
+{% endif %}
+{% if ulform.errors %}
+{{ ulform.errors }}
+{% endif %}
+<table>
+  <tr>
+    <td style="vertical-align: top" width="30">Name</td>
+    <td style="vertical-align: top">{{ ulform.name }}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top" width="30">Members</td>
+    <td style="vertical-align: top">{{ ulform.users }}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top" width="30">&nbsp;</td>
+    <td style="vertical-align: top"><input type="submit" value="Submit" /></td>
+  </tr>
+</table>
+</form>
+{% endblock %}

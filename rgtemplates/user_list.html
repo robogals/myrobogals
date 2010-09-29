@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% blocktrans with chapter.name as chapter %}Member listing: {{chapter}}{% endblocktrans %}{% endblock %}
+
+{% block pagetitle %}{% blocktrans with chapter.name as chapter %}Member listing: {{chapter}}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET">
+{% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
+</form>
+<p>
+<a href="/chapters/{{chapter.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">Add new member</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">Manage user lists</a></p>
+<table>
+  <tr>
+    <td><strong>{% trans "Username" %}</strong></td>
+    <td><strong>{% trans "First name" %}</strong></td>
+    <td><strong>{% trans "Last name" %}</strong></td>
+    <td><strong>{% trans "Email" %}</strong></td>
+    <td><strong>{% trans "Mobile" %}</strong></td>
+  </tr>
+{% for u in users %}
+  <tr>
+    <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
+    <td>{{u.first_name}}</td>
+    <td>{{u.last_name}}</td>
+    <td><a href="mailto:{{u.email}}">{{u.email}}</a></td>
+    <td>{% if not u.mobile %}{% else %}+{{u.mobile}}{% endif %}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

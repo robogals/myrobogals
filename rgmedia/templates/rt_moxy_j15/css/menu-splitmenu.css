@@ -1,0 +1,28 @@
+/* Core */
+.menutop,.menutop * {margin: 0;padding: 0;}
+#horiz-menu {z-index: 50;}
+.menutop {line-height: 1.0;float: left;margin-bottom: 1.5em;position: relative;}
+.menutop ul {background: #fff;padding: 0;min-height: 20px;}
+.menutop em, .menu em {font-size:80%;font-weight:normal;display:block;font-style:normal;}
+.menutop li {float: left;list-style: none;position: relative;}
+.menutop li .item {height:auto;}
+.menutop li li {position: relative;float: none;width: auto;}
+.menutop li#current {z-index: 199;}
+.menutop .sfHover {z-index: 700;}
+.menutop li li .item, .menutop li.active li .item {display: block;margin: 0;text-decoration: none;float: none;width: auto;}
+.menutop li ul {float: none;left: -999em;position: absolute;z-index: 500;}
+.menutop li:hover li ul, .menutop li.sfHover li ul, .menutop li li:hover li ul, .menutop li li.sfHover li ul, .menutop li li li:hover li ul, .menutop li li li.sfHover li ul {top: -999em;}
+.menutop li li:hover ul, .menutop li li.sfHover ul, .menutop li li li:hover ul, .menutop li li li.sfHover ul, .menutop li li li li:hover ul, .menutop li li li li.sfHover ul {top: 0;}
+
+/* Top Level */
+.menutop {list-style: none;margin: 0;padding: 0;position: relative;line-height: 1.0;float: left;}
+.menutop li {display: block;float: left;margin: 0 3px;padding: 6px 0;position:relative;}
+.menutop li:hover .item, .menutop li.sfHover .item {z-index: 100;cursor: pointer;}
+.menutop li .item {white-space: nowrap;display: block;float: left;height: 35px;line-height: 35px;font-weight: bold;font-size: 14px;text-decoration: none !important;z-index: 100;cursor: pointer;padding: 0;position:relative;margin: 0 0 0 12px;}
+.menutop li .item span {display: block;padding: 0 13px;margin-left: -12px;height: 35px;}
+.menutop li .item em {font-size:11px;font-weight:normal;display:block;font-style:normal;}
+.menutop .subtext span, .menu .subtext span {line-height: 18px;}
+.menutop .subtext em, .menu .subtext em {line-height:14px;}
+.menutop li:hover .item, .menutop li.sfHover .item, .menutop li.active .item {z-index: 100;cursor: pointer;}
+.menutop li .item span {display: block;padding: 0 14px;}
+#horiz-menu ul, #horiz-menu li, #horiz-menu li:hover, #horiz-menu li.active {background: none;}

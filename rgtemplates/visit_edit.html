@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+
+{% block pagetitle %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+
+{% block content %}
+<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a> | <a href="/teaching/{{visit_id}}/">Return to visit</a></p>
+{% if new %}
+<form action="/teaching/new/" method="POST">
+{% else %}
+<form action="/teaching/{{visit_id}}/edit/" method="POST">
+{% endif %}
+<table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
+  </tr>
+{% for field in formpart1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }} <span style="color: #ff0000">*</span></td>
+    <td>{{ field }}<br /><span style="font-size: 8pt">{{field.help_text}}</span></td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Info for volunteers" %}</strong></td>
+  </tr>
+{% for field in formpart2 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td>{{ field }}<br /><span style="font-size: 8pt">{{field.help_text}}</span></td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Extra info" %}</strong></td>
+  </tr>
+{% for field in formpart3 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+</table>
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

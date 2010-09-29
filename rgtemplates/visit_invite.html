@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Invite/add to school visit{% endblock %}
+
+{% block pagetitle %}Invite/add to school visit{% endblock %}
+
+{% block content %}
+<form action="/teaching/{{visit_id}}/invite/" method="POST">
+{% if inviteform.errors %}
+{{ inviteform.errors }}
+{% endif %}
+<table>
+  <tr>
+    <td style="vertical-align: top; width: 50px"><strong>Action:</strong></td>
+    <td style="vertical-align: top">{{ inviteform.action }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>To:</strong></td>
+    <td>
+      <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
+          <td style="vertical-align: top"><label for="type1">All members of {{ request.user.chapter }}</label></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" /></td>
+          <td style="vertical-align: top"><label for="type2">Executive committee members of {{ request.user.chapter }}</label></td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="5" id="type5" /></td>
+          <td style="vertical-align: top"><label for="type5">A member list</label></td>
+        </tr>
+      </table>
+      <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_lists">
+        <tr>
+          <td style="vertical-align: top" width="30">&nbsp;</td>
+          <td style="vertical-align: top">{{ inviteform.list }}</td>
+        </tr>
+      </table>
+      <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="3" id="type3" /></td>
+          <td style="vertical-align: top"><label for="type3">Select individual members</label></td>
+        </tr>
+      </table>
+      <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_recipients">
+        <tr>
+          <td style="vertical-align: top" width="30">&nbsp;</td>
+          <td style="vertical-align: top">{{ inviteform.memberselect }}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table id="inviteemail">
+  <tr>
+    <td colspan="2"><strong>Invitation email:</strong></td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 50px"><strong>Subject:</strong></td>
+    <td>{{ inviteform.subject }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Message:</strong></td>
+    <td>{{ inviteform.body }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>HTML:</strong></td>
+    <td>{{ inviteform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+  </tr>
+</table>
+<input type="submit" value="Invite" />
+</form>
+{% endblock %}

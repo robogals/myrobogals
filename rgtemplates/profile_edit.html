@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if adduser %}Add user{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+
+{% block pagetitle %}{% if adduser %}Add user{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+
+{% block content %}
+<!-- form for editing profile information -->
+{% if adduser %}
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/add/" method="POST">
+{% else %}
+ {% if join %}
+ <form action="/join/{{chapter.myrobogals_url}}/" method="POST">
+ {% else %}
+ <form action="/profile/{{u.username}}/edit/" method="POST">
+ {% endif %}
+{% endif %}
+<table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
+  </tr>
+{% if join %}
+  {% if usererr %}
+  <tr>
+    <td colspan="2"><ul class="errorlist"><li>{{ usererr }}</li></ul></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>New username <span style="color: #ff0000">*</span></td>
+    <td><input type="text" name="username"{% if new_username %} value="{{new_username}}"{% endif %}></td>
+  </tr>
+{% endif %}
+{% if chpass %}
+  {% if pwerr %}
+  <tr>
+    <td colspan="2"><ul class="errorlist"><li>{{ pwerr }}</li></ul></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>New password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
+    <td><input type="password" name="password1"></td>
+  </tr>
+  <tr>
+    <td>Confirm new password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
+    <td><input type="password" name="password2"></td>
+  </tr>
+{% endif %}
+{% for field in formpart1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }}{% ifnotequal field.name 'alt_email' %} <span style="color: #ff0000">*</span>{% endifnotequal %}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td style="vertical-align: top">Chapter <span style="color: #ff0000">*</span></td>
+    <td style="vertical-align: top">{{ chapter }}{% if not join %}<br /><span style="font-size: 9pt">To move to another chapter, please contact secretary@robogals.org</span>{% endif %}</td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Privacy settings" %}</strong></td>
+  </tr>
+  <tr>
+    <td>{{ formpart2.privacy.label_tag }}</td>
+    <td>{{ formpart2.privacy }}</td>
+  </tr>
+  <tr>
+    <td colspan="2">{{formpart2.email_public}} {{formpart2.email_public.label_tag}}</td>
+  </tr>
+  <tr>
+    <td colspan="2">{{formpart2.dob_public}} {{formpart2.dob_public.label_tag}}</td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Demographic information" %}</strong><br />{% trans "This section is <strong>optional</strong>, but it helps us to understand the demographics of the organisation a bit better. It also makes your profile page more interesting :)" %}</td>
+  </tr>
+  <tr>
+{% for field in formpart3 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2">{{ field.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ field.label_tag }}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />Email and SMS settings</strong></td>
+  </tr>
+{% for field in formpart4 %}
+  <tr>
+    <td colspan="2">{{ field }} {{ field.label_tag }}</td>
+  </tr>
+{% endfor %}
+</table>
+{% if return %}
+<input type="hidden" name="return" value="{{return}}" />
+{% endif %}
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin>
+ 	<params addpath="/plugins/roknavmenu/extendedlink/elements">
+  		<param name="roknavmenu_extendedlink" type="extendedlinknamevalue" label="PLG.ROKNAVMENU.EXTENDEDLINK.LBL.URL.ADDITION" description="PLG.ROKNAVMENU.EXTENDEDLINK.DSC.URL.ADDITION"/>
+	</params>
+</plugin>

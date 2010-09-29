@@ -1,0 +1,45 @@
+#roksearch_search_str {padding: 4px 0 4px 6px;font-size: 100%;margin: 0;border:0;}
+#roksearch_search_str.loading {background: transparent url(../images/spinner.gif) no-repeat scroll 98% 50%}
+#roksearch_results {z-index: 10000;position: absolute;width: 400px;float: right;margin-top: -1px;text-align: left;visibility: hidden;}
+#roksearch_results a#roksearch_link {float: right;padding-right: 5px;margin-top: 4px;display: block;height: 16px;width: 16px;}
+#roksearch_results h3 {margin-top: 0;margin-bottom: 0;line-height: 110%;font-size: 120%;padding-bottom: 0;}
+#roksearch_results span {display: block;line-height: 120%;font-size: 90%;}
+#roksearch_results .container-wrapper {overflow: hidden;}
+#roksearch_results .page {float: left;}
+#roksearch_results .roksearch_header, #roksearch_results .roksearch_row_btm {padding: 6px 15px;line-height: 100%;text-transform: uppercase;font-weight: normal;font-size: 100%;}
+#roksearch_results .roksearch_row_btm {overflow: hidden;}
+#roksearch_results .roksearch_row_btm span {line-height: 140%;}
+#roksearch_results span.small {display: block;position: absolute;bottom: 6px;right: 10px;text-align: right;}
+#roksearch_results span.highlight {display: inline;padding:2px;}
+#roksearch_results a.clr {font-size: 100%;}
+#roksearch_results a:hover {text-decoration: none;}
+#roksearch_results .roksearch_odd {padding: 15px;position: relative;}
+#roksearch_results .roksearch_even {padding: 15px;position: relative;}
+#roksearch_results .roksearch_odd-hover h3, #roksearch_results .roksearch_even-hover h3 {padding-left: 12px;}
+.results ol.list {padding-left: 30px;margin-top: 0;}
+.results ol.list h4 {border: 0;margin-top: 0;margin-bottom: 0;}
+.results ol.list li {padding: 10px 5px;margin-bottom: 5px;}
+.results ol.list li p {margin-top: 0;}
+#roksearch_results .container-arrows {height: 16px;width: 40px;float: left;margin-right: 10px;position: relative;}
+#roksearch_results .arrow-left {width: 16px;height: 16px;position: absolute;bottom: 0;left: 0;cursor: pointer;}
+#roksearch_results .arrow-left-disabled {width: 16px;height: 16px;position: absolute;bottom: 0;left: 0;}
+#roksearch_results .arrow-right {width: 16px;height: 16px;position: absolute;bottom: 0;left: 22px;cursor: pointer;}
+#roksearch_results .arrow-right-disabled {width: 16px;height: 16px;position: absolute;bottom: 0;left: 22px;}
+form.search_result .inputbox {padding: 4px;}
+form.search_result fieldset legend {padding-top: 10px;}
+fieldset.phrase, fieldset.word, fieldset.only {padding: 10px 2px;}
+.searchintro {margin-bottom: 10px;overflow: hidden;}
+
+
+/* Google */
+#roksearch_results .estimated_res, #roksearch_results .pagination_res {font-size: 10px;font-style: italic;padding-top: 3px;text-transform: none;margin-left: 5px;float: left;}
+#roksearch_results .powered-by-google {font-size: 9px;font-style: italic;text-transform: none;}
+#roksearch_results .roksearch_row_btm a.viewall {float: left;}
+#roksearch_results .pagination_res {font-style: normal;float: right;padding-top:0;}
+#roksearch_results .google-thumb-image {margin: 5px auto;}
+#roksearch_results .google-search-images .loading {background: transparent url(../images/spinner.gif) no-repeat scroll 50% 50%;}
+#roksearch_results .youtube, #roksearch_results .google { display: inline;}
+#roksearch_results .google-thumb-image {margin: 10px auto 0;}
+#roksearch_results .youtube small, #roksearch_results .google small {display: none;}
+#roksearch_results .youtube {background: url(../images/youtube.jpg) right center no-repeat; height: 16px; line-height: 16px;display: block;padding-right: 22px;}
+#roksearch_results .google {background: url(../images/google.jpg) right center no-repeat; height: 16px; line-height: 16px;display: block;padding-right: 22px;}

@@ -1,0 +1,8 @@
+#rokbox-top.rokbox-left{background:url(tl.gif) 0 0 no-repeat;clear:both;}
+#rokbox-top .rokbox-right{background:url(tr.gif) 100% 0 no-repeat;}
+#rokbox-top .rokbox-center{background:url(top.gif) 0 0 repeat-x;}
+#rokbox-middle.rokbox-left{background:url(left.gif) 0 0 repeat-y;}
+#rokbox-middle .rokbox-right{background:url(right.gif) 100% 0 repeat-y;}
+#rokbox-bottom.rokbox-left{background:url(bl.gif) 0 0 no-repeat;}
+#rokbox-bottom .rokbox-right{background:url(br.gif) 100% 0 no-repeat;}
+#rokbox-bottom .rokbox-center{background:url(bottom.gif) 0 0 repeat-x;}

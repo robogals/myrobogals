@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Join Robogals{% endblock %}
+
+{% block pagetitle %}Join Robogals{% endblock %}
+
+{% block content %}
+<strong>Please select the chapter you wish to join:</strong>
+<ul>
+    <li>
+        Global
+        <ul>
+        {% for item in listing %}
+            <li>
+                {{item.super.short}}
+                <ul>
+                {% for chapter in item.chapters %}
+                    {% if chapter.is_joinable %}
+                    <li><a href="/join/{{chapter.myrobogals_url}}/">{{chapter.short}}</a><br><em>{{chapter.university}}</em></li>
+                    {% else %}
+                    <li>{{chapter.short}}<br><em>{{chapter.university}}<br>Not joinable through website at this time</em></li>                    
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% endblock %}

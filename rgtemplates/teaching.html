@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Teaching{% endblock %}
+
+{% block pagetitle %}Teaching{% endblock %}
+
+{% block content %}
+<ul>
+    <li><a href="list/">View upcoming and past school visits</a></li>
+    {% if request.user.is_staff %}
+    <li><a href="new/">Create new school visit</a></li>
+    <li><a href="schools/">View schools list</a></li>
+    <li><a href="schools/add/">Add school</a></li>
+    {% endif %}
+</ul>
+{% endblock %}

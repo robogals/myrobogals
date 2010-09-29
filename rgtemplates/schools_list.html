@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Schools{% endblock %}
+
+{% block pagetitle %}Schools{% endblock %}
+
+{% block content %}
+<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/schools/new/">Add new school</a></p>
+<table cellspacing="3">
+  <tr>
+    <td><strong>{% trans "School Name" %}</strong></td>
+    <td><strong>{% trans "Contact Person" %}</strong></td>
+    <td><strong>{% trans "Email" %}</strong></td>
+    <td><strong>{% trans "Phone" %}</strong></td>
+    <td></td>
+  </tr>
+{% for s in schools %}
+  <tr>
+    <td>{{s.name}}</td>
+    <td>{{s.contact_person}}</td>
+    <td>{{s.contact_email}}</td>
+    <td>{{s.contact_phone}}</td>
+    <td><a href="/teaching/schools/{{s.pk}}/">View/Edit</a></td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,23 @@
+#roksearch_search_str {background: #090909 url(search-icon.png) 98% 50% no-repeat;border: 1px solid #2c2c2c;color: #999999;}
+#roksearch_search_str.loading {background-color: #090909; border: 1px solid #2c2c2c;}
+#roksearch_results {background: #090909;border: 1px solid #2c2c2c;}
+#roksearch_results a#roksearch_link {background: url(close.png) 0 0 no-repeat;}
+#roksearch_results h3 {color: #ccc;}
+#roksearch_results span {color: #888;}
+#roksearch_results .roksearch_header, #roksearch_results .roksearch_row_btm {background: #090909;border-bottom: 1px solid #2c2c2c;color: #999;}
+#roksearch_results .roksearch_row_btm span {color: #999;}
+#roksearch_results span.small {color: #555;}
+#roksearch_results span.highlight {background: #444;color: #fff;}
+#roksearch_results a:hover {color: #ccc;}
+#roksearch_results .roksearch_odd {background: #151515;border-bottom: 1px solid #2c2c2c;}
+#roksearch_results .roksearch_even {background: #202020;border-bottom: 1px solid #2c2c2c;}
+#roksearch_results .roksearch_odd-hover, #roksearch_results .roksearch_even-hover {background-color: #252525;}
+#roksearch_results .roksearch_odd-hover h3, #roksearch_results .roksearch_even-hover h3 {background: url(right-arrow.png) 0 4px no-repeat;}
+.results ol.list li p {color: #999;}
+#roksearch_results .arrow-left {background: #222 url(left-arrow.png) 50% 50% no-repeat;;border: 1px solid #2c2c2c;}
+#roksearch_results .arrow-left-disabled {background: #111;border: 1px solid #212121;}
+#roksearch_results .arrow-right {background: #222 url(right-arrow.png) 50% 50% no-repeat;border: 1px solid #2c2c2c;}
+#roksearch_results .arrow-right-disabled {background: #111;border: 1px solid #212121;}
+form.search_result .inputbox {border: 1px solid #2c2c2c;}
+fieldset.phrase, fieldset.word, fieldset.only {border-bottom: 1px solid #2c2c2c;}
+#roksearch_results .rokajaxsearch-overlay {background-color: #090909;}
