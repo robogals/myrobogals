@@ -11,7 +11,7 @@ class PositionType(models.Model):
 		return self.description
 
 	class Meta:
-		verbose_name = "Position Type"
+		verbose_name = "position type"
 		ordering = ('rank',)
 
 class Position(models.Model):

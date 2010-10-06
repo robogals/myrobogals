@@ -8,8 +8,8 @@ class University(models.Model):
 	
 	class Meta:
 		ordering = ('name',)
-		verbose_name = "University"
-		verbose_name_plural = "Universities"
+		verbose_name = "university"
+		verbose_name_plural = "universities"
 
 class Country(models.Model):
 	code = models.CharField("ISO code", max_length=2, primary_key=True)

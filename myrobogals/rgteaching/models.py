@@ -66,7 +66,7 @@ class TrainingSession(Event):
 		return "Training session at " + self.location + " by " + str(self.chapter) + " on " + self.start_date_formatted()
 
 	class Meta:
-		verbose_name = "Training session"
+		verbose_name = "training session"
 
 class EventAttendee(models.Model):
     RSVP_STATUS_CHOICES = (

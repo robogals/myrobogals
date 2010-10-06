@@ -1,4 +1,4 @@
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, NewsletterSubscriber, Newsletter
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, NewsletterSubscriber, Newsletter, SubscriberType
 from myrobogals import admin
 
 class EmailRecipientAdmin(admin.TabularInline):
@@ -21,9 +21,12 @@ class NewsletterSubscriberAdmin(admin.TabularInline):
 	model = NewsletterSubscriber
 	extra = 10
 
+class SubscriberTypeAdmin(admin.ModelAdmin):
+	list_display = ('description', 'order', 'public')
 
 class NewsletterAdmin(admin.ModelAdmin):
 	inlines = (NewsletterSubscriberAdmin,)
 
+admin.site.register(SubscriberType, SubscriberTypeAdmin)
 admin.site.register(Newsletter, NewsletterAdmin)
 admin.site.register(EmailMessage, EmailMessageAdmin)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms import ModelForm
 from myrobogals.auth.models import User, Group
+from myrobogals.rgprofile.usermodels import Country
 import datetime
 
 class EmailMessage(models.Model):
@@ -61,11 +62,27 @@ class Newsletter(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class SubscriberType(models.Model):
+	description = models.CharField(max_length=128)
+	order = models.IntegerField()
+	public = models.BooleanField(blank=True, default=True)
+
+	def __unicode__(self):
+		return self.description
+
+	class Meta:
+		verbose_name = "subscriber type"
+		ordering = ('order',)
+
 class NewsletterSubscriber(models.Model):
 	email = models.CharField(max_length=128)
 	newsletter = models.ForeignKey(Newsletter)
 	first_name = models.CharField(max_length=128, blank=True)
 	last_name = models.CharField(max_length=128, blank=True)
+	company = models.CharField(max_length=128, blank=True)
+	subscriber_type = models.ForeignKey(SubscriberType, blank=True, null=True)
+	country = models.ForeignKey(Country, blank=True, null=True)
+	details_verified = models.BooleanField(blank=True, default=True)
 	subscribed_date = models.DateTimeField(default=datetime.datetime.now)
 	unsubscribed_date = models.DateTimeField(blank=True, null=True)
 	active = models.BooleanField(blank=True, default=True)
