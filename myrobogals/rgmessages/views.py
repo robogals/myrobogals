@@ -167,7 +167,7 @@ def api(request):
 					p.uniqid = md5(SECRET_KEY + email + n.name).hexdigest()
 					p.newsletter = n
 					p.save()
-				confirm_url = n.confirm_url + "id=" + str(p.pk) + "&key=" + p.uniqid
+				confirm_url = n.confirm_url + "pid=" + str(p.pk) + "&key=" + p.uniqid
 				message = EmailMessage()
 				message.subject = n.confirm_subject
 				message.body = n.confirm_email.replace('{email}', email).replace('{url}', confirm_url)
