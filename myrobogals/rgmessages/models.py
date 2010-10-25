@@ -58,6 +58,13 @@ class EmailRecipient(models.Model):
 
 class Newsletter(models.Model):
 	name = models.CharField(max_length=128)
+	confirm_email = models.TextField(blank=True)
+	confirm_subject = models.CharField(max_length=128, blank=True)
+	confirm_url = models.CharField(max_length=128, blank=True)
+	confirm_from_name = models.CharField(max_length=128, blank=True)
+	confirm_from_email = models.CharField(max_length=128, blank=True)
+	confirm_from_user = models.ForeignKey(User)
+	confirm_html = models.BooleanField(blank=True)
 	
 	def __unicode__(self):
 		return self.name
@@ -87,5 +94,14 @@ class NewsletterSubscriber(models.Model):
 	unsubscribed_date = models.DateTimeField(blank=True, null=True)
 	active = models.BooleanField(blank=True, default=True)
 
+	def __unicode__(self):
+		return self.email
+
+class PendingNewsletterSubscriber(models.Model):
+	email = models.CharField(max_length=128)
+	uniqid = models.CharField(max_length=64)
+	newsletter = models.ForeignKey(Newsletter)
+	pending_since = models.DateTimeField(default=datetime.datetime.now)
+	
 	def __unicode__(self):
 		return self.email

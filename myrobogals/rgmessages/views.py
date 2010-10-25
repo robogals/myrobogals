@@ -4,9 +4,14 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from myrobogals.auth.models import Group
 from myrobogals.auth.models import User
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.settings import API_SECRET, SECRET_KEY
+from django.forms.fields import email_re
+from hashlib import md5
+from urllib import unquote_plus
+from datetime import datetime
 
 def list(request):
 	return HttpResponse("List Messages")
@@ -132,11 +137,86 @@ def writeemail(request):
 def emaildone(request):
 	return render_to_response('email_done.html', None, context_instance=RequestContext(request))
 
-def writeamp(request):
-	return HttpResponse("Write Amplifier")
-
-def confirmamp(request):
-	return HttpResponse("Confirm Amplifier")
-
 def msghistory(request):
 	return HttpResponse("Message History")
+
+def api(request):
+	if 'api' not in request.GET:
+		return HttpResponse("-1")
+	elif request.GET['api'] != API_SECRET:
+		return HttpResponse("-1")
+	elif 'action' in request.GET:
+		try:
+			n = Newsletter.objects.get(pk=request.GET['newsletter'])
+		except Newsletter.DoesNotExist:
+			return HttpResponse("-1")
+		try:
+			if request.GET['action'] == 'subscribe':
+				email = unquote_plus(request.GET['email']).strip()
+				if not email_re.match(email):
+					return HttpResponse("C")  # Invalid email
+				c = NewsletterSubscriber.objects.filter(email=email, newsletter=n, active=True).count()
+				if c != 0:
+					return HttpResponse("B")  # Already subscribed
+				try:
+					# They've tried to subscribe already, so resend confirmation email
+					p = PendingNewsletterSubscriber.objects.get(email=email, newsletter=n)
+				except PendingNewsletterSubscriber.DoesNotExist:
+					p = PendingNewsletterSubscriber()
+					p.email = email
+					p.uniqid = md5(SECRET_KEY + email + n.name).hexdigest()
+					p.newsletter = n
+					p.save()
+				confirm_url = n.confirm_url + "id=" + str(p.pk) + "&key=" + p.uniqid
+				message = EmailMessage()
+				message.subject = n.confirm_subject
+				message.body = n.confirm_email.replace('{email}', email).replace('{url}', confirm_url)
+				message.from_address = n.confirm_from_email
+				message.from_name = n.confirm_from_name
+				message.reply_address = n.confirm_from_email
+				message.sender = n.confirm_from_user
+				message.html = n.confirm_html
+				# Don't send it yet until the recipient list is done
+				message.status = -1
+				# Save to database so we get a value for the primary key,
+				# which we need for entering the recipient entries
+				message.save()
+				recipient = EmailRecipient()
+				recipient.message = message
+				recipient.to_name = ""
+				recipient.to_address = email
+				recipient.save()
+				message.status = 0
+				message.save()
+				return HttpResponse("A")  # Success!
+			elif request.GET['action'] == 'confirm':
+				pid = unquote_plus(request.GET['id'])
+				key = unquote_plus(request.GET['key'])
+				try:
+					p = PendingNewsletterSubscriber.objects.get(pk=pid, newsletter=n, uniqid=key)
+				except PendingNewsletterSubscriber.DoesNotExist:
+					return HttpResponse("B")
+				ns = NewsletterSubscriber()
+				ns.newsletter = n
+				ns.email = p.email
+				ns.active = True
+				ns.details_verified = False
+				ns.save()
+				p.delete()
+				return HttpResponse("A")
+			elif request.GET['action'] == 'unsubscribe':
+				email = unquote_plus(request.GET['email']).strip()
+				try:
+					ns = NewsletterSubscriber.objects.get(email=email, newsletter=n, active=True)
+				except NewsletterSubscriber.DoesNotExist:
+					return HttpResponse("B")  # Not subscribed
+				ns.unsubscribed_date = datetime.now()
+				ns.active = False
+				ns.save()
+				return HttpResponse("A")				
+			else:
+				return HttpResponse("-1")
+		except KeyError:
+			return HttpResponse("-1")
+	else:
+		return HttpResponse("-1")

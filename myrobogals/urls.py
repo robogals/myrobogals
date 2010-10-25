@@ -54,6 +54,7 @@ urlpatterns = patterns('',
 	(r'^credits/$', 'rgmain.views.credits'),
 	(r'^support/$', 'rgmain.views.support'),
 	(r'^files/$', 'rgmain.views.files'),
+	(r'^api/newsletter/$', 'rgmessages.views.api'),
 	(r'^i18n/', include('django.conf.urls.i18n')),
 	(r'^topsecretarea/', include(admin.site.urls)),
 )
