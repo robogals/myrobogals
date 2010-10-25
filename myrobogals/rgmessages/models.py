@@ -82,7 +82,7 @@ class SubscriberType(models.Model):
 		ordering = ('order',)
 
 class NewsletterSubscriber(models.Model):
-	email = models.CharField(max_length=128)
+	email = models.EmailField()
 	newsletter = models.ForeignKey(Newsletter)
 	first_name = models.CharField(max_length=128, blank=True)
 	last_name = models.CharField(max_length=128, blank=True)
