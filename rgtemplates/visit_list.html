@@ -5,7 +5,7 @@
 {% block pagetitle %}School visits{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/new/">Create new school visit</a></p>
+<p><a href="/teaching/">Return to teaching home</a>{% if request.user.is_staff %} | <a href="/teaching/new/">Create new school visit</a>{% endif %}</p>
 <table cellspacing="3">
   <tr>
     <td><strong>{% trans "School" %}</strong></td>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Import users{% endblock %}
+
+{% block pagetitle %}Import users{% endblock %}
+
+{% block content %}
+{% if errmsg %}{{errmsg}}<br> <br>{% endif %}
+The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>.<br>
+<br>
+The compulsory fields of first_name, last_name and email must always be included. All other fields are optional.<br>
+<br>
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data">
+CSV file to upload: {{form.csvfile}}<br>
+<input type="hidden" name="step" value="1">
+<input type="submit" value="Continue">
+</form>
+{% endblock %}

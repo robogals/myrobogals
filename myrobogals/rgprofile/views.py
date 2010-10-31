@@ -17,6 +17,10 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.db.models import Q
 from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.settings import MEDIA_ROOT
+from time import time
+import csv
+from myrobogals.rgprofile.functions import importcsv, RgImportCsvException
 
 def joinstart(request):
 	if request.user.is_authenticated():
@@ -449,3 +453,93 @@ def process_login(request):
 
 def password_change_done(request):
 	return render_to_response('password_change_done.html', {}, context_instance=RequestContext(request))
+
+class CSVUploadForm(forms.Form):
+	csvfile = forms.FileField()
+
+def importusers(request, chapterurl):
+	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	errmsg = None
+	if request.method == 'POST':
+		if request.POST['step'] == '1':
+			form = CSVUploadForm(request.POST, request.FILES)
+			if form.is_valid():
+				file = request.FILES['csvfile']
+				tmppath = "/tmp/" + request.user.chapter().myrobogals_url + request.user.username + str(time()) + ".csv"
+				destination = open(tmppath, 'w')
+				for chunk in file.chunks():
+					destination.write(chunk)
+				destination.close()
+				fp = open(tmppath, 'r')
+				filerows = csv.reader(fp)
+				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter}, context_instance=RequestContext(request))
+			else:
+				errmsg = "There was no file uploaded or the file uploaded is invalid"
+		elif request.POST['step'] == '2':
+			if 'tmppath' not in request.POST:
+				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
+			tmppath = request.POST['tmppath']
+			fp = open(tmppath, 'r')
+			filerows = csv.reader(fp)
+			welcomeemail = ""
+			defaults = ""
+			try:
+				importcsv(filerows, welcomeemail, defaults)
+			except RgImportCsvException as e:
+				errmsg = e.errmsg
+				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
+	else:
+		form = CSVUploadForm()
+	return render_to_response('import_users_1.html', {'chapter': chapter, 'form': form, 'errmsg': errmsg}, context_instance=RequestContext(request))
+
+COMPULSORY_FIELDS = (
+	('first_name', 'First name'),
+	('last_name', 'Last name'),
+	('email', 'Primary email address'),
+)
+
+CREDENTIALS_FIELDS = (
+	('username', 'myRobogals username. If blank, a username will be generated based upon their first name, last name or email address, as necessary to generate a username that is unique in the system. The new username will be included in their welcome email.'),
+	('password', 'myRobogals password. If blank, a new password will be generated for them and included in their welcome email.'),
+)
+
+BASIC_FIELDS = (
+	('alt_email', 'Alternate email address'),
+	('mobile', 'Mobile number, in international format without a leading +. Examples: 61429558100 (Aus) or 447553333111 (UK)'),
+	('date_joined', 'Date when this member joined Robogals. If blank, today\'s date is used'),
+	('dob', 'Date of birth'),
+	('gender', '0 = No answer; 1 = Male; 2 = Female'),
+)
+
+EXTRA_FIELDS = (
+	('course', 'Name of course/degree'),
+	('uni_start', 'Date when they commenced university'),
+	('uni_end', 'Date when they expect to complete university'),
+	('university_id', 'University they attend. Enter -1 to use the host university of this Robogals chapter. For a full list of IDs see https://my.robogals.org/uni_ids/'),
+	('course_type', '1 = Undergraduate; 2 = Postgraduate'),
+	('student_type', '1 = Domestic student; 2 = International student'),
+	('student_number', 'Student number, a.k.a. enrolment number, candidate number, etc.'),
+)
+
+PRIVACY_FIELDS = (
+	('privacy', '20 = Profile viewable to public internet; 10 = Profile viewable only to Robogals members; 5 = Profile viewable only to Robogals members from same chapter; 0 = Profile viewable only to exec'),
+	('dob_public', 'Either \'True\' or \'False\', specifies whether their date of birth should be displayed in their profile page'),
+	('email_public', 'Either \'True\' or \'False\', specifies whether their email address should be displayed in their profile page'),
+	('email_chapter_optin', 'Either \'True\' or \'False\', specifies whether this member will receive general emails sent by this Robogals chapter'),
+	('mobile_marketing_optin', 'Either \'True\' or \'False\', specifies whether this member will receive general SMSes sent by this Robogals chapter'),
+	('email_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive email reminders about school visits from myRobogals'),
+	('mobile_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive SMS reminders about school visits from myRobogals'),
+	('email_newsletter_optin', 'Either \'True\' or \'False\', specifies whether this member will receive The Amplifier, the monthly email newsletter of Robogals Global'),
+)
+
+HELPINFO = (
+	("Compulsory fields", COMPULSORY_FIELDS),
+	("Credentials fields", CREDENTIALS_FIELDS),
+	("Basic fields", BASIC_FIELDS),
+	("Extra fields", EXTRA_FIELDS),
+	("Privacy fields", PRIVACY_FIELDS)
+)
+
+def importusershelp(request, chapterurl):
+	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))

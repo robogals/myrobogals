@@ -63,24 +63,21 @@
                
             </span>
         </a>
-
+{% if request.user.is_authenticated %}
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
-{% if request.user.is_authenticated %}
                 <li class="item158">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/">
                         <span>View my chapter</span>
                     </a>
                 </li>
-{% endif %}
 
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/">
                         <span>List all chapters</span>
                     <a>
                 </li>
-
 {% if request.user.is_staff %}
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
@@ -98,9 +95,14 @@
                     <a>
                 </li>
 {% endif %}
-
+                <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/localtimes/">
+                        <span>Current local times</span>
+                    <a>
+                </li>
             </ul>
             </div>
+{% endif %}
         
 </li>   
             <li class="item65 parent root" >
@@ -112,7 +114,7 @@
                
             </span>
         </a>
-        
+{% if request.user.is_authenticated %}
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
@@ -187,7 +189,7 @@
 {% endif %}
                             </ul>
         </div>
-        
+{% endif %}
 </li>   
             <li class="item73 parent root" >
             <a class="daddy item bullet subtext" href="#"  >
@@ -197,7 +199,7 @@
             </span>
 
         </a>
-        
+{% if request.user.is_authenticated %}        
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
@@ -234,6 +236,7 @@
                             
                             </ul>
         </div>
+{% endif %}        
         
 </li>   
             <li class="item152 root" >

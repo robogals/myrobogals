@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Import users{% endblock %}
+
+{% block pagetitle %}Import users{% endblock %}
+
+{% block content %}
+{% if errmsg %}{{errmsg}}<br> <br>{% endif %}
+Preview of uploaded file:
+<br>
+<table>
+{% for row in filerows %}
+  <tr>
+{% for cell in row %}
+    <td>{{cell}}</td>
+{% endfor %}
+  </tr>
+{% endfor %}
+</table>
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post">
+<input type="hidden" name="tmppath" value="{{tmppath}}">
+<input type="hidden" name="step" value="2">
+<input type="submit" value="Add members">
+</form>
+{% endblock %}

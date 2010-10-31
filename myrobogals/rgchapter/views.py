@@ -24,6 +24,15 @@ def joinlist(request):
 		listing.append({'super': superchapter, 'chapters': chapters})
 	return render_to_response('join_listing.html', {'listing': listing}, context_instance=RequestContext(request))
 
+def localtimes(request):
+	listing = []
+	globalchapter = Group.objects.get(pk=1)
+	superchapters = Group.objects.filter(parent=1)
+	for superchapter in superchapters:
+		chapters = Group.objects.filter(parent=superchapter)
+		listing.append({'super': superchapter, 'chapters': chapters})
+	return render_to_response('timezone_listing.html', {'listing': listing, 'globalchapter': globalchapter}, context_instance=RequestContext(request))
+
 def detail(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')

@@ -13,7 +13,7 @@ from django.db.models.fields import PositiveIntegerField
 from myrobogals.rgprofile.usermodels import University, Country
 from myrobogals.rgprofile.files import get_profile_path
 from django.db import connection, transaction
-from pytz import timezone
+from pytz import timezone, utc
 
 UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
@@ -179,6 +179,9 @@ class Group(models.Model):
             return int(count[0])
         else:
             return 0
+
+    def local_time(self):
+    	return datetime.datetime.utcnow().replace(tzinfo=utc).astimezone(self.timezone.tz_obj())        
 
 class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
