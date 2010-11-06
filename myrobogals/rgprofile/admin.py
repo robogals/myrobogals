@@ -1,6 +1,6 @@
 from myrobogals.auth.models import User
 from myrobogals.rgprofile.models import PositionType, UserList
-from myrobogals.rgprofile.usermodels import University
+from myrobogals.rgprofile.usermodels import University, MobileRegexCollection, MobileRegex
 from myrobogals import admin
 
 class PositionTypeAdmin(admin.ModelAdmin):
@@ -16,6 +16,14 @@ class UserListAdmin(admin.ModelAdmin):
 	search_fields = ('name',)
 	filter_horizontal = ('users',)
 
+class MobileRegexInline(admin.TabularInline):
+	model = MobileRegex
+	extra = 5
+
+class MobileRegexCollectionAdmin(admin.ModelAdmin):
+	inlines = [MobileRegexInline]
+
+admin.site.register(MobileRegexCollection, MobileRegexCollectionAdmin)
 admin.site.register(PositionType, PositionTypeAdmin)
 admin.site.register(University, UniversityAdmin)
 admin.site.register(UserList, UserListAdmin)

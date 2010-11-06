@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.template import RequestContext, Context, loader
@@ -12,6 +14,13 @@ from django.forms.fields import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime
+
+def validate_sms_chars(text):
+	matches = re.compile(u'^[a-z|A-Z|0-9|\\n|\\r|@|£|\$|¥|è|é|ù|ì|ò|Ç|Ø|ø|Å|å|Δ|Φ|Γ|Λ|Ω|Π|Ψ|Σ|Θ|Ξ|_|\^|{|}|\\\\|\[|~|\]|\||€|Æ|æ|ß|É| |!|"|#|¤|\%|&|\'|(|)|\*|\+|\,|\-|\.|\/|:|;|<|=|>|\?|¡|Ä|Ö|Ñ|Ü|§|¿|ä|ö|ñ|ü|à]+$').findall(text)
+	if matches == []:
+		return False
+	else:
+		return True
 
 def list(request):
 	return HttpResponse("List Messages")

@@ -52,7 +52,7 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{{ field.label_tag }}{% ifnotequal field.name 'alt_email' %} <span style="color: #ff0000">*</span>{% endifnotequal %}</td>
+    <td>{{ field.label_tag }}{% if field.field.required %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td>{{ field }}</td>
   </tr>
 {% endfor %}

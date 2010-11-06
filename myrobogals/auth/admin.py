@@ -16,7 +16,7 @@ class GroupAdmin(admin.ModelAdmin):
     ordering = ('name',)
     #filter_horizontal = ('permissions',)
     fieldsets = (
-        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone')}),
+        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes')}),
         (_('Address info'), {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         (_('Faculty contact'), {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
         (_('Other'), {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'photo', 'default_email_domain')}),

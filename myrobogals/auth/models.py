@@ -10,7 +10,7 @@ from django.utils.encoding import smart_str
 from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.fields import PositiveIntegerField
-from myrobogals.rgprofile.usermodels import University, Country
+from myrobogals.rgprofile.usermodels import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
 from django.db import connection, transaction
 from pytz import timezone, utc
@@ -146,6 +146,7 @@ class Group(models.Model):
     ftp_user = models.CharField('FTP username', max_length=64, blank=True)
     ftp_pass = models.CharField('FTP password', max_length=64, blank=True)
     ftp_path = models.CharField('FTP path', max_length=64, blank=True, help_text='Including directory and filename, e.g. web/content/team.html')
+    mobile_regexes = models.ForeignKey(MobileRegexCollection)
 
     class Meta:
         verbose_name = _('chapter')
@@ -305,7 +306,7 @@ class User(models.Model):
     university = models.ForeignKey(University, null=True, blank=True)
     job_title = models.CharField('Job title', max_length=128, blank=True)
     company = models.CharField('Company', max_length=128, blank=True)
-    mobile = PositiveBigIntegerField(null=True, blank=True)
+    mobile = models.CharField('Mobile', max_length=16, blank=True)
     mobile_verified = models.BooleanField(default=False)
     email_reminder_optin = models.BooleanField("Allow email reminders", default=True)
     email_chapter_optin = models.BooleanField("Allow emails from chapter", default=True)

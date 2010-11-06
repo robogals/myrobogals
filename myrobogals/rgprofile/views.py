@@ -4,7 +4,7 @@ from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
 from myrobogals.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgprofile.usermodels import University
+from myrobogals.rgprofile.usermodels import University, MobileRegex
 from myrobogals.auth import authenticate, login
 #from django.forms.validators import email_re
 from django import forms
@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from myrobogals.rgmain.utils import SelectDateWidget
 import datetime
 import re
-from django.forms.widgets import Widget, Select
+from django.forms.widgets import Widget, Select, TextInput
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.db.models import Q
@@ -233,8 +233,52 @@ class SelectMonthYearWidget(Widget):
 			return '%s-%s-%s' % (y, m, d)
 		return data.get(name, None)
 
+class MobileTextInput(TextInput):
+	def render(self, name, value, attrs=None):
+		if value != None:
+			if value[0:1] in ('1', '2', '3', '4', '5', '6', '7', '8', '9'):
+				value = '+' + value
+		return super(MobileTextInput, self).render(name, value, attrs)
+
+# Custom mobile field
+class MobileField(forms.CharField):
+	chapter = None
+
+	def __init__(self, *args, **kwargs):
+		self.chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(MobileField, self).__init__(*args, **kwargs)
+
+	# This function:
+	#    - validates the number
+	#    - strips leading digits
+	#    - prepends the country code if needed
+	def clean(self, value):
+		num = value.strip().replace(' ','').replace('+','')
+		if num == '':
+			return ''
+		regexes = MobileRegex.objects.filter(collection=self.chapter.mobile_regexes)
+		try:
+			for regex in regexes:
+				matches = re.compile(regex.regex).findall(num)
+				if matches == []:
+					continue
+				else:
+					num = num[regex.strip_digits:]
+					return regex.prepend_digits + num
+			# If we got this far, then it didn't match any of the regexes
+			raise forms.ValidationError(self.chapter.mobile_regexes.errmsg)
+		except ValueError:
+			raise forms.ValidationError(self.chapter.mobile_regexes.errmsg)
+
 # Personal information
 class FormPartOne(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartOne, self).__init__(*args, **kwargs)
+		self.fields['mobile'] = MobileField(label=_('Mobile phone'), max_length=20, required=False, widget=MobileTextInput(), chapter=chapter)
+
 	GENDERS = (
 		(1, 'Male'),
 		(2, 'Female'),
@@ -244,11 +288,16 @@ class FormPartOne(forms.Form):
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
 	email = forms.EmailField(label=_('Email'), max_length=64)
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
-	mobile = forms.CharField(label=_('Mobile phone'), max_length=20)
+	mobile = forms.BooleanField()
 	gender = forms.ChoiceField(choices=GENDERS, initial=2)
 
 # Privacy settings
 class FormPartTwo(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartTwo, self).__init__(*args, **kwargs)
+
 	PRIVACY_CHOICES = (
 		(20, _('Everyone (the whole internet)')),
 		(10, _('Only Robogals members')),
@@ -262,6 +311,11 @@ class FormPartTwo(forms.Form):
 
 # Demographic information
 class FormPartThree(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartThree, self).__init__(*args, **kwargs)
+
 	dob = forms.DateField(label=_('Date of birth'), widget=SelectDateWidget(), required=False)
 	course = forms.CharField(label=_('Course'), max_length=128, required=False)
 	uni_start = forms.DateField(label=_('Started university'), widget=SelectMonthYearWidget(), required=False)
@@ -272,10 +326,17 @@ class FormPartThree(forms.Form):
 
 # User preferences
 class FormPartFour(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartFour, self).__init__(*args, **kwargs)
+		self.fields['email_chapter_optin'].label='Allow ' + chapter.name + ' to send me email updates'
+		self.fields['mobile_marketing_optin'].label='Allow ' + chapter.name + ' to send me SMS updates'
+
 	email_reminder_optin = forms.BooleanField(label=_('Allow email reminders about my upcoming school visits'), initial=True, required=False)
 	mobile_reminder_optin = forms.BooleanField(label=_('Allow SMS reminders about my upcoming school visits'), initial=True, required=False)
-	email_chapter_optin = forms.BooleanField(label=_('Allow my local Robogals chapter to send me email updates'), initial=True, required=False)
-	mobile_marketing_optin = forms.BooleanField(label=_('Allow my local Robogals chapter to send me SMS updates'), initial=True, required=False)
+	email_chapter_optin = forms.BooleanField(initial=True, required=False)
+	mobile_marketing_optin = forms.BooleanField(initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
 
 def edituser(request, username, chapter=None):
@@ -300,10 +361,10 @@ def edituser(request, username, chapter=None):
 		if request.method == 'POST':
 			if join:
 				new_username = request.POST['username'].strip()
-			formpart1 = FormPartOne(request.POST)
-			formpart2 = FormPartTwo(request.POST)
-			formpart3 = FormPartThree(request.POST)
-			formpart4 = FormPartFour(request.POST)
+			formpart1 = FormPartOne(request.POST, chapter=chapter)
+			formpart2 = FormPartTwo(request.POST, chapter=chapter)
+			formpart3 = FormPartThree(request.POST, chapter=chapter)
+			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid():
 				if join:
 					username_len = len(new_username)
@@ -323,6 +384,10 @@ def edituser(request, username, chapter=None):
 									u.groups.add(chapter)
 									mt = MemberStatus(user_id=u.pk, statusType_id=1)
 									mt.save()
+									u.is_active = True
+									u.is_staff = False
+									u.is_superuser = False
+									u.save()
 							else:
 								pwerr = _('The password and repeated password did not match. Please try again')
 						else:
@@ -359,10 +424,6 @@ def edituser(request, username, chapter=None):
 					u.mobile_reminder_optin = data['mobile_reminder_optin']
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
-					if join:
-						u.is_active = True
-						u.is_staff = False
-						u.is_superuser = False
 					u.save()
 					if 'return' in request.POST:
 						return HttpResponseRedirect(request.POST['return'])
@@ -372,10 +433,10 @@ def edituser(request, username, chapter=None):
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
-				formpart1 = FormPartOne()
-				formpart2 = FormPartTwo()
-				formpart3 = FormPartThree()
-				formpart4 = FormPartFour()
+				formpart1 = FormPartOne(None, chapter=chapter)
+				formpart2 = FormPartTwo(None, chapter=chapter)
+				formpart3 = FormPartThree(None, chapter=chapter)
+				formpart4 = FormPartFour(None, chapter=chapter)
 			else:
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
@@ -383,11 +444,11 @@ def edituser(request, username, chapter=None):
 					'email': u.email,
 					'alt_email': u.alt_email,
 					'mobile': u.mobile,
-					'gender': u.gender})
+					'gender': u.gender}, chapter=chapter)
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,
-					'email_public': u.email_public})
+					'email_public': u.email_public}, chapter=chapter)
 				if u.university:
 					uni = u.university.pk
 				else:
@@ -399,13 +460,13 @@ def edituser(request, username, chapter=None):
 					'uni_end': u.uni_end,
 					'university': uni,
 					'job_title': u.job_title,
-					'company': u.company})
+					'company': u.company}, chapter=chapter)
 				formpart4 = FormPartFour({
 					'email_reminder_optin': u.email_reminder_optin,
 					'email_chapter_optin': u.email_chapter_optin,
 					'mobile_reminder_optin': u.mobile_reminder_optin,
 					'mobile_marketing_optin': u.mobile_marketing_optin,
-					'email_newsletter_optin': u.email_newsletter_optin})
+					'email_newsletter_optin': u.email_newsletter_optin}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
