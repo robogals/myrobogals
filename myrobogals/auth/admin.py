@@ -19,6 +19,7 @@ class GroupAdmin(admin.ModelAdmin):
         (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes')}),
         (_('Address info'), {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         (_('Faculty contact'), {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
+        (_('Chapter-specific fields'), {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label')}),
         (_('Other'), {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'photo', 'default_email_domain')}),
         (_('FTP details'), {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
     )
@@ -36,7 +37,7 @@ class UserAdmin(admin.ModelAdmin):
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo')}),
         (_('Chapter'), {'fields': ('groups',)}),
-        (_('University info (student members only)'), {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number')}),
+        (_('University info (student members only)'), {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         (_('Work info (industry members only)'), {'fields': ('job_title', 'company')}),
         (_('Mobile info'), {'fields': ('mobile', 'mobile_verified',)}),
 #        (_('Photo'), {'fields': ('photo')}),
@@ -44,7 +45,7 @@ class UserAdmin(admin.ModelAdmin):
         (_('Privacy settings'), {'fields': ('privacy', 'dob_public', 'email_public')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
         (_('Bio'), {'fields': ('bio',)}),
-        (_('Internal notes'), {'fields': ('approved_to_teach', 'internal_notes')}),
+        (_('Internal notes'), {'fields': ('internal_notes',)}),
         (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
     form = UserChangeForm

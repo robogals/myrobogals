@@ -147,6 +147,12 @@ class Group(models.Model):
     ftp_pass = models.CharField('FTP password', max_length=64, blank=True)
     ftp_path = models.CharField('FTP path', max_length=64, blank=True, help_text='Including directory and filename, e.g. web/content/team.html')
     mobile_regexes = models.ForeignKey(MobileRegexCollection)
+    student_number_enable = models.BooleanField('Enable student number field')
+    student_number_required = models.BooleanField('Require student number field')
+    student_number_label = models.CharField('Label for student number field', max_length=64, blank=True)
+    student_union_enable = models.BooleanField('Enable student union member checkbox')
+    student_union_required = models.BooleanField('Require student union member checkbox')
+    student_union_label = models.CharField('Label for student union member checkbox', max_length=64, blank=True)
 
     class Meta:
         verbose_name = _('chapter')
@@ -273,11 +279,13 @@ class User(models.Model):
     )
     
     COURSE_TYPE_CHOICES = (
+    	(0, 'No answer'),
     	(1, 'Undergraduate'),
     	(2, 'Postgraduate'),
     )
 
     STUDENT_TYPE_CHOICES = (
+    	(0, 'No answer'),
     	(1, 'Local'),
     	(2, 'International'),
     )
@@ -315,16 +323,16 @@ class User(models.Model):
     email_newsletter_optin = models.BooleanField("Subscribe to The Amplifier", default=True)
     email_othernewsletter_optin = models.BooleanField("Subscribe to alumni newsletter (if alumni)", default=True, help_text="Ignored unless this user is actually alumni.  It is recommended that you leave this ticked so that the user will automatically be subscribed upon becoming alumni.")
     timezone = models.ForeignKey(Timezone, verbose_name="Override chapter's timezone", blank=True, null=True)
-    approved_to_teach = models.BooleanField(default=False)
     photo = models.FileField(upload_to='profilepics', blank=True)
     bio = models.TextField(blank=True)
     internal_notes = models.TextField(blank=True)
     website = models.CharField("Personal website", max_length=200, blank=True)
     gender = models.IntegerField("Gender", choices=GENDERS, null=True)
     privacy = models.IntegerField("Profile privacy", choices=PRIVACY_CHOICES, default=5)
-    course_type = models.IntegerField("Course level", choices=COURSE_TYPE_CHOICES, blank=True, null=True)
-    student_type = models.IntegerField("Student type", choices=STUDENT_TYPE_CHOICES, blank=True, null=True)
+    course_type = models.IntegerField("Course level", choices=COURSE_TYPE_CHOICES, default=0)
+    student_type = models.IntegerField("Student type", choices=STUDENT_TYPE_CHOICES, default=0)
     student_number = models.CharField('Student number', max_length=32, blank=True)
+    union_member = models.BooleanField(default=False)
     objects = UserManager()
 
     class Meta:

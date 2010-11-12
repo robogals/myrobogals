@@ -278,6 +278,16 @@ class FormPartOne(forms.Form):
 		del kwargs['chapter']
 		super(FormPartOne, self).__init__(*args, **kwargs)
 		self.fields['mobile'] = MobileField(label=_('Mobile phone'), max_length=20, required=False, widget=MobileTextInput(), chapter=chapter)
+		if chapter.student_number_enable:
+			self.fields['student_number'].label = chapter.student_number_label
+			self.fields['student_number'].required = chapter.student_number_required
+		else:
+			del self.fields['student_number']
+		if chapter.student_union_enable:
+			self.fields['union_member'].label = chapter.student_union_label
+			self.fields['union_member'].required = chapter.student_union_required
+		else:
+			del self.fields['union_member']
 
 	GENDERS = (
 		(1, 'Male'),
@@ -287,6 +297,8 @@ class FormPartOne(forms.Form):
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
 	email = forms.EmailField(label=_('Email'), max_length=64)
+	student_number = forms.CharField(max_length=32)
+	union_member = forms.BooleanField()
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
 	gender = forms.ChoiceField(choices=GENDERS, initial=2)
@@ -315,12 +327,27 @@ class FormPartThree(forms.Form):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
 		super(FormPartThree, self).__init__(*args, **kwargs)
-
+	
+	COURSE_TYPE_CHOICES = (
+		(0, '---'),
+		(1, 'Undergraduate'),
+		(2, 'Postgraduate')
+	)
+	
+	STUDENT_TYPE_CHOICES = (
+		(0, '---'),
+		(1, 'Local'),
+		(2, 'International')
+	)
+	
 	dob = forms.DateField(label=_('Date of birth'), widget=SelectDateWidget(), required=False)
 	course = forms.CharField(label=_('Course'), max_length=128, required=False)
 	uni_start = forms.DateField(label=_('Started university'), widget=SelectMonthYearWidget(), required=False)
 	uni_end = forms.DateField(label=_('Will finish university'), widget=SelectMonthYearWidget(), required=False)
 	university = forms.ModelChoiceField(queryset=University.objects.all(), required=False)
+	course_type = forms.ChoiceField(label=_('Course level'), choices=COURSE_TYPE_CHOICES, required=False)
+	student_type = forms.ChoiceField(label=_('Student type'), choices=STUDENT_TYPE_CHOICES, required=False)
+	bio = forms.CharField(label=_('About me (for profile page)'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	#job_title = forms.CharField(_('Job title'), max_length=128, required=False)
 	#company = forms.CharField(_('Company'), max_length=128, required=False)
 
@@ -338,6 +365,15 @@ class FormPartFour(forms.Form):
 	email_chapter_optin = forms.BooleanField(initial=True, required=False)
 	mobile_marketing_optin = forms.BooleanField(initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+
+# Bio
+class FormPartFive(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartFive, self).__init__(*args, **kwargs)
+	
+	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
 def edituser(request, username, chapter=None):
 	pwerr = ''
@@ -365,7 +401,8 @@ def edituser(request, username, chapter=None):
 			formpart2 = FormPartTwo(request.POST, chapter=chapter)
 			formpart3 = FormPartThree(request.POST, chapter=chapter)
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
-			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid():
+			formpart5 = FormPartFive(request.POST, chapter=chapter)
+			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
 				if join:
 					username_len = len(new_username)
 					if username_len < 3:
@@ -406,6 +443,10 @@ def edituser(request, username, chapter=None):
 					u.alt_email = data['alt_email']
 					u.mobile = data['mobile']
 					u.gender = data['gender']
+					if 'student_number' in data:
+						u.student_number = data['student_number']
+					if 'union_member' in data:
+						u.union_member = data['union_member']
 					data = formpart2.cleaned_data
 					u.privacy = data['privacy']
 					u.dob_public = data['dob_public']
@@ -416,6 +457,9 @@ def edituser(request, username, chapter=None):
 					u.uni_start = data['uni_start']
 					u.uni_end = data['uni_end']
 					u.university = data['university']
+					u.course_type = data['course_type']
+					u.student_type = data['student_type']
+					u.bio = data['bio']
 					#u.job_title = data['job_title']
 					#u.company = data['company']
 					data = formpart4.cleaned_data
@@ -424,6 +468,9 @@ def edituser(request, username, chapter=None):
 					u.mobile_reminder_optin = data['mobile_reminder_optin']
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
+					data = formpart5.cleaned_data
+					if 'internal_notes' in data:
+						u.internal_notes = data['internal_notes']
 					u.save()
 					if 'return' in request.POST:
 						return HttpResponseRedirect(request.POST['return'])
@@ -437,6 +484,7 @@ def edituser(request, username, chapter=None):
 				formpart2 = FormPartTwo(None, chapter=chapter)
 				formpart3 = FormPartThree(None, chapter=chapter)
 				formpart4 = FormPartFour(None, chapter=chapter)
+				formpart5 = FormPartFive(None, chapter=chapter)
 			else:
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
@@ -444,7 +492,9 @@ def edituser(request, username, chapter=None):
 					'email': u.email,
 					'alt_email': u.alt_email,
 					'mobile': u.mobile,
-					'gender': u.gender}, chapter=chapter)
+					'gender': u.gender,
+					'student_number': u.student_number,
+					'union_member': u.union_member}, chapter=chapter)
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,
@@ -460,13 +510,18 @@ def edituser(request, username, chapter=None):
 					'uni_end': u.uni_end,
 					'university': uni,
 					'job_title': u.job_title,
-					'company': u.company}, chapter=chapter)
+					'company': u.company,
+					'course_type': u.course_type,
+					'student_type': u.student_type,
+					'bio': u.bio}, chapter=chapter)
 				formpart4 = FormPartFour({
 					'email_reminder_optin': u.email_reminder_optin,
 					'email_chapter_optin': u.email_chapter_optin,
 					'mobile_reminder_optin': u.mobile_reminder_optin,
 					'mobile_marketing_optin': u.mobile_marketing_optin,
 					'email_newsletter_optin': u.email_newsletter_optin}, chapter=chapter)
+				formpart5 = FormPartFive({
+					'internal_notes': u.internal_notes}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
@@ -474,8 +529,9 @@ def edituser(request, username, chapter=None):
 		else:
 			return_url = ''
 
-		chpass = (join or (request.user.is_staff and request.user != u))			
-		return render_to_response('profile_edit.html', {'join': join, 'adduser': adduser, 'chpass': chpass, 'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'u': u, 'chapter': chapter, 'usererr': usererr, 'pwerr': pwerr, 'new_username': new_username, 'return': return_url}, context_instance=RequestContext(request))
+		chpass = (join or (request.user.is_staff and request.user != u))
+		exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter() == chapter)
+		return render_to_response('profile_edit.html', {'join': join, 'adduser': adduser, 'chpass': chpass, 'exec_fields': exec_fields, 'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'u': u, 'chapter': chapter, 'usererr': usererr, 'pwerr': pwerr, 'new_username': new_username, 'return': return_url}, context_instance=RequestContext(request))
 	else:
 		raise Http404  # don't have permission to change
 
@@ -517,9 +573,29 @@ def password_change_done(request):
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()
+	subject = forms.CharField(max_length=256, required=False)
+	body = forms.CharField(widget=forms.Textarea, required=False)
+	html = forms.BooleanField(required=False)
+'''
+gender
+uni_start
+uni_end
+university
+course_type
+student_type
+email_reminder_optin
+email_chapter_optin
+mobile_reminder_optin
+mobile_marketing_optin
+email_newsletter_optin
+privacy
+date_joined
+'''
 
 def importusers(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+		raise Http404
 	errmsg = None
 	if request.method == 'POST':
 		if request.POST['step'] == '1':
@@ -545,7 +621,7 @@ def importusers(request, chapterurl):
 			welcomeemail = ""
 			defaults = ""
 			try:
-				importcsv(filerows, welcomeemail, defaults)
+				importcsv(filerows, welcomeemail, defaults, chapter)
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
@@ -576,7 +652,7 @@ EXTRA_FIELDS = (
 	('course', 'Name of course/degree'),
 	('uni_start', 'Date when they commenced university'),
 	('uni_end', 'Date when they expect to complete university'),
-	('university_id', 'University they attend. Enter -1 to use the host university of this Robogals chapter. For a full list of IDs see https://my.robogals.org/uni_ids/'),
+	('university_id', 'University they attend. Enter -1 to use the host university of this Robogals chapter. For a full list of IDs see https://my.robogals.org/chapters/<chapter>/edit/users/import/help/unis/'),
 	('course_type', '1 = Undergraduate; 2 = Postgraduate'),
 	('student_type', '1 = Domestic student; 2 = International student'),
 	('student_number', 'Student number, a.k.a. enrolment number, candidate number, etc.'),
@@ -603,4 +679,13 @@ HELPINFO = (
 
 def importusershelp(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
+
+def unilist(request, chapterurl):
+	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+		raise Http404
+	unis = University.objects.all()
+	return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))
