@@ -74,7 +74,7 @@
     <td colspan="2">{{formpart2.dob_public}} {{formpart2.dob_public.label_tag}}</td>
   </tr>
   <tr>
-    <td colspan="2">&nbsp;<br /><strong>{% trans "Demographic information" %}</strong><br />{% trans "This section is <strong>optional</strong>, but it helps us to understand the demographics of the organisation a bit better. It also makes your profile page more interesting :)" %}</td>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Profile information" %}</strong><br />{% trans "This section is <strong>optional</strong>, but it helps us to understand the demographics of the organisation a bit better. It also makes your profile page more interesting :)" %}</td>
   </tr>
   <tr>
 {% for field in formpart3 %}
@@ -84,8 +84,8 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{{ field.label_tag }}</td>
-    <td>{{ field }}</td>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td style="vertical-align: top">{{ field }}</td>
   </tr>
 {% endfor %}
   <tr>
@@ -96,6 +96,15 @@
     <td colspan="2">{{ field }} {{ field.label_tag }}</td>
   </tr>
 {% endfor %}
+{% if exec_fields %}
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Exec-only fields" %}</strong></td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">{{ formpart5.internal_notes.label_tag }}</td>
+    <td style="vertical-align: top">{{ formpart5.internal_notes }}</td>
+  </tr>
+{% endif %}
 </table>
 {% if return %}
 <input type="hidden" name="return" value="{{return}}" />
