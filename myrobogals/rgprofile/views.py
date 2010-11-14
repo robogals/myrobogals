@@ -628,7 +628,7 @@ class DefaultsFormTwo(forms.Form):
 @login_required
 def importusers(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
 		raise Http404
 	errmsg = None
 	if request.method == 'POST':
