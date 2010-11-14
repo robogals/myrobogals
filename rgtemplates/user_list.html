@@ -9,7 +9,7 @@
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
 <p>
-<a href="/chapters/{{chapter.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">Add new member</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">Manage user lists</a></p>
+<a href="/chapters/{{chapter.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">Add new member</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">Manage user lists</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">Import CSV file</a></p>
 <table>
   <tr>
     <td><strong>{% trans "Username" %}</strong></td>
@@ -17,6 +17,12 @@
     <td><strong>{% trans "Last name" %}</strong></td>
     <td><strong>{% trans "Email" %}</strong></td>
     <td><strong>{% trans "Mobile" %}</strong></td>
+{% if chapter.student_number_enable %}
+    <td><strong>{{chapter.student_number_label}}</strong></td>
+{% endif %}
+{% if chapter.student_union_enable %}
+    <td><strong>{{chapter.student_union_label}}</strong></td>
+{% endif %}
   </tr>
 {% for u in users %}
   <tr>
@@ -25,6 +31,12 @@
     <td>{{u.last_name}}</td>
     <td><a href="mailto:{{u.email}}">{{u.email}}</a></td>
     <td>{% if not u.mobile %}{% else %}+{{u.mobile}}{% endif %}</td>
+{% if chapter.student_number_enable %}
+    <td>{{u.student_number}}</td>
+{% endif %}
+{% if chapter.student_union_enable %}
+    <td>{% if u.union_member %}Yes{% else %}No{% endif %}</td>
+{% endif %}
   </tr>
 {% endfor %}
 </table>

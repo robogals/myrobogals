@@ -7,7 +7,12 @@
 {% block content %}
 <form action="/teaching/{{visit_id}}/invite/" method="POST">
 {% if inviteform.errors %}
-{{ inviteform.errors }}
+<div class="error">
+Please correct the following field(s):<br>
+{% for error in inviteform.errors %}
+- {{error}}<br>
+{% endfor %}
+</div>
 {% endif %}
 <table>
   <tr>

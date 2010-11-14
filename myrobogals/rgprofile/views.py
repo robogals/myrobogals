@@ -22,6 +22,7 @@ from time import time
 import csv
 from myrobogals.rgprofile.functions import importcsv, RgImportCsvException
 
+'''
 def joinstart(request):
 	if request.user.is_authenticated():
 		return render_to_response('join_already_logged_in.html', {}, context_instance=RequestContext(request))
@@ -38,6 +39,7 @@ def joinstart(request):
 			})
 			secondlevel.append(t.render(c))
 		return render_to_response('join_select_chapter.html', {'secondlevels': secondlevel}, context_instance=RequestContext(request))
+'''
 
 def joinchapter(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
@@ -47,7 +49,8 @@ def joinchapter(request, chapterurl):
 		if chapter.is_joinable:
 			return edituser(request, '', chapter)
 		else:
-			raise Http404  # can't join this chapter
+			join_page = chapter.join_page.format(chapter=chapter)
+			return render_to_response('joininfo.html', {'chapter': chapter, 'join_page': join_page}, context_instance=RequestContext(request))
 
 @login_required
 def viewlist(request, chapterurl, list_id):
@@ -290,6 +293,7 @@ class FormPartOne(forms.Form):
 			del self.fields['union_member']
 
 	GENDERS = (
+		(0, '---'),
 		(1, 'Male'),
 		(2, 'Female'),
 	)
@@ -477,6 +481,7 @@ def edituser(request, username, chapter=None):
 					elif join:
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
+						request.user.message_set.create(message="Profile and settings updated!")
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
@@ -568,30 +573,58 @@ def process_login(request):
 	else:
 		return render_to_response('login_form.html', {'username': username, 'error': 'Invalid username or password', 'next': next}, context_instance=RequestContext(request))
 
-def password_change_done(request):
-	return render_to_response('password_change_done.html', {}, context_instance=RequestContext(request))
-
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()
+
+class WelcomeEmailForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(WelcomeEmailForm, self).__init__(*args, **kwargs)
+		self.fields['subject'].initial = chapter.welcome_email_subject
+		self.fields['body'].initial = chapter.welcome_email_msg
+		self.fields['html'].initial = chapter.welcome_email_html
+
+	importaction = forms.ChoiceField(choices=((1,'Add members, and send welcome email'),(2,'Add members, with no further action')),initial=1)
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=forms.Textarea, required=False)
 	html = forms.BooleanField(required=False)
-'''
-gender
-uni_start
-uni_end
-university
-course_type
-student_type
-email_reminder_optin
-email_chapter_optin
-mobile_reminder_optin
-mobile_marketing_optin
-email_newsletter_optin
-privacy
-date_joined
-'''
 
+class DefaultsFormOne(forms.Form):
+	GENDERS = (
+		(0, '---'),
+		(1, 'Male'),
+		(2, 'Female'),
+	)
+
+	COURSE_TYPE_CHOICES = (
+		(0, '---'),
+		(1, 'Undergraduate'),
+		(2, 'Postgraduate')
+	)
+	
+	STUDENT_TYPE_CHOICES = (
+		(0, '---'),
+		(1, 'Local'),
+		(2, 'International')
+	)
+
+	date_joined = forms.DateField(label=_('Date joined'), widget=SelectDateWidget(), required=False)
+	gender = forms.ChoiceField(choices=GENDERS, initial=0)
+	uni_start = forms.DateField(label=_('Started university'), widget=SelectMonthYearWidget(), required=False)
+	uni_end = forms.DateField(label=_('Will finish university'), widget=SelectMonthYearWidget(), required=False)
+	university = forms.ModelChoiceField(queryset=University.objects.all(), required=False)
+	course_type = forms.ChoiceField(label=_('Course level'), choices=COURSE_TYPE_CHOICES, required=False)
+	student_type = forms.ChoiceField(label=_('Student type'), choices=STUDENT_TYPE_CHOICES, required=False)
+
+class DefaultsFormTwo(forms.Form):
+	email_reminder_optin = forms.BooleanField(label=_('Allow email reminders about upcoming school visits'), initial=True, required=False)
+	mobile_reminder_optin = forms.BooleanField(label=_('Allow SMS reminders about upcoming school visits'), initial=True, required=False)
+	email_chapter_optin = forms.BooleanField(label=_('Allow email updates from local Robogals chapter'), initial=True, required=False)
+	mobile_marketing_optin = forms.BooleanField(label=_('Allow SMS updates from local Robogals chapter'), initial=True, required=False)
+	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+
+@login_required
 def importusers(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
@@ -600,7 +633,10 @@ def importusers(request, chapterurl):
 	if request.method == 'POST':
 		if request.POST['step'] == '1':
 			form = CSVUploadForm(request.POST, request.FILES)
-			if form.is_valid():
+			welcomeform = WelcomeEmailForm(request.POST, chapter=chapter)
+			defaultsform1 = DefaultsFormOne(request.POST)
+			defaultsform2 = DefaultsFormTwo(request.POST)
+			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
 				file = request.FILES['csvfile']
 				tmppath = "/tmp/" + request.user.chapter().myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
@@ -609,25 +645,44 @@ def importusers(request, chapterurl):
 				destination.close()
 				fp = open(tmppath, 'r')
 				filerows = csv.reader(fp)
+				defaults = {}
+				defaults.update(defaultsform1.cleaned_data)
+				defaults.update(defaultsform2.cleaned_data)
+				welcomeemail = welcomeform.cleaned_data
+				request.session['welcomeemail'] = welcomeemail
+				request.session['defaults'] = defaults
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter}, context_instance=RequestContext(request))
-			else:
-				errmsg = "There was no file uploaded or the file uploaded is invalid"
 		elif request.POST['step'] == '2':
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
 			tmppath = request.POST['tmppath']
 			fp = open(tmppath, 'r')
 			filerows = csv.reader(fp)
-			welcomeemail = ""
-			defaults = ""
+			welcomeemail = request.session['welcomeemail']
+			if welcomeemail['importaction'] == '2':
+				welcomeemail = None
+			defaults = request.session['defaults']
+			print defaults
+			print welcomeemail
 			try:
-				importcsv(filerows, welcomeemail, defaults, chapter)
+				users_imported = importcsv(filerows, welcomeemail, defaults, chapter)
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
+			if welcomeemail == None:
+				msg = _('%d users imported!') % users_imported
+			else:
+				msg = _('%d users imported and emailed!') % users_imported
+			request.user.message_set.create(message=msg)
+			del request.session['welcomeemail']
+			del request.session['defaults']
+			return HttpResponseRedirect('/chapters/' + chapter.myrobogals_url + '/edit/users/')
 	else:
 		form = CSVUploadForm()
-	return render_to_response('import_users_1.html', {'chapter': chapter, 'form': form, 'errmsg': errmsg}, context_instance=RequestContext(request))
+		welcomeform = WelcomeEmailForm(None, chapter=chapter)
+		defaultsform1 = DefaultsFormOne()
+		defaultsform2 = DefaultsFormTwo()
+	return render_to_response('import_users_1.html', {'chapter': chapter, 'form': form, 'welcomeform': welcomeform, 'defaultsform1': defaultsform1, 'defaultsform2': defaultsform2, 'errmsg': errmsg}, context_instance=RequestContext(request))
 
 COMPULSORY_FIELDS = (
 	('first_name', 'First name'),
@@ -677,12 +732,14 @@ HELPINFO = (
 	("Privacy fields", PRIVACY_FIELDS)
 )
 
+@login_required
 def importusershelp(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
 		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
 
+@login_required
 def unilist(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):

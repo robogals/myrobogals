@@ -14,7 +14,7 @@
                 {% if request.user.id %}
                 	<h4 class="module-title">{% blocktrans with request.user.first_name as first_name %}Welcome, {{first_name}}{% endblocktrans %}</h4>
                     <a href="/profile/{{request.user.username}}/">{% trans "View profile" %}</a><br />
-                    <a href="/profile/{{request.user.username}}/edit/">{% trans "Settings" %}</a><br />
+                    <a href="/profile/{{request.user.username}}/edit/">{% trans "Edit profile and settings" %}</a><br />
                     <a href="/chpass/">{% trans "Change password" %}</a><br />
                     {% if request.user.is_superuser %}
                     <a href="/topsecretarea/">{% trans "Admin panel" %}</a><br />
@@ -38,7 +38,7 @@
                 Remember Me         </label>    
             </div>-->
 
-            <div class="readon-wrap1"><div class="readon1-l"></div><a class="readon-main"><span class="readon1-m"><span class="readon1-r"><input type="submit" name="Submit" class="button" value="Log in" /></span></span></a></div><div class="clr"></div>
+            <div class="readon-wrap1"><div class="readon1-l"></div><a class="readon-main"><span class="readon1-m"><span class="readon1-r">{% if next %}<input type="hidden" name="next" value="{{next}}" />{% endif %}<input type="submit" name="Submit" class="button" value="Log in" /></span></span></a></div><div class="clr"></div>
             <div class="login-links">
             <p>
                 <a href="/support/">

@@ -1,5 +1,6 @@
-from myrobogals.auth.models import User, Group
-from myrobogals.rgprofile.usermodels import University
+from myrobogals.auth.models import User, Group, MemberStatus
+from myrobogals.rgprofile.usermodels import MobileRegex, University
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
 import re
 
@@ -12,47 +13,47 @@ class RgImportCsvException(Exception):
 def stringval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	if data != "":
-		newuser.setattr(colname, data)
+		setattr(newuser, colname, data)
 	else:
 		if colname in defaults:
-			newuser.setattr(colname, defaults[colname])
+			setattr(newuser, colname, defaults[colname])
 
 def dateval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	try:
 		date = datetime.strptime(data)
-		newuser.setattr(colname, date)
+		setattr(newuser, colname, date)
 	except ValueError:
 		if colname in defaults:
-			newuser.setattr(colname, defaults[colname])
+			setattr(newuser, colname, defaults[colname])
 
 def numval(colname, cell, newuser, defaults, options):
 	data = cell.strip()
 	try:
 		num = int(data)
 		if num in options:
-			newuser.setattr(colname, num)
+			setattr(newuser, colname, num)
 		else:
 			raise ValueError
 	except ValueError:
 		if colname in defaults:
-			newuser.setattr(colname, defaults[colname])
+			setattr(newuser, colname, defaults[colname])
 
 def boolval(colname, cell, newuser, defaults):
 	data = cell.strip().lower()
 	if data != "":
 		if data == 'true':
-			newuser.setattr(colname, True)
+			setattr(newuser, colname, True)
 		elif data == '1':
-			newuser.setattr(colname, True)
+			setattr(newuser, colname, True)
 		elif data == 'yes':
-			newuser.setattr(colname, True)
+			setattr(newuser, colname, True)
 		else:
 			if colname in defaults:
-				newuser.setattr(colname, defaults[colname])
+				setattr(newuser, colname, defaults[colname])
 	else:
 		if colname in defaults:
-			newuser.setattr(colname, defaults[colname])
+			setattr(newuser, colname, defaults[colname])
 
 def check_username(username):
 	try:
@@ -66,9 +67,9 @@ def generate_unique_username(row, columns):
 	last_name = row[columns.index('last_name')]
 	email = row[columns.index('email')]
 	
-	first_name_stripped = re.sub(r'\W+', '', first_name)
-	last_name_stripped = re.sub(r'\W+', '', last_name)
-	email_stripped = re.sub(r'\W+', '', fst(email.partition('@')))
+	first_name_stripped = re.sub(r'\W+', '', first_name).lower()
+	last_name_stripped = re.sub(r'\W+', '', last_name).lower()
+	email_stripped = re.sub(r'\W+', '', email.partition('@')[0]).lower()
 	
 	# Try different usernames until we find a unique one
 	
@@ -109,7 +110,7 @@ def generate_unique_username(row, columns):
 	if (check_username(uname)): return uname
 
 	# Example: mparncutt2
-	for i in range(1, 999):
+	for i in range(2, 1000):
 		uname = (first_name_stripped[0] + last_name_stripped)[0:27] + str(i)
 		if (check_username(uname)): return uname
 	
@@ -118,6 +119,11 @@ def generate_unique_username(row, columns):
 
 def importcsv(filerows, welcomeemail, defaults, chapter):
 	columns = None
+	users_imported = 0
+	if 'date_joined' not in defaults:
+		defaults['date_joined'] = datetime.now()
+	elif defaults['date_joined'] == None:
+		defaults['date_joined'] = datetime.now()
 	for row in filerows:
 		# Get column names from first row
 		if (columns == None):
@@ -184,7 +190,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 			elif colname == 'dob':
 				dateval(colname, cell, newuser, defaults)
 			elif colname == 'gender':
-				numval(colname, cell, newuser, defaults, range(0, 2))
+				numval(colname, cell, newuser, defaults, [0, 1, 2])
 			elif colname == 'course':
 				stringval(colname, cell, newuser, defaults)
 			elif colname == 'uni_start':
@@ -197,12 +203,12 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 				for uni in unis:
 					uni_ids.append(uni.pk)
 				numval(colname, cell, newuser, defaults, uni_ids)
-				if newuser.getattr('university_id', 0) == -1:
+				if getattr(newuser, 'university_id', 0) == -1:
 					newuser.university_id = chapter.university_id
 			elif colname == 'course_type':
-				numval(colname, cell, newuser, defaults, range(1, 2))
+				numval(colname, cell, newuser, defaults, [1, 2])
 			elif colname == 'student_type':
-				numval(colname, cell, newuser, defaults, range(1, 2))
+				numval(colname, cell, newuser, defaults, [1, 2])
 			elif colname == 'student_number':
 				stringval(colname, cell, newuser, defaults)
 			elif colname == 'privacy':
@@ -232,43 +238,54 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 
 		# If we still don't have a username and/or password
 		# by this stage, let's generate one
-		if newuser.getattr('username', '') == '':
+		if getattr(newuser, 'username', '') == '':
 			new_username = generate_unique_username(row, columns)
 			newuser.username = new_username
-		if newuser.getattr('password', '') == '':
+		if getattr(newuser, 'password', '') == '':
 			plaintext_password = User.objects.make_random_password(6)
 			newuser.set_password(plaintext_password)
 			
 		# Apply any unapplied defaults
-		for key, value in defaults:
-			if newuser.getattr(key, '') == '':
-				newuser.setattr(key, value)
+		for key, value in defaults.iteritems():
+			if key not in columns:
+				setattr(newuser, key, value)
 
-		# and finally...
+		# And finally...
 		newuser.save()
-		
+
+		# Must be called after save() because the primary key
+		# is required for these
+		newuser.groups.add(chapter)
+		mt = MemberStatus(user_id=newuser.pk, statusType_id=1)
+		mt.save()
+
 		# Send welcome email
-		message = EmailMessage()
-		message.subject = welcomeemail['subject']
-		try:
-			message.body = welcomeemail['body'].format(
-				chapter=chapter,
-				user=user)
-		except Exception:
-			newuser.delete()
-			raise RgImportCsvException('Welcome email format is invalid')
-		message.from_address = 'my@robogals.org'
-		message.reply_address = 'my@robogals.org'
-		message.from_name = chapter.name
-		message.sender = User.objects.get(username='edit')
-		message.html = welcomeemail['html']
-		message.status = -1
-		message.save()
-		recipient = EmailRecipient()
-		recipient.message = message
-		recipient.user = newuser
-		recipient.to_name = newuser.get_full_name()
-		recipient.to_address = newuser.email
-		recipient.save()
-		message.status = 0
-		message.save()
+		if welcomeemail:
+			message = EmailMessage()
+			message.subject = welcomeemail['subject']
+			try:
+				message.body = welcomeemail['body'].format(
+					chapter=chapter,
+					user=newuser,
+					plaintext_password=plaintext_password)
+			except Exception:
+				newuser.delete()
+				raise RgImportCsvException('Welcome email format is invalid')
+			message.from_address = 'my@robogals.org'
+			message.reply_address = 'my@robogals.org'
+			message.from_name = chapter.name
+			message.sender = User.objects.get(username='edit')
+			message.html = welcomeemail['html']
+			message.status = -1
+			message.save()
+			recipient = EmailRecipient()
+			recipient.message = message
+			recipient.user = newuser
+			recipient.to_name = newuser.get_full_name()
+			recipient.to_address = newuser.email
+			recipient.save()
+			message.status = 0
+			message.save()
+
+		users_imported += 1
+	return users_imported

@@ -18,7 +18,7 @@
 {% for field in formpart1 %}
   {% if field.errors %}
   <tr>
-    <td colspan="2">{{ field.errors }}</td>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -32,7 +32,7 @@
 {% for field in formpart2 %}
   {% if field.errors %}
   <tr>
-    <td colspan="2">{{ field.errors }}</td>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -46,7 +46,7 @@
 {% for field in formpart3 %}
   {% if field.errors %}
   <tr>
-    <td colspan="2">{{ field.errors }}</td>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
   </tr>
   {% endif %}
   <tr>

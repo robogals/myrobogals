@@ -11,7 +11,60 @@ The first row of your CSV file must specify the field names for the data contain
 The compulsory fields of first_name, last_name and email must always be included. All other fields are optional.<br>
 <br>
 <form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data">
-CSV file to upload: {{form.csvfile}}<br>
+{% if form.csvfile.errors %}
+<div class="error">{% for error in form.csvfile.errors %}{{error}}{% endfor %}</div>
+{% endif %}
+<table>
+  <tr>
+    <td valign="top" style="width: 70px"><strong>CSV file:</strong></td>
+    <td>{{form.csvfile}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; width: 50px"><strong>Action:</strong></td>
+    <td style="vertical-align: top">{{ welcomeform.importaction }}</td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+</table>
+<table id="welcomeemail">
+  <tr>
+    <td colspan="2"><strong>Welcome email:</strong></td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 70px"><strong>Subject:</strong></td>
+    <td>{{ welcomeform.subject }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Message:</strong></td>
+    <td>{{ welcomeform.body }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>HTML:</strong></td>
+    <td>{{ welcomeform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />Defaults</strong><br>If specified, these values will be used where that attribute is not specified in the CSV file. All fields are optional.</strong></td>
+  </tr>
+{% for field in defaultsform1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td style="vertical-align: top">{{ field }}{% ifequal field.name 'date_joined' %}<span style="font-size: 8pt">&nbsp;<br>If blank, today's date is used</span>{% endifequal %}</td>
+  </tr>
+{% endfor %}
+{% for field in defaultsform2 %}
+  <tr>
+    <td colspan="2">{{ field }} {{ field.label_tag }}</td>
+  </tr>
+{% endfor %}
+</table>
 <input type="hidden" name="step" value="1">
 <input type="submit" value="Continue">
 </form>

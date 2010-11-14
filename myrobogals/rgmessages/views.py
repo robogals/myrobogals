@@ -80,7 +80,14 @@ def writeemail(request):
 			message.reply_address = request.user.email
 			message.sender = request.user
 			message.html = data['html']
-			if int(data['from_type']) == 0:
+			if request.POST['type'] == '4':
+				n = data['newsletters']
+				message.from_name = n.from_name
+				message.from_address = n.from_email
+				message.reply_address = n.from_email
+				message.sender = n.from_user
+				message.html = True
+			elif int(data['from_type']) == 0:
 				message.from_name = "Robogals"
 			elif int(data['from_type']) == 1:
 				message.from_name = request.user.chapter().name
@@ -95,7 +102,11 @@ def writeemail(request):
 
 			if request.POST['type'] == '1':
 				if request.user.is_superuser:
-					users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
+					# "Email all members worldwide" feature disabled Nov 2010 - too much potential for abuse.
+					# Can be re-enabled by uncommenting the following line, commenting the exception,
+					# and removing the disabled tag from the relevant radio button in email_write.html
+					#users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
+					raise Exception
 				else:
 					users = User.objects.filter(groups=request.user.chapter(), is_active=True, email_chapter_optin=True)
 			elif request.POST['type'] == '2':

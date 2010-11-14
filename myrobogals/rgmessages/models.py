@@ -58,12 +58,15 @@ class EmailRecipient(models.Model):
 
 class Newsletter(models.Model):
 	name = models.CharField(max_length=128)
+	from_name = models.CharField(max_length=128)
+	from_email = models.CharField(max_length=128)
+	from_user = models.ForeignKey(User)
 	confirm_email = models.TextField(blank=True)
 	confirm_subject = models.CharField(max_length=128, blank=True)
 	confirm_url = models.CharField(max_length=128, blank=True)
 	confirm_from_name = models.CharField(max_length=128, blank=True)
 	confirm_from_email = models.CharField(max_length=128, blank=True)
-	confirm_from_user = models.ForeignKey(User)
+	confirm_from_user = models.ForeignKey(User, related_name="+")
 	confirm_html = models.BooleanField(blank=True)
 	
 	def __unicode__(self):

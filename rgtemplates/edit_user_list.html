@@ -10,14 +10,25 @@
 {% else %}
 <form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/" method="POST">
 {% endif %}
-{% if ulform.errors %}
-{{ ulform.errors }}
-{% endif %}
 <table>
+{% if ulform.name.errors %}
+{% for error in ulform.name.errors %}
+  <tr>
+    <td style="vertical-align: top" colspan="2"><div class="error">{{error}}</div></td>
+  </tr>
+{% endfor %}
+{% endif %}
   <tr>
     <td style="vertical-align: top" width="30">Name</td>
     <td style="vertical-align: top">{{ ulform.name }}</td>
   </tr>
+{% if ulform.users.errors %}
+{% for error in ulform.users.errors %}
+  <tr>
+    <td style="vertical-align: top" colspan="2"><div class="error">{{error}}</div></td>
+  </tr>
+{% endfor %}
+{% endif %}
   <tr>
     <td style="vertical-align: top" width="30">Members</td>
     <td style="vertical-align: top">{{ ulform.users }}</td>

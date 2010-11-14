@@ -17,17 +17,21 @@ class EmailMessageAdmin(admin.ModelAdmin):
 	inlines = (EmailRecipientAdmin,)
 	ordering = ('-date',)
 
-class NewsletterSubscriberAdmin(admin.TabularInline):
-	model = NewsletterSubscriber
-	extra = 10
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+	list_display = ('email', 'newsletter', 'first_name', 'last_name', 'company', 'country')
+	search_fields = ('email', 'first_name', 'last_name', 'company')
 
 class SubscriberTypeAdmin(admin.ModelAdmin):
 	list_display = ('description', 'order', 'public')
 
 class NewsletterAdmin(admin.ModelAdmin):
-	inlines = (NewsletterSubscriberAdmin,)
+	fieldsets = (
+		(None, {'fields': ('name', 'from_name', 'from_email', 'from_user')}),
+		('Confirmation email', {'fields': ('confirm_email', 'confirm_subject', 'confirm_url', 'confirm_from_name', 'confirm_from_email', 'confirm_from_user', 'confirm_html')})
+	)
 
 admin.site.register(SubscriberType, SubscriberTypeAdmin)
+admin.site.register(NewsletterSubscriber, NewsletterSubscriberAdmin)
 admin.site.register(Newsletter, NewsletterAdmin)
 admin.site.register(EmailMessage, EmailMessageAdmin)
 admin.site.register(PendingNewsletterSubscriber)

@@ -22,7 +22,7 @@
 {% if join %}
   {% if usererr %}
   <tr>
-    <td colspan="2"><ul class="errorlist"><li>{{ usererr }}</li></ul></td>
+    <td colspan="2"><div class="error">{{ usererr }}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -33,7 +33,7 @@
 {% if chpass %}
   {% if pwerr %}
   <tr>
-    <td colspan="2"><ul class="errorlist"><li>{{ pwerr }}</li></ul></td>
+    <td colspan="2"><div class="error">{{ usererr }}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -48,7 +48,7 @@
 {% for field in formpart1 %}
   {% if field.errors %}
   <tr>
-    <td colspan="2">{{ field.errors }}</td>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -80,7 +80,7 @@
 {% for field in formpart3 %}
   {% if field.errors %}
   <tr>
-    <td colspan="2">{{ field.errors }}</td>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
   </tr>
   {% endif %}
   <tr>

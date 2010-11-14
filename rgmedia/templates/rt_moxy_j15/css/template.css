@@ -520,3 +520,49 @@ pre {overflow: auto;}
 .attend-yes {padding: 5px; background-color: #6effa5; border: 1px solid #009a12}
 .attend-unconf {padding: 5px; background-color: #ffff66; border: 1px solid #ffcc00}
 .attend-no {padding: 5px; background-color: #ff6666; border: 1px solid #ff0000}
+
+/* System Messages */
+
+div.error {
+  background: #f7e5e5 url(../images/error-icon.gif) no-repeat 8px 8px;
+  border-top: 2px solid #db9f9f;
+  border-bottom: 2px solid #db9f9f;
+  margin:10px 0px;
+  padding: 10px 10px 10px 40px;
+  color: #551111;
+}
+div.error a {
+  color: #cc0000;
+  text-decoration: underline;
+}
+div.message {
+  background: #e5eef7 url(../images/message-icon.gif) no-repeat 9px 8px;
+  border-top: 2px solid #8db1d4;
+  border-bottom: 2px solid #8db1d4;
+  margin:10px 0px;
+  padding: 10px 10px 10px 40px;
+  color: #385c7f;
+  text-align: left;
+  font-weight: normal;
+}
+div.message a {
+  text-decoration: underline;
+  color: #4c88bc;
+}
+div.alert {
+  background: #fff8cf url(../images/alert-icon.gif) no-repeat 9px 8px;
+  border-top: 2px solid #e0ce62;
+  border-bottom: 2px solid #e0ce62;
+  margin:10px 0px;
+  padding: 10px 10px 10px 40px;
+  color: #64591b;
+  text-align: left;
+  font-weight: normal;
+}
+div.alert a {
+  text-decoration: underline;
+  color: #d26f3a;
+}
+div.error a:hover, div.message a:hover, div.alert a:hover {
+  text-decoration: none;
+}

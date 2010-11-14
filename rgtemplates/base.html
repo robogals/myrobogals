@@ -87,7 +87,9 @@
                 {% block pagetitle %}{% endblock %}            </h2>
 
                     </div> <!-- article-rel-wrapper -->
-                
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
         {% block content %}
         
         {% endblock %}

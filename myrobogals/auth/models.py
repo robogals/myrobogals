@@ -8,7 +8,6 @@ from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.hashcompat import md5_constructor, sha_constructor
-from django.utils.translation import ugettext_lazy as _
 from django.db.models.fields import PositiveIntegerField
 from myrobogals.rgprofile.usermodels import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
@@ -65,13 +64,13 @@ class Permission(models.Model):
 
     Three basic permissions -- add, change and delete -- are automatically created for each Django model.
     """
-    name = models.CharField(_('name'), max_length=50)
+    name = models.CharField('name', max_length=50)
     content_type = models.ForeignKey(ContentType)
-    codename = models.CharField(_('codename'), max_length=100)
+    codename = models.CharField('codename', max_length=100)
 
     class Meta:
-        verbose_name = _('permission')
-        verbose_name_plural = _('permissions')
+        verbose_name = 'permission'
+        verbose_name_plural = 'permissions'
         unique_together = (('content_type', 'codename'),)
         ordering = ('content_type__app_label', 'codename')
 
@@ -114,32 +113,32 @@ class Group(models.Model):
     )
 
     name = models.CharField('Name', max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
+    permissions = models.ManyToManyField(Permission, blank=True)
     short = models.CharField('Short Name', max_length=80, help_text='Use city name (e.g. Melbourne) unless this is a regional body (e.g. Australia & New Zealand)')
     location = models.CharField('Location', help_text='Use the format: City, Country (e.g. Melbourne, Australia)', max_length=64, blank=True)
-    myrobogals_url = models.CharField('myRobogals URL', max_length=16, unique=True, help_text=_("The chapter page will be https://my.robogals.org/chapters/&lt;url&gt;/ - our convention is to use lowercase city name"))
+    myrobogals_url = models.CharField('myRobogals URL', max_length=16, unique=True, help_text="The chapter page will be https://my.robogals.org/chapters/&lt;url&gt;/ - our convention is to use lowercase city name")
     creation_date = models.DateField(default=date.today)
     university = models.ForeignKey(University, null=True, blank=True)
     parent = models.ForeignKey('self', verbose_name='Parent', null=True, blank=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=2)
-    address = models.TextField('Postal address', help_text=_("Don't put city, state and postcode above, there's a spot for them right below"), blank=True)
+    address = models.TextField('Postal address', help_text="Don't put city, state and postcode above, there's a spot for them right below", blank=True)
     city = models.CharField('City/Suburb', max_length=64, blank=True)
-    state = models.CharField('State/Province', max_length=16, help_text=_("Use the abbreviation, e.g. 'VIC' not 'Victoria'"), blank=True)
+    state = models.CharField('State/Province', max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'", blank=True)
     postcode = models.CharField('Postcode', max_length=16, blank=True)
     country = models.ForeignKey(Country, verbose_name="Country", default="AU")
     timezone = models.ForeignKey(Timezone)
-    faculty_contact = models.CharField('Name', max_length=64, blank=True, help_text=_("e.g. Professor John Doe"))
-    faculty_position = models.CharField('Position', max_length=64, blank=True, help_text=_("e.g. Associate Dean"))
-    faculty_department = models.CharField('Department', max_length=64, blank=True, help_text=_("e.g. Faculty of Engineering"))
+    faculty_contact = models.CharField('Name', max_length=64, blank=True, help_text="e.g. Professor John Doe")
+    faculty_position = models.CharField('Position', max_length=64, blank=True, help_text="e.g. Associate Dean")
+    faculty_department = models.CharField('Department', max_length=64, blank=True, help_text="e.g. Faculty of Engineering")
     faculty_email = models.CharField('Email', max_length=64, blank=True)
-    faculty_phone = models.CharField('Phone', max_length=32, blank=True, help_text=_("International format, e.g. +61 3 8344 4000"))
+    faculty_phone = models.CharField('Phone', max_length=32, blank=True, help_text="International format, e.g. +61 3 8344 4000")
     website_url = models.CharField('Website URL', max_length=128, blank=True)
     facebook_url = models.CharField('Facebook URL', max_length=128, blank=True)
-    is_joinable = models.BooleanField('Joinable', default=True, help_text=_('People can join this chapter through the website. Untick this box for regional bodies, e.g. Robogals Australia'))
+    is_joinable = models.BooleanField('Joinable', default=True, help_text='People can join this chapter through the website. Untick this box for regional bodies, e.g. Robogals Australia')
     infobox = models.TextField(blank=True)
     photo = models.FileField(upload_to='unipics', blank=True)
-    emailtext = models.TextField('Default email reminder text', default="Hi {firstname}, just a reminder about the Robogals school visit to {school} tomorrow, meeting {meeting_time} at {meeting_location}. If you get lost or any issues arise, please contact {team_leader} on {team_leader_mobile}. See you there!", blank=True)
-    smstext = models.TextField('Default SMS reminder text', default="Hi {firstname}, just a reminder about the Robogals school visit to {school} tomorrow, meeting {meeting_time} at {meeting_location}. If you get lost or any issues arise, please contact {team_leader} on {team_leader_mobile}. See you there!", blank=True)
+    emailtext = models.TextField('Default email reminder text', blank=True)
+    smstext = models.TextField('Default SMS reminder text', blank=True)
     default_email_domain = models.ManyToManyField(EmailDomain, verbose_name="Allowed email domains")
     upload_exec_list = models.BooleanField('Enable daily FTP upload of executive committee list', default=False)
     ftp_host = models.CharField('FTP host', max_length=64, blank=True)
@@ -153,10 +152,18 @@ class Group(models.Model):
     student_union_enable = models.BooleanField('Enable student union member checkbox')
     student_union_required = models.BooleanField('Require student union member checkbox')
     student_union_label = models.CharField('Label for student union member checkbox', max_length=64, blank=True)
+    welcome_email_subject = models.CharField('Subject', max_length=128, blank=True)
+    welcome_email_msg = models.TextField('Message', blank=True)
+    welcome_email_html = models.BooleanField('HTML')
+    invite_email_subject = models.CharField('Subject', max_length=128, blank=True)
+    invite_email_msg = models.TextField('Message', blank=True)
+    invite_email_html = models.BooleanField('HTML')
+    welcome_page = models.TextField('Welcome page HTML', blank=True)
+    join_page = models.TextField('Join page HTML', blank=True)
 
     class Meta:
-        verbose_name = _('chapter')
-        verbose_name_plural = _('chapters')
+        verbose_name = 'chapter'
+        verbose_name_plural = 'chapters'
 
     def __unicode__(self):
         return self.name
@@ -194,7 +201,7 @@ class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
-        user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
+        user = self.model(None, username, '', '', email.strip().lower(), '', 'placeholder', False, True, False, now, now)
         if password:
             user.set_password(password)
         else:
@@ -290,15 +297,15 @@ class User(models.Model):
     	(2, 'International'),
     )
 
-    username = models.CharField('Username', max_length=30, unique=True, help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
+    username = models.CharField('Username', max_length=30, unique=True, help_text="Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores).")
     first_name = models.CharField('First name', max_length=30, blank=True)
     last_name = models.CharField('Last name', max_length=30, blank=True)
     email = models.EmailField('E-mail address', blank=True)
     new_email = models.EmailField('New e-mail address', blank=True)
-    password = models.CharField('Password', max_length=128, help_text=_("Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
-    is_staff = models.BooleanField('Exec access', default=False, help_text=_("Designates whether the user can use exec functions on the site. Note that this option is completely independent of positions defined below."))
-    is_active = models.BooleanField('Active', default=True, help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
-    is_superuser = models.BooleanField('Superuser access', default=False, help_text=_("Designates that this user is able to access the Global Admin Panel."))
+    password = models.CharField('Password', max_length=128, help_text="Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>.")
+    is_staff = models.BooleanField('Exec access', default=False, help_text="Designates whether the user can use exec functions on the site. Note that this option is completely independent of positions defined below.")
+    is_active = models.BooleanField('Active', default=True, help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.")
+    is_superuser = models.BooleanField('Superuser access', default=False, help_text="Designates that this user is able to access the Global Admin Panel.")
     last_login = models.DateTimeField('Last login', default=datetime.datetime.now)
     date_joined = models.DateTimeField('Date joined', default=datetime.datetime.now)
     groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True,
@@ -327,7 +334,7 @@ class User(models.Model):
     bio = models.TextField(blank=True)
     internal_notes = models.TextField(blank=True)
     website = models.CharField("Personal website", max_length=200, blank=True)
-    gender = models.IntegerField("Gender", choices=GENDERS, null=True)
+    gender = models.IntegerField("Gender", choices=GENDERS, default=0)
     privacy = models.IntegerField("Profile privacy", choices=PRIVACY_CHOICES, default=5)
     course_type = models.IntegerField("Course level", choices=COURSE_TYPE_CHOICES, default=0)
     student_type = models.IntegerField("Student type", choices=STUDENT_TYPE_CHOICES, default=0)
@@ -546,7 +553,7 @@ class Message(models.Model):
     message.
     """
     user = models.ForeignKey(User)
-    message = models.TextField(_('message'))
+    message = models.TextField('message')
 
     def __unicode__(self):
         return self.message

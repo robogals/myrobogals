@@ -7,7 +7,12 @@
 {% block content %}
 <form action="/messages/email/write/" method="POST">
 {% if emailform.errors %}
-{{ emailform.errors }}
+<div class="error">
+Please correct the following field(s):<br>
+{% for error in emailform.errors %}
+- {{error}}<br>
+{% endfor %}
+</div>
 {% endif %}
 <table>
   <tr>
@@ -15,10 +20,11 @@
     <td>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
 {% if request.user.is_superuser %}
-          <td style="vertical-align: top"><label for="type1">All members who have opted to receive email from the following chapters </label></td>
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" disabled="disabled" /></td>
+          <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">All members who have opted to receive email from the following chapters</span></label></td>
 {% else %}
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
           <td style="vertical-align: top"><label for="type1">All members of {{ request.user.chapter }} who have opted to receive email</label></td>
 {% endif %}
         </tr>
@@ -33,10 +39,11 @@
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
 {% endif %}
         <tr>
-          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" /></td>
 {% if request.user.is_superuser %}
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" checked="checked" /></td>
           <td style="vertical-align: top"><label for="type2">Executive committee members of the following chapters</label></td>
 {% else %}
+          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" /></td>
           <td style="vertical-align: top"><label for="type2">Executive committee members of {{ request.user.chapter }}</label></td>
 {% endif %}
         </tr>
@@ -99,7 +106,7 @@
   </tr>
   <tr>
     <td valign="top"><strong>From:</strong></td>
-    <td>{{ emailform.from_type }}</td>
+    <td><span id="from_normal">{{ emailform.from_type }}</span><span id="from_newsletter" style="display: none">From address set according to newsletter options</span></td>
   </tr>
   <tr>
     <td valign="top"><strong>Subject:</strong></td>
@@ -111,9 +118,18 @@
   </tr>
   <tr>
     <td valign="top"><strong>HTML:</strong></td>
-    <td>{{ emailform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+    <td><span id="html_normal">{{ emailform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</span>
+    <span id="html_newsletter" style="display: none">HTML automatically <strong>on</strong> for newsletter</span></td>
   </tr>
 </table>
+<div id="newsletter_warning" style="padding: 7px; margin: 7px; background-color: #CC0000; color: #FFFFFF; display: none">
+<strong>This newsletter will be sent to hundreds of people. If this message is showing, then the option you have selected is the real thing and NOT a test. Please ensure:</strong>
+<ul>
+  <li>All relevant procedures for this newsletter have been complied with</li>
+  <li>An up-to-date web version has been uploaded for people who click "view it online"</li>
+  <li>{email_id} has been inserted into the email here, but not the "view it online" version</li>
+</ul>
+</div>
 <input type="submit" value="Send Email!" />
 </form>
 {% endblock %}

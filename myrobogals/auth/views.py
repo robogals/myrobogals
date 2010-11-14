@@ -146,13 +146,14 @@ def password_reset_complete(request, template_name='registration/password_reset_
 
 def password_change(request, template_name='registration/password_change_form.html',
                     post_change_redirect=None):
-    if post_change_redirect is None:
-        post_change_redirect = reverse('myrobogals.auth.views.password_change_done')
+    #if post_change_redirect is None:
+    #    post_change_redirect = reverse('myrobogals.auth.views.password_change_done')
     if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(post_change_redirect)
+            request.user.message_set.create(message="Password changed")
+            return HttpResponseRedirect("/profile/" + request.user.username + "/")
     else:
         form = PasswordChangeForm(request.user)
     return render_to_response(template_name, {

@@ -9,19 +9,22 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.html import escape
-from django.utils.translation import ugettext, ugettext_lazy as _
+
 
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
     #filter_horizontal = ('permissions',)
     fieldsets = (
-        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes')}),
-        (_('Address info'), {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
-        (_('Faculty contact'), {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
-        (_('Chapter-specific fields'), {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label')}),
-        (_('Other'), {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'photo', 'default_email_domain')}),
-        (_('FTP details'), {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
+        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable')}),
+        ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
+        ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
+        ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label')}),
+        ('Default welcome email', {'fields': ('welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
+        ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
+        ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
+        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'photo', 'default_email_domain')}),
+        ('FTP details', {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
     )
 
 class MemberStatusAdmin(admin.TabularInline):
@@ -35,18 +38,18 @@ class PositionAdmin(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo')}),
-        (_('Chapter'), {'fields': ('groups',)}),
-        (_('University info (student members only)'), {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
-        (_('Work info (industry members only)'), {'fields': ('job_title', 'company')}),
-        (_('Mobile info'), {'fields': ('mobile', 'mobile_verified',)}),
-#        (_('Photo'), {'fields': ('photo')}),
-        (_('User preferences'), {'fields': ('timezone','email_reminder_optin','email_chapter_optin', 'mobile_marketing_optin', 'mobile_reminder_optin', 'email_newsletter_optin', 'email_othernewsletter_optin')}),
-        (_('Privacy settings'), {'fields': ('privacy', 'dob_public', 'email_public')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-        (_('Bio'), {'fields': ('bio',)}),
-        (_('Internal notes'), {'fields': ('internal_notes',)}),
-        (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo')}),
+        ('Chapter', {'fields': ('groups',)}),
+        ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
+        ('Work info (industry members only)', {'fields': ('job_title', 'company')}),
+        ('Mobile info', {'fields': ('mobile', 'mobile_verified',)}),
+        #('Photo'), {'fields': ('photo')}),
+        ('User preferences', {'fields': ('timezone','email_reminder_optin','email_chapter_optin', 'mobile_marketing_optin', 'mobile_reminder_optin', 'email_newsletter_optin', 'email_othernewsletter_optin')}),
+        ('Privacy settings', {'fields': ('privacy', 'dob_public', 'email_public')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Bio', {'fields': ('bio',)}),
+        ('Internal notes', {'fields': ('internal_notes',)}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
     form = UserChangeForm
     add_form = UserCreationForm
@@ -89,7 +92,7 @@ class UserAdmin(admin.ModelAdmin):
             form = self.add_form(request.POST)
             if form.is_valid():
                 new_user = form.save()
-                msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': 'user', 'obj': new_user}
+                msg = 'The %(name)s "%(obj)s" was added successfully.' % {'name': 'user', 'obj': new_user}
                 self.log_addition(request, new_user)
                 if "_addanother" in request.POST:
                     request.user.message_set.create(message=msg)
@@ -97,12 +100,12 @@ class UserAdmin(admin.ModelAdmin):
                 elif '_popup' in request.REQUEST:
                     return self.response_add(request, new_user)
                 else:
-                    request.user.message_set.create(message=msg + ' ' + ugettext("You may edit it again below."))
+                    request.user.message_set.create(message=msg + ' ' + "You may edit it again below.")
                     return HttpResponseRedirect('../%s/' % new_user.id)
         else:
             form = self.add_form()
         return render_to_response('admin/auth/user/add_form.html', {
-            'title': _('Add user'),
+            'title': 'Add user',
             'form': form,
             'is_popup': '_popup' in request.REQUEST,
             'add': True,
@@ -128,13 +131,13 @@ class UserAdmin(admin.ModelAdmin):
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
                 new_user = form.save()
-                msg = ugettext('Password changed successfully.')
+                msg = 'Password changed successfully.'
                 request.user.message_set.create(message=msg)
                 return HttpResponseRedirect('..')
         else:
             form = self.change_password_form(user)
         return render_to_response('admin/auth/user/change_password.html', {
-            'title': _('Change password: %s') % escape(user.username),
+            'title': 'Change password: %s' % escape(user.username),
             'form': form,
             'is_popup': '_popup' in request.REQUEST,
             'add': True,

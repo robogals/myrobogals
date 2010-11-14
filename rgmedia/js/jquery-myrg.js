@@ -9,6 +9,11 @@
 					$('#form_table_recipients').hide();
 					$('#form_table_newsletter').hide();
 					$('#form_table_lists').hide();
+					$('#newsletter_warning').hide();
+					$('#html_newsletter').hide();
+					$('#from_newsletter').hide();
+					$('#html_normal').show();
+					$('#from_normal').show();
 					break;
 				case '2':
 					$('#form_table_chapters').hide();
@@ -16,6 +21,11 @@
 					$('#form_table_recipients').hide();
 					$('#form_table_newsletter').hide();
 					$('#form_table_lists').hide();
+					$('#newsletter_warning').hide();
+					$('#html_newsletter').hide();
+					$('#from_newsletter').hide();
+					$('#html_normal').show();
+					$('#from_normal').show();
 					break;
 				case '3':
 					$('#form_table_chapters').hide();
@@ -23,6 +33,11 @@
 					$('#form_table_recipients').show();
 					$('#form_table_newsletter').hide();
 					$('#form_table_lists').hide();
+					$('#newsletter_warning').hide();
+					$('#html_newsletter').hide();
+					$('#from_newsletter').hide();
+					$('#html_normal').show();
+					$('#from_normal').show();
 					break;
 				case '4':
 					$('#form_table_chapters').hide();
@@ -30,6 +45,11 @@
 					$('#form_table_recipients').hide();
 					$('#form_table_newsletter').show();
 					$('#form_table_lists').hide();
+					$('#newsletter_warning').show();
+					$('#html_newsletter').show();
+					$('#from_newsletter').show();
+					$('#html_normal').hide();
+					$('#from_normal').hide();
 					break;
 				case '5':
 					$('#form_table_chapters').hide();
@@ -37,6 +57,11 @@
 					$('#form_table_recipients').hide();
 					$('#form_table_newsletter').hide();
 					$('#form_table_lists').show();
+					$('#newsletter_warning').hide();
+					$('#html_newsletter').hide();
+					$('#from_newsletter').hide();
+					$('#html_normal').show();
+					$('#from_normal').show();
 					break;
 			}
 		});
@@ -53,4 +78,16 @@
 			}
 		});
 		$('#id_action').change();
+
+		$('#id_importaction').change(function() {
+			switch ($('#id_importaction').val()) {
+				case '1':
+					$('#welcomeemail').show();
+					break;
+				case '2':
+					$('#welcomeemail').hide();
+					break;
+			}
+		});
+		$('#id_importaction').change();
 	});
