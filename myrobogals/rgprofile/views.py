@@ -662,8 +662,6 @@ def importusers(request, chapterurl):
 			if welcomeemail['importaction'] == '2':
 				welcomeemail = None
 			defaults = request.session['defaults']
-			print defaults
-			print welcomeemail
 			try:
 				users_imported = importcsv(filerows, welcomeemail, defaults, chapter)
 			except RgImportCsvException as e:
