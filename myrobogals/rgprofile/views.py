@@ -477,6 +477,7 @@ def edituser(request, username, chapter=None):
 						u.internal_notes = data['internal_notes']
 					u.save()
 					if 'return' in request.POST:
+						request.user.message_set.create(message="Profile and settings updated!")
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
