@@ -7,7 +7,7 @@ def home(request):
 
 def welcome(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	welcome_page = chapter.welcome_page.format(chapter=chapter)
+	welcome_page = chapter.welcome_page.format(user=request.user, chapter=chapter)
 	return render_to_response('welcome.html', {'chapter': chapter, 'welcome_page': welcome_page}, context_instance=RequestContext(request))
 
 def credits(request):
