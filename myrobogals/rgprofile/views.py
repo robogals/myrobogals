@@ -20,7 +20,7 @@ from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import MEDIA_ROOT
 from time import time
 import csv
-from myrobogals.rgprofile.functions import importcsv, RgImportCsvException
+from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
 
 '''
 def joinstart(request):
@@ -734,14 +734,56 @@ HELPINFO = (
 @login_required
 def importusershelp(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
 		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
+
+class WelcomeEmailFormTwo(forms.Form):
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(WelcomeEmailFormTwo, self).__init__(*args, **kwargs)
+		self.fields['subject'].initial = chapter.welcome_email_subject
+		self.fields['body'].initial = chapter.welcome_email_msg
+		self.fields['html'].initial = chapter.welcome_email_html
+
+	subject = forms.CharField(max_length=256)
+	body = forms.CharField(widget=forms.Textarea)
+	html = forms.BooleanField(required=False)
+
+@login_required
+def genpw(request, username):
+	user = get_object_or_404(User, username__exact=username)
+	chapter = user.chapter()
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
+		raise Http404
+	if 'return' in request.GET:
+		return_url = request.GET['return']
+	elif 'return' in request.POST:
+		return_url = request.POST['return']
+	else:
+		return_url = ''
+	errmsg = ''
+	if request.method == 'POST':
+		welcomeform = WelcomeEmailFormTwo(request.POST, chapter=chapter)
+		if welcomeform.is_valid():
+			welcomeemail = welcomeform.cleaned_data
+			try:
+				genandsendpw(user, welcomeemail, chapter)
+				request.user.message_set.create(message="Password generated and emailed")
+				if return_url == '':
+					return_url = '/profile/' + username + '/edit/'
+				return HttpResponseRedirect(return_url)
+			except RgGenAndSendPwException as e:
+				errmsg = e.errmsg
+	else:
+		welcomeform = WelcomeEmailFormTwo(None, chapter=chapter)
+	return render_to_response('genpw.html', {'welcomeform': welcomeform, 'username': user.username, 'chapter': chapter, 'return': return_url, 'error': errmsg}, context_instance=RequestContext(request))
 
 @login_required
 def unilist(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
 		raise Http404
 	unis = University.objects.all()
 	return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))

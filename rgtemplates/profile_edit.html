@@ -44,6 +44,10 @@
     <td>Confirm new password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td><a href="/profile/{{u.username}}/genpw/">Generate and email new password</a></td>
+  </tr>
 {% endif %}
 {% for field in formpart1 %}
   {% if field.errors %}

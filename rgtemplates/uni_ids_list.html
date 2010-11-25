@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}University IDs for CSV import{% endblock %}
+
+{% block pagetitle %}University IDs for CSV import{% endblock %}
+
+{% block content %}
+<table cellspacing="0" border="1" cellpadding="3">
+{% for uni in unis %}
+  <tr>
+    <td style="vertical-align: top">{{ uni.pk }}</td>
+    <td style="vertical-align: top">{{ uni.name }}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

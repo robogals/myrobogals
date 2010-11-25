@@ -10,6 +10,12 @@ class RgImportCsvException(Exception):
 	def __str__(self):
 		return self.errmsg
 
+class RgGenAndSendPwException(Exception):
+	def __init__(self, errmsg):
+		self.errmsg = errmsg
+	def __str__(self):
+		return self.errmsg
+
 def stringval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	if data != "":
@@ -133,7 +139,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 			if 'last_name' not in columns:
 				raise RgImportCsvException('You must specify a last_name field')
 			if 'email' not in columns:
-				raise RgImportCsvException('You must specify a email field')
+				raise RgImportCsvException('You must specify an email field')
 			continue
 		
 		# Create new user
@@ -227,6 +233,8 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 				boolval(colname, cell, newuser, defaults)
 			elif colname == 'email_newsletter_optin':
 				boolval(colname, cell, newuser, defaults)
+			else:
+				pass   # Unknown column, ignore
 			# Increment column and do the loop again
 			i += 1
 
@@ -289,3 +297,33 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 
 		users_imported += 1
 	return users_imported
+
+def genandsendpw(user, welcomeemail, chapter):
+	plaintext_password = User.objects.make_random_password(6)
+	user.set_password(plaintext_password)
+	user.save()
+	
+	message = EmailMessage()
+	message.subject = welcomeemail['subject']
+	try:
+		message.body = welcomeemail['body'].format(
+			chapter=chapter,
+			user=user,
+			plaintext_password=plaintext_password)
+	except Exception:
+		raise RgGenAndSendPwException('Email body contains invalid fields')
+	message.from_address = 'my@robogals.org'
+	message.reply_address = 'my@robogals.org'
+	message.from_name = chapter.name
+	message.sender = User.objects.get(username='edit')
+	message.html = welcomeemail['html']
+	message.status = -1
+	message.save()
+	recipient = EmailRecipient()
+	recipient.message = message
+	recipient.user = user
+	recipient.to_name = user.get_full_name()
+	recipient.to_address = user.email
+	recipient.save()
+	message.status = 0
+	message.save()
