@@ -33,7 +33,7 @@
 {% if chpass %}
   {% if pwerr %}
   <tr>
-    <td colspan="2"><div class="error">{{ usererr }}</div></td>
+    <td colspan="2"><div class="error">{{ pwerr }}</div></td>
   </tr>
   {% endif %}
   <tr>
@@ -44,10 +44,12 @@
     <td>Confirm new password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
+{% if request.user.is_staff %}
   <tr>
     <td>&nbsp;</td>
     <td><a href="/profile/{{u.username}}/genpw/">Generate and email new password</a></td>
   </tr>
+{% endif %}
 {% endif %}
 {% for field in formpart1 %}
   {% if field.errors %}

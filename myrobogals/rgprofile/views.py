@@ -413,6 +413,9 @@ def edituser(request, username, chapter=None):
 						usererr = _('Your username must be 3 or more characters')
 					elif username_len > 30:
 						usererr = _('Your username must be less than 30 characters')
+					matches = re.compile(r'^\w+$').findall(new_username)
+					if matches == []:
+						usererr = _('Your username must contain only letters, numbers and underscores')
 					else:
 						try:
 							usercheck = User.objects.get(username=new_username)
