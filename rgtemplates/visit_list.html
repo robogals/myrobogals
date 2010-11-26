@@ -16,7 +16,7 @@
 {% for v in visits %}
   <tr>
     <td>{{v.school}}</td>
-    <td>{{v.start_date_formatted}}</td>
+    <td>{{v.visit_start|date:"l j F Y"}}</td>
     <td>{{v.location}}</td>
     <td><a href="/teaching/{{v.pk}}/">View</a></td>
   </tr>
