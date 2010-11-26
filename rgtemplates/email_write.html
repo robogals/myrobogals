@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}Write email{% endblock %}
 
@@ -127,7 +128,7 @@ Please correct the following field(s):<br>
 <ul>
   <li>All relevant procedures for this newsletter have been complied with</li>
   <li>An up-to-date web version has been uploaded for people who click "view it online"</li>
-  <li>{{email_id}} has been inserted into the email here, but not the "view it online" version</li>
+  <li>{% trans "{{email_id}}" %} has been inserted into the email here, but not the "view it online" version</li>
 </ul>
 </div>
 <input type="submit" value="Send Email!" />
