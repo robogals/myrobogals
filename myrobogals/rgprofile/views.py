@@ -159,6 +159,33 @@ def redirtoeditself(request):
 
 def detail(request, username):
 	u = get_object_or_404(User, username__exact=username)
+	
+	# Privacy setting
+	private = False
+	if u.privacy >= 20:
+		pass
+	elif u.privacy >= 10:
+		if not request.user.is_authenticated():
+			private = True
+	elif u.privacy >= 5:
+		if not request.user.is_authenticated():
+			private = False
+		elif not (request.user.chapter() == u.chapter()):
+			private = True
+	else:
+		if not request.user.is_authenticated():
+			private = True
+		elif not (request.user.chapter() == u.chapter()):
+			private = True
+		elif not request.user.is_staff:
+			private = True
+	
+	if request.user.is_superuser:
+		private = False
+	
+	if private:
+		return render_to_response('private.html', {}, context_instance=RequestContext(request))
+
 	current_positions = Position.objects.filter(user=u, position_date_end__isnull=True)
 	past_positions = Position.objects.filter(user=u, position_date_end__isnull=False)
 	if u.membertype().type_of_person == 1:  # Student

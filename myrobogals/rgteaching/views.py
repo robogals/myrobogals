@@ -314,6 +314,7 @@ def editschool(request, school_id):
 				data = formpart3.cleaned_data
 				s.notes = data['notes']
 				s.save()
+				request.user.message_set.create(message="School info updated")
 				return HttpResponseRedirect('/teaching/schools/')
 		else:
 			if school_id == 0:
