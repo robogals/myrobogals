@@ -217,6 +217,9 @@ def api(request):
 				except PendingNewsletterSubscriber.DoesNotExist:
 					return HttpResponse("B")
 				try:
+					if n.pk != 1:
+						# Only do the user thing for The Amplifier (id = 1)
+						raise User.DoesNotExist
 					try:
 						u = User.objects.get(email=p.email)
 					except User.MultipleObjectsReturned:
@@ -240,8 +243,11 @@ def api(request):
 					ns = NewsletterSubscriber.objects.get(email=email, newsletter=n, active=True)
 				except NewsletterSubscriber.DoesNotExist:
 					# Not on the list. Perhaps subscribed as a Robogals member?
+					if n.pk != 1:
+						# Only do the user thing for The Amplifier (id = 1)
+						return HttpResponse("B")  # Not subscribed
 					try:
-						for u in User.objects.filter(email=p.email):
+						for u in User.objects.filter(email=email):
 							if u.email_newsletter_optin:
 								u.email_newsletter_optin = False
 								u.save()
