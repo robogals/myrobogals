@@ -169,7 +169,7 @@ def detail(request, username):
 			private = True
 	elif u.privacy >= 5:
 		if not request.user.is_authenticated():
-			private = False
+			private = True
 		elif not (request.user.chapter() == u.chapter()):
 			private = True
 	else:
