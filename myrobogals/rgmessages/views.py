@@ -217,7 +217,11 @@ def api(request):
 				except PendingNewsletterSubscriber.DoesNotExist:
 					return HttpResponse("B")
 				try:
-					u = User.objects.filter(email=p.email)
+					try:
+						u = User.objects.get(email=p.email)
+					except User.MultipleObjectsReturned:
+						# Subscribe the first user with this email address
+						u = User.objects.filter(email=p.email)[0]
 					# This user is already a Robogals member
 					u.email_newsletter_optin = True
 					u.save()
@@ -237,13 +241,12 @@ def api(request):
 				except NewsletterSubscriber.DoesNotExist:
 					# Not on the list. Perhaps subscribed as a Robogals member?
 					try:
-						u = User.objects.filter(email=p.email)
-						if u.email_newsletter_optin == False:
-							return HttpResponse("B")  # Not subscribed
-						else:
-							u.email_newsletter_optin = False
-							u.save()
-							return HttpResponse("A")
+						for u in User.objects.filter(email=p.email):
+							if u.email_newsletter_optin:
+								u.email_newsletter_optin = False
+								u.save()
+								return HttpResponse("A")
+						return HttpResponse("B")  # Not subscribed
 					except User.DoesNotExist:
 						return HttpResponse("B")  # Not subscribed
 				ns.unsubscribed_date = datetime.now()
