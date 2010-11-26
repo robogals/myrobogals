@@ -116,6 +116,7 @@ def edituserlist(request, chapterurl, list_id):
 					l.save()
 				l.users = data['users']
 				l.save()
+				request.user.message_set.create(message="User list \"" + l.name + "\" has been updated")
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:

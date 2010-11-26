@@ -152,6 +152,7 @@ class Group(models.Model):
     student_union_enable = models.BooleanField('Enable student union member checkbox')
     student_union_required = models.BooleanField('Require student union member checkbox')
     student_union_label = models.CharField('Label for student union member checkbox', max_length=64, blank=True)
+    welcome_email_enable = models.BooleanField('Enable welcome email for new signups')
     welcome_email_subject = models.CharField('Subject', max_length=128, blank=True)
     welcome_email_msg = models.TextField('Message', blank=True)
     welcome_email_html = models.BooleanField('HTML')
@@ -160,6 +161,8 @@ class Group(models.Model):
     invite_email_html = models.BooleanField('HTML')
     welcome_page = models.TextField('Welcome page HTML', blank=True)
     join_page = models.TextField('Join page HTML', blank=True)
+    notify_enable = models.BooleanField('Notify when a new member signs up online')
+    notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True)
 
     class Meta:
         verbose_name = 'chapter'

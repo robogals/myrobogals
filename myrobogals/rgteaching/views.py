@@ -103,6 +103,7 @@ def editvisit(request, visit_id):
 				v.otherprep = data['otherprep']
 				v.notes = data['notes']
 				v.save()
+				request.user.message_set.create(message="School visit info updated")
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 		else:
 			if visit_id == 0:
@@ -253,6 +254,10 @@ def invitetovisit(request, visit_id):
 				message.status = 0
 				message.save()
 			
+			if data['action'] == '1':
+				request.user.message_set.create(message="Invitations have been sent to the selected volunteers")
+			if data['action'] == '2':
+				request.user.message_set.create(message="Selected volunteers have been added as attending")
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)

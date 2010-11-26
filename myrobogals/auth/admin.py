@@ -20,10 +20,10 @@ class GroupAdmin(admin.ModelAdmin):
         ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
         ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label')}),
-        ('Default welcome email', {'fields': ('welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
+        ('Welcome email', {'fields': ('welcome_email_enable', 'welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
         ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
         ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
-        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'photo', 'default_email_domain')}),
+        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'notify_enable', 'notify_list', 'photo', 'default_email_domain')}),
         ('FTP details', {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
     )
 
