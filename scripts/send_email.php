@@ -53,7 +53,7 @@ Content-Type: text/html; charset=\"utf-8\"
 Content-Transfer-Encoding: base64
 
 ";
-				$body .= chunk_split(base64_encode(str_replace('{{email_id}}', $recipient['id'], $msg['body']));
+				$body .= chunk_split(base64_encode(str_replace('{{email_id}}', $recipient['id'], $msg['body'])));
 				$body .= "
 
 --robogals{$uniqid}--
