@@ -189,7 +189,7 @@ class InviteForm(forms.Form):
 		self.fields['memberselect'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_reminder_optin=True).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
 		self.fields['body'].initial = "Hello,\n\nThere will be an upcoming Robogals school visit:\n"
-		self.fields['body'].initial += "Date: " + visit.start_date_formatted() + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
+		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
 		self.fields['body'].initial += "\nLocation: " + visit.location + "\nSchool: " + visit.school.name
 		self.fields['body'].initial += "\n\nTo accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/\n\nThanks,\n\n" + user.chapter().name + "\n"
 

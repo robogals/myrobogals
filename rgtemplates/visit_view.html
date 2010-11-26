@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Lesson for {{v.school}} on {{v.start_date_formatted}}{% endblock %}
+{% block title %}Lesson for {{v.school}} on {{v.visit_start|date:"l j F Y"}}{% endblock %}
 
-{% block pagetitle %}Lesson for {{v.school}} on {{v.start_date_formatted}}{% endblock %}
+{% block pagetitle %}Lesson for {{v.school}} on {{v.visit_start|date:"l j F Y"}}{% endblock %}
 
 {% block content %}
 <p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a>
@@ -53,7 +53,7 @@
   </tr>
   <tr>
     <td style="vertical-align: top">Date</td>
-    <td>{{v.start_date_formatted}}</td>
+    <td>{{v.visit_start|date:"l j F Y"}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">Time</td>

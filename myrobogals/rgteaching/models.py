@@ -40,9 +40,6 @@ class Event(models.Model):
 	notes = models.TextField(blank=True)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=0)
 	allow_rsvp = models.IntegerField(choices=ALLOW_RSVP_CHOICES, default=0)
-	
-	def start_date_formatted(self):
-		return self.visit_start.strftime("%e %b %y")
 
 class SchoolVisit(Event):
 	school = models.ForeignKey(School)
@@ -56,14 +53,14 @@ class SchoolVisit(Event):
 	closing_comments = models.TextField("Closing comments", blank=True)
 	
 	def __unicode__(self):
-		return "Visit to " + str(self.school) + " by " + str(self.chapter) + " on " + self.start_date_formatted()
+		return "Visit to " + str(self.school) + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
 	
 	class Meta:
 		ordering = ['-visit_start']
 
 class TrainingSession(Event):
 	def __unicode__(self):
-		return "Training session at " + self.location + " by " + str(self.chapter) + " on " + self.start_date_formatted()
+		return "Training session at " + self.location + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
 
 	class Meta:
 		verbose_name = "training session"
