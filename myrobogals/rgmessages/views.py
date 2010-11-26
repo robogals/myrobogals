@@ -216,12 +216,18 @@ def api(request):
 					p = PendingNewsletterSubscriber.objects.get(pk=pid, newsletter=n, uniqid=key)
 				except PendingNewsletterSubscriber.DoesNotExist:
 					return HttpResponse("B")
-				ns = NewsletterSubscriber()
-				ns.newsletter = n
-				ns.email = p.email
-				ns.active = True
-				ns.details_verified = False
-				ns.save()
+				try:
+					u = User.objects.filter(email=p.email)
+					# This user is already a Robogals member
+					u.email_newsletter_optin = True
+					u.save()
+				except User.DoesNotExist:
+					ns = NewsletterSubscriber()
+					ns.newsletter = n
+					ns.email = p.email
+					ns.active = True
+					ns.details_verified = False
+					ns.save()
 				p.delete()
 				return HttpResponse("A")
 			elif request.GET['action'] == 'unsubscribe':
@@ -229,11 +235,21 @@ def api(request):
 				try:
 					ns = NewsletterSubscriber.objects.get(email=email, newsletter=n, active=True)
 				except NewsletterSubscriber.DoesNotExist:
-					return HttpResponse("B")  # Not subscribed
+					# Not on the list. Perhaps subscribed as a Robogals member?
+					try:
+						u = User.objects.filter(email=p.email)
+						if u.email_newsletter_optin == False:
+							return HttpResponse("B")  # Not subscribed
+						else:
+							u.email_newsletter_optin = False
+							u.save()
+							return HttpResponse("A")
+					except User.DoesNotExist:
+						return HttpResponse("B")  # Not subscribed
 				ns.unsubscribed_date = datetime.now()
 				ns.active = False
 				ns.save()
-				return HttpResponse("A")				
+				return HttpResponse("A")
 			else:
 				return HttpResponse("-1")
 		except KeyError:
