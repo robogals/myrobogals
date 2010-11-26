@@ -4,12 +4,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import Group
 from myrobogals.auth.models import User
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
-from myrobogals.settings import API_SECRET, SECRET_KEY
+from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
 from django.forms.fields import email_re
 from hashlib import md5
 from urllib import unquote_plus
@@ -153,6 +154,19 @@ def writeemail(request):
 	else:
 		emailform = WriteEmailForm(None, user=request.user)
 	return render_to_response('email_write.html', {'emailform': emailform,}, context_instance=RequestContext(request))
+
+def serveimg(request, msgid, filename):
+	try:
+		recipient = EmailRecipient.objects.get(pk=msgid)
+	except EmailRecipient.DoesNotExist:
+		raise Http404
+	recipient.status = 7
+	recipient.save()
+	try:
+		image_data = open(MEDIA_ROOT + '/images/' + filename, "rb").read()
+	except Exception:
+		raise Http404
+	return HttpResponse(image_data, mimetype="image/jpeg")
 
 def emaildone(request):
 	return render_to_response('email_done.html', None, context_instance=RequestContext(request))

@@ -41,7 +41,8 @@ class EmailRecipient(models.Model):
 		(3, 'No sender address'),
 		(4, 'Invalid sender address'),
 		(5, 'Invalid recipient address'),
-		(6, 'Unknown error')
+		(6, 'Unknown error'),
+		(7, 'Opened')
 	)
 
 	message = models.ForeignKey(EmailMessage)
