@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Private{% endblock %}
+
+{% block pagetitle %}Private{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="error">{{error}}</div>
+{% else %}
+This user has their profile set as private, you do not have permission to view it.
+{% endif %}
+{% endblock %}
