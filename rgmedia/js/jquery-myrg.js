@@ -87,6 +87,9 @@
 				case '2':
 					$('#welcomeemail').hide();
 					break;
+				case '3':
+					$('#welcomeemail').show();
+					break;
 			}
 		});
 		$('#id_importaction').change();

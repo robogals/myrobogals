@@ -72,6 +72,13 @@ class Newsletter(models.Model):
 	
 	def __unicode__(self):
 		return self.name
+	
+	def get_most_recent(self):
+		try:
+			most_recent_issue = EmailMessage.objects.filter(sender=self.from_user).order_by('-date')[0]
+		except KeyError:
+			most_recent_issue = None
+		return most_recent_issue
 
 class SubscriberType(models.Model):
 	description = models.CharField(max_length=128)

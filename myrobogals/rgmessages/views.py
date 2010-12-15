@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import Group
 from myrobogals.auth.models import User
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -15,6 +15,12 @@ from django.forms.fields import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime
+from myrobogals.rgprofile.usermodels import Country
+from django.utils.translation import ugettext_lazy as _
+from myrobogals.auth.decorators import login_required
+from time import time
+from myrobogals.rgmessages.functions import importcsv, RgImportCsvException
+import csv
 
 def validate_sms_chars(text):
 	matches = re.compile(u'^[a-z|A-Z|0-9|\\n|\\r|@|£|\$|¥|è|é|ù|ì|ò|Ç|Ø|ø|Å|å|Δ|Φ|Γ|Λ|Ω|Π|Ψ|Σ|Θ|Ξ|_|\^|{|}|\\\\|\[|~|\]|\||€|Æ|æ|ß|É| |!|"|#|¤|\%|&|\'|(|)|\*|\+|\,|\-|\.|\/|:|;|<|=|>|\?|¡|Ä|Ö|Ñ|Ü|§|¿|ä|ö|ñ|ü|à]+$').findall(text)
@@ -69,7 +75,10 @@ class WriteEmailForm(forms.Form):
 			(2, user.get_full_name() + " <" + user.email + ">")
 		)
 
+@login_required
 def writeemail(request):
+	if not request.user.is_staff:
+		raise Http404
 	if request.method == 'POST':
 		emailform = WriteEmailForm(request.POST, user=request.user)
 		if emailform.is_valid():
@@ -168,7 +177,10 @@ def serveimg(request, msgid, filename):
 		raise Http404
 	return HttpResponse(image_data, mimetype="image/jpeg")
 
+@login_required
 def emaildone(request):
+	if not request.user.is_staff:
+		raise Http404
 	return render_to_response('email_done.html', None, context_instance=RequestContext(request))
 
 def msghistory(request):
@@ -279,3 +291,120 @@ def api(request):
 			return HttpResponse("-1")
 	else:
 		return HttpResponse("-1")
+
+class CSVUploadForm(forms.Form):
+	csvfile = forms.FileField()
+
+class WelcomeEmailForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		super(WelcomeEmailForm, self).__init__(*args, **kwargs)
+		self.fields['from_address'].initial = user.email
+		self.fields['reply_address'].initial = user.email
+		self.fields['from_name'].initial = user.get_full_name()
+
+	importaction = forms.ChoiceField(choices=((1,'Add subscribers, and send welcome email'),(2,'Add subscribers, with no further action'),(3,'Add subscribers, and send welcome email if send_email = 1')),initial=1)
+	from_address = forms.CharField(max_length=256, required=True)
+	reply_address = forms.CharField(max_length=256, required=True)
+	from_name = forms.CharField(max_length=256, required=True)
+	subject = forms.CharField(max_length=256, required=False)
+	body = forms.CharField(widget=forms.Textarea, required=False)
+	html = forms.BooleanField(required=False)
+
+class DefaultsForm(forms.Form):
+	type = forms.ModelChoiceField(queryset=SubscriberType.objects.all(), label=_('Subscriber type'), required=False)
+	country = forms.ModelChoiceField(queryset=Country.objects.all(), label=_('Country'), required=False)
+	details_verified = forms.BooleanField(label=_('Details verified'), required=False, initial=True)
+	send_most_recent = forms.BooleanField(label=_('Send most recent newsletter upon subscribing'), required=False, initial=False)
+
+@login_required
+def importsubscribers(request, newsletter_id):
+	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+		raise Http404
+	errmsg = None
+	if request.method == 'POST':
+		if request.POST['step'] == '1':
+			form = CSVUploadForm(request.POST, request.FILES)
+			welcomeform = WelcomeEmailForm(request.POST, user=request.user)
+			defaultsform = DefaultsForm(request.POST)
+			if form.is_valid() and welcomeform.is_valid() and defaultsform.is_valid():
+				file = request.FILES['csvfile']
+				tmppath = "/tmp/" + str(newsletter.pk) + request.user.username + str(time()) + ".csv"
+				destination = open(tmppath, 'w')
+				for chunk in file.chunks():
+					destination.write(chunk)
+				destination.close()
+				fp = open(tmppath, 'r')
+				filerows = csv.reader(fp)
+				defaults = defaultsform.cleaned_data
+				welcomeemail = welcomeform.cleaned_data
+				request.session['welcomeemail'] = welcomeemail
+				request.session['defaults'] = defaults
+				return render_to_response('import_subscribers_2.html', {'tmppath': tmppath, 'filerows': filerows, 'newsletter': newsletter}, context_instance=RequestContext(request))
+		elif request.POST['step'] == '2':
+			if 'tmppath' not in request.POST:
+				return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/import/")
+			tmppath = request.POST['tmppath']
+			fp = open(tmppath, 'r')
+			filerows = csv.reader(fp)
+			welcomeemail = request.session['welcomeemail']
+			defaults = request.session['defaults']
+			try:
+				users_imported = importcsv(filerows, welcomeemail, defaults, newsletter, request.user)
+			except RgImportCsvException as e:
+				errmsg = e.errmsg
+				return render_to_response('import_subscribers_2.html', {'tmppath': tmppath, 'filerows': filerows, 'newsletter': newsletter, 'errmsg': errmsg}, context_instance=RequestContext(request))
+			msg = _('%d subscribers imported!') % users_imported
+			request.user.message_set.create(message=msg)
+			del request.session['welcomeemail']
+			del request.session['defaults']
+			return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/")
+	else:
+		form = CSVUploadForm()
+		welcomeform = WelcomeEmailForm(None, user=request.user)
+		defaultsform = DefaultsForm()
+	return render_to_response('import_subscribers_1.html', {'newsletter': newsletter, 'form': form, 'welcomeform': welcomeform, 'defaultsform': defaultsform, 'errmsg': errmsg}, context_instance=RequestContext(request))
+
+COMPULSORY_FIELDS = (
+	('email', 'Email address'),
+)
+
+NAME_FIELDS = (
+	('first_name', 'First name'),
+	('last_name', 'Last name'),
+	('company', 'Company name'),
+)
+
+ADVANCED_FIELDS = (
+	('type', 'Type of subscriber'),
+	('country', 'ISO two-letter country code'),
+	('details_verified', 'Either \'True\' or \'False\', specifies whether this subscriber\'s details are known to be correct'),
+)
+
+ACTION_FIELDS = (
+	('send_most_recent', 'Either \'True\' or \'False\', send the most recent newsletter to this user upon subscribing'),
+	('send_email', 'Either \'True\' or \'False\', send the welcome email to this user upon subscribing'),
+)
+
+HELPINFO = (
+	("Compulsory field", COMPULSORY_FIELDS),
+	("Name fields", NAME_FIELDS),
+	("Advanced fields", ADVANCED_FIELDS),
+	("Action fields", ACTION_FIELDS)
+)
+
+@login_required
+def importsubscribershelp(request, newsletter_id):
+	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+		raise Http404
+	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
+
+@login_required
+def newslettercp(request, newsletter_id):
+	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+		raise Http404
+	return render_to_response('newsletter_cp.html', {'newsletter': newsletter}, context_instance=RequestContext(request))

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Import subscribers for {{newsletter.name}}{% endblock %}
+
+{% block pagetitle %}Import subscribers for {{newsletter.name}}{% endblock %}
+
+{% block content %}
+{% if errmsg %}{{errmsg}}<br> <br>{% endif %}
+The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>.<br>
+<br>
+The email field must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't.<br>
+<br>
+<form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post" enctype="multipart/form-data">
+{% if form.csvfile.errors %}
+<div class="error">{% for error in form.csvfile.errors %}{{error}}{% endfor %}</div>
+{% endif %}
+<table>
+  <tr>
+    <td valign="top" style="width: 70px"><strong>CSV file:</strong></td>
+    <td>{{form.csvfile}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; width: 50px"><strong>Action:</strong></td>
+    <td style="vertical-align: top">{{ welcomeform.importaction }}</td>
+  </tr>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+</table>
+<table id="welcomeemail">
+  <tr>
+    <td colspan="2"><strong>Welcome email:</strong></td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 110px"><strong>From address:</strong></td>
+    <td>{{ welcomeform.from_address }}</td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 110px"><strong>From name:</strong></td>
+    <td>{{ welcomeform.from_name }}</td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 110px"><strong>Reply-to address:</strong></td>
+    <td>{{ welcomeform.reply_address }}</td>
+  </tr>
+  <tr>
+    <td valign="top" style="width: 110px"><strong>Subject:</strong></td>
+    <td>{{ welcomeform.subject }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Message:</strong></td>
+    <td>{{ welcomeform.body }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>HTML:</strong></td>
+    <td>{{ welcomeform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td colspan="2"><strong>&nbsp;<br />Defaults</strong><br>If specified, these values will be used where that attribute is not specified in the CSV file. All fields are optional.</strong></td>
+  </tr>
+{% for field in defaultsform %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ field.label_tag }}</td>
+    <td style="vertical-align: top">{{ field }}</td>
+  </tr>
+{% endfor %}
+</table>
+<input type="hidden" name="step" value="1">
+<input type="submit" value="Continue">
+</form>
+{% endblock %}
