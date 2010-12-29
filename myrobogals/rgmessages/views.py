@@ -15,6 +15,7 @@ from django.forms.fields import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime
+from tinymce.widgets import TinyMCE
 from myrobogals.rgprofile.usermodels import Country
 from django.utils.translation import ugettext_lazy as _
 from myrobogals.auth.decorators import login_required
@@ -51,14 +52,13 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class WriteEmailForm(forms.Form):
 	subject = forms.CharField(max_length=256)
-	body = forms.CharField(widget=forms.Textarea)
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,"Chapter name"),(2,"Your name")), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	newsletters = forms.ModelChoiceField(queryset=Newsletter.objects.all(), required=False)
-	html = forms.BooleanField(required=False)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -89,20 +89,21 @@ def writeemail(request):
 			message.from_address = request.user.email
 			message.reply_address = request.user.email
 			message.sender = request.user
-			message.html = data['html']
+			message.html = True
 			if request.POST['type'] == '4':
 				n = data['newsletters']
 				message.from_name = n.from_name
 				message.from_address = n.from_email
 				message.reply_address = n.from_email
 				message.sender = n.from_user
-				message.html = True
-			elif int(data['from_type']) == 0:
-				message.from_name = "Robogals"
-			elif int(data['from_type']) == 1:
-				message.from_name = request.user.chapter().name
 			else:
-				message.from_name = request.user.get_full_name()
+				message.content_subtype = "html"
+				if int(data['from_type']) == 0:
+					message.from_name = "Robogals"
+				elif int(data['from_type']) == 1:
+					message.from_name = request.user.chapter().name
+				else:
+					message.from_name = request.user.get_full_name()
 				
 			# Don't send it yet until the recipient list is done
 			message.status = -1
