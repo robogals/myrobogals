@@ -1,3 +1,4 @@
+document.domain = 'my.robogals.org';
 (function(win) {
 	var whiteSpaceRe = /^\s*|\s*$/g,
 		undefined, isRegExpBroken = 'B'.replace(/A(.)|B/, '$1') === '$1';
