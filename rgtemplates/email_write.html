@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_tinymce.html" %}
 {% load i18n %}
 
 {% block title %}Write email{% endblock %}
@@ -116,11 +116,6 @@ Please correct the following field(s):<br>
   <tr>
     <td valign="top"><strong>Message:</strong></td>
     <td>{{ emailform.body }}</td>
-  </tr>
-  <tr>
-    <td valign="top"><strong>HTML:</strong></td>
-    <td><span id="html_normal">{{ emailform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</span>
-    <span id="html_newsletter" style="display: none">HTML automatically <strong>on</strong> for newsletter</span></td>
   </tr>
 </table>
 <div id="newsletter_warning" style="padding: 7px; margin: 7px; background-color: #CC0000; color: #FFFFFF; display: none">
