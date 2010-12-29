@@ -65,4 +65,5 @@ urlpatterns = patterns('',
 	(r'^api/newsletter/$', 'rgmessages.views.api'),
 	(r'^i18n/', include('django.conf.urls.i18n')),
 	(r'^topsecretarea/', include(admin.site.urls)),
+	(r'^tinymce/', include('tinymce.urls')),
 )
