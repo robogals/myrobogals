@@ -52,8 +52,7 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class WriteEmailForm(forms.Form):
 	subject = forms.CharField(max_length=256)
-	body = forms.CharField(widget=TinyMCE())
-	plain_body = forms.CharField(widget=forms.Textarea)
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,"Chapter name"),(2,"Your name")), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
@@ -86,10 +85,7 @@ def writeemail(request):
 			data = emailform.cleaned_data
 			message = EmailMessage()
 			message.subject = data['subject']
-			if request.POST['editor'] == 'plain_text':
-				message.body = data['plain_body']
-			else:
-				message.body = data['body']
+			message.body = data['body']
 			message.from_address = request.user.email
 			message.reply_address = request.user.email
 			message.sender = request.user
