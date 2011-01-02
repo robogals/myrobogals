@@ -114,26 +114,9 @@ Please correct the following field(s):<br>
     <td>{{ emailform.subject }}</td>
   </tr>
   <tr>
-	<td valign="top"><strong>Editor</strong></td>
-	<td>
-	<table border="0" width="100%" cellpadding="0" cellspacing="0">
-	<tr>
-	  <td style="vertical-align: top" width="30"><input name="editor" type="radio" value="wysiwyg" id="editor1" checked="checked"/></td>
-	  <td style="vertical-align: top"><label for="editor1">WYSIWYG (Main)</label></td>
-    </tr>
-    <tr>	
-	  <td style="vertical-align: top" width="30"><input name="editor" type="radio" value="plain_text" id="editor2" /></td>
-	  <td style="vertical-align: top"><label for="editor2">Plain Text (HTML)</label></td>
-    </tr>
-    </table>	
-	</td>
-  <tr>
     <td valign="top"><strong>Message:</strong></td>
-	<td>
-	<span id="wysiwyg">{{ emailform.body }}</span>
-	<span id="plain_text">{{ emailform.plain_body }}</span>
-	</td>
-	</tr>
+    <td>{{ emailform.body }}</td>
+  </tr>
 </table>
 <div id="newsletter_warning" style="padding: 7px; margin: 7px; background-color: #CC0000; color: #FFFFFF; display: none">
 <strong>This newsletter will be sent to hundreds of people. If this message is showing, then the option you have selected is the real thing and NOT a test. Please ensure:</strong>
