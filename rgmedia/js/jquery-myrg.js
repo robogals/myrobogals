@@ -67,6 +67,20 @@
 		});
 		$('input[name=type]:radio').change();
 		
+		$('input[name=editor]:radio').change(function() {
+			switch ($('input[name=editor]:radio:checked').val()) {
+				case 'wysiwyg':
+					$('#wysiwyg').show();
+					$('#plain_text').hide();
+					break;
+				case 'plain_text':
+					$('#wysiwyg').hide();
+					$('#plain_text').show();
+					break;
+			}
+		});
+		$('input[name=editor]:radio').change();
+		
 		$('#id_action').change(function() {
 			switch ($('#id_action').val()) {
 				case '1':
