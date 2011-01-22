@@ -7,14 +7,14 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import Group
 from myrobogals.auth.models import User
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType
+from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
 from django.forms.fields import email_re
 from hashlib import md5
 from urllib import unquote_plus
-from datetime import datetime
+from datetime import datetime, date
 from tinymce.widgets import TinyMCE
 from myrobogals.rgprofile.usermodels import Country
 from django.utils.translation import ugettext_lazy as _
@@ -22,28 +22,8 @@ from myrobogals.auth.decorators import login_required
 from time import time
 from myrobogals.rgmessages.functions import importcsv, RgImportCsvException
 import csv
-
-def validate_sms_chars(text):
-	matches = re.compile(u'^[a-z|A-Z|0-9|\\n|\\r|@|£|\$|¥|è|é|ù|ì|ò|Ç|Ø|ø|Å|å|Δ|Φ|Γ|Λ|Ω|Π|Ψ|Σ|Θ|Ξ|_|\^|{|}|\\\\|\[|~|\]|\||€|Æ|æ|ß|É| |!|"|#|¤|\%|&|\'|(|)|\*|\+|\,|\-|\.|\/|:|;|<|=|>|\?|¡|Ä|Ö|Ñ|Ü|§|¿|ä|ö|ñ|ü|à]+$').findall(text)
-	if matches == []:
-		return False
-	else:
-		return True
-
-def list(request):
-	return HttpResponse("List Messages")
-
-def view(request, msgid):
-	return HttpResponse("View Message %s" % msgid)
-
-def createnew(request):
-	return HttpResponse("Create New Message")
-
-def writesms(request):
-	return HttpResponse("Write SMS")
-
-def confirmsms(request):
-	return HttpResponse("Confirm SMS")
+from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
+from pytz import utc
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -51,6 +31,11 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
         #return obj.last_name + ", " + obj.first_name + " (" + obj.email + ")"
 
 class WriteEmailForm(forms.Form):
+	SCHEDULED_DATE_TYPES = (
+		(1, 'My timezone'),
+		(2, 'Recipients\' timezones'),
+	)
+
 	subject = forms.CharField(max_length=256)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,"Chapter name"),(2,"Your name")), initial=1)
@@ -59,21 +44,27 @@ class WriteEmailForm(forms.Form):
 	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	newsletters = forms.ModelChoiceField(queryset=Newsletter.objects.all(), required=False)
+	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
+	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)
+	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
 		del kwargs['user']
 		super(WriteEmailForm, self).__init__(*args, **kwargs)
 		if user.is_superuser:
-			self.fields['recipients'].queryset = User.objects.filter(is_active=True, email_chapter_optin=True).order_by('last_name')
+			self.fields['recipients'].queryset = User.objects.filter(is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
 		else:
-			self.fields['recipients'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_chapter_optin=True).order_by('last_name')
+			self.fields['recipients'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
 		self.fields['from_type'].choices = (
 			(0, "Robogals <" + user.email + ">"),
 			(1, user.chapter().name + " <" + user.email + ">"),
 			(2, user.get_full_name() + " <" + user.email + ">")
 		)
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
+		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 
 @login_required
 def writeemail(request):
@@ -90,6 +81,17 @@ def writeemail(request):
 			message.reply_address = request.user.email
 			message.sender = request.user
 			message.html = True
+
+			if request.POST['scheduling'] == '1':
+				message.scheduled = True
+				message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+				try:
+					message.scheduled_date_type = int(data['schedule_zone'])
+				except Exception:
+					message.scheduled_date_type = 1
+			else:
+				message.scheduled = False
+
 			if request.POST['type'] == '4':
 				n = data['newsletters']
 				message.from_name = n.from_name
@@ -119,20 +121,20 @@ def writeemail(request):
 					#users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
 					raise Exception
 				else:
-					users = User.objects.filter(groups=request.user.chapter(), is_active=True, email_chapter_optin=True)
+					users = User.objects.filter(groups=request.user.chapter(), is_active=True, email_chapter_optin=True).exclude(email='')
 			elif request.POST['type'] == '2':
 				if request.user.is_superuser:
-					users = User.objects.filter(groups__in=data['chapters_exec'], is_active=True, is_staff=True)
+					users = User.objects.filter(groups__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(email='')
 				else:
-					users = User.objects.filter(groups=request.user.chapter(), is_active=True, is_staff=True)
+					users = User.objects.filter(groups=request.user.chapter(), is_active=True, is_staff=True).exclude(email='')
 			elif request.POST['type'] == '5':
 				ul = data['list']
-				users = ul.users.all()
+				users = ul.users.all().exclude(email='')
 			elif request.POST['type'] == '4':
 				if request.user.is_superuser:
 					# Special rule for The Amplifier
 					if data['newsletters'].pk == 1:
-						users = User.objects.filter(is_active=True, email_newsletter_optin=True)
+						users = User.objects.filter(is_active=True, email_newsletter_optin=True).exclude(email='')
 					else:
 						users = User.objects.none()
 			else:
@@ -164,6 +166,137 @@ def writeemail(request):
 	else:
 		emailform = WriteEmailForm(None, user=request.user)
 	return render_to_response('email_write.html', {'emailform': emailform,}, context_instance=RequestContext(request))
+
+class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return obj.last_name + ", " + obj.first_name + " (+" + obj.mobile + ")"
+
+class WriteSMSForm(forms.Form):
+	SCHEDULED_DATE_TYPES = (
+		(1, 'My timezone'),
+		(2, 'Recipients\' timezones'),
+	)
+
+	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial="<<Put your message here>>   To opt-out reply 'stop'")
+	from_type = forms.ChoiceField(choices=((0,"+61 429 558 100"),))
+	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
+	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
+	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)
+	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
+
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		super(WriteSMSForm, self).__init__(*args, **kwargs)
+		if user.is_superuser:
+			self.fields['recipients'].queryset = User.objects.filter(is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
+		else:
+			self.fields['recipients'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
+		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
+
+@login_required
+def writesms(request):
+	if not request.user.is_staff:
+		raise Http404
+	smserror = None
+	if request.method == 'POST':
+		smsform = WriteSMSForm(request.POST, user=request.user)
+		try:
+			if smsform.is_valid():
+				data = smsform.cleaned_data
+				message = SMSMessage()
+				message.body = data['body']
+				message.sender = request.user
+				message.chapter = request.user.chapter()
+				message.senderid = '61429558100'
+				if request.POST['scheduling'] == '1':
+					message.scheduled = True
+					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+					try:
+						message.scheduled_date_type = int(data['schedule_zone'])
+					except Exception:
+						message.scheduled_date_type = 1
+				else:
+					message.scheduled = False
+			
+				# Validate, and calculate the values for unicode and split.
+				# If the message is too long, the exception will be caught below.
+				message.validate()
+			
+				# Don't send it yet until the recipient list is done
+				message.status = -1
+				# Save to database so we get a value for the primary key,
+				# which we need for entering the recipient entries
+				message.save()
+
+				if request.POST['type'] == '1':
+					if request.user.is_superuser:
+					# "SMS all members worldwide" feature disabled - too much potential for abuse.
+					# Can be re-enabled by uncommenting the following line, commenting the exception,
+					# and removing the disabled tag from the relevant radio button in email_write.html
+					#users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
+						raise Exception
+					else:
+						users = User.objects.filter(groups=request.user.chapter(), is_active=True, mobile_marketing_optin=True).exclude(mobile='')
+				elif request.POST['type'] == '2':
+					if request.user.is_superuser:
+						users = User.objects.filter(groups__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(mobile='')
+					else:
+						users = 	User.objects.filter(groups=request.user.chapter(), is_active=True, is_staff=True).exclude(mobile='')
+				elif request.POST['type'] == '5':
+					ul = data['list']
+					users = ul.users.all().exclude(mobile='')
+				else:
+					# The form has already validated this to exclude
+					# those users with a blank mobile number
+					users = data['recipients']
+
+				for one_user in users:
+					recipient = SMSRecipient()
+					recipient.message = message
+					recipient.user = one_user
+					recipient.to_number = one_user.mobile
+					recipient.save()
+			
+				# Check that we haven't used too many credits
+				sms_this_month = 0
+				sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime(datetime.now().year, datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
+				for obj in sms_this_month_obj:
+					sms_this_month += obj.credits_used()
+				sms_this_month += message.credits_used()
+				if sms_this_month > request.user.chapter().sms_limit:
+					message.status = 3
+					message.save()
+					return HttpResponseRedirect('/messages/sms/overlimit/')
+			
+				# Now mark it as OK to send. The email and all recipients are now in MySQL.
+				# A background script on the server will process the queue.
+				message.status = 0
+				message.save()
+			
+				return HttpResponseRedirect('/messages/sms/done/')
+		except SMSLengthException as e:
+			smserror = e.errmsg
+	else:
+		smsform = WriteSMSForm(None, user=request.user)
+	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror}, context_instance=RequestContext(request))
+
+@login_required
+def smsdone(request):
+	if not request.user.is_staff:
+		raise Http404
+	return render_to_response('sms_done.html', None, context_instance=RequestContext(request))
+
+@login_required
+def smsoverlimit(request):
+	if not request.user.is_staff:
+		raise Http404
+	return render_to_response('sms_overlimit.html', {'chapter': request.user.chapter()}, context_instance=RequestContext(request))
 
 def serveimg(request, msgid, filename):
 	try:
@@ -292,6 +425,30 @@ def api(request):
 			return HttpResponse("-1")
 	else:
 		return HttpResponse("-1")
+
+def dlrapi(request):
+	try:
+		msg = SMSRecipient.objects.get(gateway_msg_id=request.GET['msgid'])
+		dlr = request.GET['dlrstatus']
+		if dlr == 'DELIVRD':
+			msg.status = 12
+		elif dlr == 'EXPIRED':
+			msg.status = 14
+		elif dlr == 'DELETED':
+			msg.status = 15
+		elif dlr == 'UNDELIV':
+			msg.status = 13
+		elif dlr == 'ACCEPTD':
+			msg.status = 11
+		elif dlr == 'REJECTD':
+			msg.status = 16
+		else:
+			msg.status = 17
+		msg.gateway_err = int(request.GET['dlr_err'])
+		msg.save()
+		return HttpResponse("OK\n")
+	except Exception:
+		return HttpResponse("-1\n")
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()

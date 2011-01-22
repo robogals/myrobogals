@@ -163,7 +163,8 @@ class Group(models.Model):
     join_page = models.TextField('Join page HTML', blank=True)
     notify_enable = models.BooleanField('Notify when a new member signs up online')
     notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True)
-
+    sms_limit = models.IntegerField('Monthly SMS limit', default=0)
+    
     class Meta:
         verbose_name = 'chapter'
         verbose_name_plural = 'chapters'

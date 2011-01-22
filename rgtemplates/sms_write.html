@@ -1,18 +1,23 @@
-{% extends "base_tinymce.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Send bulk email{% endblock %}
+{% block title %}Send bulk SMS{% endblock %}
 
-{% block pagetitle %}Send bulk email{% endblock %}
+{% block pagetitle %}Send bulk SMS{% endblock %}
 
 {% block content %}
-<form action="/messages/email/write/" method="POST">
-{% if emailform.errors %}
+<form action="/messages/sms/write/" method="POST" id="fm_sendsms">
+{% if smsform.errors %}
 <div class="error">
 Please correct the following field(s):<br>
-{% for error in emailform.errors %}
+{% for error in smsform.errors %}
 - {{error}}<br>
 {% endfor %}
+</div>
+{% endif %}
+{% if smserror %}
+<div class="error">
+{{smserror}}
 </div>
 {% endif %}
 <table>
@@ -23,10 +28,10 @@ Please correct the following field(s):<br>
         <tr>
 {% if request.user.is_superuser %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" disabled="disabled" /></td>
-          <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">All members who have opted to receive email from the following chapters</span></label></td>
+          <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">All members who have opted to receive SMS from the following chapters</span></label></td>
 {% else %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="type1">All members of {{ request.user.chapter }} who have opted to receive email</label></td>
+          <td style="vertical-align: top"><label for="type1">All members of {{ request.user.chapter }} who have opted to receive SMS</label></td>
 {% endif %}
         </tr>
 {% if request.user.is_superuser %}
@@ -34,7 +39,7 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_chapters">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{{ emailform.chapters }}</td>
+          <td style="vertical-align: top">{{ smsform.chapters }}</td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
@@ -53,7 +58,7 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_exec">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{{ emailform.chapters_exec }}</td>
+          <td style="vertical-align: top">{{ smsform.chapters_exec }}</td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
@@ -66,11 +71,11 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_lists">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top"><b>N.B.</b> Message will only be sent to list members who have opted to receive email</td>
+          <td style="vertical-align: top"><b>N.B.</b> Message will only be sent to list members who have opted to receive SMS</td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{{ emailform.list }}</td>
+          <td style="vertical-align: top">{{ smsform.list }}</td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
@@ -82,40 +87,29 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_recipients">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top"><b>N.B.</b> Only members who have opted to receive email are shown</td>
+          <td style="vertical-align: top"><b>N.B.</b> Only members who have opted to receive SMS are shown</td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{{ emailform.recipients }}</td>
+          <td style="vertical-align: top">{{ smsform.recipients }}</td>
         </tr>
       </table>
-{% if request.user.is_superuser %}
-      <table border="0" width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="vertical-align: top" width="30"><input name="type" type="radio" value="4" id="type4" /></td>
-          <td style="vertical-align: top"><label for="type4">Send newsletter</label></td>
-        </tr>
-      </table>
-      <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_newsletter">
-        <tr>
-          <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{{ emailform.newsletters }}</td>
-        </tr>
-      </table>
-{% endif %}
     </td>
   </tr>
   <tr>
     <td valign="top"><strong>From:</strong></td>
-    <td><span id="from_normal">{{ emailform.from_type }}</span><span id="from_newsletter" style="display: none">From address set according to newsletter options</span></td>
-  </tr>
-  <tr>
-    <td valign="top"><strong>Subject:</strong></td>
-    <td>{{ emailform.subject }}</td>
+    <td><span id="from_normal">{{ smsform.from_type }}</span></td>
   </tr>
   <tr>
     <td valign="top"><strong>Message:</strong></td>
-    <td>{{ emailform.body }}</td>
+    <td>{{ smsform.body }}<br>
+      <div id="InfoCharCounter"></div>
+      <script language="javascript">
+      document.getElementById('id_body').focus();
+      updateTextBoxCounter();
+      </script>
+      <div>To comply with anti-spam legislation, please ensure your message ends with: <strong>to opt-out reply 'stop'</strong></div>
+    </td>
   </tr>
   <tr>
     <td valign="top"><strong>Scheduling:</strong></td>
@@ -133,20 +127,12 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">at {{ emailform.schedule_time }} on {{ emailform.schedule_date }}{% if request.user.is_superuser %}<br>in {{ emailform.schedule_zone }}{% endif %}</td>
+          <td style="vertical-align: top">at {{ smsform.schedule_time }} on {{ smsform.schedule_date }}{% if request.user.is_superuser %}<br>in {{ smsform.schedule_zone }}{% endif %}</td>
         </tr>
       </table>
     </td>
   <tr>
 </table>
-<div id="newsletter_warning" style="padding: 7px; margin: 7px; background-color: #CC0000; color: #FFFFFF; display: none">
-<strong>This newsletter will be sent to hundreds of people. If this message is showing, then the option you have selected is the real thing and NOT a test. Please ensure:</strong>
-<ul>
-  <li>All relevant procedures for this newsletter have been complied with</li>
-  <li>An up-to-date web version has been uploaded for people who click "view it online"</li>
-  <li>{% trans "{{email_id}}" %} has been inserted into the email here, but not the "view it online" version</li>
-</ul>
-</div>
-<input type="submit" value="Send Email!" />
+<input type="submit" value="Send SMS!" onClick="return confirm('Are you sure you want to send this SMS to all the selected recipients?');" />
 </form>
 {% endblock %}

@@ -1,14 +1,24 @@
+# coding: utf-8
+
 from django.db import models
 from django.forms import ModelForm
 from myrobogals.auth.models import User, Group
 from myrobogals.rgprofile.usermodels import Country
+from django.db.models.fields import PositiveIntegerField
 import datetime
+from pytz import utc
+import re
 
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (
 		(-1, 'Wait'),
 		(0, 'Pending'),
 		(1, 'Complete'),
+	)
+
+	SCHEDULED_DATE_TYPES = (
+		(1, 'Sender\'s timezone'),
+		(2, 'Recipient\'s timezone'),
 	)
 
 	subject = models.CharField("Subject", max_length=256)
@@ -20,6 +30,9 @@ class EmailMessage(models.Model):
 	status = models.IntegerField("Status Code", choices=STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Time Sent (in UTC)")
 	html = models.BooleanField("HTML", blank=True)
+	scheduled = models.BooleanField("Scheduled", blank=True)
+	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
+	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	
 	def status_description(self):
 		return STATUS_CODES_MSG[self.status]
@@ -31,7 +44,6 @@ class EmailMessage(models.Model):
 		if self.date == None:
 			self.date = datetime.datetime.now()
 		super(EmailMessage, self).save(*args, **kwargs)
-
 
 class EmailRecipient(models.Model):
 	STATUS_CODES_RECIPIENT = (
@@ -50,12 +62,240 @@ class EmailRecipient(models.Model):
 	to_name = models.CharField("To Name", max_length=128, blank=True)
 	to_address = models.EmailField("To Email")
 	status = models.IntegerField("Status Code", choices=STATUS_CODES_RECIPIENT, default=0)
+	scheduled_date = models.DateTimeField("Scheduled date (in UTC)", null=True, blank=True)
+
+	def set_scheduled_date(self):
+		if not self.message.scheduled:
+			self.scheduled_date = datetime.datetime.utcnow()
+		else:
+			if self.message.scheduled_date_type == 1:
+				# Use sender's timezone
+				local_tz = self.message.sender.tz_obj()
+			else:
+				# Use recipient's timezone
+				if self.user:
+					local_tz = self.user.tz_obj()
+				else:
+					local_tz = utc
+			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
+			scheduled_date_utc = scheduled_date_local.astimezone(utc)
+			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
 
 	def status_description(self):
 		return STATUS_CODES_RECIPIENT[self.status]
 	
 	def __unicode__(self):
 		return self.to_address
+
+	def save(self, *args, **kwargs):
+		if self.scheduled_date == None:
+			self.set_scheduled_date()
+		super(EmailRecipient, self).save(*args, **kwargs)
+
+class PositiveBigIntegerField(PositiveIntegerField):
+	empty_strings_allowed = False
+	
+	def get_internal_type(self):
+		return "PositiveBigIntegerField"
+	
+	def db_type(self):
+		return "bigint UNSIGNED"
+
+def validate_sms_chars(text):
+	matches = re.compile(u'^[a-z|A-Z|0-9|\\n|\\r|@|£|\$|¥|è|é|ù|ì|ò|Ç|Ø|ø|Å|å|Δ|Φ|Γ|Λ|Ω|Π|Ψ|Σ|Θ|Ξ|_|\^|{|}|\\\\|\[|~|\]|\||€|Æ|æ|ß|É| |!|"|#|¤|\%|&|\'|(|)|\*|\+|\,|\-|\.|\/|:|;|<|=|>|\?|¡|Ä|Ö|Ñ|Ü|§|¿|ä|ö|ñ|ü|à]+$').findall(text)
+	if matches == []:
+		return False
+	else:
+		return True
+
+class SMSLengthException(Exception):
+	def __init__(self, errmsg):
+		self.errmsg = errmsg
+	def __str__(self):
+		return self.errmsg
+
+class SMSMessage(models.Model):
+	SMS_STATUS_CODES_MSG = (
+		(-1, 'Wait'),
+		(0, 'Pending'),
+		(1, 'Complete'),
+		(2, 'Error'),
+		(3, 'Limits exceeded'),
+	)
+	
+	SCHEDULED_DATE_TYPES = (
+		(1, 'Sender\'s timezone'),
+		(2, 'Recipient\'s timezone'),
+	)
+
+	body = models.TextField("Message body")
+	senderid = models.CharField("Sender ID", max_length=32)
+	sender = models.ForeignKey(User)
+	chapter = models.ForeignKey(Group, null=True, blank=True)
+	status = models.IntegerField("Status code", choices=SMS_STATUS_CODES_MSG, default=0)
+	date = models.DateTimeField("Date set (in UTC)")
+	unicode = models.BooleanField("Unicode", blank=True)
+	split = models.IntegerField("Split", default=1)
+	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
+	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
+	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
+
+	def validate(self):
+		if validate_sms_chars(self.body):
+			self.unicode = False
+			extrachars = 0
+			length = len(self.body)
+			for i in range(length):
+				if self.body[i] == '^':
+					extrachars += 1
+				elif self.body[i] == '{':
+					extrachars += 1
+				elif self.body[i] == '}':
+					extrachars += 1
+				elif self.body[i] == '\\':
+					extrachars += 1
+				elif self.body[i] == '[':
+					extrachars += 1
+				elif self.body[i] == '~':
+					extrachars += 1
+				elif self.body[i] == ']':
+					extrachars += 1
+				elif self.body[i] == '|':
+					extrachars += 1
+				elif self.body[i] == u'€':
+					extrachars += 1
+			smslength = length + extrachars
+			if (smslength <= 160):
+				self.split = 1;
+			elif (smslength <= 1530):
+				smslength += 152;
+				smslength -= (smslength % 153);
+				self.split = smslength / 153;
+			else:
+				raise SMSLengthException("Your message is too long. Please reduce your message to 1530 characters or less")
+		else:
+			self.unicode = True
+			if len(self.body) < 5:
+				raise SMSLengthException("Your message is too short. Please lengthen your message to be 5 characters or more")
+			elif len(self.body) > 80:
+				raise SMSLengthException("Your message is too long. Please reduce your message to be 80 characters or less, or do not use unicode characters (e.g. foreign alphabets)")
+			self.split = 1
+	
+	def status_description(self):
+		return SMS_STATUS_CODES_MSG[self.status]
+		
+	def credits_used(self):
+		return self.smsrecipient_set.count() * self.split
+	
+	def __unicode__(self):
+		return "SMS " + str(self.date)
+
+	def save(self, *args, **kwargs):
+		if self.date == None:
+			self.date = datetime.datetime.now()
+		super(SMSMessage, self).save(*args, **kwargs)
+	
+	class Meta:
+		verbose_name = "SMS message"
+
+class SMSRecipient(models.Model):
+	SMS_GATEWAYS = (
+		(0, 'Use default'),
+		(1, 'SMSGlobal'),
+	)
+
+	SMS_STATUS_CODES_RECIPIENT = (
+		(0, 'Pending'),
+		(1, 'Processing'),
+		(5, 'Unknown error'),
+		(6, 'Cancelled'),
+		(7, 'Number barred'),
+		(9, 'Number invalid'),
+		(10, 'SMS sent'),
+		(11, 'SMS accepted by carrier'),
+		(12, 'SMS delivered'),
+		(13, 'SMS undeliverable'),
+		(14, 'SMS expired'),
+		(15, 'SMS deleted by carrier'),
+		(16, 'SMS rejected by carrier'),
+		(17, 'SMS in unknown state'),
+		(18, 'Construction error'),
+		(19, 'Limits exceeded'),
+		(20, 'Temporary error at SMSC'),
+		(21, 'Permanent error at SMSC'),
+		(22, 'Request to SMSC timed out'),
+	)
+	
+	SMS_ERROR_CODES = (
+		(0, 'Unknown subscriber'),
+		(10, 'Network time-out'),
+		(100, 'Facility not supported'),
+		(101, 'Unknown subscriber'),
+		(102, 'Facility not provided'),
+		(103, 'Call barred'),
+		(104, 'Operation barred'),
+		(105, 'SC congestion'),
+		(106, 'Facility not supported'),
+		(107, 'Absent subscriber'),
+		(108, 'Delivery fail'),
+		(109, 'Sc congestion'),
+		(110, 'Protocol error'),
+		(111, 'MS not equipped'),
+		(112, 'Unknown SC'),
+		(113, 'SC congestion'),
+		(114, 'Illegal MS'),
+		(115, 'MS not a subscriber'),
+		(116, 'Error in MS'),
+		(117, 'SMS lower layer not provisioned'),
+		(118, 'System fail'),
+		(512, 'Expired'),
+		(513, 'Rejected'),
+		(515, 'No route to destination'),
+		(608, 'System error'),
+		(610, 'Invalid source address'),
+		(611, 'Invalid destination address'),
+		(625, 'Unknown destination'),
+	)
+
+	message = models.ForeignKey(SMSMessage)
+	user = models.ForeignKey(User, null=True, blank=True)
+	to_number = models.CharField("To number", max_length=16)
+	status = models.IntegerField("Status code", choices=SMS_STATUS_CODES_RECIPIENT, default=0)
+	gateway = models.IntegerField("Gateway", choices=SMS_GATEWAYS, default=0)
+	gateway_msg_id = PositiveBigIntegerField(verbose_name="Gateway message ID", default=0)
+	gateway_err = models.IntegerField("Error code", choices=SMS_ERROR_CODES, default=0)
+	scheduled_date = models.DateTimeField("Scheduled date (in UTC)", null=True, blank=True)
+
+	def set_scheduled_date(self):
+		if not self.message.scheduled:
+			self.scheduled_date = datetime.datetime.utcnow()
+		else:
+			if self.message.scheduled_date_type == 1:
+				# Use sender's timezone
+				local_tz = self.message.sender.tz_obj()
+			else:
+				# Use recipient's timezone
+				if self.user:
+					local_tz = self.user.tz_obj()
+				else:
+					local_tz = utc
+			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
+			scheduled_date_utc = scheduled_date_local.astimezone(utc)
+			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+
+	def status_description(self):
+		if self.status == 11 or self.status == 13:
+			return self.get_status_display() + ": " + self.get_gateway_err_display()
+		else:
+			return self.get_status_display()
+	
+	def __unicode__(self):
+		return self.status_description()
+
+	def save(self, *args, **kwargs):
+		if self.scheduled_date == None:
+			self.set_scheduled_date()
+		super(SMSRecipient, self).save(*args, **kwargs)
 
 class Newsletter(models.Model):
 	name = models.CharField(max_length=128)

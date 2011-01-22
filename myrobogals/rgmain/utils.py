@@ -88,3 +88,62 @@ class SelectDateWidget(Widget):
 		if y and m and d:
 			return '%s-%s-%s' % (y, m, d)
 		return data.get(name, None)
+
+RE_TIME = re.compile(r'(\d\d?):(\d\d?):00$')
+
+class SelectTimeWidget(Widget):
+	none_value = (0, '---')
+	hour_field = '%s_hour'
+	minute_field = '%s_minute'
+
+	def __init__(self, attrs=None, required=True):
+		self.attrs = attrs or {}
+		self.required = required
+
+	def render(self, name, value, attrs=None):
+		try:
+			hour_val, minute_val = value.hour, value.minute
+		except AttributeError:
+			hour_val = minute_val = None
+			if isinstance(value, basestring):
+				match = RE_TIME.match(value)
+				if match:
+					hour_val, minute_val = [int(v) for v in match.groups()]
+
+		output = []
+
+		if 'id' in self.attrs:
+			id_ = self.attrs['id']
+		else:
+			id_ = 'id_%s' % name
+
+		hour_choices = [(i, '%02d' % i) for i in range(0, 24)]
+		if not (self.required and value):
+			hour_choices.append(self.none_value)
+		s = Select(choices=hour_choices)
+		select_html = s.render(self.hour_field % name, hour_val)
+		output.append(select_html)
+
+		output.append(':')
+
+		minute_choices = [(i, '%02d' % i) for i in range(0, 60)]
+		if not (self.required and value):
+			minute_choices.append(self.none_value)
+		s = Select(choices=minute_choices)
+		select_html = s.render(self.minute_field % name, minute_val)
+		output.append(select_html)
+
+		return mark_safe(u'\n'.join(output))
+
+	def id_for_label(self, id_):
+		return '%s_hour' % id_
+	id_for_label = classmethod(id_for_label)
+
+	def value_from_datadict(self, data, files, name):
+		h = data.get(self.hour_field % name)
+		m = data.get(self.minute_field % name)
+		if h == "24" or m == "60":
+			return None
+		if h and m:
+			return '%s:%s:00' % (h, m)
+		return data.get(name, None)

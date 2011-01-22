@@ -67,6 +67,17 @@
 		});
 		$('input[name=type]:radio').change();
 
+		$('input[name=scheduling]:radio').change(function() {
+			switch ($('input[name=scheduling]:radio:checked').val()) {
+				case '0':
+					$('#form_table_scheduling').hide();
+					break;
+				case '1':
+					$('#form_table_scheduling').show();
+					break;
+			}
+		});
+		$('input[name=scheduling]:radio').change();
 		
 		$('#id_action').change(function() {
 			switch ($('#id_action').val()) {

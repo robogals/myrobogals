@@ -21,7 +21,7 @@ mysql_select_db('myrobogals');
 
 while (1) {
 
-	$sql = "SELECT * FROM rgmessages_emailmessage WHERE `status` = 0 LIMIT 1";
+	$sql = "SELECT * FROM rgmessages_emailmessage WHERE `status` = 0 ORDER BY `date` DESC LIMIT 1";
 	$result = mysql_query($sql);
 	
 	if ($msg = mysql_fetch_assoc($result)) {
@@ -39,7 +39,7 @@ while (1) {
 			$headers['Content-Type'] = "multipart/alternative; boundary=robogals{$uniqid}";
 		}
 
-		$sql = sprintf("SELECT * FROM rgmessages_emailrecipient WHERE `message_id` = %d AND `status` = 0", $msg['id']);
+		$sql = sprintf("SELECT * FROM rgmessages_emailrecipient WHERE `message_id` = %d AND `status` = 0 AND `scheduled_date` < NOW()", $msg['id']);
 		$result2 = mysql_query($sql);
 		
 		while ($recipient = mysql_fetch_assoc($result2)) {
@@ -108,7 +108,7 @@ Content-Transfer-Encoding: base64
 			$sql = sprintf("UPDATE rgmessages_emailrecipient SET `status` = %d WHERE `id` = %d", $status, $recipient['id']);
 			mysql_query($sql);
 
-			sleep(2);
+			sleep(1);
 		}
 		
 		unset($mailer);
@@ -127,7 +127,7 @@ Content-Transfer-Encoding: base64
 	}
 	mysql_free_result($result);
 	
-	// Wait 5 seconds before looking in the database again
-	sleep(5);
+	// Wait 3 seconds before looking in the database again
+	sleep(3);
 }
 ?>
