@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% if adduser %}Add user{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block title %}{% if adduser %}Add member{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
 
-{% block pagetitle %}{% if adduser %}Add user{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block pagetitle %}{% if adduser %}Add member{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
 
 {% block content %}
 <!-- form for editing profile information -->
@@ -44,7 +44,7 @@
     <td>Confirm new password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
-{% if request.user.is_staff %}
+{% if request.user.is_staff and not adduser %}
   <tr>
     <td>&nbsp;</td>
     <td><a href="/profile/{{u.username}}/genpw/">Generate and email new password</a></td>

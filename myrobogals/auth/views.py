@@ -83,7 +83,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
         password_reset_form=PasswordResetForm, token_generator=default_token_generator,
         post_reset_redirect=None):
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('myrobogals.auth.views.password_reset_done')
+        post_reset_redirect = '/forgotpass/done/'
     if request.method == "POST":
         form = password_reset_form(request.POST)
         if form.is_valid():
@@ -116,7 +116,7 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
     """
     assert uidb36 is not None and token is not None # checked by URLconf
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('myrobogals.auth.views.password_reset_complete')
+        post_reset_redirect = '/forgotpass/complete/'
     try:
         uid_int = base36_to_int(uidb36)
     except ValueError:
@@ -137,7 +137,9 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
     else:
         context_instance['validlink'] = False
         form = None
-    context_instance['form'] = form    
+    context_instance['form'] = form
+    context_instance['uidb36'] = uidb36
+    context_instance['token'] = token
     return render_to_response(template_name, context_instance=context_instance)
 
 def password_reset_complete(request, template_name='registration/password_reset_complete.html'):

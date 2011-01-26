@@ -6,6 +6,8 @@ from django.template import Context, loader
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils.http import int_to_base36
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -104,9 +106,12 @@ class PasswordResetForm(forms.Form):
         Validates that a user exists with the given e-mail address.
         """
         email = self.cleaned_data["email"]
-        self.users_cache = User.objects.filter(email__iexact=email)
+        self.users_cache = User.objects.filter(email__iexact=email, is_active=True)
         if len(self.users_cache) == 0:
             raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
+        for user in self.users_cache:
+        	if user.is_superuser:
+        		raise forms.ValidationError(_("The password for that account cannot be reset through this form. Please contact my@robogals.org to reset your password."))
         return email
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html',
@@ -114,26 +119,32 @@ class PasswordResetForm(forms.Form):
         """
         Generates a one-use only link for resetting password and sends to the user
         """
-        from django.core.mail import send_mail
         for user in self.users_cache:
-            if not domain_override:
-                current_site = Site.objects.get_current()
-                site_name = current_site.name
-                domain = current_site.domain
-            else:
-                site_name = domain = domain_override
             t = loader.get_template(email_template_name)
             c = {
                 'email': user.email,
-                'domain': domain,
-                'site_name': site_name,
                 'uid': int_to_base36(user.id),
                 'user': user,
                 'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
             }
-            send_mail(_("Password reset on %s") % site_name,
-                t.render(Context(c)), None, [user.email])
+            message = EmailMessage()
+            message.subject = 'Password reset'
+            message.body = t.render(Context(c))
+            message.from_address = 'my@robogals.org'
+            message.reply_address = 'my@robogals.org'
+            message.from_name = user.chapter().name
+            message.sender = User.objects.get(username='edit')
+            message.html = False
+            message.status = -1
+            message.save()
+            recipient = EmailRecipient()
+            recipient.message = message
+            recipient.user = user
+            recipient.to_name = user.get_full_name()
+            recipient.to_address = user.email
+            recipient.save()
+            message.status = 0
+            message.save()
 
 class SetPasswordForm(forms.Form):
     """

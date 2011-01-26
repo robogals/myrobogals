@@ -16,5 +16,8 @@ def credits(request):
 def support(request):
 	return render_to_response('support.html', {}, context_instance=RequestContext(request))
 
+def wiki(request):
+	return render_to_response('wiki.html', {}, context_instance=RequestContext(request))
+
 def files(request):
 	return render_to_response('files.html', {}, context_instance=RequestContext(request))
