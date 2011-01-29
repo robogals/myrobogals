@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-c -g -O2 -Wall -arch i386 -I/usr/local/mysql/include -DDEBUG
-LDFLAGS=-arch i386 -L/usr/local/mysql/lib -lcurl -lmysqlclient -lm -lz
+CFLAGS=-c -I/usr/include -DDEBUG
+LDFLAGS=-L/usr/lib -lcurl -lmysqlclient -lm -lz
 
 all: rgsmsd
 

@@ -7,7 +7,7 @@
 
 */
 
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 #define SQL_HOST "localhost"
 #define SQL_USER "myrobogals"
