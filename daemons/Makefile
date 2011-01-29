@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -I/usr/include -DDEBUG
+CFLAGS=-c -I/usr/include
 LDFLAGS=-L/usr/lib -lcurl -lmysqlclient -lm -lz
 
 all: rgsmsd

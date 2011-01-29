@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
 		res = mysql_use_result(utf8conn);
 		while((row = mysql_fetch_row(res)) != NULL) {
 			m_id = atoi(row[0]);
-			sprintf(query, "SELECT COUNT(*) FROM rgmessages_smsrecipient WHERE `status` = 0 AND `message_id` = %d", m_id);
+			sprintf(query, "SELECT COUNT(*) FROM rgmessages_smsrecipient WHERE `status` IN (0, 20, 22) AND `message_id` = %d", m_id);
 			mysql_query(updateconn, query);
 			res2 = mysql_use_result(updateconn);
 			row2 = mysql_fetch_row(res2);

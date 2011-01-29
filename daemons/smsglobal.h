@@ -16,7 +16,7 @@
 #define SMSGLOBAL_SMS_CHECK_CERT 1
 
 /* Where to log outgoing messages */
-#define SMSGLOBAL_SMS_LOG "/var/home/myrobogals/var/sms.log"
+#define SMSGLOBAL_SMS_LOG "/home/myrobogals/var/sms.log"
 
 typedef struct {
     char smsglobal_msg_id[17];
