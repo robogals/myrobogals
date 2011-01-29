@@ -362,14 +362,14 @@ class FormPartThree(forms.Form):
 	
 	COURSE_TYPE_CHOICES = (
 		(0, '---'),
-		(1, 'Undergraduate'),
-		(2, 'Postgraduate')
+		(1, _('Undergraduate')),
+		(2, _('Postgraduate'))
 	)
 	
 	STUDENT_TYPE_CHOICES = (
 		(0, '---'),
-		(1, 'Local'),
-		(2, 'International')
+		(1, _('Local')),
+		(2, _('International'))
 	)
 	
 	dob = forms.DateField(label=_('Date of birth'), widget=SelectDateWidget(), required=False)
