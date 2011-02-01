@@ -10,10 +10,14 @@ from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 #from myrobogals.auth.models import Group
 import datetime
-from myrobogals.rgmain.utils import SelectDateWidget
+from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from myrobogals.auth.decorators import login_required
 from myrobogals.auth.models import User
 from myrobogals.admin.widgets import FilteredSelectMultiple
+from tinymce.widgets import TinyMCE
+from time import time
+from pytz import utc
+from myrobogals.rgprofile.usermodels import Country
 
 @login_required
 def teachhome(request):
@@ -262,7 +266,101 @@ def invitetovisit(request, visit_id):
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)
 	return render_to_response('visit_invite.html', {'inviteform': inviteform, 'visit_id': visit_id}, context_instance=RequestContext(request))
+	
+class EmailAttendeesForm(forms.Form):
+	SCHEDULED_DATE_TYPES = (
+		(1, 'My timezone'),
+		(2, 'Recipients\' timezones'),
+	)
+	
+	subject = forms.CharField(max_length=256, required=False)
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
+	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
+	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.datetime.now(), required=False)
+	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.datetime.now().year, datetime.datetime.now().year + 2)), initial=datetime.datetime.now(), required=False)
+	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
 
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		visit=kwargs['visit']
+		del kwargs['visit']
+		super(EmailAttendeesForm, self).__init__(*args, **kwargs)
+		id_list = EventAttendee.objects.filter(event=visit.id).values_list('user_id')
+		self.fields['memberselect'].queryset = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True).order_by('last_name')
+		self.fields['schedule_time'].initial = utc.localize(datetime.datetime.now()).astimezone(user.tz_obj())
+		self.fields['schedule_date'].initial = utc.localize(datetime.datetime.now()).astimezone(user.tz_obj())
+		
+@login_required
+def emailvisitattendees(request, visit_id):
+	chapter = request.user.chapter()
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if (v.chapter != chapter):
+		raise Http404
+	if request.method == 'POST':
+		emailform = EmailAttendeesForm(request.POST, user=request.user, visit=v)
+		if emailform.is_valid():
+			data = emailform.cleaned_data
+			
+			message = EmailMessage()
+			message.subject = data['subject']
+			message.body = data['body']
+			message.from_address = request.user.email
+			message.reply_address = request.user.email
+			message.sender = request.user
+			message.html = True
+			message.from_name = chapter.name
+			
+			if request.POST['scheduling'] == '1':
+				message.scheduled = True
+				message.scheduled_date = datetime.datetime.combine(data['schedule_date'], data['schedule_time'])
+				try:
+					message.scheduled_date_type = int(data['schedule_zone'])
+				except Exception:
+					message.scheduled_date_type = 1
+			else:
+				message.scheduled = False
+				
+			# Don't send it yet until the recipient list is done
+			message.status = -1
+			# Save to database so we get a value for the primary key,
+			# which we need for entering the recipient entries
+			message.save()
+			
+			
+			#---Start processing recieptent list ---#
+			#Insert choices for attending, not attending etc here
+			if request.POST['invitee_type'] == '1':
+				id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
+				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			elif request.POST['invitee_type'] == '2':
+				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=2).values_list('user_id')
+				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			elif request.POST['invitee_type'] == '3':
+				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=1).values_list('user_id')
+				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)	
+			elif request.POST['invitee_type'] == '4':
+				users = data['memberselect']
+
+			for one_user in users:
+				recipient = EmailRecipient()
+				recipient.message = message
+				recipient.user = one_user
+				recipient.to_name = one_user.get_full_name()
+				recipient.to_address = one_user.email
+				recipient.save()
+				
+			
+			message.status = 0
+			message.save()
+			
+			request.user.message_set.create(message="Email sent succesfully")
+			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
+	else:
+		emailform = EmailAttendeesForm(None, user=request.user, visit=v)
+	return render_to_response('visit_email.html', {'emailform': emailform, 'visit_id': visit_id}, context_instance=RequestContext(request))
+
+	
 @login_required
 def listschools(request):
 	chapter = request.user.chapter()

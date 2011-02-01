@@ -43,6 +43,7 @@ urlpatterns = patterns('',
 	(r'^teaching/list/$', 'rgteaching.views.listvisits'),
 	(r'^teaching/(?P<visit_id>\d+)/$', 'rgteaching.views.viewvisit'),
 	(r'^teaching/(?P<visit_id>\d+)/invite/$', 'rgteaching.views.invitetovisit'),
+	(r'^teaching/(?P<visit_id>\d+)/email/$', 'rgteaching.views.emailvisitattendees'),
 	(r'^teaching/(?P<visit_id>\d+)/edit/$', 'rgteaching.views.editvisit'),
 	(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/yes/$', 'rgteaching.views.rsvpyes'),
 	(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/no/$', 'rgteaching.views.rsvpno'),
@@ -70,4 +71,5 @@ urlpatterns = patterns('',
 	(r'^i18n/', include('django.conf.urls.i18n')),
 	(r'^topsecretarea/', include(admin.site.urls)),
 	(r'^tinymce/', include('tinymce.urls')),
+	
 )

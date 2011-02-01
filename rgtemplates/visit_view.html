@@ -6,7 +6,7 @@
 
 {% block content %}
 <p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a>
-{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">Edit visit</a>  | <a href="/teaching/{{v.pk}}/invite/">Invite/add to visit</a>
+{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">Edit visit</a>  | <a href="/teaching/{{v.pk}}/invite/">Invite/add to visit</a><br><a href="/teaching/{{v.pk}}/email/">Email Invitees</a>
 {% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/close/">Close visit</a>  | <a href="/teaching/{{v.pk}}/cancel/">Cancel visit</a>{% endifequal %}
 {% endifequal %}{% endif %}
 </p>

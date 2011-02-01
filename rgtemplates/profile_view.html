@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load hide_email %}
 
 {% comment %}{% load profile_filters %}{% endcomment %}
 
@@ -20,7 +21,7 @@
 <strong>Date of birth:</strong> {{user.dob|date:"j F Y"}} (age {{user.age}})<br />
 {% endif %}
 {% if user.email_public %}
-<strong>Email address:</strong> {{user.email}}<br />
+<strong>Email address:</strong> {% hide_email user.email %}<br />
 {% endif %}
 {% if show_course %}
 {% if user.course %}
