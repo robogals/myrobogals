@@ -181,7 +181,6 @@ class InviteForm(forms.Form):
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
-	html = forms.BooleanField(required=False)
 	action = forms.ChoiceField(choices=((1,'Invite members'),(2,'Add members as attending')),initial=1)
 
 	def __init__(self, *args, **kwargs):
@@ -214,7 +213,7 @@ def invitetovisit(request, visit_id):
 				message.from_address = request.user.email
 				message.reply_address = request.user.email
 				message.sender = request.user
-				message.html = data['html']
+				message.html = True
 				message.from_name = chapter.name
 				
 				# Don't send it yet until the recipient list is done
