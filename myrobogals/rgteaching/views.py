@@ -425,7 +425,32 @@ def cancelvisit(request, visit_id):
 		cancelform = CancelForm(None, user=request.user, visit=v)
 	return render_to_response('visit_cancel.html', {'cancelform': cancelform, 'visit_id': visit_id}, context_instance=RequestContext(request))
 
-
+class DeleteForm(forms.Form):
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		school=kwargs['school']
+		del kwargs['school']
+		super(DeleteForm, self).__init__(*args, **kwargs)
+			
+@login_required
+def deleteschool(request, school_id):
+	chapter = request.user.chapter()
+	s = get_object_or_404(School, pk=school_id)
+	if (s.chapter != chapter):
+		raise Http404
+	if request.method == 'POST':
+		deleteform = DeleteForm(request.POST, user=request.user, school=s)
+		if SchoolVisit.objects.filter(school=s):
+			request.user.message_set.create(message="You cannot delete this school as it has a visit in the database.")
+			return HttpResponseRedirect('/teaching/schools/')
+		else:
+			School.objects.filter(id = s.id).delete()
+			request.user.message_set.create(message="School sucessfully deleted.")
+			return HttpResponseRedirect('/teaching/schools/')
+	else:
+		deleteform = DeleteForm(None, user=request.user, school=s)
+	return render_to_response('school_delete.html', {'school': s}, context_instance=RequestContext(request))
 	
 @login_required
 def listschools(request):
