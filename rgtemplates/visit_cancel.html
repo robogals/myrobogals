@@ -1,0 +1,37 @@
+{% extends "base_tinymce.html" %}
+
+{% block title %}Cancel a School Visit{% endblock %}
+
+{% block pagetitle %}Cancel a School Visit{% endblock %}
+
+{% block content %}
+<div class ="error">
+<strong>Once a visit is cancelled it will be removed from the database and you will not be able to edit it again. Only cancel a visit if you are sure it is not happening. <strong>
+</div>
+<form action="/teaching/{{visit_id}}/cancel/" method="POST">
+{% if cancelform.errors %}
+<div class="error">
+Please correct the following field(s):<br>
+{% for error in cancelform.errors %}
+- {{error}}<br>
+{% endfor %}
+</div>
+{% endif %}
+<table>
+  <tr>
+    <td valign="top"><strong>Notification Email to Invitees</strong></td>
+  </tr>
+</table>
+<table id="cancelemail">
+  <tr>
+    <td valign="top" style="width: 50px"><strong>Subject:</strong></td>
+    <td>{{ cancelform.subject }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>Message:</strong></td>
+    <td>{{ cancelform.body }}</td>
+  </tr>
+</table>
+<input type="submit" value="Cancel Visit and Send Email" />
+</form>
+{% endblock %}

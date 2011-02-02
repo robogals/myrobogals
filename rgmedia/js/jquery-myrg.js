@@ -108,7 +108,7 @@
 		
 		$('input[name=invitee_type]:radio').change(function() {
 			switch ($('input[name=invitee_type]:radio:checked').val()) {
-				case '4':
+				case '5':
 					$('#form_table_recipientes').show();
 					break;
 				default:  $('#form_table_recipientes').hide();

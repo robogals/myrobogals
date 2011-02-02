@@ -45,6 +45,7 @@ urlpatterns = patterns('',
 	(r'^teaching/(?P<visit_id>\d+)/invite/$', 'rgteaching.views.invitetovisit'),
 	(r'^teaching/(?P<visit_id>\d+)/email/$', 'rgteaching.views.emailvisitattendees'),
 	(r'^teaching/(?P<visit_id>\d+)/edit/$', 'rgteaching.views.editvisit'),
+	(r'^teaching/(?P<visit_id>\d+)/cancel/$', 'rgteaching.views.cancelvisit'),
 	(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/yes/$', 'rgteaching.views.rsvpyes'),
 	(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/no/$', 'rgteaching.views.rsvpno'),
 	(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/remove/$', 'rgteaching.views.rsvpremove'),
@@ -71,5 +72,6 @@ urlpatterns = patterns('',
 	(r'^i18n/', include('django.conf.urls.i18n')),
 	(r'^topsecretarea/', include(admin.site.urls)),
 	(r'^tinymce/', include('tinymce.urls')),
+	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 	
 )

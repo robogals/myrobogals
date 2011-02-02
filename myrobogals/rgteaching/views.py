@@ -337,9 +337,12 @@ def emailvisitattendees(request, visit_id):
 				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=2).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
 			elif request.POST['invitee_type'] == '3':
+				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=4).values_list('user_id')
+				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			elif request.POST['invitee_type'] == '4':
 				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=1).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)	
-			elif request.POST['invitee_type'] == '4':
+			elif request.POST['invitee_type'] == '5':
 				users = data['memberselect']
 
 			for one_user in users:
@@ -359,6 +362,70 @@ def emailvisitattendees(request, visit_id):
 	else:
 		emailform = EmailAttendeesForm(None, user=request.user, visit=v)
 	return render_to_response('visit_email.html', {'emailform': emailform, 'visit_id': visit_id}, context_instance=RequestContext(request))
+	
+class CancelForm(forms.Form):
+	subject = forms.CharField(max_length=256, required=False,widget=forms.TextInput(attrs={'size':'40'}))
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
+	
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		visit=kwargs['visit']
+		del kwargs['visit']
+		super(CancelForm, self).__init__(*args, **kwargs)
+		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
+		self.fields['body'].initial = "The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start)
+		
+@login_required
+def cancelvisit(request, visit_id):
+	chapter = request.user.chapter()
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if (v.chapter != chapter):
+		raise Http404
+	if request.method == 'POST':
+		cancelform = CancelForm(request.POST, user=request.user, visit=v)
+		if cancelform.is_valid():
+			data = cancelform.cleaned_data
+			
+			message = EmailMessage()
+			message.subject = data['subject']
+			message.body = data['body']
+			message.from_address = request.user.email
+			message.reply_address = request.user.email
+			message.sender = request.user
+			message.html = True
+			message.from_name = chapter.name
+			message.scheduled = False
+				
+			# Don't send it yet until the recipient list is done
+			message.status = -1
+			# Save to database so we get a value for the primary key,
+			# which we need for entering the recipient entries
+			message.save()
+			
+			
+			#Email everyone who has been invited.
+			id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
+			users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+
+			for one_user in users:
+				recipient = EmailRecipient()
+				recipient.message = message
+				recipient.user = one_user
+				recipient.to_name = one_user.get_full_name()
+				recipient.to_address = one_user.email
+				recipient.save()
+				
+			
+			message.status = 0
+			message.save()
+			Event.objects.filter(id = v.id).delete()
+			request.user.message_set.create(message="Visit cancelled successfully")
+			return HttpResponseRedirect('/teaching/list/')
+	else:
+		cancelform = CancelForm(None, user=request.user, visit=v)
+	return render_to_response('visit_cancel.html', {'cancelform': cancelform, 'visit_id': visit_id}, context_instance=RequestContext(request))
+
 
 	
 @login_required
