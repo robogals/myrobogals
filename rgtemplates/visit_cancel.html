@@ -1,4 +1,5 @@
 {% extends "base_tinymce.html" %}
+{{cancelform.media}}
 
 {% block title %}Cancel a School Visit{% endblock %}
 
@@ -31,6 +32,7 @@ Please correct the following field(s):<br>
     <td valign="top"><strong>Message:</strong></td>
     <td>{{ cancelform.body }}</td>
   </tr>
+	
 </table>
 <input type="submit" value="Cancel Visit and Send Email" />
 </form>

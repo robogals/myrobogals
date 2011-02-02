@@ -178,7 +178,7 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class InviteForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False)
-	body = forms.CharField(widget=forms.Textarea, required=False)
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	html = forms.BooleanField(required=False)
@@ -192,10 +192,10 @@ class InviteForm(forms.Form):
 		super(InviteForm, self).__init__(*args, **kwargs)
 		self.fields['memberselect'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_reminder_optin=True).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
-		self.fields['body'].initial = "Hello,\n\nThere will be an upcoming Robogals school visit:\n"
+		self.fields['body'].initial = "Hello,\n\nThere will be an upcoming Robogals school visit:<br>"
 		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
-		self.fields['body'].initial += "\nLocation: " + visit.location + "\nSchool: " + visit.school.name
-		self.fields['body'].initial += "\n\nTo accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/\n\nThanks,\n\n" + user.chapter().name + "\n"
+		self.fields['body'].initial += "<br>Location: " + visit.location + "\nSchool: " + visit.school.name
+		self.fields['body'].initial += "<br><br>To accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>"
 
 @login_required
 def invitetovisit(request, visit_id):
@@ -374,7 +374,7 @@ class CancelForm(forms.Form):
 		del kwargs['visit']
 		super(CancelForm, self).__init__(*args, **kwargs)
 		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
-		#self.fields['body'].initial = "The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start)
+		self.fields['body'].initial = "The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start)
 		
 @login_required
 def cancelvisit(request, visit_id):
