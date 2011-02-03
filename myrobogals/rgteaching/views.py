@@ -591,7 +591,8 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage = EventMessage()
 				rsvpmessage.event = e
 				rsvpmessage.user = request.user
-				rsvpmessage.date = datetime.datetime.now()
+				fmt = '%Y-%m-%d %H:%M'
+				rsvpmessage.date = request.user.tz_obj().localize(datetime.datetime.now()).astimezone(utc).strftime(fmt)
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
 			request.user.message_set.create(message=rsvp_string)

@@ -60,7 +60,7 @@ class SchoolVisit(Event):
 class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
-	date = models.DateTimeField("Message Time")
+	date = models.CharField(max_length=50)
 	message = models.TextField("RSVP Message")
 
 class TrainingSession(Event):
