@@ -591,7 +591,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage = EventMessage()
 				rsvpmessage.event = e
 				rsvpmessage.user = request.user
-				utc_dt = datetime.datetime.now()
+				utc_dt = utc.localize(datetime.datetime.now())
 				user_tz = request.user.tz_obj()
 				user_dt = user_tz.normalize(utc_dt.astimezone(user_tz))
 				fmt = '%Y-%m-%d %H:%M'
