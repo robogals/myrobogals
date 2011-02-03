@@ -142,7 +142,8 @@
   <tr></tr>
 </table>
 {% if request.user.is_staff %}
-<h4><strong>RSVP Messages </strong></h4>
+{% if eventmessages %}
+<h4><strong>RSVP Messages: </strong></h4>
 	{% for eventmessage in eventmessages%}
 	 <div class="eventmessage">
 	  <div class="topbar">{{eventmessage.user.get_full_name}}  said: <span style="position: absolute; right: 0.5em;"><a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">Delete</a></span></div>
@@ -151,5 +152,6 @@
 	  </div>
 	 </div>
 	{% endfor %}
+{% endif %}
 {% endif %}
 {% endblock %}
