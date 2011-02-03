@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.template import Context, loader
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event
+from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 #from myrobogals.auth.models import Group
@@ -158,13 +158,14 @@ def viewvisit(request, visit_id):
 	notattending = EventAttendee.objects.filter(event=v, rsvp_status=4)
 	waitingreply = EventAttendee.objects.filter(event=v, rsvp_status=1)
 	user_attended = False
+	eventmessages = EventMessage.objects.filter(event=v)
 	try:
 		ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
 		user_rsvp_status = ea.rsvp_status
 		user_attended = (ea.actual_status == 1)
 	except IndexError:
 		user_rsvp_status = 0
-	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended}, context_instance=RequestContext(request))
+	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
 @login_required
 def listvisits(request):
@@ -552,11 +553,62 @@ def dorsvp(request, event_id, user_id, rsvp_status):
 				ea.save()
 	return HttpResponseRedirect('/teaching/' + str(event.pk) + '/')
 
-def rsvpyes(request, event_id, user_id):
-	return dorsvp(request, event_id, user_id, 2)
+class RSVPForm(forms.Form):
+	leave_message = forms.BooleanField(required=False)
+	message = forms.CharField(widget=TinyMCE(attrs={'cols': 60}), required=False)
+	
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		visit=kwargs['event']
+		del kwargs['event']
+		super(RSVPForm, self).__init__(*args, **kwargs)
+		
+def rsvp(request, event_id, user_id, rsvp_type):
+	e = get_object_or_404(Event, pk=event_id)
+	chapter = request.user.chapter()
+	if rsvp_type == 'yes':
+		rsvp_id = 2
+		rsvp_string = "RSVP'd as Attending"
+		title_string = "RSVP as Attending"
+	elif rsvp_type == 'no':
+		rsvp_id = 4
+		rsvp_string = "RSVP'd as Not Attending"
+		title_string = "RSVP as Not Attending"
+	elif rsvp_type == 'remove':
+		title_string = "Remove as Invitee"
+		rsvp_string = "Removed from this event"
+		rsvp_id = 0
+	else:
+		raise Http404
+	if e.chapter != chapter:
+		raise Http404
+	if request.method == 'POST':
+		rsvpform = RSVPForm(request.POST, user=request.user, event=e)
+		if rsvpform.is_valid():
+			data = rsvpform.cleaned_data
+			if data['leave_message'] == True:
+				rsvpmessage = EventMessage()
+				rsvpmessage.event = e
+				rsvpmessage.user = request.user
+				rsvpmessage.message = data['message']
+				rsvpmessage.save()
+			request.user.message_set.create(message=rsvp_string)
+			return dorsvp(request, event_id, user_id, rsvp_id)
+	else:
+		rsvpform = RSVPForm(None, user=request.user, event=e)
+	return render_to_response('event_rsvp.html', {'rsvpform': rsvpform, 'title_string': title_string, 'event_id': event_id, 'user_id': user_id, 'rsvp_type': rsvp_type}, context_instance=RequestContext(request))
 
-def rsvpno(request, event_id, user_id):
-	return dorsvp(request, event_id, user_id, 4)
-
-def rsvpremove(request, event_id, user_id):
-	return dorsvp(request, event_id, user_id, 0)
+@login_required
+def deletemessage(request, visit_id, message_id):
+	chapter = request.user.chapter()
+	v = get_object_or_404(Event, pk=visit_id)
+	m = get_object_or_404(EventMessage, pk=message_id)
+	if (v.chapter != chapter):
+		raise Http404
+	if request.user.is_staff:	
+		m.delete()
+		request.user.message_set.create(message="Message Delete")
+	else:
+		raise Http404
+	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')

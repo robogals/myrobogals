@@ -50,13 +50,17 @@ class SchoolVisit(Event):
 	toprint = models.TextField("Materials to be printed", blank=True)
 	tobring = models.TextField("Stuff to bring", blank=True)
 	otherprep = models.TextField("Other preparation", blank=True)
-	closing_comments = models.TextField("Closing comments", blank=True)
-	
+	closing_comments = models.TextField("Closing comments", blank=True)	
 	def __unicode__(self):
 		return "Visit to " + str(self.school) + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
 	
 	class Meta:
 		ordering = ['-visit_start']
+
+class EventMessage(models.Model):
+	event = models.ForeignKey(Event)
+	user = models.ForeignKey(User)
+	message = models.TextField("RSVP Message")
 
 class TrainingSession(Event):
 	def __unicode__(self):
