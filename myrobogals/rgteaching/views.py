@@ -591,6 +591,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage = EventMessage()
 				rsvpmessage.event = e
 				rsvpmessage.user = request.user
+				rsvpmessage.date = datetime.datetime.now()
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
 			request.user.message_set.create(message=rsvp_string)
@@ -608,7 +609,7 @@ def deletemessage(request, visit_id, message_id):
 		raise Http404
 	if request.user.is_staff:	
 		m.delete()
-		request.user.message_set.create(message="Message Delete")
+		request.user.message_set.create(message=_("Message Deleted"))
 	else:
 		raise Http404
 	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')
