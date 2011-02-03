@@ -592,10 +592,10 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage.event = e
 				rsvpmessage.user = request.user
 				fmt = '%Y-%m-%d %H:%M'
-				rsvpmessage.date = request.user.tz_obj().localize(datetime.datetime.now()).astimezone(utc).strftime(fmt)
+				rsvpmessage.date = request.user.tz_obj().localize(datetime.datetime.now()).strftime(fmt)
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
-			request.user.message_set.create(message=rsvp_string)
+			request.user.message_set.create(message= str(rsvp_string))
 			return dorsvp(request, event_id, user_id, rsvp_id)
 	else:
 		rsvpform = RSVPForm(None, user=request.user, event=e)
