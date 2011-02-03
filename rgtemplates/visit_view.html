@@ -146,7 +146,7 @@
 <h4><strong>RSVP Messages: </strong></h4>
 	{% for eventmessage in eventmessages%}
 	 <div class="eventmessage">
-	  <div class="topbar">{{eventmessage.user.get_full_name}}  said: <span style="position: absolute; right: 0.5em;">Message sent at {{eventmessage.date}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">Delete</a></span></div>
+	  <div class="topbar">{{eventmessage.user.get_full_name}}  said: <span style="position: absolute; right: 0.5em;">Message sent at {{eventmessage.date}} (UTC)| <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">Delete</a></span></div>
 	  <div class="message-box">
 		<div class="message-content">{{eventmessage.message|safe}}</div>
 	  </div>
