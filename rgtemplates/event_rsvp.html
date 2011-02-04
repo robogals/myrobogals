@@ -1,4 +1,5 @@
 {% extends "base_tinymce.html" %}
+{% load i18n %}
 
 {% block title %}RSVP to an event {% endblock %}
 
@@ -9,15 +10,15 @@
 <form action="/teaching/{{event_id}}/rsvp/{{user_id}}/{{ rsvp_type }}/" method="POST">
 {% if rsvpform.errors %}
 <div class="error">
-Please correct the following field(s):<br>
+{% trans "Please correct the following field(s)" %}:<br>
 {% for error in rsvpform.errors %}
 - {{error}}<br>
 {% endfor %}
 </div>
 {% endif %}
 <div id="rsvpmessage">
-	<p><label for="leave_message" class="rightlabel"><strong>Leave a message:</strong></label>{{ rsvpform.leave_message }} </p>
-	<p><label for="message"  class="rightlabel"><strong>Message:</strong></label>{{ rsvpform.message }}</p>
+	<p><label for="leave_message" class="leftlabel"><strong>{% trans "Leave a message:" %}</strong></label>{{ rsvpform.leave_message }} </p>
+	<p><label for="message"  class="leftlabel"><strong>{% trans "Message:" %}</strong></label>{{ rsvpform.message }}</p>
 	<p class="submit"><input type="submit" value="RSVP" /></p>
 </div>
 

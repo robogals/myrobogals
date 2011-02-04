@@ -1,14 +1,15 @@
 {% extends "base_tinymce.html" %}
+{% load i18n %}
 
-{% block title %}Email Invitees of a School Visit{% endblock %}
+{% block title %}{% trans "Email Invitees of a School Visit" %}{% endblock %}
 
-{% block pagetitle %}Email Invitees of a School Visit{% endblock %}
+{% block pagetitle %}{% trans "Email Invitees of a School Visit" %}{% endblock %}
 
 {% block content %}
 <form action="/teaching/{{visit_id}}/email/" method="POST">
 {% if emailform.errors %}
 <div class="error">
-Please correct the following field(s):<br>
+{% trans "Please correct the following field(s):" %}<br>
 {% for error in emailform.errors %}
 - {{error}}<br>
 {% endfor %}
@@ -21,23 +22,23 @@ Please correct the following field(s):<br>
 		<table border="0" width="100%" cellpadding="0" cellspacing="0">
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="1" id="invitee_type1" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="type2">All Invitees</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "All Invitees" %}</label></td>
         </tr>
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="2" id="invitee_type2"/></td>
-          <td style="vertical-align: top"><label for="type2">Invitees who have RSVP'd as attending</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "Invitees who have RSVP'd as attending" %}</label></td>
         </tr>
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="3" id="invitee_type2"/></td>
-          <td style="vertical-align: top"><label for="type2">Invitees who have RSVP'd as not attending</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "Invitees who have RSVP'd as not attending" %}</label></td>
         </tr>
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="4" id="invitee_type2" /></td>
-          <td style="vertical-align: top"><label for="type2">Invitees who have yet to RSVP</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "Invitees who have yet to RSVP" %}</label></td>
         </tr>
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="5" id="invitee_type2" /></td>
-          <td style="vertical-align: top"><label for="type2">Selected Invitees</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "Selected Invitees" %}</label></td>
         </tr>
         <tr>
 			<table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_recipientes">
@@ -53,35 +54,35 @@ Please correct the following field(s):<br>
 </table>
 <table id="inviteemail">
   <tr>
-    <td valign="top" style="width: 50px"><strong>Subject:</strong></td>
+    <td valign="top" style="width: 50px"><strong>{% trans "Subject:" %}</strong></td>
     <td>{{ emailform.subject }}</td>
   </tr>
   <tr>
-    <td valign="top"><strong>Message:</strong></td>
+    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
     <td>{{ emailform.body }}</td>
   </tr>
   <tr>
-    <td valign="top"><strong>Scheduling:</strong></td>
+    <td valign="top"><strong>{% trans "Scheduling:" %}</strong></td>
     <td>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="0" id="sched0" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="sched0"><span>Send immediately</span></label></td>
+          <td style="vertical-align: top"><label for="sched0"><span>{% trans "Send immediately" %}</span></label></td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="1" id="sched1" /></td>
-          <td style="vertical-align: top"><label for="sched1"><span>Send later</span></label></td>
+          <td style="vertical-align: top"><label for="sched1"><span>{% trans "Send later" %}</span></label></td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">at {{ emailform.schedule_time }} on {{ emailform.schedule_date }}</td>
+          <td style="vertical-align: top">{% blocktrans %} at {{ emailform.schedule_time }} on {{ emailform.schedule_date }} {% endblocktrans %}</td>
         </tr>
       </table>
     </td>
   <tr>
 </table>
-<input type="submit" value="Send Email" />
+<input type="submit" value={% trans "Send Email" %}/>
 </form>
 {% endblock %}

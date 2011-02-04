@@ -38,10 +38,10 @@ class WriteEmailForm(forms.Form):
 
 	subject = forms.CharField(max_length=256)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
-	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,"Chapter name"),(2,"Your name")), initial=1)
-	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
-	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
-	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
+	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	newsletters = forms.ModelChoiceField(queryset=Newsletter.objects.all(), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
@@ -177,7 +177,7 @@ class WriteSMSForm(forms.Form):
 		(2, 'Recipients\' timezones'),
 	)
 
-	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial="<<Put your message here>>   To opt-out reply 'stop'")
+	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("<<Put your message here>>   To opt-out reply 'stop'"))
 	from_type = forms.ChoiceField(choices=((0,"+61 429 558 100"),))
 	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
@@ -318,7 +318,7 @@ def emaildone(request):
 	return render_to_response('email_done.html', None, context_instance=RequestContext(request))
 
 def msghistory(request):
-	return HttpResponse("Message History")
+	return HttpResponse(_("Message History"))
 
 def api(request):
 	if 'api' not in request.GET:
@@ -462,7 +462,7 @@ class WelcomeEmailForm(forms.Form):
 		self.fields['reply_address'].initial = user.email
 		self.fields['from_name'].initial = user.get_full_name()
 
-	importaction = forms.ChoiceField(choices=((1,'Add subscribers, and send welcome email'),(2,'Add subscribers, with no further action'),(3,'Add subscribers, and send welcome email if send_email = 1')),initial=1)
+	importaction = forms.ChoiceField(choices=((1,_('Add subscribers, and send welcome email')),(2,_('Add subscribers, with no further action')),(3,_('Add subscribers, and send welcome email if send_email = 1'))),initial=1)
 	from_address = forms.CharField(max_length=256, required=True)
 	reply_address = forms.CharField(max_length=256, required=True)
 	from_name = forms.CharField(max_length=256, required=True)

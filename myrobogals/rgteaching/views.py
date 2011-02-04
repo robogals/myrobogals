@@ -107,7 +107,7 @@ def editvisit(request, visit_id):
 				v.otherprep = data['otherprep']
 				v.notes = data['notes']
 				v.save()
-				request.user.message_set.create(message="School visit info updated")
+				request.user.message_set.create(message=_("School visit info updated"))
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 		else:
 			if visit_id == 0:
@@ -180,9 +180,9 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 class InviteForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
-	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
+	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
-	action = forms.ChoiceField(choices=((1,'Invite members'),(2,'Add members as attending')),initial=1)
+	action = forms.ChoiceField(choices=((1,_('Invite members')),(2,_('Add members as attending'))),initial=1)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -192,10 +192,10 @@ class InviteForm(forms.Form):
 		super(InviteForm, self).__init__(*args, **kwargs)
 		self.fields['memberselect'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_reminder_optin=True).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
-		self.fields['body'].initial = "Hello,\n\nThere will be an upcoming Robogals school visit:<br>"
-		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
-		self.fields['body'].initial += "<br>Location: " + visit.location + "\nSchool: " + visit.school.name
-		self.fields['body'].initial += "<br><br>To accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>"
+		self.fields['body'].initial = _("Hello,\n\nThere will be an upcoming Robogals school visit:<br>")
+		self.fields['body'].initial += _("Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time()))
+		self.fields['body'].initial += _("<br>Location: " + visit.location + "\nSchool: " + visit.school.name)
+		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>")
 
 @login_required
 def invitetovisit(request, visit_id):
@@ -259,9 +259,9 @@ def invitetovisit(request, visit_id):
 				message.save()
 			
 			if data['action'] == '1':
-				request.user.message_set.create(message="Invitations have been sent to the selected volunteers")
+				request.user.message_set.create(message=_("Invitations have been sent to the selected volunteers"))
 			if data['action'] == '2':
-				request.user.message_set.create(message="Selected volunteers have been added as attending")
+				request.user.message_set.create(message=_("Selected volunteers have been added as attending"))
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)
@@ -275,7 +275,7 @@ class EmailAttendeesForm(forms.Form):
 	
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
-	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
+	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.datetime.now(), required=False)
 	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.datetime.now().year, datetime.datetime.now().year + 2)), initial=datetime.datetime.now(), required=False)
 	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
@@ -357,7 +357,7 @@ def emailvisitattendees(request, visit_id):
 			message.status = 0
 			message.save()
 			
-			request.user.message_set.create(message="Email sent succesfully")
+			request.user.message_set.create(message=_("Email sent succesfully"))
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		emailform = EmailAttendeesForm(None, user=request.user, visit=v)
@@ -374,7 +374,7 @@ class CancelForm(forms.Form):
 		del kwargs['visit']
 		super(CancelForm, self).__init__(*args, **kwargs)
 		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
-		self.fields['body'].initial = "The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start)
+		self.fields['body'].initial = _("The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start))
 		
 @login_required
 def cancelvisit(request, visit_id):
@@ -420,7 +420,7 @@ def cancelvisit(request, visit_id):
 			message.status = 0
 			message.save()
 			Event.objects.filter(id = v.id).delete()
-			request.user.message_set.create(message="Visit cancelled successfully")
+			request.user.message_set.create(message=_("Visit cancelled successfully"))
 			return HttpResponseRedirect('/teaching/list/')
 	else:
 		cancelform = CancelForm(None, user=request.user, visit=v)
@@ -443,11 +443,11 @@ def deleteschool(request, school_id):
 	if request.method == 'POST':
 		deleteform = DeleteForm(request.POST, user=request.user, school=s)
 		if SchoolVisit.objects.filter(school=s):
-			request.user.message_set.create(message="You cannot delete this school as it has a visit in the database.")
+			request.user.message_set.create(message=_("You cannot delete this school as it has a visit in the database."))
 			return HttpResponseRedirect('/teaching/schools/')
 		else:
 			School.objects.filter(id = s.id).delete()
-			request.user.message_set.create(message="School sucessfully deleted.")
+			request.user.message_set.create(message=-("School sucessfully deleted."))
 			return HttpResponseRedirect('/teaching/schools/')
 	else:
 		deleteform = DeleteForm(None, user=request.user, school=s)
@@ -504,7 +504,7 @@ def editschool(request, school_id):
 				data = formpart3.cleaned_data
 				s.notes = data['notes']
 				s.save()
-				request.user.message_set.create(message="School info updated")
+				request.user.message_set.create(message=_("School info updated"))
 				return HttpResponseRedirect('/teaching/schools/')
 		else:
 			if school_id == 0:
@@ -569,15 +569,15 @@ def rsvp(request, event_id, user_id, rsvp_type):
 	chapter = request.user.chapter()
 	if rsvp_type == 'yes':
 		rsvp_id = 2
-		rsvp_string = "RSVP'd as Attending"
-		title_string = "RSVP as Attending"
+		rsvp_string = _("RSVP'd as Attending")
+		title_string = _("RSVP as Attending")
 	elif rsvp_type == 'no':
 		rsvp_id = 4
-		rsvp_string = "RSVP'd as Not Attending"
-		title_string = "RSVP as Not Attending"
+		rsvp_string = _("RSVP'd as Not Attending")
+		title_string = _("RSVP as Not Attending")
 	elif rsvp_type == 'remove':
-		title_string = "Remove as Invitee"
-		rsvp_string = "Removed from this event"
+		title_string = _("Remove as Invitee")
+		rsvp_string = _("Removed from this event")
 		rsvp_id = 0
 	else:
 		raise Http404

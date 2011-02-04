@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Login{% endblock %}
+{% block title %}{%trans "Login" %}{% endblock %}
 
-{% block pagetitle %}Login{% endblock %}
+{% block pagetitle %}{% trans "Login" %}{% endblock %}
 
 {% block content %}
 <form action="/image/" method="post" enctype="multipart/form-data">

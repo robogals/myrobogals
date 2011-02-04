@@ -6,9 +6,9 @@
 
 {% block content %}
 {% if errmsg %}{{errmsg}}<br> <br>{% endif %}
-The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>.<br>
+{% trans "The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>" %}.<br>
 <br>
-The email field must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't.<br>
+{% trans "The email field must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't." %}<br>
 <br>
 <form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post" enctype="multipart/form-data">
 {% if form.csvfile.errors %}
@@ -16,11 +16,11 @@ The email field must always be included. All other fields are optional. Fields w
 {% endif %}
 <table>
   <tr>
-    <td valign="top" style="width: 70px"><strong>CSV file:</strong></td>
+    <td valign="top" style="width: 70px"><strong>{% trans "CSV file:" %}</strong></td>
     <td>{{form.csvfile}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top; width: 50px"><strong>Action:</strong></td>
+    <td style="vertical-align: top; width: 50px"><strong>{% trans "Action:" %}</strong></td>
     <td style="vertical-align: top">{{ welcomeform.importaction }}</td>
   </tr>
   <tr>
@@ -29,36 +29,36 @@ The email field must always be included. All other fields are optional. Fields w
 </table>
 <table id="welcomeemail">
   <tr>
-    <td colspan="2"><strong>Welcome email:</strong></td>
+    <td colspan="2"><strong>{% trans "Welcome email:" %}</strong></td>
   </tr>
   <tr>
-    <td valign="top" style="width: 110px"><strong>From address:</strong></td>
+    <td valign="top" style="width: 110px"><strong>{% trans "From address:" %}</strong></td>
     <td>{{ welcomeform.from_address }}</td>
   </tr>
   <tr>
-    <td valign="top" style="width: 110px"><strong>From name:</strong></td>
+    <td valign="top" style="width: 110px"><strong>{% trans "From name:" %}</strong></td>
     <td>{{ welcomeform.from_name }}</td>
   </tr>
   <tr>
-    <td valign="top" style="width: 110px"><strong>Reply-to address:</strong></td>
+    <td valign="top" style="width: 110px"><strong>{% trans "Reply-to address:" %}</strong></td>
     <td>{{ welcomeform.reply_address }}</td>
   </tr>
   <tr>
-    <td valign="top" style="width: 110px"><strong>Subject:</strong></td>
+    <td valign="top" style="width: 110px"><strong>{% trans "Subject:" %}</strong></td>
     <td>{{ welcomeform.subject }}</td>
   </tr>
   <tr>
-    <td valign="top"><strong>Message:</strong></td>
+    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
     <td>{{ welcomeform.body }}</td>
   </tr>
   <tr>
     <td valign="top"><strong>HTML:</strong></td>
-    <td>{{ welcomeform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+    <td>{{ welcomeform.html }} "{% trans "Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to" %} &lt;br&gt;)</td>
   </tr>
 </table>
 <table>
   <tr>
-    <td colspan="2"><strong>&nbsp;<br />Defaults</strong><br>If specified, these values will be used where that attribute is not specified in the CSV file. All fields are optional.</strong></td>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Defaults</strong><br>If specified, these values will be used where that attribute is not specified in the CSV file. All fields are optional." %}</strong></td>
   </tr>
 {% for field in defaultsform %}
   {% if field.errors %}

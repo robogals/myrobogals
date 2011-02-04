@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Generate and email password: {{username}}{% endblock %}
+{% block title %}{% trans "Generate and email password:" %} {{username}}{% endblock %}
 
-{% block pagetitle %}Generate and email password: {{username}}{% endblock %}
+{% block pagetitle %}{% trans "Generate and email password:" %} {{username}}{% endblock %}
 
 {% block content %}
 {% if errmsg %}{{errmsg}}<br> <br>{% endif %}
-In the email below, the field names are the same as for importing a CSV file. <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/help/">Full list of field names</a>.<br>&nbsp;<br>
+{% trans "In the email below, the field names are the same as for importing a CSV file." %} <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/help/">{% trans "Full list of field names" %}</a>.<br>&nbsp;<br>
 <form action="/profile/{{username}}/genpw/" method="post" enctype="multipart/form-data">
 {% if error %}
 <div class="error">{{error}}</div>
 {% endif %}
 <table>
   <tr>
-    <td colspan="2"><strong>Notification email:</strong></td>
+    <td colspan="2"><strong>{% trans "Notification email:" %}</strong></td>
   </tr>
   {% if welcomeform.subject.errors %}
   <tr>
@@ -21,7 +21,7 @@ In the email below, the field names are the same as for importing a CSV file. <a
   </tr>
   {% endif %}
   <tr>
-    <td valign="top" style="width: 70px"><strong>Subject:</strong></td>
+    <td valign="top" style="width: 70px"><strong>{% trans "Subject:" %}</strong></td>
     <td>{{ welcomeform.subject }}</td>
   </tr>
   {% if welcomeform.body.errors %}
@@ -35,7 +35,7 @@ In the email below, the field names are the same as for importing a CSV file. <a
   </tr>
   <tr>
     <td valign="top"><strong>HTML:</strong></td>
-    <td>{{ welcomeform.html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+    <td>{{ welcomeform.html }} {% trans "Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to" %} &lt;br&gt;)</td>
   </tr>
 </table>
 {% if return %}

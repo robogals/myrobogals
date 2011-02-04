@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load hide_email %}
+
 {% block title %}{% blocktrans with chapter.name as chapter %}View list: {{userlist}}{% endblocktrans %}{% endblock %}
 
 {% block pagetitle %}{% blocktrans with chapter.name as chapter %}View list: {{userlist}}{% endblocktrans %}{% endblock %}
@@ -9,7 +11,7 @@
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
 <p>
-<a href="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/">Edit this list</a> | <a href="/chapters/{{chapter.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/">Return to manage users</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">Return to list of lists</a></p>
+<a href="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/">{% trans "Edit this list" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/">{% trans "Return to manage users" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Return to list of lists" %}</a></p>
 <table>
   <tr>
     <td><strong>{% trans "Username" %}</strong></td>
@@ -23,7 +25,7 @@
     <td><a href="/profile/{{u.username}}/">{{u.username}}</a></td>
     <td>{{u.first_name}}</td>
     <td>{{u.last_name}}</td>
-    <td><a href="mailto:{{u.email}}">{{u.email}}</a></td>
+    <td>{% hide_email u.email %}</td>
     <td>{% if not u.mobile %}{% else %}+{{u.mobile}}{% endif %}</td>
   </tr>
 {% endfor %}

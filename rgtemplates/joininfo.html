@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Join {{chapter.name}}{% endblock %}
+{% block title %}{% trans "Join" %} {{chapter.name}}{% endblock %}
 
-{% block pagetitle %}Join {{chapter.name}}{% endblock %}
+{% block pagetitle %}{% trans "Join" %} {{chapter.name}}{% endblock %}
 
 {% block content %}
 {% autoescape off %}

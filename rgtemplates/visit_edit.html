@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+{% block title %}{% if new %}{% trans "Create new" %}{% else %}{% trans "Edit" %}{% endif %} {% trans "school visit" %} {% endblock %}
 
-{% block pagetitle %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
+{% block pagetitle %}{% if new %}{% trans "Create new" %}{% else %}{% trans "Edit" %}{% endif %}{% trans "school visit" %}{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a> | <a href="/teaching/{{visit_id}}/">Return to visit</a></p>
+<p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a> | <a href="/teaching/{{visit_id}}/">{% trans "Return to visit" %}</a></p>
 {% if new %}
 <form action="/teaching/new/" method="POST">
 {% else %}
@@ -55,6 +55,6 @@
   </tr>
 {% endfor %}
 </table>
-<input type="submit" value="Submit" />
+<input type="submit" value={%trans "Submit" %} />
 </form>
 {% endblock %}

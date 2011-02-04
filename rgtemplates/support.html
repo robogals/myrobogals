@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Support{% endblock %}
+{% block title %}{% trans "Support" %}{% endblock %}
 
-{% block pagetitle %}myRobogals Support{% endblock %}
+{% block pagetitle %}{% trans "myRobogals Support" %}{% endblock %}
 
 {% block content %}
-For all questions about myRobogals please email <strong>my@robogals.org</strong> - we're here to help!<br>
+{% blocktrans %} For all questions about myRobogals please email <strong>my@robogals.org</strong> - we're here to help!<br>
 <br>
-For other questions about Robogals please see the contact details on <a href="http://www.robogals.org/">robogals.org</a>
+For other questions about Robogals please see the contact details on <a href="http://www.robogals.org/">robogals.org</a> {% endblocktrans %}
 {% endblock %}

@@ -21,7 +21,7 @@
                     {% endif %}
                     <a href="/logout/">{% trans "Logout" %}</a>
                 {% else %}
-                             <h3 class="module-title">Login Form</h3>
+                             <h3 class="module-title">{% trans "Login Form" %}</h3>
 <div class="main-login-form">
     <form action="/login/process/" method="post" name="login" class="form-login">
                 <div class="username-block">
@@ -43,11 +43,11 @@
             <p>
                 <a href="/join/">
 
-                    Join Robogals</a>
+                    {% trans "Join Robogals" %}</a>
             </p>
             <p>
                 <a href="/forgotpass/">
-                    Reset password</a>
+                    {% trans "Reset password" %}</a>
             </p>
             </div>
             </div>

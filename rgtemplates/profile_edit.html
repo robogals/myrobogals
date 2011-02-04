@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% if adduser %}Add member{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block title %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %}{{u.username}}{% endif %}{% endif %}{% endblock %}
 
-{% block pagetitle %}{% if adduser %}Add member{% else %}{% if join %}Join {{chapter}}{% else %}Edit Profile: {{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block pagetitle %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %}{{u.username}}{% endif %}{% endif %}{% endblock %}
 
 {% block content %}
 <!-- form for editing profile information -->
@@ -37,17 +37,17 @@
   </tr>
   {% endif %}
   <tr>
-    <td>New password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
+    <td>{% trans "New password" %}{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password1"></td>
   </tr>
   <tr>
-    <td>Confirm new password{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
+    <td>{% trans "Confirm new password" %}{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
 {% if request.user.is_staff and not adduser %}
   <tr>
     <td>&nbsp;</td>
-    <td><a href="/profile/{{u.username}}/genpw/">Generate and email new password</a></td>
+    <td><a href="/profile/{{u.username}}/genpw/">{% trans "Generate and email new password" %}</a></td>
   </tr>
 {% endif %}
 {% endif %}
@@ -63,8 +63,8 @@
   </tr>
 {% endfor %}
   <tr>
-    <td style="vertical-align: top">Chapter <span style="color: #ff0000">*</span></td>
-    <td style="vertical-align: top">{{ chapter }}{% if not join %}<br /><span style="font-size: 9pt">To move to another chapter, please contact secretary@robogals.org</span>{% endif %}</td>
+    <td style="vertical-align: top">{% trans "Chapter" %} <span style="color: #ff0000">*</span></td>
+    <td style="vertical-align: top">{{ chapter }}{% if not join %}<br /><span style="font-size: 9pt">{% trans "To move to another chapter, please contact secretary@robogals.org" %}</span>{% endif %}</td>
   </tr>
   <tr>
     <td colspan="2"><strong>&nbsp;<br />{% trans "Privacy settings" %}</strong></td>
@@ -95,7 +95,7 @@
   </tr>
 {% endfor %}
   <tr>
-    <td colspan="2"><strong>&nbsp;<br />Email and SMS settings</strong></td>
+    <td colspan="2"><strong>&nbsp;<br />{% trans "Email and SMS settings" %}</strong></td>
   </tr>
 {% for field in formpart4 %}
   <tr>

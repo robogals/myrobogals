@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}School visits{% endblock %}
+{% block title %}{% trans "School visits" %}{% endblock %}
 
-{% block pagetitle %}School visits{% endblock %}
+{% block pagetitle %}{% trans "School visits" %}{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">Return to teaching home</a>{% if request.user.is_staff %} | <a href="/teaching/new/">Create new school visit</a>{% endif %}</p>
+<p><a href="/teaching/">{% trans "Return to teaching home" %}</a>{% if request.user.is_staff %} | <a href="/teaching/new/">{% trans "Create new school visit" %}</a>{% endif %}</p>
 <table cellspacing="3">
   <tr>
     <td><strong>{% trans "School" %}</strong></td>
@@ -18,7 +18,7 @@
     <td>{{v.school}}</td>
     <td>{{v.visit_start|date:"l j F Y"}}</td>
     <td>{{v.location}}</td>
-    <td><a href="/teaching/{{v.pk}}/">View</a></td>
+    <td><a href="/teaching/{{v.pk}}/">{% trans "View" %}</a></td>
   </tr>
 {% endfor %}
 </table>

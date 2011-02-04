@@ -1,3 +1,4 @@
+{% load i18n %}
     <!--Begin Header-->
     <div id="header-bg">
         <!--Begin Horizontal Menu-->
@@ -10,7 +11,7 @@
             <li class="item1 root" >
             <a class="orphan item bullet" href="/"  >
             <span>
-                        Home               
+                        {% trans "Home" %}               
             </span>
         </a>
         
@@ -20,7 +21,7 @@
 
             <a class="daddy item bullet" href="/profile/"  >
             <span>
-                        Profile
+                        {% trans "Profile" %}
                
             </span>
         </a>
@@ -33,7 +34,7 @@
                     <li class="item54" >
             <a class="orphan item bullet" href="/profile/"  >
             <span>
-                        View Profile           
+                        {% trans "View Profile" %}          
             </span>
         </a>
         
@@ -44,7 +45,7 @@
             <a class="orphan item bullet" href="/profile/edit/"  >
             <span>
 
-                        Edit Profile               
+                        {% trans "Edit Profile" %}               
             </span>
         </a>
         
@@ -59,7 +60,7 @@
             <a class="daddy item bullet" href="/chapters/"  >
 
             <span>
-                        Chapter   
+                        {% trans "Chapter" %}   
                
             </span>
         </a>
@@ -69,35 +70,35 @@
             <ul class="level2">
                 <li class="item158">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/">
-                        <span>View my chapter</span>
+                        <span>{% trans "View my chapter" %}</span>
                     </a>
                 </li>
 
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/">
-                        <span>List all chapters</span>
+                        <span>{% trans "List all chapters" %}</span>
                     <a>
                 </li>
 {% if request.user.is_staff %}
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
-                        <span>Edit my chapter</span>
+                        <span>{% trans "Edit my chapter" %}</span>
                     <a>
                 </li>
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/users/">
-                        <span>Manage members</span>
+                        <span>{% trans "Manage members" %}</span>
                     <a>
                 </li>
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/lists/">
-                        <span>Manage lists</span>
+                        <span>{% trans "Manage lists" %}</span>
                     <a>
                 </li>
 {% endif %}
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/localtimes/">
-                        <span>Current local times</span>
+                        <span>{% trans "Current local times" %}</span>
                     <a>
                 </li>
             </ul>
@@ -109,7 +110,7 @@
 
             <a class="daddy item bullet" href="/teaching/"  >
             <span>
-                        Teaching    
+                        {% trans "Teaching" %}    
                
             </span>
         </a>
@@ -146,7 +147,7 @@
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/list/"  >
             <span>
-                        List school visits          
+                        {% trans "List school visits" %}          
             </span>
         </a>
 
@@ -158,7 +159,7 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/new/"  >
             <span>
-                        Create new               
+                        {% trans "Create new" %}               
             </span>
 
         </a>
@@ -168,7 +169,7 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/schools/"  >
             <span>
-                        List schools              
+                        {% trans "List schools" %}              
             </span>
 
         </a>
@@ -178,7 +179,7 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/schools/new/"  >
             <span>
-                        Add new school
+                        {% trans "Add new school" %}
             </span>
 
         </a>
@@ -193,7 +194,7 @@
             <li class="item73 parent root" >
             <a class="daddy item bullet" href="#"  >
             <span>
-                        Email &amp; SMS   
+                        {% trans "Email &amp; SMS" %}   
                
             </span>
 
@@ -207,7 +208,7 @@
                     <li class="item82" >
             <a class="orphan item bullet" href="/messages/email/write/"  >
             <span>
-                        Send email         
+                        {% trans "Send email" %}         
             </span>
 
         </a>
@@ -218,7 +219,7 @@
                     <li class="item83" >
             <a class="orphan item bullet" href="/messages/sms/write/"  >
             <span>
-                        Send SMS           
+                        {% trans "Send SMS" %}           
             </span>
         </a>
 </li>   
@@ -226,7 +227,7 @@
                     <li class="item89" >
             <a class="orphan item bullet" href="#"  >
             <span>
-                        Message history    
+                        {% trans "Message history" %}    
             </span>
         </a>
         
@@ -242,7 +243,7 @@
             <a class="orphan item bullet" href="/wiki/"  >
             <span>
 
-                        Wiki   
+                       {% trans "Wiki" %}   
                
             </span>
         </a>
@@ -254,7 +255,7 @@
             <a class="orphan item bullet" href="/files/"  >
             <span>
 
-                        Files   
+                        {% trans "Files" %}   
                
             </span>
         </a>

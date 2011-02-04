@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% load hide_email %}
 
 {% comment %}{% load profile_filters %}{% endcomment %}
 
-{% block title %}Profile - {{user.first_name}} {{user.last_name}}{% endblock %}
+{% block title %}{% trans "Profile" %} - {{user.first_name}} {{user.last_name}}{% endblock %}
 
-{% block pagetitle %}Profile: {{user.first_name}} {{user.last_name}}{% endblock %}
+{% block pagetitle %}{% trans "Profile" %} {{user.first_name}} {{user.last_name}}{% endblock %}
 
 {% block content %}
 <!-- display profile information -->
@@ -14,18 +15,18 @@
 <img src="{{user.photo.url}}" style="float: right">
 {% endif %}
 -->
-<strong>Chapter:</strong> <a href="/chapters/{{user.chapter.myrobogals_url}}/">{{user.chapter}}</a><br />
-<strong>Joined:</strong> {{user.date_joined_local|date:"j F Y"}}<br />
-<strong>Membership type:</strong> {{user.membertype}}<br />
+<strong>{% trans "Chapter:" %}</strong> <a href="/chapters/{{user.chapter.myrobogals_url}}/">{{user.chapter}}</a><br />
+<strong>{% trans "Joined:" %}</strong> {{user.date_joined_local|date:"j F Y"}}<br />
+<strong>{% trans "Membership type:" %}</strong> {{user.membertype}}<br />
 {% if user.dob_public %}
-<strong>Date of birth:</strong> {{user.dob|date:"j F Y"}} (age {{user.age}})<br />
+<strong>{% trans "Date of birth:" %}</strong> {{user.dob|date:"j F Y"}} (age {{user.age}})<br />
 {% endif %}
 {% if user.email_public %}
-<strong>Email address:</strong> {% hide_email user.email %}<br />
+<strong>{% trans "Email address:" %}</strong> {% hide_email user.email %}<br />
 {% endif %}
 {% if show_course %}
 {% if user.course %}
-<strong>Course:</strong> {{user.course}} at {% if user.university %}{{user.university}}{% endif %}
+<strong>{% trans "Course:" %}</strong> {{user.course}} at {% if user.university %}{{user.university}}{% endif %}
 {% if user.graduation_year %}
 (completing {{user.graduation_year}})
 {% endif %}
@@ -34,18 +35,18 @@
 {% endif %}
 {% if show_job %}
 {% if user.job_title %}
-<strong>Occupation:</strong> {{user.job_title}} at {% if user.company %}{{user.company}}{% endif %}<br />
+<strong>{% trans "Occupation:" %}</strong> {{user.job_title}} at {% if user.company %}{{user.company}}{% endif %}<br />
 {% endif %}
 {% endif %}
 {% if current_positions %}
 <br />
-<strong>Current position:</strong> <ul style="margin-top: 2px">
+<strong>{% trans "Current position:" %}</strong> <ul style="margin-top: 2px">
 	{% for current_position in current_positions %}
 		<li><strong>{{current_position}}</strong></li>
 	{% endfor %}</ul>
 {% endif %}
 {% if past_positions %}
-<strong>Past positions:</strong> <ul style="margin-top: 2px">
+<strong>{% trans "Past positions:" %}</strong> <ul style="margin-top: 2px">
 	{% for past_position in past_positions %}
 		<li>{{past_position}}</li>
 	{% endfor %}</ul>
@@ -54,7 +55,7 @@
 <br />
 {% endif %}
 {% if user.bio %}
-<strong>About me:</strong><br />
+<strong>{% trans "About me:" %}</strong><br />
 {{ user.bio }}
 {% endif %}
 {% endblock %}

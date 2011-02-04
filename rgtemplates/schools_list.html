@@ -5,7 +5,7 @@
 {% block pagetitle %}Schools{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/schools/new/">Add new school</a></p>
+<p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/schools/new/">{% trans "Add new school" %}</a></p>
 <table cellspacing="3">
   <tr>
     <td><strong>{% trans "School Name" %}</strong></td>
@@ -20,8 +20,8 @@
     <td>{{s.contact_person}}</td>
     <td>{{s.contact_email}}</td>
     <td>{{s.contact_phone}}</td>
-    <td><a href="/teaching/schools/{{s.pk}}/">View/Edit</a></td>
-	<td><a href="/teaching/schools/{{s.pk}}/delete/">Delete</a></td>
+    <td><a href="/teaching/schools/{{s.pk}}/">{% trans "View/Edit" %}</a></td>
+	<td><a href="/teaching/schools/{{s.pk}}/delete/">{% trans "Delete" %}</a></td>
   </tr>
 {% endfor %}
 </table>

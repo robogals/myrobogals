@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Join Robogals{% endblock %}
+{% block title %}{% trans "Join Robogals" %}{% endblock %}
 
-{% block pagetitle %}Join Robogals{% endblock %}
+{% block pagetitle %}{% trans "Join Robogals" %}{% endblock %}
 
 {% block content %}
-<strong>Please select the chapter you wish to join:</strong>
+<strong>{% trans "Please select the chapter you wish to join:" %}</strong>
 <ul>
     <li>
         Global

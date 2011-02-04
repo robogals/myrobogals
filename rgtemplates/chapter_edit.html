@@ -6,7 +6,7 @@
 
 {% block content %}
 <form action="/chapters/{{c.myrobogals_url}}/edit/" method="POST">
-<a href="/chapters/{{c.myrobogals_url}}/">Return to chapter page</a> | <a href="/chapters/{{c.myrobogals_url}}/edit/users/">Manage members</a>
+<a href="/chapters/{{c.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{c.myrobogals_url}}/edit/users/">{% trans "Manage members" %}</a>
 <table>
   <tr>
     <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>

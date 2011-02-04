@@ -1,11 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}Home{% endblock %}
 
 {% block pagetitle %}myRobogals Home{% endblock %}
 {% block content %}
-<img src="{{MEDIA_URL}}/images/nxt.jpg" style="float: right"><strong>Welcome to myRobogals!</strong><br>
+<img src="{{MEDIA_URL}}/images/nxt.jpg" style="float: right"><strong>{% trans "Welcome to myRobogals!" %}</strong><br>
 <br>
+{% blocktrans %}
 myRobogals is our new global intranet and record-keeping tool, intended to simplify many of Robogals' day-to-day tasks including organising school visits, maintaining a member database, communicating with members, storing records reliably for future generations and easily collecting statistics on a global scale.<br>
 <br>
 myRobogals is in beta testing. It currently supports the following features:
@@ -27,5 +29,5 @@ New features coming soon:
   <li>Online discussion forum - with separate boards for your chapter's committee only, your chapter's members only, and all members globally</li>
   <li>And more...</li>
 </ul>
-Throughout these early stages, we really appreciate any feedback, suggestions and other queries! Just email <a href="mailto:my@robogals.org">my@robogals.org</a> to get in touch with the myRobogals development team.
+Throughout these early stages, we really appreciate any feedback, suggestions and other queries! Just email <a href="mailto:my@robogals.org">my@robogals.org</a> to get in touch with the myRobogals development team. {% endblocktrans %}
 {% endblock %}

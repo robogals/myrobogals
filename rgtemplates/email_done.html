@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Send bulk email{% endblock %}
+{% block title %}{%trans "Send bulk email" %}{% endblock %}
 
-{% block pagetitle %}Send bulk email{% endblock %}
+{% block pagetitle %}{%trans "Send bulk email" %}{% endblock %}
 
 {% block content %}
-Your email has been sent!
+{%trans "Your email has been sent!" %}
 {% endblock %}

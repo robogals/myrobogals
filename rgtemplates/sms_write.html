@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Send bulk SMS{% endblock %}
+{% block title %}{% trans "Send bulk SMS" %}{% endblock %}
 
-{% block pagetitle %}Send bulk SMS{% endblock %}
+{% block pagetitle %}{% trans "Send bulk SMS" %}{% endblock %}
 
 {% block content %}
 <form action="/messages/sms/write/" method="POST" id="fm_sendsms">
 {% if smsform.errors %}
 <div class="error">
-Please correct the following field(s):<br>
+{% trans "Please correct the following field(s):" %}<br>
 {% for error in smsform.errors %}
 - {{error}}<br>
 {% endfor %}
@@ -28,10 +28,10 @@ Please correct the following field(s):<br>
         <tr>
 {% if request.user.is_superuser %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" disabled="disabled" /></td>
-          <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">All members who have opted to receive SMS from the following chapters</span></label></td>
+          <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">{% trans "All members who have opted to receive SMS from the following chapters" %}</span></label></td>
 {% else %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="type1">All members of {{ request.user.chapter }} who have opted to receive SMS</label></td>
+          <td style="vertical-align: top"><label for="type1">{% trans "All members of {{ request.user.chapter }} who have opted to receive SMS" %}</label></td>
 {% endif %}
         </tr>
 {% if request.user.is_superuser %}
@@ -47,10 +47,10 @@ Please correct the following field(s):<br>
         <tr>
 {% if request.user.is_superuser %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="type2">Executive committee members of the following chapters</label></td>
+          <td style="vertical-align: top"><label for="type2">{% trans "Executive committee members of the following chapters" %}</label></td>
 {% else %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" /></td>
-          <td style="vertical-align: top"><label for="type2">Executive committee members of {{ request.user.chapter }}</label></td>
+          <td style="vertical-align: top"><label for="type2">{% blocktrans %}Executive committee members of {{ request.user.chapter }}{% endblocktrans %}</label></td>
 {% endif %}
         </tr>
 {% if request.user.is_superuser %}
@@ -65,13 +65,13 @@ Please correct the following field(s):<br>
 {% endif %}
         <tr>
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="5" id="type5" /></td>
-          <td style="vertical-align: top"><label for="type5">To a member list</label></td>
+          <td style="vertical-align: top"><label for="type5">{% trans "To a member list" %}</label></td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_lists">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top"><b>N.B.</b> Message will only be sent to list members who have opted to receive SMS</td>
+          <td style="vertical-align: top"><b>N.B.</b>{% trans "Message will only be sent to list members who have opted to receive SMS" %}</td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
@@ -81,13 +81,13 @@ Please correct the following field(s):<br>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="3" id="type3" /></td>
-          <td style="vertical-align: top"><label for="type3">Select individual members</label></td>
+          <td style="vertical-align: top"><label for="type3">{% trans "Select individual members" %}</label></td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_recipients">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top"><b>N.B.</b> Only members who have opted to receive SMS are shown</td>
+          <td style="vertical-align: top"><b>N.B.</b> {% trans "Only members who have opted to receive SMS are shown" %}</td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
@@ -97,41 +97,41 @@ Please correct the following field(s):<br>
     </td>
   </tr>
   <tr>
-    <td valign="top"><strong>From:</strong></td>
+    <td valign="top"><strong>{% trans "From:" %}</strong></td>
     <td><span id="from_normal">{{ smsform.from_type }}</span></td>
   </tr>
   <tr>
-    <td valign="top"><strong>Message:</strong></td>
+    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
     <td>{{ smsform.body }}<br>
       <div id="InfoCharCounter"></div>
       <script language="javascript">
       updateTextBoxCounter();
       </script>
-      <div>To comply with anti-spam legislation, please ensure your message ends with: <strong>to opt-out reply 'stop'</strong></div>
+      <div>{% trans "To comply with anti-spam legislation, please ensure your message ends with: <strong>to opt-out reply 'stop'" %}</strong></div>
     </td>
   </tr>
   <tr>
-    <td valign="top"><strong>Scheduling:</strong></td>
+    <td valign="top"><strong>{% trans "Scheduling:" %}</strong></td>
     <td>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="0" id="sched0" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="sched0"><span>Send immediately</span></label></td>
+          <td style="vertical-align: top"><label for="sched0"><span>{% trans "Send immediately" %}</span></label></td>
         </tr>
         <tr>
           <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="1" id="sched1" /></td>
-          <td style="vertical-align: top"><label for="sched1"><span>Send later</span></label></td>
+          <td style="vertical-align: top"><label for="sched1"><span>{% trans "Send later" %}</span></label></td>
         </tr>
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">at {{ smsform.schedule_time }} on {{ smsform.schedule_date }}{% if request.user.is_superuser %}<br>in {{ smsform.schedule_zone }}{% endif %}</td>
+          <td style="vertical-align: top">{% trans "at" %} {{ smsform.schedule_time }} {% trans "on" %} {{ smsform.schedule_date }}{% if request.user.is_superuser %}<br>{% trans "in" %} {{ smsform.schedule_zone }}{% endif %}</td>
         </tr>
       </table>
     </td>
   <tr>
 </table>
-<input type="submit" value="Send SMS!" onClick="return confirm('Are you sure you want to send this SMS to all the selected recipients?');" />
+<input type="submit" value={% trans "Send SMS!" %} onClick="return confirm({%trans 'Are you sure you want to send this SMS to all the selected recipients?' %});" />
 </form>
 {% endblock %}

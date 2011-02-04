@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Import users: field names{% endblock %}
+{% block title %}{% trans "Import users: field names" %}{% endblock %}
 
-{% block pagetitle %}Import users: field names{% endblock %}
+{% block pagetitle %}{% trans "Import users: field names" %}{% endblock %}
 
 {% block content %}
-The first row of your CSV file must specify the field names for the data contained in the file.<br>
+{% trans "The first row of your CSV file must specify the field names for the data contained in the file." %}<br>
 <br>
-The compulsory fields of first_name, last_name and email must always be included. All other fields are optional. Fields with an unrecognised name are ignored - it doesn't hurt to have them in your file.
+{% trans "The compulsory fields of first_name, last_name and email must always be included. All other fields are optional. Fields with an unrecognised name are ignored - it doesn't hurt to have them in your file." %}
 {% for section_name, section_info in HELPINFO %}
 <h4>{{ section_name }}</h4>
 <table cellspacing="0" border="1" cellpadding="3">

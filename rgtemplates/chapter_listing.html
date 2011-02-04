@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Robogals Chapters{% endblock %}
+{% block title %}{% trans "Robogals Chapters" %}{% endblock %}
 
-{% block pagetitle %}Robogals Chapters{% endblock %}
+{% block pagetitle %}{% trans "Robogals Chapters" %}{% endblock %}
 
 {% block content %}
 <ul>
     <li>
-        <a href="/chapters/global/">Global</a>
+        <a href="/chapters/global/">{% trans "Global" %}</a>
         <ul>
         {% for item in listing %}
             <li>

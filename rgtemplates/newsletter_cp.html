@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Newsletter CP: {{newsletter}}{% endblock %}
+{% block title %}{% trans "Newsletter" %} CP: {{newsletter}}{% endblock %}
 
-{% block pagetitle %}Newsletter CP: {{newsletter}}{% endblock %}
+{% block pagetitle %}{% trans "Newsletter" %} {{newsletter}}{% endblock %}
 
 {% block content %}
-<a href="import/">Import subscribers from CSV file</a>
+<a href="import/">{% trans "Import subscribers from CSV file" %}</a>
 {% endblock %}

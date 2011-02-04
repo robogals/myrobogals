@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Private{% endblock %}
+{% block title %}{% trans "Private" %}{% endblock %}
 
-{% block pagetitle %}Private{% endblock %}
+{% block pagetitle %}{% trans "Private" %}{% endblock %}
 
 {% block content %}
 {% if error %}
 <div class="error">{{error}}</div>
 {% else %}
-This user has their profile set as private, you do not have permission to view it.
+{% trans "This user has their profile set as private, you do not have permission to view it." %}
 {% endif %}
 {% endblock %}

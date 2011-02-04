@@ -5,27 +5,27 @@
 {% block pagetitle %}Lesson for {{v.school}} on {{v.visit_start|date:"l j F Y"}}{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">Return to teaching home</a> | <a href="/teaching/list/">Return to visit list</a>
-{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">Edit visit</a>  | <a href="/teaching/{{v.pk}}/invite/">Invite/add to visit</a><br><a href="/teaching/{{v.pk}}/email/">Email Invitees</a>
-{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/close/">Close visit</a>  | <a href="/teaching/{{v.pk}}/cancel/">Cancel visit</a>{% endifequal %}
+<p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a>
+{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit visit" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite/add to visit" %}</a><br><a href="/teaching/{{v.pk}}/email/">{% trans "Email Invitees" %}</a>
+{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/close/">{% trans "Close visit" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel visit" %}</a>{% endifequal %}
 {% endifequal %}{% endif %}
 </p>
 {% ifequal v.status 0 %}
 {% ifequal user_rsvp_status 0 %}
   {% ifequal v.allow_rsvp 0 %}
-    <p class="attend-unconf">You have not RSVP'd to this event. Your RSVP: <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">not attending</a></p>
+    <p class="attend-unconf">{% trans "You have not RSVP'd to this event. Your RSVP:" %} <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">{% trans "attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">{% trans "not attending" %}</a></p>
   {% else %}
-    <p class="attend-unconf">This is a closed event. You must be invited to RSVP.</p>
+    <p class="attend-unconf">{% trans "This is a closed event. You must be invited to RSVP." %}</p>
   {% endifequal %}
 {% else %}
   {% ifequal user_rsvp_status 1 %}
-    <p class="attend-unconf">You have been invited to this event but have not yet RSVP'd. Your RSVP: <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">not attending</a></p>
+    <p class="attend-unconf">{% trans "You have been invited to this event but have not yet RSVP'd. Your RSVP:" %} <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">{% trans "attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">{% trans "not attending" %}</a></p>
   {% else %}
     {% ifequal user_rsvp_status 2 %}
-      <p class="attend-yes">Your RSVP status is <strong>attending</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">Change to not attending</a></p>
+      <p class="attend-yes">{% trans "Your RSVP status is" %} <strong>{% trans "attending" %}</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/no/">{% trans "Change to not attending" %}</a></p>
     {% else %}
       {% ifequal user_rsvp_status 4 %}
-        <p class="attend-no">Your RSVP status is <strong>not attending</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">Change to attending</a></p>
+        <p class="attend-no">{% trans "Your RSVP status is" %} <strong> {% trans "not attending" %}</strong>. <a href="/teaching/{{v.pk}}/rsvp/{{request.user.pk}}/yes/">{% trans "Change to attending" %}</a></p>
       {% endifequal %}
     {% endifequal %}
   {% endifequal %}
@@ -33,13 +33,13 @@
 {% else %}
   {% ifequal v.status 1 %}
   	{% if user_attended %}
-      <p class="attend-yes">This event is over. You attended this event.</p>
+      <p class="attend-yes">{% trans "This event is over. You attended this event." %}</p>
     {% else %}
-      <p class="attend-unconf">This event is over.</p>
+      <p class="attend-unconf">{% trans "This event is over." %}</p>
     {% endif %}
   {% else %}
     {% ifequal v.status 2 %}
-      <p class="attend-no">This event has been cancelled</p>
+      <p class="attend-no">{% trans "This event has been cancelled" %}</p>
     {% endifequal %}
   {% endifequal %}
 {% endifequal %}
@@ -48,43 +48,43 @@
     <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>
   </tr>
   <tr>
-    <td style="vertical-align: top; width: 150px">School</td>
+    <td style="vertical-align: top; width: 150px">{% trans "School" %}</td>
     <td>{{v.school}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Date</td>
+    <td style="vertical-align: top">{% trans "Date" %}</td>
     <td>{{v.visit_start|date:"l j F Y"}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Time</td>
+    <td style="vertical-align: top">{% trans "Time" %}</td>
     <td>{{v.visit_start.time}} - {{v.visit_end.time}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Location</td>
+    <td style="vertical-align: top">{% trans "Location" %}</td>
     <td>{{v.location}}</td>
   </tr>
   <tr>
     <td colspan="2"><strong>&nbsp;<br />{% trans "Info for volunteers" %}</strong></td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Meeting location</td>
-    <td>{{v.meeting_location}}<br /><span style="font-size: 8pt">Where people will meet at university to go as a group to the school, if applicable</span></td>
+    <td style="vertical-align: top">{% trans "Meeting location" %}</td>
+    <td>{{v.meeting_location}}<br /><span style="font-size: 8pt">{% trans "Where people will meet at university to go as a group to the school, if applicable" %}</span></td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Meeting time</td>
+    <td style="vertical-align: top">{% trans "Meeting time" %}</td>
     <td>{{v.meeting_time.time}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Contact person</td>
+    <td style="vertical-align: top">{% trans "Contact person" %}</td>
     <td>{{v.contact}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Email</td>
+    <td style="vertical-align: top">{%trans "Email" %}</td>
     <td>{{v.contact_email}}</td>
   </tr>
   <tr>
-    <td style="vertical-align: top">Phone</td>
-    <td>{{v.contact_phone}}<br /><span style="font-size: 8pt">Call this number if you get lost!</span></td>
+    <td style="vertical-align: top">{% trans "Phone" %}</td>
+    <td>{{v.contact_phone}}<br /><span style="font-size: 8pt">{% trans "Call this number if you get lost!" %}</span></td>
   </tr>
 {% ifequal v.status 0 %}
   <tr>
@@ -95,7 +95,7 @@
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
-    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">change RSVP to not attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">{% trans "change RSVP to not attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
     {% endifequal %}{% endif %}
     </td>
   </tr>
@@ -108,7 +108,7 @@
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
-    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">change RSVP to attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">{% trans "change RSVP to attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
     {% endifequal %}{% endif %}
     </td>
   </tr>
@@ -121,8 +121,8 @@
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
-    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">change RSVP to attending</a>
-    | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">change RSVP to not attending</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">remove</a>
+    <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">{% trans "change RSVP to attending" %}</a>
+    | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">{% trans "change RSVP to not attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
     {% endifequal %}{% endif %}
     </td>
   </tr>
@@ -146,7 +146,7 @@
 <h4><strong>RSVP Messages: </strong></h4>
 	{% for eventmessage in eventmessages%}
 	 <div class="eventmessage">
-	  <div class="topbar">{{eventmessage.user.get_full_name}}  said: <span style="position: absolute; right: 0.5em;">Message sent at {{eventmessage.date}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">Delete</a></span></div>
+	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{% trans "Message sent at" %} {{eventmessage.date}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
 	  <div class="message-box">
 		<div class="message-content">{{eventmessage.message|safe}}</div>
 	  </div>

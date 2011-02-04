@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Teaching{% endblock %}
+{% block title %}{% trans "Teaching" %}{% endblock %}
 
-{% block pagetitle %}Teaching{% endblock %}
+{% block pagetitle %}{% trans "Teaching" %}{% endblock %}
 
 {% block content %}
 <ul>
-    <li><a href="list/">View upcoming and past school visits</a></li>
+    <li><a href="list/">{% trans "View upcoming and past school visits" %}</a></li>
     {% if request.user.is_staff %}
-    <li><a href="new/">Create new school visit</a></li>
-    <li><a href="schools/">View schools list</a></li>
-    <li><a href="schools/add/">Add school</a></li>
+    <li><a href="new/">{% trans "Create new school visit" %}</a></li>
+    <li><a href="schools/">{% trans "View schools list" %}</a></li>
+    <li><a href="schools/add/">{% trans "Add school" %}</a></li>
     {% endif %}
 </ul>
 {% endblock %}

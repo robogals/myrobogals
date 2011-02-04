@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}500: Internal Server Error{% endblock %}
+{% block title %}500: {%trans "Internal Server Error" %}{% endblock %}
 
-{% block pagetitle %}500: Internal Server Error{% endblock %}
+{% block pagetitle %}500: {% trans "Internal Server Error" %}{% endblock %}
 
 {% block content %}
-Oops! Something went wrong!<br />
+{%trans "Oops! Something went wrong!" %}<br />
 <br />
-Please email my@robogals.org and describe exactly what you were doing when this error appeared, as well as any other information that may help us to reproduce (and fix!) the problem.
+{%trans "Please email my@robogals.org and describe exactly what you were doing when this error appeared, as well as any other information that may help us to reproduce (and fix!) the problem." %}
 {% endblock %}

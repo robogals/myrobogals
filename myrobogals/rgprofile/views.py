@@ -73,7 +73,7 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class EditListForm(forms.Form):
 	name = forms.CharField(max_length=256)
-	users = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Members", False, attrs={'rows': 20}), required=True)
+	users = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Members"), False, attrs={'rows': 20}), required=True)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -116,7 +116,7 @@ def edituserlist(request, chapterurl, list_id):
 					l.save()
 				l.users = data['users']
 				l.save()
-				request.user.message_set.create(message="User list \"" + l.name + "\" has been updated")
+				request.user.message_set.create(message=_("User list \"" + l.name + "\" has been updated"))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:
@@ -508,12 +508,12 @@ def edituser(request, username, chapter=None):
 						u.internal_notes = data['internal_notes']
 					u.save()
 					if 'return' in request.POST:
-						request.user.message_set.create(message="Profile and settings updated!")
+						request.user.message_set.create(message=_("Profile and settings updated!"))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
-						request.user.message_set.create(message="Profile and settings updated!")
+						request.user.message_set.create(message=_("Profile and settings updated!"))
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
@@ -617,7 +617,7 @@ class WelcomeEmailForm(forms.Form):
 		self.fields['body'].initial = chapter.welcome_email_msg
 		self.fields['html'].initial = chapter.welcome_email_html
 
-	importaction = forms.ChoiceField(choices=((1,'Add members, and send welcome email'),(2,'Add members, with no further action')),initial=1)
+	importaction = forms.ChoiceField(choices=((1,_('Add members, and send welcome email')),(2,_('Add members, with no further action'))),initial=1)
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=forms.Textarea, required=False)
 	html = forms.BooleanField(required=False)
@@ -801,7 +801,7 @@ def genpw(request, username):
 			welcomeemail = welcomeform.cleaned_data
 			try:
 				genandsendpw(user, welcomeemail, chapter)
-				request.user.message_set.create(message="Password generated and emailed")
+				request.user.message_set.create(message=_("Password generated and emailed"))
 				if return_url == '':
 					return_url = '/profile/' + username + '/edit/'
 				return HttpResponseRedirect(return_url)

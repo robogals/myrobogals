@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Send bulk SMS{% endblock %}
+{% block title %}{% trans "Send bulk SMS" %}{% endblock %}
 
-{% block pagetitle %}Send bulk SMS{% endblock %}
+{% block pagetitle %}{% trans "Send bulk SMS" %}{% endblock %}
 
 {% block content %}
-Your SMS has been sent!
+{% trans "Your SMS has been sent!" %}
 {% endblock %}

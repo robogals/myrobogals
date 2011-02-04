@@ -1,9 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% block title %}{%trans "Wiki" %}{% endblock %}
 
-{% block title %}Wiki{% endblock %}
-
-{% block pagetitle %}Wiki{% endblock %}
+{% block pagetitle %}{% trans "Wiki" %}{% endblock %}
 
 {% block content %}
-Wiki coming soon :)
+{% trans "Wiki coming soon :)" %}
 {% endblock %}
