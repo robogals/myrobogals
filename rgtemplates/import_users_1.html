@@ -6,13 +6,13 @@
 
 {% block content %}
 {% if errmsg %}{{errmsg}}<br> <br>{% endif %}
-{% trans "The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>. " %}<br>
+{% trans 'The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>. ' %}<br>
 <br>
 {% trans "The compulsory fields of first_name, last_name and email must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't." %}<br>
 <br>
 <form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data">
 {% if form.csvfile.errors %}
-<div class="error">{% for error in form.csvfile.errors %}{% blocktrans %}{{error}} {% endblocktrans %}{% endfor %}</div>
+<div class="error">{% for error in form.csvfile.errors %}{% blocktrans with error as error%}{{error}} {% endblocktrans %}{% endfor %}</div>
 {% endif %}
 <table>
   <tr>
