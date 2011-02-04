@@ -154,7 +154,7 @@ def password_change(request, template_name='registration/password_change_form.ht
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             form.save()
-            request.user.message_set.create(message=unicode(_("Password changed"))
+            request.user.message_set.create(message=unicode(_("Password changed")))
             return HttpResponseRedirect("/profile/" + request.user.username + "/")
     else:
         form = PasswordChangeForm(request.user)
