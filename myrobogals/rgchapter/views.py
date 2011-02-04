@@ -98,7 +98,7 @@ def editchapter(request, chapterurl):
 				c.emailtext = data['emailtext']
 				c.smstext = data['smstext']
 				c.save()
-				request.user.message_set.create(message=_("Chapter info updated"))
+				request.user.message_set.create(message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
 		else:
 			formpart1 = FormPartOne({

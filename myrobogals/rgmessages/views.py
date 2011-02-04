@@ -515,7 +515,7 @@ def importsubscribers(request, newsletter_id):
 				errmsg = e.errmsg
 				return render_to_response('import_subscribers_2.html', {'tmppath': tmppath, 'filerows': filerows, 'newsletter': newsletter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 			msg = _('%d subscribers imported!') % users_imported
-			request.user.message_set.create(message=msg)
+			request.user.message_set.create(message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/")

@@ -107,7 +107,7 @@ def editvisit(request, visit_id):
 				v.otherprep = data['otherprep']
 				v.notes = data['notes']
 				v.save()
-				request.user.message_set.create(message=_("School visit info updated"))
+				request.user.message_set.create(message=unicode(_("School visit info updated")))
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 		else:
 			if visit_id == 0:
@@ -259,9 +259,9 @@ def invitetovisit(request, visit_id):
 				message.save()
 			
 			if data['action'] == '1':
-				request.user.message_set.create(message=_("Invitations have been sent to the selected volunteers"))
+				request.user.message_set.create(message=unicode(_("Invitations have been sent to the selected volunteers")))
 			if data['action'] == '2':
-				request.user.message_set.create(message=_("Selected volunteers have been added as attending"))
+				request.user.message_set.create(message=unicode(_("Selected volunteers have been added as attending")))
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)
@@ -357,7 +357,7 @@ def emailvisitattendees(request, visit_id):
 			message.status = 0
 			message.save()
 			
-			request.user.message_set.create(message=_("Email sent succesfully"))
+			request.user.message_set.create(message=unicode(_("Email sent succesfully")))
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		emailform = EmailAttendeesForm(None, user=request.user, visit=v)
@@ -420,7 +420,7 @@ def cancelvisit(request, visit_id):
 			message.status = 0
 			message.save()
 			Event.objects.filter(id = v.id).delete()
-			request.user.message_set.create(message=_("Visit cancelled successfully"))
+			request.user.message_set.create(message=unicode(_("Visit cancelled successfully")))
 			return HttpResponseRedirect('/teaching/list/')
 	else:
 		cancelform = CancelForm(None, user=request.user, visit=v)
@@ -443,7 +443,7 @@ def deleteschool(request, school_id):
 	if request.method == 'POST':
 		deleteform = DeleteForm(request.POST, user=request.user, school=s)
 		if SchoolVisit.objects.filter(school=s):
-			request.user.message_set.create(message=_("You cannot delete this school as it has a visit in the database."))
+			request.user.message_set.create(message=str(_("You cannot delete this school as it has a visit in the database.")))
 			return HttpResponseRedirect('/teaching/schools/')
 		else:
 			School.objects.filter(id = s.id).delete()
@@ -504,7 +504,7 @@ def editschool(request, school_id):
 				data = formpart3.cleaned_data
 				s.notes = data['notes']
 				s.save()
-				request.user.message_set.create(message=_("School info updated"))
+				request.user.message_set.create(message=unicode(_("School info updated")))
 				return HttpResponseRedirect('/teaching/schools/')
 		else:
 			if school_id == 0:
@@ -598,7 +598,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage.date = user_dt.strftime(fmt)
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
-			request.user.message_set.create(message= str(rsvp_string))
+			request.user.message_set.create(message= unicode((rsvp_string)))
 			return dorsvp(request, event_id, user_id, rsvp_id)
 	else:
 		rsvpform = RSVPForm(None, user=request.user, event=e)
@@ -613,7 +613,7 @@ def deletemessage(request, visit_id, message_id):
 		raise Http404
 	if request.user.is_staff:	
 		m.delete()
-		request.user.message_set.create(message=_("Message Deleted"))
+		request.user.message_set.create(message=unicode(_("Message Deleted")))
 	else:
 		raise Http404
 	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')

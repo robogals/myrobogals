@@ -116,7 +116,7 @@ def edituserlist(request, chapterurl, list_id):
 					l.save()
 				l.users = data['users']
 				l.save()
-				request.user.message_set.create(message=_("User list \"" + l.name + "\" has been updated"))
+				request.user.message_set.create(message=unicode(_("User list \"" + l.name + "\" has been updated")))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:
@@ -508,12 +508,12 @@ def edituser(request, username, chapter=None):
 						u.internal_notes = data['internal_notes']
 					u.save()
 					if 'return' in request.POST:
-						request.user.message_set.create(message=_("Profile and settings updated!"))
+						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
-						request.user.message_set.create(message=_("Profile and settings updated!"))
+						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
@@ -703,7 +703,7 @@ def importusers(request, chapterurl):
 				msg = _('%d users imported!') % users_imported
 			else:
 				msg = _('%d users imported and emailed!') % users_imported
-			request.user.message_set.create(message=msg)
+			request.user.message_set.create(message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			return HttpResponseRedirect('/chapters/' + chapter.myrobogals_url + '/edit/users/')
@@ -801,7 +801,7 @@ def genpw(request, username):
 			welcomeemail = welcomeform.cleaned_data
 			try:
 				genandsendpw(user, welcomeemail, chapter)
-				request.user.message_set.create(message=_("Password generated and emailed"))
+				request.user.message_set.create(message=unicode(_("Password generated and emailed")))
 				if return_url == '':
 					return_url = '/profile/' + username + '/edit/'
 				return HttpResponseRedirect(return_url)
