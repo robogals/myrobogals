@@ -193,9 +193,9 @@ class InviteForm(forms.Form):
 		self.fields['memberselect'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_reminder_optin=True).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
 		self.fields['body'].initial = _("Hello,\n\nThere will be an upcoming Robogals school visit:<br>")
-		self.fields['body'].initial += _("Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time()))
-		self.fields['body'].initial += _("<br>Location: " + visit.location + "\nSchool: " + visit.school.name)
-		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>")
+		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
+		self.fields['body'].initial += _("<br>Location: ") + visit.location + "\nSchool: " + visit.school.name
+		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit") + " https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>"
 
 @login_required
 def invitetovisit(request, visit_id):
