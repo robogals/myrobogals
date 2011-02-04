@@ -443,11 +443,11 @@ def deleteschool(request, school_id):
 	if request.method == 'POST':
 		deleteform = DeleteForm(request.POST, user=request.user, school=s)
 		if SchoolVisit.objects.filter(school=s):
-			request.user.message_set.create(message=str(_("You cannot delete this school as it has a visit in the database.")))
+			request.user.message_set.create(message=unicode(_("You cannot delete this school as it has a visit in the database.")))
 			return HttpResponseRedirect('/teaching/schools/')
 		else:
 			School.objects.filter(id = s.id).delete()
-			request.user.message_set.create(message=-("School sucessfully deleted."))
+			request.user.message_set.create(message=unicode(_("School sucessfully deleted.")))
 			return HttpResponseRedirect('/teaching/schools/')
 	else:
 		deleteform = DeleteForm(None, user=request.user, school=s)
