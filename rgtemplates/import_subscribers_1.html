@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Import subscribers for {{newsletter.name}}{% endblock %}
+{% block title %}{% trans "Import subscribers for" %} {{newsletter.name}}{% endblock %}
 
-{% block pagetitle %}Import subscribers for {{newsletter.name}}{% endblock %}
+{% block pagetitle %}{% trans "Import subscribers" %} for {{newsletter.name}}{% endblock %}
 
 {% block content %}
 {% if errmsg %}{{errmsg}}<br> <br>{% endif %}
-{% trans "The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>" %}.<br>
+{% trans 'The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>' %}.<br>
 <br>
 {% trans "The email field must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't." %}<br>
 <br>
