@@ -43,7 +43,7 @@
     {% endifequal %}
   {% endifequal %}
 {% endifequal %}
-<table>
+<table  cellpadding="5" cellspacing="0">
   <tr>
     <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>
   </tr>
@@ -91,7 +91,7 @@
     <td colspan="2"><strong>&nbsp;<br />{% trans "Attending" %}</strong></td>
   </tr>
   {% for user in attending %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
@@ -104,7 +104,7 @@
     <td colspan="2"><strong>&nbsp;<br />{% trans "Not Attending" %}</strong></td>
   </tr>
   {% for user in notattending %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
@@ -117,7 +117,7 @@
     <td colspan="2"><strong>&nbsp;<br />{% trans "Awaiting Reply" %}</strong></td>
   </tr>
   {% for user in waitingreply %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
     {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
@@ -133,7 +133,7 @@
     <td colspan="2"><strong>&nbsp;<br />{% trans "Attended" %}</strong></td>
   </tr>
   {% for user in attended %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td colspan="2"><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
   </tr>
   {% endfor %}

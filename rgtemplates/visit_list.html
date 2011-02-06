@@ -6,15 +6,15 @@
 
 {% block content %}
 <p><a href="/teaching/">{% trans "Return to teaching home" %}</a>{% if request.user.is_staff %} | <a href="/teaching/new/">{% trans "Create new school visit" %}</a>{% endif %}</p>
-<table cellspacing="3">
-  <tr>
+<table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+  <tr class="even">
     <td><strong>{% trans "School" %}</strong></td>
     <td><strong>{% trans "Date" %}</strong></td>
     <td><strong>{% trans "Location" %}</strong></td>
     <td></td>
   </tr>
 {% for v in visits %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td>{{v.school}}</td>
     <td>{{v.visit_start|date:"l j F Y"}}</td>
     <td>{{v.location}}</td>

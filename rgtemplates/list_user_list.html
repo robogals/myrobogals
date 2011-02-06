@@ -12,7 +12,7 @@
 </form>
 <p>
 <a href="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/">{% trans "Edit this list" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/">{% trans "Return to manage users" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Return to list of lists" %}</a></p>
-<table>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr>
     <td><strong>{% trans "Username" %}</strong></td>
     <td><strong>{% trans "First name" %}</strong></td>
@@ -21,7 +21,7 @@
     <td><strong>{% trans "Mobile" %}</strong></td>
   </tr>
 {% for u in users %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{u.username}}/">{{u.username}}</a></td>
     <td>{{u.first_name}}</td>
     <td>{{u.last_name}}</td>

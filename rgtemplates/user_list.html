@@ -11,8 +11,8 @@
 </form>
 <p>
 <a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a></p>
-<table>
-  <tr>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr class="even">
     <td><strong>{% trans "Username" %}</strong></td>
     <td><strong>{% trans "First name" %}</strong></td>
     <td><strong>{% trans "Last name" %}</strong></td>
@@ -26,7 +26,7 @@
 {% endif %}
   </tr>
 {% for u in users %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
     <td>{{u.first_name}}</td>
     <td>{{u.last_name}}</td>

@@ -5,9 +5,9 @@
 {% block pagetitle %}{% trans "University IDs for CSV import" %}{% endblock %}
 
 {% block content %}
-<table cellspacing="0" border="1" cellpadding="3">
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
 {% for uni in unis %}
-  <tr>
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td style="vertical-align: top">{{ uni.pk }}</td>
     <td style="vertical-align: top">{{ uni.name }}</td>
   </tr>

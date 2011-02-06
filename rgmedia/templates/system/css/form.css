@@ -12,6 +12,18 @@ display: block;
 margin-left: 10.5em;
 }
 
+.odd
+{
+padding: 0.5em;
+background-color: #EFEFEF;
+}
+
+.even
+{
+padding: 0.5em;
+background-color: #E1E1E1;
+}
+
 .eventmessage
 {
 position: relative;
