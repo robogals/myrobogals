@@ -10,7 +10,8 @@
 require_once "Mail.php";
 
 $params = array(
-	'host' => 'mail.connexus.net.au',
+	//'host' => 'orange.kas.net.au',
+	'host' => '127.0.0.1',
 	'port' => 25,
 	'auth' => false,
 	'persist' => false
@@ -108,7 +109,7 @@ Content-Transfer-Encoding: base64
 			$sql = sprintf("UPDATE rgmessages_emailrecipient SET `status` = %d WHERE `id` = %d", $status, $recipient['id']);
 			mysql_query($sql);
 
-			sleep(1);
+			//sleep(1);
 		}
 		
 		unset($mailer);
@@ -127,7 +128,7 @@ Content-Transfer-Encoding: base64
 	}
 	mysql_free_result($result);
 	
-	// Wait 3 seconds before looking in the database again
-	sleep(3);
+	// Wait 0.5 seconds before looking in the database again
+	sleep(0.5);
 }
 ?>
