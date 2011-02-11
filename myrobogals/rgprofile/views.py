@@ -535,7 +535,7 @@ def edituser(request, username, chapter=None):
 								message.body = chapter.welcome_email_msg.format(
 									chapter=chapter,
 									user=user,
-									plaintext_password=plaintext_password)
+									plaintext_password=request.POST['password1'])
 							except Exception:
 								message.body = chapter.welcome_email_msg
 							message.from_address = 'my@robogals.org'
