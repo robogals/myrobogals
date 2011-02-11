@@ -1,5 +1,5 @@
 from myrobogals.rgprofile.models import Position
-from myrobogals.auth.models import Group
+from myrobogals.auth.models import Group, User
 from myrobogals.rgprofile.usermodels import Country
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
@@ -82,10 +82,21 @@ class FormPartFour(forms.Form):
 	#	self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
 
 
+class WelcomeEmailMsgField(forms.CharField):
+	def clean(self, value):
+		try:
+			formatted = value.format(
+				chapter=Group.objects.get(pk=1),
+				user=User.objects.get(username='edit'),
+				plaintext_password='abc123')
+		except Exception:
+			raise forms.ValidationError("Welcome email contains invalid field names")
+		return value
+
 class FormPartFive(forms.Form):
 	welcome_email_enable = forms.BooleanField(required=False, label=_("Send a welcome email to new signups"))
 	welcome_email_subject = forms.CharField(required=False, max_length=256)
-	welcome_email_msg = forms.CharField(required=False, widget=forms.Textarea)
+	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
 	welcome_email_html = forms.BooleanField(required=False)
 
 @login_required

@@ -22,6 +22,7 @@ from time import time
 import csv
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgchapter.models import DisplayColumn
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 
 '''
 def joinstart(request):
@@ -527,6 +528,31 @@ def edituser(request, username, chapter=None):
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
+						if chapter.welcome_email_enable:
+							message = EmailMessage()
+							message.subject = chapter.welcome_email_subject
+							try:
+								message.body = chapter.welcome_email_msg.format(
+									chapter=chapter,
+									user=user,
+									plaintext_password=plaintext_password)
+							except Exception:
+								message.body = chapter.welcome_email_msg
+							message.from_address = 'my@robogals.org'
+							message.reply_address = 'my@robogals.org'
+							message.from_name = chapter.name
+							message.sender = User.objects.get(username='edit')
+							message.html = chapter.welcome_email_html
+							message.status = -1
+							message.save()
+							recipient = EmailRecipient()
+							recipient.message = message
+							recipient.user = u
+							recipient.to_name = u.get_full_name()
+							recipient.to_address = u.email
+							recipient.save()
+							message.status = 0
+							message.save()
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
