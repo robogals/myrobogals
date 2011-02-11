@@ -11,6 +11,7 @@ from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.db.models.fields import PositiveIntegerField
 from myrobogals.rgprofile.usermodels import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
+from myrobogals.rgchapter.models import DisplayColumn
 from django.db import connection, transaction
 from pytz import timezone, utc
 
@@ -164,6 +165,7 @@ class Group(models.Model):
     notify_enable = models.BooleanField('Notify when a new member signs up online')
     notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True)
     sms_limit = models.IntegerField('Monthly SMS limit', default=0)
+    display_columns = models.ManyToManyField(DisplayColumn)
     
     class Meta:
         verbose_name = 'chapter'

@@ -7,6 +7,8 @@ from myrobogals.auth.decorators import login_required
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect, Http404
+from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.rgchapter.models import DisplayColumn
 
 def list(request):
 	listing = []
@@ -62,10 +64,29 @@ class FormPartThree(forms.Form):
 	postcode = forms.CharField(max_length=16, label=_("Postcode"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	country = forms.ModelChoiceField(queryset=Country.objects.all(), required=False)
 
+class DPModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+    	return obj.display_name_en
+
 class FormPartFour(forms.Form):
 	is_joinable = forms.BooleanField(label=_("Accept new members through website (if this is unchecked, new members can only be added by exec)"), required=False)
-	emailtext = forms.CharField(label=_("Default email reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
-	smstext = forms.CharField(label=_("Default SMS reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	#emailtext = forms.CharField(label=_("Default email reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	#smstext = forms.CharField(label=_("Default SMS reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('display_name_en'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True)
+
+	# Future: use the correct language
+	#def __init__(self, *args, **kwargs):
+	#	user=kwargs['user']
+	#	del kwargs['user']
+	#	super(WriteEmailForm, self).__init__(*args, **kwargs)
+	#	self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+
+
+class FormPartFive(forms.Form):
+	welcome_email_enable = forms.BooleanField(required=False, label=_("Send a welcome email to new signups"))
+	welcome_email_subject = forms.CharField(required=False, max_length=256)
+	welcome_email_msg = forms.CharField(required=False, widget=forms.Textarea)
+	welcome_email_html = forms.BooleanField(required=False)
 
 @login_required
 def editchapter(request, chapterurl):
@@ -76,7 +97,8 @@ def editchapter(request, chapterurl):
 			formpart2 = FormPartTwo(request.POST)
 			formpart3 = FormPartThree(request.POST)
 			formpart4 = FormPartFour(request.POST)
-			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid():
+			formpart5 = FormPartFive(request.POST)
+			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
 				data = formpart1.cleaned_data
 				c.infobox = data['infobox']
 				c.website_url = data['website_url']
@@ -95,12 +117,19 @@ def editchapter(request, chapterurl):
 				c.country = data['country']
 				data = formpart4.cleaned_data
 				c.is_joinable = data['is_joinable']
-				c.emailtext = data['emailtext']
-				c.smstext = data['smstext']
+				c.display_columns = data['display_columns']
+				data = formpart5.cleaned_data
+				c.welcome_email_enable = data['welcome_email_enable']
+				c.welcome_email_subject = data['welcome_email_subject']
+				c.welcome_email_msg = data['welcome_email_msg']
+				c.welcome_email_html = data['welcome_email_html']
 				c.save()
 				request.user.message_set.create(message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
 		else:
+			display_columns = []
+			for col in c.display_columns.all():
+				display_columns.append(int(col.pk))
 			formpart1 = FormPartOne({
 				'infobox': c.infobox,
 				'website_url': c.website_url,
@@ -123,8 +152,12 @@ def editchapter(request, chapterurl):
 				'country': country})
 			formpart4 = FormPartFour({
 				'is_joinable': c.is_joinable,
-				'emailtext': c.emailtext,
-				'smstext': c.smstext})
-		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'c': c}, context_instance=RequestContext(request))
+				'display_columns': display_columns})
+			formpart5 = FormPartFive({
+				'welcome_email_enable': c.welcome_email_enable,
+				'welcome_email_subject': c.welcome_email_subject,
+				'welcome_email_msg': c.welcome_email_msg,
+				'welcome_email_html': c.welcome_email_html})
+		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'c': c}, context_instance=RequestContext(request))
 	else:
 		raise Http404

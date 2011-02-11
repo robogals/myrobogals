@@ -3,31 +3,12 @@
 
 {% block title %}Home{% endblock %}
 
-{% block pagetitle %}myRobogals Home{% endblock %}
+{% block pagetitle %}{% trans "Welcome to myRobogals" %}{% endblock %}
 {% block content %}
-<img src="{{MEDIA_URL}}/images/nxt.jpg" style="float: right"><strong>{% trans "Welcome to myRobogals!" %}</strong><br>
+<img src="{{MEDIA_URL}}/images/myrobogals-home.jpg" style="float: right; margin-left: 5px; margin-bottom: 5px">{% blocktrans %}
+<strong>myRobogals</strong> is our new global intranet and record-keeping tool, intended to simplify many of Robogals' day-to-day tasks including organising school visits, maintaining a member database, communicating with members, storing records reliably for future generations and easily collecting statistics on a global scale!<br>
 <br>
-{% blocktrans %}
-myRobogals is our new global intranet and record-keeping tool, intended to simplify many of Robogals' day-to-day tasks including organising school visits, maintaining a member database, communicating with members, storing records reliably for future generations and easily collecting statistics on a global scale.<br>
+To get started, download the <a href="http://www.robogals.org/files/myRobogals-guide.pdf">myRobogals user guide</a>.<br>
 <br>
-myRobogals is in beta testing. It currently supports the following features:
-<ul>
-  <li>View/update your profile</li>
-  <li>View/update your chapter</li>
-  <li>Maintain a database of members</li>
-  <li>Maintain a database of schools</li>
-  <li>Maintain a database of school visits</li>
-  <li>Students can join Robogals online</li>
-  <li>Send email to all members in chapter</li>
-  <li>Send SMS to all members in chapter</li>
-  <li>RSVP online for school visits</li>
-</ul>
-New features coming soon:
-<ul>
-  <li>Files manager</li>
-  <li>Wiki</li>
-  <li>Online discussion forum - with separate boards for your chapter's committee only, your chapter's members only, and all members globally</li>
-  <li>And more...</li>
-</ul>
-Throughout these early stages, we really appreciate any feedback, suggestions and other queries! Just email <a href="mailto:my@robogals.org">my@robogals.org</a> to get in touch with the myRobogals development team. {% endblocktrans %}
+Throughout these early stages, we really appreciate any feedback, suggestions and other queries! Just email <a href="mailto:my@robogals.org">my@robogals.org</a> to get in touch with the myRobogals development team.{% endblocktrans %}
 {% endblock %}

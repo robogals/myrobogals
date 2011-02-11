@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load hide_email %}
+{% load get_user_attr %}
 {% block title %}{% blocktrans with chapter.name as chapter %}Member listing: {{chapter}}{% endblocktrans %}{% endblock %}
 
 {% block pagetitle %}{% blocktrans with chapter.name as chapter %}Member listing: {{chapter}}{% endblocktrans %}{% endblock %}
@@ -10,34 +11,20 @@
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
 <p>
-<a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a></p>
+<a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/#cols">{% trans "Add/remove columns" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a></p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "Username" %}</strong></td>
-    <td><strong>{% trans "First name" %}</strong></td>
-    <td><strong>{% trans "Last name" %}</strong></td>
-    <td><strong>{% trans "Email" %}</strong></td>
-    <td><strong>{% trans "Mobile" %}</strong></td>
-{% if chapter.student_number_enable %}
-    <td><strong>{{chapter.student_number_label}}</strong></td>
-{% endif %}
-{% if chapter.student_union_enable %}
-    <td><strong>{{chapter.student_union_label}}</strong></td>
-{% endif %}
+    {% for col in display_columns %}
+    <td><strong>{{col.display_name_en}}</strong></td>
+    {% endfor %}
   </tr>
 {% for u in users %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
-    <td>{{u.first_name}}</td>
-    <td>{{u.last_name}}</td>
-    <td>{% hide_email u.email %}</td>
-    <td>{% if not u.mobile %}{% else %}+{{u.mobile}}{% endif %}</td>
-{% if chapter.student_number_enable %}
-    <td>{{u.student_number}}</td>
-{% endif %}
-{% if chapter.student_union_enable %}
-    <td>{% if u.union_member %}Yes{% else %}No{% endif %}</td>
-{% endif %}
+	{% for col in display_columns %}
+    <td>{% get_user_attr u col.field_name %}</td>
+    {% endfor %}
   </tr>
 {% endfor %}
 </table>

@@ -4,9 +4,9 @@
 
 {% comment %}{% load profile_filters %}{% endcomment %}
 
-{% block title %}{% trans "Profile" %} - {{user.first_name}} {{user.last_name}}{% endblock %}
+{% block title %}{% blocktrans with user.get_full_name as name %}Profile - {{name}}{% endblocktrans %}{% endblock %}
 
-{% block pagetitle %}{% trans "Profile" %} {{user.first_name}} {{user.last_name}}{% endblock %}
+{% block pagetitle %}{% blocktrans with user.get_full_name as name %}Profile: {{name}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <!-- display profile information -->

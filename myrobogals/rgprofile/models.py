@@ -1,6 +1,7 @@
 from django.db import models
 from myrobogals.auth.models import Group, User
 from datetime import date
+from myrobogals.rgchapter.models import DisplayColumn
 
 class PositionType(models.Model):
 	description = models.CharField(max_length=64)
@@ -34,6 +35,8 @@ class UserList(models.Model):
 	name = models.CharField(max_length=128)
 	chapter = models.ForeignKey(Group)
 	users = models.ManyToManyField(User)
+	display_columns = models.ManyToManyField(DisplayColumn)
+	notes = models.TextField(blank=True)
 	
 	def __unicode__(self):
 		return self.name

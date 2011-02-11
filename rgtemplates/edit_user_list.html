@@ -33,6 +33,28 @@
     <td style="vertical-align: top" width="30">{% trans "Members" %}</td>
     <td style="vertical-align: top">{{ ulform.users }}</td>
   </tr>
+{% if ulform.display_columns.errors %}
+{% for error in ulform.display_columns.errors %}
+  <tr>
+    <td style="vertical-align: top" colspan="2"><div class="error">{{error}}</div></td>
+  </tr>
+{% endfor %}
+{% endif %}
+  <tr>
+    <td style="vertical-align: top" width="30">{% trans "Columns to display" %}</td>
+    <td style="vertical-align: top">{{ ulform.display_columns }}</td>
+  </tr>
+{% if ulform.notes.errors %}
+{% for error in ulform.notes.errors %}
+  <tr>
+    <td style="vertical-align: top" colspan="2"><div class="error">{{error}}</div></td>
+  </tr>
+{% endfor %}
+{% endif %}
+  <tr>
+    <td style="vertical-align: top" width="30">{% trans "Notes" %}</td>
+    <td style="vertical-align: top">{{ ulform.notes }}</td>
+  </tr>
   <tr>
     <td style="vertical-align: top" width="30">&nbsp;</td>
     <td style="vertical-align: top"><input type="submit" value="Submit" /></td>

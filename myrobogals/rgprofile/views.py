@@ -21,6 +21,7 @@ from myrobogals.settings import MEDIA_ROOT
 from time import time
 import csv
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
+from myrobogals.rgchapter.models import DisplayColumn
 
 '''
 def joinstart(request):
@@ -63,7 +64,8 @@ def viewlist(request, chapterurl, list_id):
 			search = request.GET['search']
 			users = users.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search))
 		users = users.order_by('last_name', 'first_name')
-		return render_to_response('list_user_list.html', {'userlist': l, 'list_id': list_id, 'users': users, 'search': search, 'chapter': c, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+		display_columns = l.display_columns.all()
+		return render_to_response('list_user_list.html', {'userlist': l, 'list_id': list_id, 'users': users, 'search': search, 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 
@@ -71,9 +73,15 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
     	return obj.last_name + ", " + obj.first_name
 
+class DPModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+    	return obj.display_name_en
+
 class EditListForm(forms.Form):
 	name = forms.CharField(max_length=256)
 	users = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Members"), False, attrs={'rows': 20}), required=True)
+	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('display_name_en'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True, initial=(26,4,15))
+	notes = forms.CharField(required=False, widget=forms.Textarea)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -111,10 +119,12 @@ def edituserlist(request, chapterurl, list_id):
 			if ulform.is_valid():
 				data = ulform.cleaned_data
 				l.name = data['name']
+				l.notes = data['notes']
 				if new:
 					l.chapter = c
 					l.save()
 				l.users = data['users']
+				l.display_columns = data['display_columns']
 				l.save()
 				request.user.message_set.create(message=unicode(_("User list \"" + l.name + "\" has been updated")))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
@@ -125,9 +135,14 @@ def edituserlist(request, chapterurl, list_id):
 				users_selected = []
 				for u in l.users.all():
 					users_selected.append(u.pk)
+				cols_selected = []
+				for u in l.display_columns.all():
+					cols_selected.append(u.pk)
 				ulform = EditListForm({
 					'name': l.name,
-					'users': users_selected}, user=request.user)
+					'users': users_selected,
+					'display_columns': cols_selected,
+					'notes': l.notes}, user=request.user)
 		return render_to_response('edit_user_list.html', {'new': new, 'userlist': l, 'ulform': ulform, 'list_id': list_id, 'chapter': c}, context_instance=RequestContext(request))
 
 @login_required
@@ -140,7 +155,8 @@ def editusers(request, chapterurl):
 			search = request.GET['search']
 			users = users.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search))
 		users = users.order_by('last_name', 'first_name')
-		return render_to_response('user_list.html', {'users': users, 'search': search, 'chapter': c, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+		display_columns = c.display_columns.all()
+		return render_to_response('user_list.html', {'users': users, 'search': search, 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 

@@ -23,7 +23,7 @@ class GroupAdmin(admin.ModelAdmin):
         ('Welcome email', {'fields': ('welcome_email_enable', 'welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
         ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
         ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
-        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'notify_enable', 'notify_list', 'photo', 'default_email_domain', 'sms_limit')}),
+        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'notify_enable', 'notify_list', 'photo', 'default_email_domain', 'sms_limit', 'display_columns')}),
         ('FTP details', {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
     )
 
