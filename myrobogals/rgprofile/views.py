@@ -534,7 +534,7 @@ def edituser(request, username, chapter=None):
 							try:
 								message.body = chapter.welcome_email_msg.format(
 									chapter=chapter,
-									user=user,
+									user=u,
 									plaintext_password=request.POST['password1'])
 							except Exception:
 								message.body = chapter.welcome_email_msg
