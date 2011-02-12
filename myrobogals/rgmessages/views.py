@@ -165,7 +165,7 @@ def writeemail(request):
 			return HttpResponseRedirect('/messages/email/done/')
 	else:
 		emailform = WriteEmailForm(None, user=request.user)
-	return render_to_response('email_write.html', {'emailform': emailform,}, context_instance=RequestContext(request))
+	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter()}, context_instance=RequestContext(request))
 
 class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -284,7 +284,7 @@ def writesms(request):
 			smserror = e.errmsg
 	else:
 		smsform = WriteSMSForm(None, user=request.user)
-	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror}, context_instance=RequestContext(request))
+	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter()}, context_instance=RequestContext(request))
 
 @login_required
 def smsdone(request):

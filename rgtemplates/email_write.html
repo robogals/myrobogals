@@ -26,7 +26,7 @@
           <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">{% trans "All members who have opted to receive email from the following chapters" %}</span></label></td>
 {% else %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="type1">{% trans "All members of" %} {{ request.user.chapter }} {% trans "who have opted to receive email" %}</label></td>
+          <td style="vertical-align: top"><label for="type1">{% blocktrans %}All members of {{ chapter }} who have opted to receive email{% endblocktrans %}</label></td>
 {% endif %}
         </tr>
 {% if request.user.is_superuser %}
@@ -45,7 +45,7 @@
           <td style="vertical-align: top"><label for="type2">{% trans "Executive committee members of the following chapters" %}</label></td>
 {% else %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" /></td>
-          <td style="vertical-align: top"><label for="type2">{% trans "Executive committee members of" %} {{ request.user.chapter }}</label></td>
+          <td style="vertical-align: top"><label for="type2">{% blocktrans %}Executive committee members of {{ chapter }}{% endblocktrans %}</label></td>
 {% endif %}
         </tr>
 {% if request.user.is_superuser %}
