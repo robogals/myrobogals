@@ -21,7 +21,7 @@ from myrobogals.settings import MEDIA_ROOT
 from time import time
 import csv
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
-from myrobogals.rgchapter.models import DisplayColumn
+from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 
 '''
@@ -336,6 +336,12 @@ class FormPartOne(forms.Form):
 			self.fields['union_member'].required = chapter.student_union_required
 		else:
 			del self.fields['union_member']
+		if chapter.tshirt_enable:
+			self.fields['tshirt'].label = chapter.tshirt_label
+			self.fields['tshirt'].required = chapter.tshirt_required
+			self.fields['tshirt'].queryset = ShirtSize.objects.filter(chapter=chapter)
+		else:
+			del self.fields['tshirt']
 
 	GENDERS = (
 		(0, '---'),
@@ -348,6 +354,7 @@ class FormPartOne(forms.Form):
 	email = forms.EmailField(label=_('Email'), max_length=64)
 	student_number = forms.CharField(max_length=32)
 	union_member = forms.BooleanField()
+	tshirt = forms.ModelChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
 	gender = forms.ChoiceField(choices=GENDERS, initial=2)
@@ -499,6 +506,8 @@ def edituser(request, username, chapter=None):
 						u.student_number = data['student_number']
 					if 'union_member' in data:
 						u.union_member = data['union_member']
+					if 'tshirt' in data:
+						u.tshirt = data['tshirt']
 					data = formpart2.cleaned_data
 					u.privacy = data['privacy']
 					u.dob_public = data['dob_public']
@@ -573,7 +582,8 @@ def edituser(request, username, chapter=None):
 					'mobile': u.mobile,
 					'gender': u.gender,
 					'student_number': u.student_number,
-					'union_member': u.union_member}, chapter=chapter)
+					'union_member': u.union_member,
+					'tshirt': u.tshirt.pk}, chapter=chapter)
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,

@@ -12,3 +12,16 @@ class DisplayColumn(models.Model):
 	class Meta:
 		ordering = ('order','field_name')
 		verbose_name = "Column display name"
+
+class ShirtSize(models.Model):
+	size_short = models.CharField(max_length=32)
+	size_long = models.CharField(max_length=64)
+	chapter = models.ForeignKey('auth.Group')
+	order = models.IntegerField(default=10)
+	
+	def __unicode__(self):
+		return self.size_short
+	
+	class Meta:
+		ordering = ('order','size_long')
+		verbose_name = "T-shirt size"

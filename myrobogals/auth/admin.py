@@ -19,7 +19,7 @@ class GroupAdmin(admin.ModelAdmin):
         (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable')}),
         ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
-        ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label')}),
+        ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label')}),
         ('Welcome email', {'fields': ('welcome_email_enable', 'welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
         ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
         ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
@@ -38,7 +38,7 @@ class PositionAdmin(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt')}),
         ('Chapter', {'fields': ('groups',)}),
         ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         ('Work info (industry members only)', {'fields': ('job_title', 'company')}),

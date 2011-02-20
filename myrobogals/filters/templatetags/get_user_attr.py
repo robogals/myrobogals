@@ -50,7 +50,10 @@ def get_user_attr(user, attr):
 	try:
 		return val()
 	except:
-		return str(val)
+		if val == None:
+			return ''
+		else:
+			return str(val)
 
 register = template.Library()
 register.simple_tag(get_user_attr)

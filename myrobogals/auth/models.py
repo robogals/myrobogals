@@ -11,7 +11,7 @@ from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.db.models.fields import PositiveIntegerField
 from myrobogals.rgprofile.usermodels import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
-from myrobogals.rgchapter.models import DisplayColumn
+from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from django.db import connection, transaction
 from pytz import timezone, utc
 
@@ -166,7 +166,10 @@ class Group(models.Model):
     notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True)
     sms_limit = models.IntegerField('Monthly SMS limit', default=0)
     display_columns = models.ManyToManyField(DisplayColumn)
-    
+    tshirt_enable = models.BooleanField('Enable T-shirt drop-down')
+    tshirt_required = models.BooleanField('Require T-shirt drop-down')
+    tshirt_label = models.CharField('Label for T-shirt drop-down', max_length=64, blank=True)
+
     class Meta:
         verbose_name = 'chapter'
         verbose_name_plural = 'chapters'
@@ -346,6 +349,7 @@ class User(models.Model):
     student_type = models.IntegerField("Student type", choices=STUDENT_TYPE_CHOICES, default=0)
     student_number = models.CharField('Student number', max_length=32, blank=True)
     union_member = models.BooleanField(default=False)
+    tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
     objects = UserManager()
 
     class Meta:
