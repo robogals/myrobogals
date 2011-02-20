@@ -581,7 +581,7 @@ def edituser(request, username, chapter=None):
 				if u.tshirt:
 					tshirt_id = u.tshirt.pk
 				else:
-					tshirt_id = 0
+					tshirt_id = None
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
 					'last_name': u.last_name,
