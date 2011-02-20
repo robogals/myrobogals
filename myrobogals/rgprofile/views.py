@@ -574,6 +574,10 @@ def edituser(request, username, chapter=None):
 				formpart4 = FormPartFour(None, chapter=chapter)
 				formpart5 = FormPartFive(None, chapter=chapter)
 			else:
+				if u.tshirt:
+					tshirt_id = u.tshirt.pk
+				else:
+					tshirt_id = 0
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
 					'last_name': u.last_name,
@@ -583,7 +587,7 @@ def edituser(request, username, chapter=None):
 					'gender': u.gender,
 					'student_number': u.student_number,
 					'union_member': u.union_member,
-					'tshirt': u.tshirt.pk}, chapter=chapter)
+					'tshirt': tshirt_id}, chapter=chapter)
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,
