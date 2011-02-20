@@ -23,5 +23,5 @@ class ShirtSize(models.Model):
 		return self.size_short
 	
 	class Meta:
-		ordering = ('order','size_long')
+		ordering = ('chapter', 'order', 'size_long')
 		verbose_name = "T-shirt size"
