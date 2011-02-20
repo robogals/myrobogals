@@ -319,6 +319,10 @@ class MobileField(forms.CharField):
 		except ValueError:
 			raise forms.ValidationError(self.chapter.mobile_regexes.errmsg)
 
+class ShirtChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.size_long
+
 # Personal information
 class FormPartOne(forms.Form):
 	def __init__(self, *args, **kwargs):
@@ -354,7 +358,7 @@ class FormPartOne(forms.Form):
 	email = forms.EmailField(label=_('Email'), max_length=64)
 	student_number = forms.CharField(max_length=32)
 	union_member = forms.BooleanField()
-	tshirt = forms.ModelChoiceField(queryset=ShirtSize.objects.none())
+	tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
 	gender = forms.ChoiceField(choices=GENDERS, initial=2)
