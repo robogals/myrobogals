@@ -103,7 +103,7 @@ class FormPartFive(forms.Form):
 @login_required
 def editchapter(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if (request.user.is_staff and request.user.chapter() == c):
+	if (request.user.is_staff and request.user.chapter() == c) or request.user.is_superuser:
 		if request.method == 'POST':
 			formpart1 = FormPartOne(request.POST)
 			formpart2 = FormPartTwo(request.POST)
