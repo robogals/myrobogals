@@ -145,7 +145,7 @@ Most options can be modified here, but you will need to contact <a href="mailto:
 {% autoescape off %}
 <table>
   <tr>
-    <td colspan="2">&nbsp;<br /><strong><a name="cols"></a>{% trans "Miscellaneous settings" %}</strong></td>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Miscellaneous settings" %}</strong></td>
   </tr>
   <tr>
     <td colspan="2">{{formpart4.is_joinable}} {{formpart4.is_joinable.label_tag}}</td>
@@ -159,7 +159,7 @@ Most options can be modified here, but you will need to contact <a href="mailto:
     <td>{{ formpart4.joinpage }}<br><span style="font-size: 9pt">{{ formpart4.joinpage.help_text }}</span></td>
   </tr>
   <tr>
-  	<td style="vertical-align: top">{{formpart4.display_columns.label_tag}}</td>
+  	<td style="vertical-align: top"><a name="cols"></a>{{formpart4.display_columns.label_tag}}</td>
     <td>{{formpart4.display_columns}}</td>
   </tr>
 </table>
