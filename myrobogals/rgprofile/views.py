@@ -545,6 +545,13 @@ def edituser(request, username, chapter=None):
 							message = EmailMessage()
 							message.subject = chapter.welcome_email_subject
 							try:
+								message.subject = chapter.welcome_email_subject.format(
+									chapter=chapter,
+									user=u,
+									plaintext_password=request.POST['password1'])
+							except Exception:
+								message.subject = chapter.welcome_email_subject
+							try:
 								message.body = chapter.welcome_email_msg.format(
 									chapter=chapter,
 									user=u,

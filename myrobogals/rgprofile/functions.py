@@ -27,7 +27,7 @@ def stringval(colname, cell, newuser, defaults):
 def dateval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	try:
-		date = datetime.strptime(data)
+		date = datetime.strptime(data, "%d %b %Y, %I:%M%p")
 		setattr(newuser, colname, date)
 	except ValueError:
 		if colname in defaults:
@@ -270,7 +270,14 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 		# Send welcome email
 		if welcomeemail:
 			message = EmailMessage()
-			message.subject = welcomeemail['subject']
+			try:
+				message.subject = welcomeemail['subject'].format(
+					chapter=chapter,
+					user=newuser,
+					plaintext_password=plaintext_password)
+			except Exception:
+				newuser.delete()
+				raise RgImportCsvException('Welcome email subject format is invalid')
 			try:
 				message.body = welcomeemail['body'].format(
 					chapter=chapter,
@@ -304,7 +311,13 @@ def genandsendpw(user, welcomeemail, chapter):
 	user.save()
 	
 	message = EmailMessage()
-	message.subject = welcomeemail['subject']
+	try:
+		message.subject = welcomeemail['subject'].format(
+			chapter=chapter,
+			user=user,
+			plaintext_password=plaintext_password)
+	except Exception:
+		raise RgGenAndSendPwException('Email subject contains invalid fields')
 	try:
 		message.body = welcomeemail['body'].format(
 			chapter=chapter,
