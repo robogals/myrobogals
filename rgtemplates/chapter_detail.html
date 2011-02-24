@@ -7,7 +7,7 @@
 {% block content %}
 <div style="float: right">
 {% if officers %}
-<div style="background: #CCCCCC; padding: 10px; width: 220px; margin-bottom: 15px">
+<div style="background: #CCCCCC; padding: 10px; width: 220px; margin-bottom: 15px; margin-left: 15px">
 <div style="text-align: center">{% trans "Executive Committee" %}</div>
 {% for officer in officers %}
 <div style="margin-top: 7px"><a href="/profile/{{officer.user.username}}/">{{officer.user.first_name}} {{officer.user.last_name}}</a><br />
@@ -37,7 +37,9 @@
 <br />
 {% endif %}
 {% if chapter.infobox %}<strong>{% trans "About us:" %}</strong><br />
+{% autoescape off %}
 {{chapter.infobox}}<br />
+{% endautoescape %}
 <br />
 {% endif %}
 {% if not request.user.id and chapter.is_joinable %}<a href="/join/{{chapter.myrobogals_url}}/">{% blocktrans %}Join {{chapter}}{% endblocktrans %}</a><br />{% endif %}
