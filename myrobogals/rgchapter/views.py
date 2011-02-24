@@ -46,7 +46,7 @@ def redirtomy(request):
 
 # forms for editing a chapter
 class FormPartOne(forms.Form):
-	infobox = forms.CharField(label=_("About this chapter"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	infobox = forms.CharField(label=_("About this chapter"), help_text = _("This is shown on your chapter page. Full HTML is allowed, including images! Please keep it somewhat professional - this is a corporate web portal, not MySpace :)"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	website_url = forms.CharField(max_length=128, label=_("Website URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	facebook_url = forms.CharField(max_length=128, label=_("Facebook URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 
@@ -69,18 +69,19 @@ class DPModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     	return obj.display_name_en
 
 class FormPartFour(forms.Form):
-	is_joinable = forms.BooleanField(label=_("Accept new members through website (if this is unchecked, new members can only be added by exec)"), required=False)
-	#emailtext = forms.CharField(label=_("Default email reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
-	#smstext = forms.CharField(label=_("Default SMS reminder"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	is_joinable = forms.BooleanField(label=_("Allow new members to sign up directly on myRobogals"), required=False)
+	welcomepage = forms.CharField(label=_("Welcome page"), required=False, widget=forms.Textarea)
+	joinpage = forms.CharField(label=_("Join page"), required=False, widget=forms.Textarea)
 	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('display_name_en'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True)
 
 	# Future: use the correct language
-	#def __init__(self, *args, **kwargs):
-	#	user=kwargs['user']
-	#	del kwargs['user']
-	#	super(WriteEmailForm, self).__init__(*args, **kwargs)
-	#	self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
-
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartFour, self).__init__(*args, **kwargs)
+		#self.fields['list'].queryset = UserList.objects.filter(chapter=chapter)
+		self.fields['welcomepage'].help_text = _("This is shown when new users have just signed up.<br>Full HTML is allowed. After saving, you can preview this page at:<br><a href=\"https://my.robogals.org/welcome/%s/\" target=\"blank\">https://my.robogals.org/welcome/%s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
+		self.fields['joinpage'].help_text = _("This is shown if people try to join, but your chapter doesn't allow<br>new members to sign up to myRobogals directly. In this case, put a<br>message here about how they <em>should</em> sign up. Full HTML is allowed.<br>After saving, and if the above checkbox is unchecked, you can preview this page at:<br><a href=\"https://my.robogals.org/join/%s/\" target=\"blank\">https://my.robogals.org/join/%s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
 
 class WelcomeEmailMsgField(forms.CharField):
 	def clean(self, value):
@@ -107,7 +108,7 @@ def editchapter(request, chapterurl):
 			formpart1 = FormPartOne(request.POST)
 			formpart2 = FormPartTwo(request.POST)
 			formpart3 = FormPartThree(request.POST)
-			formpart4 = FormPartFour(request.POST)
+			formpart4 = FormPartFour(request.POST, chapter=c)
 			formpart5 = FormPartFive(request.POST)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
 				data = formpart1.cleaned_data
@@ -128,6 +129,8 @@ def editchapter(request, chapterurl):
 				c.country = data['country']
 				data = formpart4.cleaned_data
 				c.is_joinable = data['is_joinable']
+				c.welcome_page = data['welcomepage']
+				c.join_page = data['joinpage']
 				c.display_columns = data['display_columns']
 				data = formpart5.cleaned_data
 				c.welcome_email_enable = data['welcome_email_enable']
@@ -163,7 +166,9 @@ def editchapter(request, chapterurl):
 				'country': country})
 			formpart4 = FormPartFour({
 				'is_joinable': c.is_joinable,
-				'display_columns': display_columns})
+				'welcomepage': c.welcome_page,
+				'joinpage': c.join_page,
+				'display_columns': display_columns}, chapter=c)
 			formpart5 = FormPartFive({
 				'welcome_email_enable': c.welcome_email_enable,
 				'welcome_email_subject': c.welcome_email_subject,

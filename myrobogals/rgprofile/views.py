@@ -45,14 +45,14 @@ def joinstart(request):
 
 def joinchapter(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if request.user.is_authenticated():
-		return render_to_response('join_already_logged_in.html', {}, context_instance=RequestContext(request))
-	else:
-		if chapter.is_joinable:
-			return edituser(request, '', chapter)
+	if chapter.is_joinable:
+		if request.user.is_authenticated():
+			return render_to_response('join_already_logged_in.html', {}, context_instance=RequestContext(request))
 		else:
-			join_page = chapter.join_page.format(chapter=chapter)
-			return render_to_response('joininfo.html', {'chapter': chapter, 'join_page': join_page}, context_instance=RequestContext(request))
+			return edituser(request, '', chapter)
+	else:
+		join_page = chapter.join_page.format(chapter=chapter)
+		return render_to_response('joininfo.html', {'chapter': chapter, 'join_page': join_page}, context_instance=RequestContext(request))
 
 @login_required
 def viewlist(request, chapterurl, list_id):

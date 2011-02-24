@@ -4,7 +4,7 @@ from myrobogals.auth.models import Group
 
 
 def home(request):
-	return render_to_response('home.html', {}, context_instance=RequestContext(request))
+	return render_to_response('home.html', {'is_home': True}, context_instance=RequestContext(request))
 
 def welcome(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
