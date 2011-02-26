@@ -69,7 +69,7 @@ class DPModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     	return obj.display_name_en
 
 class FormPartFour(forms.Form):
-	is_joinable = forms.BooleanField(label=_("Allow new members to sign up directly on myRobogals"), required=False)
+	is_joinable = forms.BooleanField(label=_("Allow new members to sign up directly on myRobogals (highly recommended!)"), required=False)
 	welcomepage = forms.CharField(label=_("Welcome page"), required=False, widget=forms.Textarea)
 	joinpage = forms.CharField(label=_("Join page"), required=False, widget=forms.Textarea)
 	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('display_name_en'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True)

@@ -227,6 +227,8 @@ def invitetovisit(request, visit_id):
 				users = User.objects.filter(groups=chapter, is_active=True, email_reminder_optin=True)
 			elif request.POST['type'] == '2':
 				users = User.objects.filter(groups=chapter, is_active=True, is_staff=True)
+			elif request.POST['type'] == '4':
+				users = User.objects.filter(groups=chapter, is_active=True, email_reminder_optin=True, trained=True)
 			elif request.POST['type'] == '5':
 				ul = data['list']
 				users = ul.users.all()

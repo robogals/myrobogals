@@ -38,7 +38,7 @@ class PositionAdmin(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained')}),
         ('Chapter', {'fields': ('groups',)}),
         ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         ('Work info (industry members only)', {'fields': ('job_title', 'company')}),

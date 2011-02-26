@@ -350,6 +350,7 @@ class User(models.Model):
     student_number = models.CharField('Student number', max_length=32, blank=True)
     union_member = models.BooleanField(default=False)
     tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
+    trained = models.BooleanField(default=False)
     objects = UserManager()
 
     class Meta:

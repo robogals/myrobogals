@@ -432,7 +432,8 @@ class FormPartFive(forms.Form):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
 		super(FormPartFive, self).__init__(*args, **kwargs)
-	
+
+	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
 def edituser(request, username, chapter=None):
@@ -536,6 +537,8 @@ def edituser(request, username, chapter=None):
 					data = formpart5.cleaned_data
 					if 'internal_notes' in data:
 						u.internal_notes = data['internal_notes']
+					if 'trained' in data:
+						u.trained = data['trained']
 					u.save()
 					if 'return' in request.POST:
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
@@ -625,7 +628,8 @@ def edituser(request, username, chapter=None):
 					'mobile_marketing_optin': u.mobile_marketing_optin,
 					'email_newsletter_optin': u.email_newsletter_optin}, chapter=chapter)
 				formpart5 = FormPartFive({
-					'internal_notes': u.internal_notes}, chapter=chapter)
+					'internal_notes': u.internal_notes,
+					'trained': u.trained}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
