@@ -8,7 +8,7 @@
 {% block content %}
 <ul>
     <li>
-        <a href="/chapters/global/">{% trans "Global" %}</a>
+        <a href="/chapters/global/">Global</a>
         <ul>
         {% for item in listing %}
             <li>
@@ -22,5 +22,9 @@
         {% endfor %}
         </ul>
     </li>
+</ul>
+Virtual chapters:
+<ul>
+    <li><a href="/chapters/rrr/">Rural and regional programme</a></li>
 </ul>
 {% endblock %}

@@ -8,6 +8,8 @@
 	It should be running constantly in the background on the server.
 */
 
+set_time_limit(59);
+
 require_once "Mail.php";
 
 $params = array(
@@ -17,28 +19,27 @@ $params = array(
 	'persist' => false
 );
 
-// Wait for database to come online
-do {
+//do {
 	$dbh = mysql_connect('localhost', 'myrobogals', 'myrobogals');
-	sleep(1);
-} while (!$dbh);
+//	sleep(1);
+//} while (!$dbh);
 mysql_select_db('myrobogals');
 
-while (1) {
+//while (1) {
 
 	// Ensure connection hasn't dropped
-	if (!mysql_ping($dbh)) {
-		do {
-			$dbh = mysql_connect('localhost', 'myrobogals', 'myrobogals');
-			sleep(1);
-		} while (!$dbh);
-		mysql_select_db('myrobogals');
-	}
+//	if (!mysql_ping($dbh)) {
+//		do {
+//			$dbh = mysql_connect('localhost', 'myrobogals', 'myrobogals');
+//			sleep(1);
+//		} while (!$dbh);
+//		mysql_select_db('myrobogals');
+//	}
 
-	$sql = "SELECT * FROM rgmessages_emailmessage WHERE `status` = 0 ORDER BY `date` DESC LIMIT 1";
+	$sql = "SELECT * FROM rgmessages_emailmessage WHERE `status` = 0 ORDER BY `date` DESC";
 	$result = mysql_query($sql);
 	
-	if ($msg = mysql_fetch_assoc($result)) {
+	while($msg = mysql_fetch_assoc($result)) {
 	
 		$mailer = Mail::factory('smtp', $params);
 		
@@ -126,7 +127,7 @@ Content-Transfer-Encoding: base64
 			$sql = sprintf("UPDATE rgmessages_emailrecipient SET `status` = %d WHERE `id` = %d", $status, $recipient['id']);
 			mysql_query($sql);
 
-			sleep(0.5);
+			sleep(0.3);
 		}
 		
 		unset($mailer);
@@ -146,6 +147,6 @@ Content-Transfer-Encoding: base64
 	mysql_free_result($result);
 	
 	// Wait 0.5 seconds before looking in the database again
-	sleep(0.5);
-}
+//	sleep(0.5);
+//}
 ?>
