@@ -494,7 +494,7 @@ def importsubscribers(request, newsletter_id):
 				for chunk in file.chunks():
 					destination.write(chunk)
 				destination.close()
-				fp = open(tmppath, 'r')
+				fp = open(tmppath, 'rU')
 				filerows = csv.reader(fp)
 				defaults = defaultsform.cleaned_data
 				welcomeemail = welcomeform.cleaned_data

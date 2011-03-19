@@ -746,7 +746,7 @@ def importusers(request, chapterurl):
 				for chunk in file.chunks():
 					destination.write(chunk)
 				destination.close()
-				fp = open(tmppath, 'r')
+				fp = open(tmppath, 'rU')
 				filerows = csv.reader(fp)
 				defaults = {}
 				defaults.update(defaultsform1.cleaned_data)
