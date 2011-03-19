@@ -505,7 +505,7 @@ def importsubscribers(request, newsletter_id):
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/import/")
 			tmppath = request.POST['tmppath']
-			fp = open(tmppath, 'r')
+			fp = open(tmppath, 'rU')
 			filerows = csv.reader(fp)
 			welcomeemail = request.session['welcomeemail']
 			defaults = request.session['defaults']

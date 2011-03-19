@@ -759,7 +759,7 @@ def importusers(request, chapterurl):
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
 			tmppath = request.POST['tmppath']
-			fp = open(tmppath, 'r')
+			fp = open(tmppath, 'rU')
 			filerows = csv.reader(fp)
 			welcomeemail = request.session['welcomeemail']
 			if welcomeemail['importaction'] == '2':
