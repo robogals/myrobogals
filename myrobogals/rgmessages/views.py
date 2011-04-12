@@ -310,6 +310,16 @@ def serveimg(request, msgid, filename):
 	except Exception:
 		raise Http404
 	return HttpResponse(image_data, mimetype="image/jpeg")
+	
+def servenewsletter(request, msgid, issue):
+	try:
+		recipient = EmailRecipient.objects.get(pk=msgid)
+	except EmailRecipient.DoesNotExist:
+		raise Http404
+	recipient.status = 7
+	recipient.save()
+	return HttpResponseRedirect("http://www.robogals.org/amp-img/%s.html"%(issue))
+
 
 @login_required
 def emaildone(request):
