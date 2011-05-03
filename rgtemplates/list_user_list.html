@@ -18,6 +18,7 @@
 <form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/" method="GET">
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
+<p align="right"><b>Total Users: {{ users|length }} </b></p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr>
     <td><strong>{% trans "Username" %}</strong></td>
@@ -34,4 +35,5 @@
   </tr>
 {% endfor %}
 </table>
+<p align="right"><b>Total Users: {{ users|length }} </b></p>
 {% endblock %}

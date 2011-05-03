@@ -6,4 +6,37 @@
 
 {% block content %}
 <a href="import/">{% trans "Import subscribers from CSV file" %}</a>
+<h3> {%trans "Subscriber Details" %}</h3>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="600px">
+  <tr>
+    <td><strong>{% trans "Subscriber Type" %}</strong></td>
+    <td><strong>{% trans "Number of Subscribers" %}</strong></td>
+  </tr>
+  <tr class="odd">
+	<td>Total</td>
+	<td>{{ total }} </td>
+  </tr>
+{% for type,value in sub_totals.items %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td>{{ type }} </td>
+	<td>{{ value }} </td>
+  </tr>
+{% endfor %}
+ </table>
+<h3> {%trans "Previous Messages" %}</h3>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="600px">
+  <tr>
+    <td><strong>{% trans "Subject" %}</strong></td>
+    <td><strong>{% trans "Total Sent" %}</strong></td>
+	<td><strong>{% trans "Opened" %}</strong></td>
+	<td><strong>{% trans "Percentage Opened" %}</strong></td>
+ {% for message in history %}
+ <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td>{{ message.subject }}</td>
+	<td>{{ message.total_sent }}</td>
+	<td>{{ message.opened }}</td>
+	<td>{{ message.percent}}</td>
+</tr>
+{% endfor %}
+</table>
 {% endblock %}

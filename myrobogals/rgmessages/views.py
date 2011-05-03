@@ -24,6 +24,7 @@ from myrobogals.rgmessages.functions import importcsv, RgImportCsvException
 import csv
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from pytz import utc
+from decimal import *
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -573,6 +574,30 @@ def importsubscribershelp(request, newsletter_id):
 @login_required
 def newslettercp(request, newsletter_id):
 	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
+	getcontext().prec = 2
+	subscribers = NewsletterSubscriber.objects.filter(newsletter=newsletter)
+	total = len(subscribers)
+	sub_totals = {}
+	for subscriber in subscribers:
+		if subscriber.subscriber_type is None:
+			if "Member" in sub_totals:
+				sub_totals['Member'] += 1
+			else:
+				sub_totals['Member'] = 1
+		elif subscriber.subscriber_type.description in sub_totals:
+			sub_totals[subscriber.subscriber_type.description] += 1
+		else:
+			sub_totals[subscriber.subscriber_type.description] = 1
+	past_messages = EmailMessage.objects.filter(sender=newsletter.from_user).order_by('date')
+	history = []
+	for message in past_messages:
+		message_details = {}
+		recipients = EmailRecipient.objects.filter(message=message)
+		message_details['subject'] = message.subject
+		message_details['total_sent'] = len(recipients)
+		message_details['opened'] = len(EmailRecipient.objects.filter(message=message, status=7))
+		message_details['percent'] = (Decimal((message_details['opened']))/(message_details['total_sent'])) * 100
+		history.append(message_details)
 	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
 		raise Http404
-	return render_to_response('newsletter_cp.html', {'newsletter': newsletter}, context_instance=RequestContext(request))
+	return render_to_response('newsletter_cp.html', {'newsletter': newsletter, 'history': history, 'sub_totals': sub_totals, 'total': total}, context_instance=RequestContext(request))
