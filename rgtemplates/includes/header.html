@@ -233,6 +233,16 @@
         
         
 </li>   
+{% if request.user.is_superuser %}
+
+                    <li class="item83" >
+            <a class="orphan item bullet" href="/messages/newsletter/1/"  >
+            <span>
+                        {% trans "Newsletter CP" %}           
+            </span>
+        </a>
+</li>   
+{% endif %}        
                             
                             </ul>
         </div>
