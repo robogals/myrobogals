@@ -14,13 +14,22 @@ def list(request):
 	listing = []
 	superchapters = Group.objects.filter(parent=1)		
 	for superchapter in superchapters:
-		if superchapter.status == 0 or superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter:
-			chapters_all = Group.objects.filter(parent=superchapter)
-			chapters_display = []
-			for chapter in chapters_all:
-				if chapter.status == 0 or chapter == request.user.chapter() or request.user.is_superuser:
-					chapters_display.append(chapter)
-			listing.append({'super': superchapter, 'chapters': chapters_display})
+		if request.user.is_authenticated():
+			if superchapter.status == 0 or superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter:
+				chapters_all = Group.objects.filter(parent=superchapter, status=0)
+				chapters_display = []
+				for chapter in chapters_all:
+					if chapter.status == 0 or chapter == request.user.chapter() or request.user.is_superuser:
+						chapters_display.append(chapter)
+				listing.append({'super': superchapter, 'chapters': chapters_display})
+		else:
+			if superchapter.status == 0:
+				chapters_all = Group.objects.filter(parent=superchapter)
+				chapters_display = []
+				for chapter in chapters_all:
+					if chapter.status == 0:
+						chapters_display.append(chapter)
+				listing.append({'super': superchapter, 'chapters': chapters_display})
 	return render_to_response('chapter_listing.html', {'listing': listing}, context_instance=RequestContext(request))
 
 def joinlist(request):
