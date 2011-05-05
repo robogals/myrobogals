@@ -25,6 +25,7 @@ import csv
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from pytz import utc
 from decimal import *
+from operator import itemgetter
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -578,26 +579,30 @@ def newslettercp(request, newsletter_id):
 	subscribers = NewsletterSubscriber.objects.filter(newsletter=newsletter)
 	total = len(subscribers)
 	sub_totals = {}
+	if newsletter.pk == 1:  # for The Amplifier only
+		sub_totals["Robogals member"] = User.objects.filter(is_active=True, email_newsletter_optin=True).count()
+		total += sub_totals["Robogals member"]
 	for subscriber in subscribers:
 		if subscriber.subscriber_type is None:
-			if "Member" in sub_totals:
-				sub_totals['Member'] += 1
+			if "<i>Unspecified</i>" in sub_totals:
+				sub_totals['<i>Unspecified</i>'] += 1
 			else:
-				sub_totals['Member'] = 1
+				sub_totals['<i>Unspecified</i>'] = 1
 		elif subscriber.subscriber_type.description in sub_totals:
 			sub_totals[subscriber.subscriber_type.description] += 1
 		else:
 			sub_totals[subscriber.subscriber_type.description] = 1
-	past_messages = EmailMessage.objects.filter(sender=newsletter.from_user).order_by('date')
+	past_messages = EmailMessage.objects.filter(sender=newsletter.from_user).order_by('-date')
 	history = []
 	for message in past_messages:
 		message_details = {}
 		recipients = EmailRecipient.objects.filter(message=message)
 		message_details['subject'] = message.subject
 		message_details['total_sent'] = len(recipients)
+		message_details['date'] = str(message.date.day) + "/" + str(message.date.month) + "/" + str(message.date.year)
 		message_details['opened'] = len(EmailRecipient.objects.filter(message=message, status=7))
 		message_details['percent'] = (Decimal((message_details['opened']))/(message_details['total_sent'])) * 100
 		history.append(message_details)
 	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
 		raise Http404
-	return render_to_response('newsletter_cp.html', {'newsletter': newsletter, 'history': history, 'sub_totals': sub_totals, 'total': total}, context_instance=RequestContext(request))
+	return render_to_response('newsletter_cp.html', {'newsletter': newsletter, 'history': history, 'sub_totals': sorted(sub_totals.items(), key=itemgetter(1), reverse=True), 'total': total}, context_instance=RequestContext(request))
