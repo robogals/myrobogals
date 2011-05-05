@@ -576,7 +576,7 @@ def importsubscribershelp(request, newsletter_id):
 def newslettercp(request, newsletter_id):
 	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
 	getcontext().prec = 2
-	subscribers = NewsletterSubscriber.objects.filter(newsletter=newsletter)
+	subscribers = NewsletterSubscriber.objects.filter(newsletter=newsletter, active=True)
 	total = len(subscribers)
 	sub_totals = {}
 	if newsletter.pk == 1:  # for The Amplifier only
