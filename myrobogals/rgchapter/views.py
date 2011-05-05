@@ -14,25 +14,39 @@ def list(request):
 	listing = []
 	superchapters = Group.objects.filter(parent=1)		
 	for superchapter in superchapters:
-		chapters = Group.objects.filter(parent=superchapter)
-		listing.append({'super': superchapter, 'chapters': chapters})
+		if superchapter.status == 0 or superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter:
+			chapters_all = Group.objects.filter(parent=superchapter)
+			chapters_display = []
+			for chapter in chapters_all:
+				if chapter.status == 0 or chapter == request.user.chapter() or request.user.is_superuser:
+					chapters_display.append(chapter)
+			listing.append({'super': superchapter, 'chapters': chapters_display})
 	return render_to_response('chapter_listing.html', {'listing': listing}, context_instance=RequestContext(request))
 
 def joinlist(request):
 	listing = []
 	superchapters = Group.objects.filter(parent=1)		
 	for superchapter in superchapters:
-		chapters = Group.objects.filter(parent=superchapter)
-		listing.append({'super': superchapter, 'chapters': chapters})
+		if superchapter.status == 0:
+			chapters_all = Group.objects.filter(parent=superchapter)
+			chapters_display = []
+			for chapter in chapters_all:
+				if chapter.status == 0:
+					chapters_display.append(chapter)
+			listing.append({'super': superchapter, 'chapters': chapters_display})
 	return render_to_response('join_listing.html', {'listing': listing}, context_instance=RequestContext(request))
 
 def localtimes(request):
 	listing = []
 	globalchapter = Group.objects.get(pk=1)
-	superchapters = Group.objects.filter(parent=1)
 	for superchapter in superchapters:
-		chapters = Group.objects.filter(parent=superchapter)
-		listing.append({'super': superchapter, 'chapters': chapters})
+		if superchapter.status == 0 or superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter:
+			chapters_all = Group.objects.filter(parent=superchapter)
+			chapters_display = []
+			for chapter in chapters_all:
+				if chapter.status == 0 or chapter == request.user.chapter() or request.user.is_superuser:
+					chapters_display.append(chapter)
+			listing.append({'super': superchapter, 'chapters': chapters_display})
 	return render_to_response('timezone_listing.html', {'listing': listing, 'globalchapter': globalchapter}, context_instance=RequestContext(request))
 
 def detail(request, chapterurl):
