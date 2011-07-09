@@ -127,7 +127,7 @@ Content-Transfer-Encoding: base64
 			$sql = sprintf("UPDATE rgmessages_emailrecipient SET `status` = %d WHERE `id` = %d", $status, $recipient['id']);
 			mysql_query($sql);
 
-			sleep(0.3);
+			sleep(0.1);
 		}
 		
 		unset($mailer);
