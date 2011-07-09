@@ -73,6 +73,8 @@ def writeemail(request):
 	if not request.user.is_staff:
 		raise Http404
 	if request.method == 'POST':
+		typesel = request.POST['type']
+		schedsel = request.POST['scheduling']
 		emailform = WriteEmailForm(request.POST, user=request.user)
 		if emailform.is_valid():
 			data = emailform.cleaned_data
@@ -166,8 +168,13 @@ def writeemail(request):
 			
 			return HttpResponseRedirect('/messages/email/done/')
 	else:
+		if request.user.is_superuser:
+			typesel = '2'
+		else:
+			typesel = '1'
+		schedsel = '0'
 		emailform = WriteEmailForm(None, user=request.user)
-	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter()}, context_instance=RequestContext(request))
+	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter(), 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
 
 class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -207,6 +214,8 @@ def writesms(request):
 		raise Http404
 	smserror = None
 	if request.method == 'POST':
+		typesel = request.POST['type']
+		schedsel = request.POST['scheduling']
 		smsform = WriteSMSForm(request.POST, user=request.user)
 		try:
 			if smsform.is_valid():
@@ -285,8 +294,13 @@ def writesms(request):
 		except SMSLengthException as e:
 			smserror = e.errmsg
 	else:
+		if request.user.is_superuser:
+			typesel = '2'
+		else:
+			typesel = '1'
+		schedsel = '0'
 		smsform = WriteSMSForm(None, user=request.user)
-	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter()}, context_instance=RequestContext(request))
+	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter(), 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
 
 @login_required
 def smsdone(request):
