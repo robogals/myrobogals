@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-10 18:49+1000\n"
+"POT-Creation-Date: 2011-07-11 01:04+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,7 +64,7 @@ msgid "Edit this chapter"
 msgstr ""
 
 #: chapter_detail.html:25 chapter_detail.html.py:30 chapter_edit.html:9
-#: includes/header.html:90
+#: exec_list.html:14 includes/header.html:90
 msgid "Manage members"
 msgstr ""
 
@@ -120,8 +120,8 @@ msgstr ""
 msgid "Edit chapter: %(chapter)s"
 msgstr ""
 
-#: chapter_edit.html:9 list_user_list.html:11 list_user_lists.html:8
-#: user_list.html:14
+#: chapter_edit.html:9 exec_list.html:14 list_user_list.html:11
+#: list_user_lists.html:8 user_list.html:14
 msgid "Return to chapter page"
 msgstr ""
 
@@ -251,7 +251,7 @@ msgstr ""
 msgid "Your email has been sent!"
 msgstr ""
 
-#: email_write.html:12 event_rsvp.html:13
+#: email_write.html:12 event_rsvp.html:13 visit_stats.html:12
 msgid "Please correct the following field(s)"
 msgstr ""
 
@@ -368,6 +368,35 @@ msgstr ""
 
 #: event_rsvp.html:20
 msgid "Leave a message:"
+msgstr ""
+
+#: exec_list.html:5 exec_list.html.py:7
+#, python-format
+msgid "Exec listing: %(chapter)s"
+msgstr ""
+
+#: exec_list.html:11 list_user_list.html:19 user_list.html:11
+msgid "Search:"
+msgstr ""
+
+#: exec_list.html:14 user_list.html:14
+msgid "Add/remove columns"
+msgstr ""
+
+#: exec_list.html:14 user_list.html:14
+msgid "Add new member"
+msgstr ""
+
+#: exec_list.html:14 user_list.html:14
+msgid "Manage user lists"
+msgstr ""
+
+#: exec_list.html:14 user_list.html:14
+msgid "Import CSV file"
+msgstr ""
+
+#: exec_list.html:18 list_user_list.html:24 user_list.html:18
+msgid "Username"
 msgstr ""
 
 #: files.html:4 files.html.py:6 includes/header.html:273
@@ -605,14 +634,6 @@ msgstr ""
 msgid "Notes:"
 msgstr ""
 
-#: list_user_list.html:19 user_list.html:11
-msgid "Search:"
-msgstr ""
-
-#: list_user_list.html:24 user_list.html:18
-msgid "Username"
-msgstr ""
-
 #: list_user_lists.html:11
 msgid "Select a list to view/edit:"
 msgstr ""
@@ -700,21 +721,19 @@ msgid ""
 msgstr ""
 
 #: password_change_form.html:19
-msgid "Old password"
+msgid "Old password:"
 msgstr ""
 
-#: password_change_form.html:28 password_reset_confirm.html:22
-#: profile_edit.html:40
-msgid "New password"
+#: password_change_form.html:28
+msgid "New password:"
 msgstr ""
 
-#: password_change_form.html:37 password_reset_confirm.html:31
-#: profile_edit.html:44
-msgid "Confirm new password"
+#: password_change_form.html:37
+msgid "Confirm password:"
 msgstr ""
 
-#: password_change_form.html:41 visit_edit.html:58
-msgid "Submit"
+#: password_change_form.html:41 password_reset_confirm.html:35
+msgid "Change my password"
 msgstr ""
 
 #: password_reset_complete.html:4 password_reset_complete.html.py:6
@@ -732,8 +751,12 @@ msgstr ""
 msgid "Please create a new password:"
 msgstr ""
 
-#: password_reset_confirm.html:35
-msgid "Change my password"
+#: password_reset_confirm.html:22 profile_edit.html:40
+msgid "New password"
+msgstr ""
+
+#: password_reset_confirm.html:31 profile_edit.html:44
+msgid "Confirm new password"
 msgstr ""
 
 #: password_reset_confirm.html:40
@@ -920,7 +943,7 @@ msgid " school"
 msgstr ""
 
 #: school_edit.html:8 schools_list.html:8 visit_edit.html:8 visit_list.html:8
-#: visit_view.html:8
+#: visit_stats.html:8 visit_view.html:8
 msgid "Return to teaching home"
 msgstr ""
 
@@ -956,7 +979,7 @@ msgstr ""
 msgid "View/Edit"
 msgstr ""
 
-#: schools_list.html:24 visit_view.html:149
+#: schools_list.html:24 visit_view.html:209
 msgid "Delete"
 msgstr ""
 
@@ -1094,19 +1117,7 @@ msgid "Member listing: %(chapter)s"
 msgstr ""
 
 #: user_list.html:14
-msgid "Add/remove columns"
-msgstr ""
-
-#: user_list.html:14
-msgid "Add new member"
-msgstr ""
-
-#: user_list.html:14
-msgid "Manage user lists"
-msgstr ""
-
-#: user_list.html:14
-msgid "Import CSV file"
+msgid "Show exec committee members"
 msgstr ""
 
 #: visit_cancel.html:5
@@ -1132,12 +1143,16 @@ msgstr ""
 msgid "school visit"
 msgstr ""
 
-#: visit_edit.html:8 visit_view.html:8
+#: visit_edit.html:8 visit_stats.html:8 visit_view.html:8
 msgid "Return to visit list"
 msgstr ""
 
-#: visit_edit.html:8
+#: visit_edit.html:8 visit_stats.html:8
 msgid "Return to visit"
+msgstr ""
+
+#: visit_edit.html:58
+msgid "Submit"
 msgstr ""
 
 #: visit_email.html:4 visit_email.html.py:6
@@ -1213,6 +1228,10 @@ msgstr ""
 msgid "View"
 msgstr ""
 
+#: visit_stats.html:3 visit_stats.html.py:5
+msgid "Enter School Visit Stats"
+msgstr ""
+
 #: visit_view.html:9
 msgid "Edit visit"
 msgstr ""
@@ -1226,7 +1245,7 @@ msgid "Email Invitees"
 msgstr ""
 
 #: visit_view.html:10
-msgid "Close visit"
+msgid "Close and enter stats visit"
 msgstr ""
 
 #: visit_view.html:10
@@ -1323,15 +1342,15 @@ msgstr ""
 msgid "Awaiting Reply"
 msgstr ""
 
-#: visit_view.html:133
+#: visit_view.html:134
 msgid "Attended"
 msgstr ""
 
-#: visit_view.html:149
+#: visit_view.html:209
 msgid "said:"
 msgstr ""
 
-#: visit_view.html:149
+#: visit_view.html:209
 msgid "Message sent at"
 msgstr ""
 
