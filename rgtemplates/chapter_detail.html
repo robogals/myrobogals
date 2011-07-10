@@ -47,6 +47,22 @@
 {% endautoescape %}
 <br />
 {% endif %}
+
+{% if recipients %}
+<strong>{% trans "Awards:" %}</strong><br />
+{% autoescape off %}
+{% for recipient in recipients %}
+{% ifequal recipient.award.award_type 0 %}
+<img src="{{MEDIA_URL}}/images/trophy-g.jpg" width=26 height=34 align=absmiddle>
+{% else %}
+<img src="{{MEDIA_URL}}/images/trophy-s.jpg" width=26 height=34 align=absmiddle>
+{% endifequal %}
+{{recipient.award.award_name}}{% trans " (" %}{{recipient.get_region_display}}{% trans ") " %}{{recipient.year}}<br />
+<br />
+{% endfor %}
+{% endautoescape %}
+{% endif %}
+
 {% if not request.user.id and chapter.is_joinable %}<a href="/join/{{chapter.myrobogals_url}}/">{% blocktrans %}Join {{chapter}}{% endblocktrans %}</a><br />{% endif %}
 {% if chapter.website_url %}<a href="{{chapter.website_url}}">{% blocktrans %}Visit {{chapter}}'s website{% endblocktrans %}</a><br />{% endif %}
 {% if chapter.facebook_url %}<a href="{{chapter.facebook_url}}">{% blocktrans %}Visit {{chapter}} on Facebook{% endblocktrans %}</a>{% endif %}

@@ -2,13 +2,15 @@ from myrobogals.rgprofile.models import Position
 from myrobogals.auth.models import Group, User
 from myrobogals.rgprofile.usermodels import Country
 from django.template import RequestContext, Context, loader
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from myrobogals.auth.decorators import login_required
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.admin.widgets import FilteredSelectMultiple
-from myrobogals.rgchapter.models import DisplayColumn
+from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
+from myrobogals.rgchapter.models import REGION_CHOICES
+from django.db import connection
 
 def list(request):
 	listing = []
@@ -71,11 +73,30 @@ def localtimes(request):
 def detail(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')
-	return render_to_response('chapter_detail.html', {'chapter': c, 'officers': officers}, context_instance=RequestContext(request))
+	recipients = AwardRecipient.objects.filter(chapter=c)
+	return render_to_response('chapter_detail.html', {'chapter': c, 'officers': officers, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
 def redirtomy(request):
 	return HttpResponseRedirect("/chapters/" + request.user.chapter().myrobogals_url + "/")
+
+
+def awards(request):
+	# awards = AwardRecipient.objects.all()
+	
+	cursor = connection.cursor()
+
+	cursor.execute("SELECT DISTINCT YEAR FROM rgchapter_awardrecipient")
+	#year_list = cursor.fetchone()
+	award_dic = {}
+	for row in cursor:
+		award_dic[row[0]] = {}
+		for i in range(len(REGION_CHOICES)):
+			award_dic[row[0]][REGION_CHOICES[i][1]]= AwardRecipient.objects.filter(year=int(row[0])).filter(region=i)
+
+	award_dic_s = sorted(award_dic.items(), reverse=True)
+	
+	return render_to_response('chapter_award.html', {'award_dic': award_dic_s}, context_instance=RequestContext(request))
 
 # forms for editing a chapter
 class FormPartOne(forms.Form):

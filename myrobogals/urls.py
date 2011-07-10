@@ -23,6 +23,9 @@ urlpatterns = patterns('',
 	(r'^profile/(?P<username>.+)/genpw/$', 'rgprofile.views.genpw'),
 	(r'^profile/(?P<username>.+)/$', 'rgprofile.views.detail'),
 	(r'^chapters/$', 'rgchapter.views.list'),
+	
+	(r'^chapters/awards/$', 'rgchapter.views.awards'),
+	
 	(r'^chapters/my/$', 'rgchapter.views.redirtomy'),
 	(r'^chapters/localtimes/$', 'rgchapter.views.localtimes'),
 	(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/edit/$', 'rgprofile.views.edituserlist'),

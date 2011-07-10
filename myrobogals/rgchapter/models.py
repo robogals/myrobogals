@@ -25,3 +25,40 @@ class ShirtSize(models.Model):
 	class Meta:
 		ordering = ('chapter', 'order', 'size_long')
 		verbose_name = "T-shirt size"
+
+class Award(models.Model):
+	AWARD_TYPE_CHOICES = (
+		(0, 'Major'),
+		(1, 'Minor')
+	)
+	
+	award_name = models.CharField(max_length=64)
+	award_type = models.IntegerField(choices=AWARD_TYPE_CHOICES, default=0)
+	award_description = models.CharField(max_length= 128)
+	
+	def __unicode__(self):
+		return self.award_name
+		
+	class Meta:
+		ordering = ('award_type', 'award_name')
+		verbose_name = "Award"
+		
+REGION_CHOICES = (
+	(0, 'Australia & New Zealand'),
+	(1, 'UK & Europe')
+)
+
+class AwardRecipient(models.Model):
+
+	award = models.ForeignKey(Award)
+	chapter = models.ForeignKey('auth.Group')
+	year = models.IntegerField(default=2000)
+	region = models.IntegerField(choices=REGION_CHOICES, default=0)
+	description = models.CharField(max_length=128)
+	
+	def __unicode__(self):
+		return self.award.award_name
+		
+	class Meta:
+		ordering = ('-year', 'award', 'region', 'chapter')
+		verbose_name = "Award recipient"
