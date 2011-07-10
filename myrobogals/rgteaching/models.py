@@ -57,6 +57,7 @@ class SchoolVisit(Event):
 	class Meta:
 		ordering = ['-visit_start']
 
+	
 class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
@@ -92,3 +93,30 @@ class EventAttendee(models.Model):
     
     def __unicode__(self):
     	return self.user.get_full_name()
+
+class SchoolVisitStats(models.Model):
+
+	VISIT_TYPES = ( 
+		(0, 'Robogals robotics teaching'),
+		(1, 'Robogals career visit'),
+		(2, 'Robogals event'),
+		(3, 'Non-Robogals robotics teaching'),
+		(4, 'Non-Robogals career visit'),
+		(5, 'Non-Robogals event'),
+		(6, 'Other (specify in notes below)'),
+	)
+	visit = models.ForeignKey(SchoolVisit, editable=False)
+	visit_type = models.IntegerField(choices=VISIT_TYPES, null=False)
+	primary_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	primary_girls_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	primary_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	primary_boys_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	high_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	high_girls_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	high_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	high_boys_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	other_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	other_girls_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	other_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
+	other_boys_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
+	notes = models.TextField("General Notes", blank=True)

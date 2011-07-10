@@ -3,9 +3,11 @@ from django.template import RequestContext
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.template import Context, loader
+from django.db import connection
+connection.queries
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage
+from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 #from myrobogals.auth.models import Group
@@ -59,7 +61,7 @@ class SchoolVisitFormThree(forms.Form):
 	tobring = forms.CharField(label=_("To bring"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	otherprep = forms.CharField(label=_("Other preparation"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	notes = forms.CharField(label=_("Other notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
-
+		
 @login_required
 def editvisit(request, visit_id):
 	chapter = request.user.chapter()
@@ -160,12 +162,16 @@ def viewvisit(request, visit_id):
 	user_attended = False
 	eventmessages = EventMessage.objects.filter(event=v)
 	try:
+		stats = SchoolVisitStats.objects.get(visit=v)
+	except:
+		stats = None
+	try:
 		ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
 		user_rsvp_status = ea.rsvp_status
 		user_attended = (ea.actual_status == 1)
 	except IndexError:
 		user_rsvp_status = 0
-	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
+	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
 @login_required
 def listvisits(request):
@@ -619,3 +625,161 @@ def deletemessage(request, visit_id, message_id):
 	else:
 		raise Http404
 	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')
+
+class StatsModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+    	return obj.last_name + ", " + obj.first_name
+	
+class SchoolVisitStatsForm(forms.Form):
+	VISIT_TYPES = (
+		(-1, ''),
+		(0, 'Robogals robotics teaching'),
+		(1, 'Robogals career visit'),
+		(2, 'Robogals event'),
+		(3, 'Non-Robogals robotics teaching'),
+		(4, 'Non-Robogals career visit'),
+		(5, 'Non-Robogals event'),
+		(6, 'Other (specify in notes below)'),
+	)
+	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=False)
+	primary_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	primary_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	primary_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	primary_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	high_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	high_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	high_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	high_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	other_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	other_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	other_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	other_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
+	attended = StatsModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Invitees"), False, attrs={'rows': 8}), required=False)
+	notes = forms.CharField(label=_("General Notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	
+	def clean(self):
+		cleaned_data = self.cleaned_data
+		print cleaned_data['visit_type']
+		if cleaned_data['visit_type'] == '-1':
+			print "here"
+			raise forms.ValidationError('You must select a type of visit')
+		return cleaned_data
+	
+	def __init__(self, *args, **kwargs):
+		visit=kwargs['visit']
+		del kwargs['visit']
+		super(SchoolVisitStatsForm, self).__init__(*args, **kwargs)
+		attending = EventAttendee.objects.filter(rsvp_status=2, event__id=visit.id).values_list('user_id')
+		self.fields['attended'].queryset = User.objects.filter(is_active=True,groups=visit.school.chapter).order_by('last_name')
+		self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in = attending)]
+		self.fields['visit_type'].initial = ''
+		self.fields['primary_girls_first'].initial = visit.numstudents
+
+def stats(request, visit_id):
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if request.method == 'POST':
+		form = SchoolVisitStatsForm(request.POST, visit = v)
+		if form.is_valid():
+			data = form.cleaned_data
+			stats = SchoolVisitStats()
+			stats.visit = v
+			stats.visit_type = data['visit_type']
+			stats.primary_girls_first = data['primary_girls_first']
+			stats.primary_girls_repeat = data['primary_girls_repeat']
+			stats.primary_boys_first = data['primary_boys_first']
+			stats.primary_boys_repeat = data['primary_boys_repeat']
+			stats.high_girls_first = data['high_girls_first']
+			stats.high_girls_repeat = data['high_girls_repeat']
+			stats.high_boys_first = data['high_boys_first']
+			stats.high_boys_repeat = data['high_boys_repeat']
+			stats.other_girls_first = data['other_girls_first']
+			stats.other_girls_repeat = data['other_girls_repeat']
+			stats.other_boys_first = data['other_boys_first']
+			stats.other_boys_repeat = data['other_boys_repeat']
+			stats.notes = data['notes']
+			stats.save()
+			for attendee in data['attended']:
+				list = EventAttendee.objects.filter(event__id=v.id).values_list('user_id', flat=True)
+				if attendee.id not in list:
+					newinvite = EventAttendee()
+					newinvite.event = v
+					newinvite.user = attendee
+					newinvite.actual_status = 1
+					newinvite.rsvp_status = 0
+					newinvite.save()
+			
+			for person in EventAttendee.objects.filter(event__id=v.id):
+				if person.user in data['attended']:
+					person.actual_status = 1
+					person.save()
+				else:
+					person.actual_status = 2
+					person.save()
+						
+			v.status = 1
+			v.save()
+			request.user.message_set.create(message=unicode(_("Stats saved successfully, visit closed.")))
+			return HttpResponseRedirect('/teaching/')
+	else:
+		form = SchoolVisitStatsForm(None, visit = v)
+	return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+	
+class ReportSelectorForm(forms.Form):
+	start_date = forms.DateField(label='Report start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
+	end_date = forms.DateField(label='Report end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
+	start_time = forms.TimeField(label='Report start time', initial='00:00:00')
+	end_time = forms.TimeField(label='Report end time', initial='23:59:59')
+
+def xint(n):
+	if n is None:
+		return 0
+	return int(n)
+@login_required
+def report_standard(request):
+	if request.method == 'POST':
+		theform = ReportSelectorForm(request.POST)
+		if theform.is_valid():
+			formdata = theform.cleaned_data
+			event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=request.user.chapter()).values_list('id',flat=True)
+			stats_list = SchoolVisitStats.objects.filter(visit__id__in = event_id_list)
+			event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list)
+			visited_schools = []
+			totals = {}
+			totals['schools_count'] = 0
+			for visit in event_list:
+				if visit.school not in visited_schools:
+					visited_schools.append(visit.school)
+					totals['schools_count'] += 1
+			totals['pgf'] = 0
+			totals['pgr'] = 0
+			totals['pbf'] = 0
+			totals['pbr'] = 0
+			totals['hgf'] = 0
+			totals['hgr'] = 0
+			totals['hbf'] = 0
+			totals['hbr'] = 0
+			totals['ogf'] = 0
+			totals['ogr'] = 0
+			totals['obf'] = 0
+			totals['obr'] = 0
+			totals['events'] = 0
+			for event in stats_list:
+				totals['pgf'] += xint(event.primary_girls_first)
+				totals['pgr'] += xint(event.primary_girls_repeat)
+				totals['pbf'] += xint(event.primary_boys_first)
+				totals['pbr'] += xint(event.primary_boys_repeat)
+				totals['hgf'] += xint(event.high_girls_first)
+				totals['hgr'] += xint(event.high_girls_repeat)
+				totals['hbf'] += xint(event.high_boys_first)
+				totals['hbr'] += xint(event.high_boys_repeat)
+				totals['ogf'] += xint(event.other_girls_first)
+				totals['ogr'] += xint(event.other_girls_repeat)
+				totals['obf'] += xint(event.other_boys_first)
+				totals['obr'] += xint(event.other_boys_repeat)
+				totals['events'] += 1
+		else:
+			totals = {}
+	else:
+		theform = ReportSelectorForm()
+		totals = {}
+	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals},context_instance=RequestContext(request))

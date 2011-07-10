@@ -6,8 +6,8 @@
 
 {% block content %}
 <p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a>
-{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}  | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit visit" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite/add to visit" %}</a><br><a href="/teaching/{{v.pk}}/email/">{% trans "Email Invitees" %}</a>
-{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/close/">{% trans "Close visit" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel visit" %}</a>{% endifequal %}
+{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %} {% ifequal v.status 0 %}  | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit visit" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite/add to visit" %}</a><br><a href="/teaching/{{v.pk}}/email/">{% trans "Email Invitees" %}</a>
+| <a href="/teaching/{{v.pk}}/stats/">{% trans "Close and enter stats visit" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel visit" %}</a>{% endifequal %}
 {% endifequal %}{% endif %}
 </p>
 {% ifequal v.status 0 %}
@@ -125,10 +125,11 @@
     | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">{% trans "change RSVP to not attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
     {% endifequal %}{% endif %}
     </td>
-  </tr>
+  </tr></table>
   {% endfor %}
 {% else %}
 {% ifequal v.status 1 %}
+<table>
   <tr>
     <td colspan="2"><strong>&nbsp;<br />{% trans "Attended" %}</strong></td>
   </tr>
@@ -136,11 +137,70 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td colspan="2"><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
   </tr>
+
   {% endfor %}
 {% endifequal %}
 {% endifequal %}
+{% ifequal v.status 0%}
   <tr></tr>
 </table>
+{% else %}
+ {% if stats %}
+ <tr></tr>
+ </table>
+ <h2> Visit Stats</h2>
+ <p><strong>Visit type:</strong></label> {{ stats.get_visit_type_display }}</p>
+	<p><strong>Students taught:</strong>
+    <table width="400px" style="table-layout:fixed;  text-align:center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="150px" />
+		<col width="150px" />
+		<tr class="odd">
+			<td></td>
+			<td>Girls</td>
+			<td>Boys</td>
+		</tr>
+	</table>
+	<table width="400px" style="table-layout:fixed; text-align: center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="75px" />
+		<col width="75px" />
+		<col width="75px" />
+		<col width="75px" />
+		<tr class="even" style="">
+			<td></td>
+			<td>First</td>
+			<td>Repeat</td>
+			<td>First</td>
+			<td>Repeat</td>
+		</tr>
+		<tr class="odd">
+			<td>Primary School</td>
+			<td>{{ stats.primary_girls_first }}</td>
+			<td>{{ stats.primary_girls_repeat }}</td>
+			<td>{{ stats.primary_boys_first }}</td>
+			<td>{{ stats.primary_boys_repeat }}</td>
+		</tr>
+		<tr class="even">
+			<td>High School</td>
+			<td>{{ stats.high_girls_first }}</td>
+			<td>{{ stats.high_girls_repeat }}</td>
+			<td>{{ stats.high_boys_first }}</td>
+			<td>{{ stats.high_boys_repeat }}</td>
+		</tr>
+		<tr class="odd">
+			<td>Other</td>
+			<td>{{ stats.other_girls_first }}</td>
+			<td>{{ stats.other_girls_repeat }}</td>
+			<td>{{ stats.other_boys_first }}</td>
+			<td>{{ stats.other_boys_repeat }}</td>
+		</tr>
+	</table></p>
+	{% if stats.notes %}
+	<p><strong>General Notes:</strong> <br />{{ stats.notes }}</p>
+	{% endif %}
+	{% endif %}
+{% endifequal %}
 {% if request.user.is_staff %}
 {% if eventmessages %}
 <h4><strong>RSVP Messages: </strong></h4>
