@@ -162,6 +162,21 @@ def editusers(request, chapterurl):
 		raise Http404
 
 @login_required
+def editexecs(request, chapterurl):
+	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter())):
+		users = User.objects.filter(groups=c).filter(is_staff = True)
+		search = ''
+		if 'search' in request.GET:
+			search = request.GET['search']
+			users = users.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search))
+		users = users.order_by('last_name', 'first_name')
+		display_columns = c.display_columns.all()
+		return render_to_response('exec_list.html', {'users': users, 'search': search, 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+	else:
+		raise Http404
+	
+@login_required
 def adduser(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	return edituser(request, '', chapter)
