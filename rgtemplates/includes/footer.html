@@ -36,6 +36,20 @@
                                     <a href="http://www.rockettheme.com/" title="RocketTheme Joomla Templates Club" id="rocket"></a>
 -->
             <div id="copyright">
+<form action="/i18n/setlang/" method="post">
+<input name="next" type="hidden" value="{{request.path}}" />
+<select name="language">
+{% for lang in LANGUAGES %}
+{% ifequal lang.0 request.LANGUAGE_CODE %}
+<option value="{{ lang.0 }}" selected="selected">{{ lang.1 }}</option>
+{% else %}
+<option value="{{ lang.0 }}">{{ lang.1 }}</option>
+{% endifequal %}
+{% endfor %}
+</select>
+<input type="submit" value="Go" />
+</form>
+
                 myRobogals v1.0 &copy; 2010-2011 Robogals Global<br>
                                     <span style="font-size: 8pt"><a href="/credits/" class="top-button-desc">{% trans "Credits" %}</a> | <a href="/support/" class="top-button-desc">{% trans "Support" %}</a> | <a href="http://www.robogals.org/" class="top-button-desc">{% trans "Go to robogals.org" %}</a></span></div>
                         </div>

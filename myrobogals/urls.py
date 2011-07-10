@@ -79,5 +79,6 @@ urlpatterns = patterns('',
 	(r'^topsecretarea/', include(admin.site.urls)),
 	(r'^reports/$', 'rgteaching.views.report_standard'),
 	(r'^tinymce/', include('tinymce.urls')),
+	(r'^i18n/', include('django.conf.urls.i18n')),
 	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
