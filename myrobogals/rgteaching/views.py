@@ -674,9 +674,11 @@ class SchoolVisitStatsForm(forms.Form):
 		self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in = attending)]
 		self.fields['visit_type'].initial = ''
 		self.fields['primary_girls_first'].initial = visit.numstudents
-
+@login_required
 def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if v.school.chapter != request.user.chapter():
+		raise Http404
 	if request.method == 'POST':
 		form = SchoolVisitStatsForm(request.POST, visit = v)
 		if form.is_valid():
