@@ -376,7 +376,7 @@ class CancelForm(forms.Form):
 		del kwargs['visit']
 		super(CancelForm, self).__init__(*args, **kwargs)
 		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
-		self.fields['body'].initial = _("The visit to %s at %s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start))
+		self.fields['body'].initial = _("The visit to %(location)s at %(starttime)s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start))
 		
 @login_required
 def cancelvisit(request, visit_id):

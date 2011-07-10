@@ -52,9 +52,9 @@ def HideEmail(email, name=None):
 	mailto_link = u'<a href="mai\'+\'lto:%s">%s</a>' % (encode_string(email), encode_string(name))
 
 	return u"\n<noscript>(Javascript must be enabled to see this e-mail address)</noscript>\n" \
-	       +'<script type="text/javascript">// <![CDATA['+"\n \
-	       \tdocument.write('%s')\n \
-	       \t// ]]></script>\n" % (mailto_link)
+	       +'<script type="text/javascript">// <![CDATA['+"\n \n"
+	       +"\tdocument.write('%s')\n \n"
+	       +"\t// ]]></script>\n" % (mailto_link)
 
 
 class HideEmailNode(template.Node):

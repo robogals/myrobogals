@@ -134,8 +134,8 @@ class FormPartFour(forms.Form):
 		del kwargs['chapter']
 		super(FormPartFour, self).__init__(*args, **kwargs)
 		#self.fields['list'].queryset = UserList.objects.filter(chapter=chapter)
-		self.fields['welcomepage'].help_text = _("This is shown when new users have just signed up.<br>Full HTML is allowed. After saving, you can preview this page at:<br><a href=\"https://my.robogals.org/welcome/%s/\" target=\"blank\">https://my.robogals.org/welcome/%s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
-		self.fields['joinpage'].help_text = _("This is shown if people try to join, but your chapter doesn't allow<br>new members to sign up to myRobogals directly. In this case, put a<br>message here about how they <em>should</em> sign up. Full HTML is allowed.<br>After saving, and if the above checkbox is unchecked, you can preview this page at:<br><a href=\"https://my.robogals.org/join/%s/\" target=\"blank\">https://my.robogals.org/join/%s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
+		self.fields['welcomepage'].help_text = _("This is shown when new users have just signed up.<br>Full HTML is allowed. After saving, you can preview this page at:<br><a href=\"https://my.robogals.org/welcome/%(chapter)s/\" target=\"blank\">https://my.robogals.org/welcome/%(chapteru)s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
+		self.fields['joinpage'].help_text = _("This is shown if people try to join, but your chapter doesn't allow<br>new members to sign up to myRobogals directly. In this case, put a<br>message here about how they <em>should</em> sign up. Full HTML is allowed.<br>After saving, and if the above checkbox is unchecked, you can preview this page at:<br><a href=\"https://my.robogals.org/join/%(chapter)s/\" target=\"blank\">https://my.robogals.org/join/%(chapteru)s/</a>") % (chapter.myrobogals_url, chapter.myrobogals_url)
 
 class WelcomeEmailMsgField(forms.CharField):
 	def clean(self, value):
