@@ -100,11 +100,24 @@
                         <span>{% trans "Current local times" %}</span>
                     <a>
                 </li>
-				 <li class="item147">
+				<li class="item147">
                     <a class="orphan item bullet" href="/chapters/awards/">
                         <span>{% trans "View chapters' awards" %}</span>
                     <a>
                 </li>
+	{% if request.user.is_superuser %}
+				<li class="item147">
+                    <a class="orphan item bullet" href="/globalreports/">
+                        <span>{% trans "Reporting" %}</span>
+                    <a>
+                </li>
+	{% else %}
+				<li class="item147">
+                    <a class="orphan item bullet" href="/reports/">
+                        <span>{% trans "Reporting" %}</span>
+                    <a>
+                </li>
+	{% endif %}
             </ul>
             </div>
 {% endif %}

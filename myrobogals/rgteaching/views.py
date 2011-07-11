@@ -14,7 +14,7 @@ from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 import datetime
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from myrobogals.auth.decorators import login_required
-from myrobogals.auth.models import User
+from myrobogals.auth.models import User, Group
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 from time import time
@@ -659,9 +659,7 @@ class SchoolVisitStatsForm(forms.Form):
 	
 	def clean(self):
 		cleaned_data = self.cleaned_data
-		print cleaned_data['visit_type']
 		if cleaned_data['visit_type'] == '-1':
-			print "here"
 			raise forms.ValidationError('You must select a type of visit')
 		return cleaned_data
 	
@@ -765,7 +763,6 @@ def report_standard(request):
 			totals['obr'] = 0
 			event_list = set(event_list)
 			for school_id in event_list:
-				print "Twice: %s" %school_id
 				school = School.objects.get(id = school_id)
 				if school.name in visited_schools:
 					visited_schools[school.name]['visits'] += 1
@@ -788,10 +785,8 @@ def report_standard(request):
 				visited_schools[school.name]['obf'] = 0
 				visited_schools[school.name]['obr'] = 0
 				this_schools_visits = SchoolVisitStats.objects.filter(visit__school = school)
-				print len(this_schools_visits)
 				for each_visit in this_schools_visits:
 					#Totals for this school 
-					print "In this loop"
 					visited_schools[school.name]['pgf'] += xint(each_visit.primary_girls_first)
 					visited_schools[school.name]['pgr'] += xint(each_visit.primary_girls_repeat)
 					visited_schools[school.name]['pbf'] += xint(each_visit.primary_boys_first)
@@ -843,3 +838,81 @@ def report_standard(request):
 		visited_schools = {}
 		attendance = {}
 	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals, 'schools': sorted(visited_schools.iteritems()), 'attendance': sorted(attendance.iteritems())},context_instance=RequestContext(request))
+
+@login_required
+def report_global(request):
+	if  not request.user.is_superuser:
+		raise Http404
+	if request.method == 'POST':
+		theform = ReportSelectorForm(request.POST)
+		if theform.is_valid():
+			formdata = theform.cleaned_data
+			chapter_totals = {}
+			region_totals = {}
+			global_totals = {}
+			region_totals['UK & Europe'] = {}
+			region_totals['Australia & New Zealand'] = {}
+			region_totals['USA'] = {}
+			chapters = Group.objects.all()
+			for chapter in chapters:
+				chapter_totals[chapter.short] = {}
+				chapter_totals[chapter.short]['workshops'] = 0
+				chapter_totals[chapter.short]['schools'] = 0
+				chapter_totals[chapter.short]['first'] = 0
+				chapter_totals[chapter.short]['repeat'] = 0
+				chapter_totals[chapter.short]['girl_workshops'] = 0
+				chapter_totals[chapter.short]['weighted'] = 0
+				event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=chapter).values_list('id',flat=True)
+				event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
+				visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
+				event_list = set(event_list)
+				for school_id in event_list:
+					if SchoolVisitStats.objects.filter(visit__school__id = school_id, visit_type = 0):
+						chapter_totals[chapter.short]['schools'] += 1
+					this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id, visit_type = 0)
+					for each_visit in this_schools_visits: 
+						chapter_totals[chapter.short]['first'] += xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
+						chapter_totals[chapter.short]['repeat'] += xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)	
+						chapter_totals[chapter.short]['workshops'] += 1	
+				chapter_totals[chapter.short]['girl_workshops'] += chapter_totals[chapter.short]['first'] + chapter_totals[chapter.short]['repeat']
+				chapter_totals[chapter.short]['weighted'] = chapter_totals[chapter.short]['first'] + (float(chapter_totals[chapter.short]['repeat'])/2)
+				#Regional and Global Totals
+				if chapter.parent_id == 2:
+					for key, value in chapter_totals[chapter.short].iteritems():
+						if  key in region_totals['Australia & New Zealand']:
+							region_totals['Australia & New Zealand'][key] += value
+						else:
+							region_totals['Australia & New Zealand'][key] = value
+				elif chapter.parent_id == 8:
+					for key, value in chapter_totals[chapter.short].iteritems():
+						if key in region_totals['UK & Europe']:
+							region_totals['UK & Europe'][key] += value
+						else:
+							region_totals['UK & Europe'][key] = value
+				elif chapter.parent_id == 22:
+					for key, value in chapter_totals[chapter.short].iteritems():
+						if key in region_totals['USA']:
+							region_totals['USA'][key] += value
+						else:
+							region_totals['USA'][key] = value
+				elif chapter.parent_id == 1:
+					for key, value in chapter_totals[chapter.short].iteritems():
+						if key in global_totals:
+							global_totals[key] += value
+						else:
+							global_totals[key] = value
+			del chapter_totals['Global']
+			del chapter_totals['Australia & New Zealand']
+			del chapter_totals['UK & Europe']
+			del chapter_totals['USA']
+		else:
+			totals = {}
+			chapter_totals = {}
+			region_totals = {}
+			global_totals = {}
+	else:
+		theform = ReportSelectorForm()
+		chapter_totals = {}
+		region_totals = {}
+		global_totals = {}
+	return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals},context_instance=RequestContext(request))
