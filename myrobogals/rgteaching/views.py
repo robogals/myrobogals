@@ -677,6 +677,8 @@ def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	if v.school.chapter != request.user.chapter():
 		raise Http404
+	if not request.user.is_staff:
+		raise Http404
 	if request.method == 'POST':
 		form = SchoolVisitStatsForm(request.POST, visit = v)
 		if form.is_valid():

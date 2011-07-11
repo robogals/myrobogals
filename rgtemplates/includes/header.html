@@ -112,11 +112,13 @@
                     <a>
                 </li>
 	{% else %}
+		{% if request.user.is_staff %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/reports/">
                         <span>{% trans "Reporting" %}</span>
                     <a>
                 </li>
+		{% endif %}
 	{% endif %}
             </ul>
             </div>
