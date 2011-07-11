@@ -827,7 +827,7 @@ def report_standard(request):
 				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
 				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr'] 
 			#Attendance reporting
-			user_list = User.objects.filter(is_active=True,groups=request.user.chapter())
+			user_list = User.objects.filter(is_active=True,groups=request.user.chapter()).order_by('last_name')
 			for volunteer in user_list:
 				attendance[volunteer.last_name + ", " + volunteer.first_name] = 0
 				for attended in EventAttendee.objects.filter(actual_status = 1, event__id__in = visit_ids, user__id = volunteer.id):
@@ -842,4 +842,4 @@ def report_standard(request):
 		totals = {}
 		visited_schools = {}
 		attendance = {}
-	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals, 'schools': visited_schools, 'attendance': attendance},context_instance=RequestContext(request))
+	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals, 'schools': sorted(visited_schools.iteritems()), 'attendance': sorted(attendance.iteritems())},context_instance=RequestContext(request))

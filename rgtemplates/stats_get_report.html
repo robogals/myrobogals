@@ -51,7 +51,7 @@
 			<td>First</td>
 			<td>Repeat</td>
 		</tr>
-		{% for key, school in schools.items %}
+		{% for key, school in schools%}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 			<td>{{ school.name }}</td>
 			<td>{{ school.visits }} </td>
@@ -124,7 +124,7 @@
 		<td> Name</td>
 		<td> Visits Attended </td>
 	</tr>
-	{% for key,value in attendance.items %}
+	{% for key,value in attendance %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td> {{ key }} </td>
 		<td style="text-align: center;"> {{ value }} </td>
