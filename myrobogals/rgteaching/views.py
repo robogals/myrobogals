@@ -729,13 +729,13 @@ def stats(request, visit_id):
 class ReportSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Report start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
 	end_date = forms.DateField(label='Report end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
-	start_time = forms.TimeField(label='Report start time', initial='00:00:00')
-	end_time = forms.TimeField(label='Report end time', initial='23:59:59')
+
 
 def xint(n):
 	if n is None:
 		return 0
 	return int(n)
+
 @login_required
 def report_standard(request):
 	if request.method == 'POST':
@@ -744,14 +744,13 @@ def report_standard(request):
 			formdata = theform.cleaned_data
 			event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=request.user.chapter()).values_list('id',flat=True)
 			stats_list = SchoolVisitStats.objects.filter(visit__id__in = event_id_list)
-			event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list)
-			visited_schools = []
+			event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
+			visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
+			visited_schools = {}
 			totals = {}
+			attendance = {}
 			totals['schools_count'] = 0
-			for visit in event_list:
-				if visit.school not in visited_schools:
-					visited_schools.append(visit.school)
-					totals['schools_count'] += 1
+			totals['visits'] = 0
 			totals['pgf'] = 0
 			totals['pgr'] = 0
 			totals['pbf'] = 0
@@ -764,24 +763,83 @@ def report_standard(request):
 			totals['ogr'] = 0
 			totals['obf'] = 0
 			totals['obr'] = 0
-			totals['events'] = 0
-			for event in stats_list:
-				totals['pgf'] += xint(event.primary_girls_first)
-				totals['pgr'] += xint(event.primary_girls_repeat)
-				totals['pbf'] += xint(event.primary_boys_first)
-				totals['pbr'] += xint(event.primary_boys_repeat)
-				totals['hgf'] += xint(event.high_girls_first)
-				totals['hgr'] += xint(event.high_girls_repeat)
-				totals['hbf'] += xint(event.high_boys_first)
-				totals['hbr'] += xint(event.high_boys_repeat)
-				totals['ogf'] += xint(event.other_girls_first)
-				totals['ogr'] += xint(event.other_girls_repeat)
-				totals['obf'] += xint(event.other_boys_first)
-				totals['obr'] += xint(event.other_boys_repeat)
-				totals['events'] += 1
+			event_list = set(event_list)
+			for school_id in event_list:
+				print "Twice: %s" %school_id
+				school = School.objects.get(id = school_id)
+				if school.name in visited_schools:
+					visited_schools[school.name]['visits'] += 1
+				else:
+					visited_schools[school.name] = {}
+					visited_schools[school.name]['name'] = school.name
+					visited_schools[school.name]['visits'] = 1
+					if SchoolVisitStats.objects.filter(visit__school = school):
+						totals['schools_count'] += 1
+				visited_schools[school.name]['pgf'] = 0
+				visited_schools[school.name]['pgr'] = 0
+				visited_schools[school.name]['pbf'] = 0
+				visited_schools[school.name]['pbr'] = 0
+				visited_schools[school.name]['hgf'] = 0
+				visited_schools[school.name]['hgr'] = 0
+				visited_schools[school.name]['hbf'] = 0
+				visited_schools[school.name]['hbr'] = 0
+				visited_schools[school.name]['ogf'] = 0
+				visited_schools[school.name]['ogr'] = 0
+				visited_schools[school.name]['obf'] = 0
+				visited_schools[school.name]['obr'] = 0
+				this_schools_visits = SchoolVisitStats.objects.filter(visit__school = school)
+				print len(this_schools_visits)
+				for each_visit in this_schools_visits:
+					#Totals for this school 
+					print "In this loop"
+					visited_schools[school.name]['pgf'] += xint(each_visit.primary_girls_first)
+					visited_schools[school.name]['pgr'] += xint(each_visit.primary_girls_repeat)
+					visited_schools[school.name]['pbf'] += xint(each_visit.primary_boys_first)
+					visited_schools[school.name]['pbr'] += xint(each_visit.primary_boys_repeat)
+					visited_schools[school.name]['hgf'] += xint(each_visit.high_girls_first)
+					visited_schools[school.name]['hgr'] += xint(each_visit.high_girls_repeat)
+					visited_schools[school.name]['hbf'] += xint(each_visit.high_boys_first)
+					visited_schools[school.name]['hbr'] += xint(each_visit.high_boys_repeat)
+					visited_schools[school.name]['ogf'] += xint(each_visit.other_girls_first)
+					visited_schools[school.name]['ogr'] += xint(each_visit.other_girls_repeat)
+					visited_schools[school.name]['obf'] += xint(each_visit.other_boys_first)
+					visited_schools[school.name]['obr'] += xint(each_visit.other_boys_repeat)	
+					#Overall totals
+					totals['pgf'] += xint(each_visit.primary_girls_first)
+					totals['pgr'] += xint(each_visit.primary_girls_repeat)
+					totals['pbf'] += xint(each_visit.primary_boys_first)
+					totals['pbr'] += xint(each_visit.primary_boys_repeat)
+					totals['hgf'] += xint(each_visit.high_girls_first)
+					totals['hgr'] += xint(each_visit.high_girls_repeat)
+					totals['hbf'] += xint(each_visit.high_boys_first)
+					totals['hbr'] += xint(each_visit.high_boys_repeat)
+					totals['ogf'] += xint(each_visit.other_girls_first)
+					totals['ogr'] += xint(each_visit.other_girls_repeat)
+					totals['obf'] += xint(each_visit.other_boys_first)
+					totals['obr'] += xint(each_visit.other_boys_repeat)	
+					totals['visits'] += 1
+				visited_schools[school.name]['gf'] = visited_schools[school.name]['pgf'] + visited_schools[school.name]['hgf'] + visited_schools[school.name]['ogf']
+				visited_schools[school.name]['gr'] = visited_schools[school.name]['pgr'] + visited_schools[school.name]['hgr'] + visited_schools[school.name]['ogr'] 
+				visited_schools[school.name]['bf'] = visited_schools[school.name]['pbf'] + visited_schools[school.name]['hbf'] + visited_schools[school.name]['obf']
+				visited_schools[school.name]['br'] = visited_schools[school.name]['pbr'] + visited_schools[school.name]['hbr'] + visited_schools[school.name]['obr'] 
+				totals['gf'] = totals['pgf'] + totals['hgf'] + totals['ogf']
+				totals['gr'] = totals['pgr'] + totals['hgr'] + totals['ogr'] 
+				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
+				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr'] 
+			#Attendance reporting
+			user_list = User.objects.filter(is_active=True,groups=request.user.chapter())
+			for volunteer in user_list:
+				attendance[volunteer.last_name + ", " + volunteer.first_name] = 0
+				for attended in EventAttendee.objects.filter(actual_status = 1, event__id__in = visit_ids, user__id = volunteer.id):
+					attendance[volunteer.last_name + ", " + volunteer.first_name] += 1
+			
 		else:
 			totals = {}
+			visited_schools = {}
+			attendance = {}
 	else:
 		theform = ReportSelectorForm()
 		totals = {}
-	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals},context_instance=RequestContext(request))
+		visited_schools = {}
+		attendance = {}
+	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals, 'schools': visited_schools, 'attendance': attendance},context_instance=RequestContext(request))
