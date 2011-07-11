@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-11 01:04+1000\n"
+"POT-Creation-Date: 2011-07-11 12:27+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgid ""
 "reproduce (and fix!) the problem."
 msgstr ""
 
-#: base.html:6 base_tinymce.html:5 includes/header.html:14
+#: base.html:6 base_tinymce.html:5 includes/header.html:13
 msgid "Home"
 msgstr ""
 
@@ -64,7 +64,7 @@ msgid "Edit this chapter"
 msgstr ""
 
 #: chapter_detail.html:25 chapter_detail.html.py:30 chapter_edit.html:9
-#: exec_list.html:14 includes/header.html:90
+#: exec_list.html:14 includes/header.html:89
 msgid "Manage members"
 msgstr ""
 
@@ -202,7 +202,7 @@ msgstr ""
 msgid "Robogals Chapters"
 msgstr ""
 
-#: credits.html:3 credits.html.py:5 includes/footer.html:40
+#: credits.html:3 credits.html.py:5 includes/footer.html:54
 msgid "Credits"
 msgstr ""
 
@@ -399,7 +399,7 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: files.html:4 files.html.py:6 includes/header.html:273
+#: files.html:4 files.html.py:6 includes/header.html:272
 msgid "Files"
 msgstr ""
 
@@ -669,7 +669,7 @@ msgstr ""
 msgid "This section is optional"
 msgstr ""
 
-#: newsletter_cp.html:3 newsletter_cp.html.py:5 includes/header.html:246
+#: newsletter_cp.html:3 newsletter_cp.html.py:5 includes/header.html:245
 msgid "Newsletter CP"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 msgid "Generate and email new password"
 msgstr ""
 
-#: profile_edit.html:66 includes/header.html:63
+#: profile_edit.html:66 includes/header.html:62
 msgid "Chapter"
 msgstr ""
 
@@ -925,7 +925,7 @@ msgid "Are you sure you want to delete"
 msgstr ""
 
 #: school_edit.html:3 school_edit.html.py:5 visit_edit.html:3
-#: visit_edit.html.py:5 includes/header.html:167
+#: visit_edit.html.py:5 includes/header.html:166
 msgid "Create new"
 msgstr ""
 
@@ -955,7 +955,7 @@ msgstr ""
 msgid "Contact person"
 msgstr ""
 
-#: schools_list.html:8 includes/header.html:187
+#: schools_list.html:8 includes/header.html:186
 msgid "Add new school"
 msgstr ""
 
@@ -1054,7 +1054,7 @@ msgstr ""
 msgid "Are you sure you want to send this SMS to all the selected recipients?"
 msgstr ""
 
-#: support.html:4 includes/footer.html:40
+#: support.html:4 includes/footer.html:54
 msgid "Support"
 msgstr ""
 
@@ -1091,7 +1091,7 @@ msgstr ""
 msgid "Add school"
 msgstr ""
 
-#: timezone_listing.html:4 timezone_listing.html.py:6 includes/header.html:101
+#: timezone_listing.html:4 timezone_listing.html.py:6 includes/header.html:100
 msgid "Current local times"
 msgstr ""
 
@@ -1365,7 +1365,7 @@ msgid ""
 "%(welcome_page)s\n"
 msgstr ""
 
-#: wiki.html:3 wiki.html.py:5 includes/header.html:261
+#: wiki.html:3 wiki.html.py:5 includes/header.html:260
 msgid "Wiki"
 msgstr ""
 
@@ -1373,67 +1373,67 @@ msgstr ""
 msgid "Wiki coming soon :)"
 msgstr ""
 
-#: includes/footer.html:40
+#: includes/footer.html:54
 msgid "Go to robogals.org"
 msgstr ""
 
-#: includes/header.html:24
+#: includes/header.html:23
 msgid "Profile"
 msgstr ""
 
-#: includes/header.html:37
+#: includes/header.html:36
 msgid "View Profile"
 msgstr ""
 
-#: includes/header.html:48
+#: includes/header.html:47
 msgid "Edit Profile"
 msgstr ""
 
-#: includes/header.html:73
+#: includes/header.html:72
 msgid "View my chapter"
 msgstr ""
 
-#: includes/header.html:79
+#: includes/header.html:78
 msgid "List all chapters"
 msgstr ""
 
-#: includes/header.html:85
+#: includes/header.html:84
 msgid "Edit my chapter"
 msgstr ""
 
-#: includes/header.html:95
+#: includes/header.html:94
 msgid "Manage lists"
 msgstr ""
 
-#: includes/header.html:106
+#: includes/header.html:105
 msgid "View chapters' awards"
 msgstr ""
 
-#: includes/header.html:118
+#: includes/header.html:117
 msgid "Workshops"
 msgstr ""
 
-#: includes/header.html:155
+#: includes/header.html:154
 msgid "List school visits"
 msgstr ""
 
-#: includes/header.html:177
+#: includes/header.html:176
 msgid "List schools"
 msgstr ""
 
-#: includes/header.html:202
+#: includes/header.html:201
 msgid "Email &amp; SMS"
 msgstr ""
 
-#: includes/header.html:216
+#: includes/header.html:215
 msgid "Send email"
 msgstr ""
 
-#: includes/header.html:227
+#: includes/header.html:226
 msgid "Send SMS"
 msgstr ""
 
-#: includes/header.html:235
+#: includes/header.html:234
 msgid "Message history"
 msgstr ""
 
