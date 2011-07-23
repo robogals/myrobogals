@@ -766,14 +766,11 @@ def report_standard(request):
 			event_list = set(event_list)
 			for school_id in event_list:
 				school = School.objects.get(id = school_id)
-				if school.name in visited_schools:
-					visited_schools[school.name]['visits'] += 1
-				else:
-					visited_schools[school.name] = {}
-					visited_schools[school.name]['name'] = school.name
-					visited_schools[school.name]['visits'] = 1
-					if SchoolVisitStats.objects.filter(visit__school = school):
-						totals['schools_count'] += 1
+				visited_schools[school.name] = {}
+				visited_schools[school.name]['name'] = school.name
+				visited_schools[school.name]['visits'] = 0
+				if SchoolVisitStats.objects.filter(visit__school = school):
+					totals['schools_count'] += 1
 				visited_schools[school.name]['pgf'] = 0
 				visited_schools[school.name]['pgr'] = 0
 				visited_schools[school.name]['pbf'] = 0
@@ -800,7 +797,8 @@ def report_standard(request):
 					visited_schools[school.name]['ogf'] += xint(each_visit.other_girls_first)
 					visited_schools[school.name]['ogr'] += xint(each_visit.other_girls_repeat)
 					visited_schools[school.name]['obf'] += xint(each_visit.other_boys_first)
-					visited_schools[school.name]['obr'] += xint(each_visit.other_boys_repeat)	
+					visited_schools[school.name]['obr'] += xint(each_visit.other_boys_repeat)
+					visited_schools[school.name]['visits'] += 1					
 					#Overall totals
 					totals['pgf'] += xint(each_visit.primary_girls_first)
 					totals['pgr'] += xint(each_visit.primary_girls_repeat)
@@ -852,9 +850,6 @@ def report_global(request):
 			chapter_totals = {}
 			region_totals = {}
 			global_totals = {}
-			region_totals['UK & Europe'] = {}
-			region_totals['Australia & New Zealand'] = {}
-			region_totals['USA'] = {}
 			chapters = Group.objects.all()
 			for chapter in chapters:
 				chapter_totals[chapter.short] = {}
@@ -879,34 +874,23 @@ def report_global(request):
 				chapter_totals[chapter.short]['girl_workshops'] += chapter_totals[chapter.short]['first'] + chapter_totals[chapter.short]['repeat']
 				chapter_totals[chapter.short]['weighted'] = chapter_totals[chapter.short]['first'] + (float(chapter_totals[chapter.short]['repeat'])/2)
 				#Regional and Global Totals
-				if chapter.parent_id == 2:
+				if chapter.parent:
+					if chapter.parent.short not in region_totals:
+						region_totals[chapter.parent.short] = {}
 					for key, value in chapter_totals[chapter.short].iteritems():
-						if  key in region_totals['Australia & New Zealand']:
-							region_totals['Australia & New Zealand'][key] += value
+						if key in region_totals[chapter.parent.short]:
+							region_totals[chapter.parent.short][key] += value							
 						else:
-							region_totals['Australia & New Zealand'][key] = value
-				elif chapter.parent_id == 8:
-					for key, value in chapter_totals[chapter.short].iteritems():
-						if key in region_totals['UK & Europe']:
-							region_totals['UK & Europe'][key] += value
-						else:
-							region_totals['UK & Europe'][key] = value
-				elif chapter.parent_id == 22:
-					for key, value in chapter_totals[chapter.short].iteritems():
-						if key in region_totals['USA']:
-							region_totals['USA'][key] += value
-						else:
-							region_totals['USA'][key] = value
-				elif chapter.parent_id == 1:
-					for key, value in chapter_totals[chapter.short].iteritems():
+							region_totals[chapter.parent.short][key] = value	
 						if key in global_totals:
 							global_totals[key] += value
 						else:
 							global_totals[key] = value
-			del chapter_totals['Global']
-			del chapter_totals['Australia & New Zealand']
-			del chapter_totals['UK & Europe']
-			del chapter_totals['USA']
+					if chapter.parent.id == 1:
+						del chapter_totals[chapter.short]
+				elif chapter.id == 1:
+					del chapter_totals[chapter.short]
+			del region_totals['Global']	
 		else:
 			totals = {}
 			chapter_totals = {}
