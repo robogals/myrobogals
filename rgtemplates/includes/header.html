@@ -105,21 +105,6 @@
                         <span>{% trans "View chapters' awards" %}</span>
                     <a>
                 </li>
-	{% if request.user.is_superuser %}
-				<li class="item147">
-                    <a class="orphan item bullet" href="/globalreports/">
-                        <span>{% trans "Reporting" %}</span>
-                    <a>
-                </li>
-	{% else %}
-		{% if request.user.is_staff %}
-				<li class="item147">
-                    <a class="orphan item bullet" href="/reports/">
-                        <span>{% trans "Reporting" %}</span>
-                    <a>
-                </li>
-		{% endif %}
-	{% endif %}
             </ul>
             </div>
 {% endif %}
@@ -205,6 +190,21 @@
         
         
 </li>   
+{% if request.user.is_superuser %}
+				<li class="item147">
+                    <a class="orphan item bullet" href="/globalreports/">
+                        <span>{% trans "Reporting" %}</span>
+                    <a>
+                </li>
+	{% else %}
+		{% if request.user.is_staff %}
+				<li class="item147">
+                    <a class="orphan item bullet" href="/reports/">
+                        <span>{% trans "Reporting" %}</span>
+                    <a>
+                </li>
+		{% endif %}
+	{% endif %}
 {% endif %}
                             </ul>
         </div>

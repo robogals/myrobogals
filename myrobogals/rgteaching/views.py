@@ -284,9 +284,6 @@ class EmailAttendeesForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
-	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.datetime.now(), required=False)
-	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.datetime.now().year, datetime.datetime.now().year + 2)), initial=datetime.datetime.now(), required=False)
-	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -296,8 +293,6 @@ class EmailAttendeesForm(forms.Form):
 		super(EmailAttendeesForm, self).__init__(*args, **kwargs)
 		id_list = EventAttendee.objects.filter(event=visit.id).values_list('user_id')
 		self.fields['memberselect'].queryset = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True).order_by('last_name')
-		self.fields['schedule_time'].initial = utc.localize(datetime.datetime.now()).astimezone(user.tz_obj())
-		self.fields['schedule_date'].initial = utc.localize(datetime.datetime.now()).astimezone(user.tz_obj())
 		
 @login_required
 def emailvisitattendees(request, visit_id):
@@ -318,16 +313,7 @@ def emailvisitattendees(request, visit_id):
 			message.sender = request.user
 			message.html = True
 			message.from_name = chapter.name
-			
-			if request.POST['scheduling'] == '1':
-				message.scheduled = True
-				message.scheduled_date = datetime.datetime.combine(data['schedule_date'], data['schedule_time'])
-				try:
-					message.scheduled_date_type = int(data['schedule_zone'])
-				except Exception:
-					message.scheduled_date_type = 1
-			else:
-				message.scheduled = False
+			message.scheduled = False
 				
 			# Don't send it yet until the recipient list is done
 			message.status = -1

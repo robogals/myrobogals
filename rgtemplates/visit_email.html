@@ -61,27 +61,6 @@
     <td valign="top"><strong>{% trans "Message:" %}</strong></td>
     <td>{{ emailform.body }}</td>
   </tr>
-  <tr>
-    <td valign="top"><strong>{% trans "Scheduling:" %}</strong></td>
-    <td>
-      <table border="0" width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="0" id="sched0" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="sched0"><span>{% trans "Send immediately" %}</span></label></td>
-        </tr>
-        <tr>
-          <td style="vertical-align: top" width="30"><input name="scheduling" type="radio" value="1" id="sched1" /></td>
-          <td style="vertical-align: top"><label for="sched1"><span>{% trans "Send later" %}</span></label></td>
-        </tr>
-      </table>
-      <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
-        <tr>
-          <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{% blocktrans  with emailform.schedule_time as schedule_time and emailform.schedule_date as schedule_date %} at {{ schedule_time }} on {{ schedule_date }} {% endblocktrans %}</td>
-        </tr>
-      </table>
-    </td>
-  <tr>
 </table>
 <input type="submit" value="{% trans "Send Email" %}"/>
 </form>
