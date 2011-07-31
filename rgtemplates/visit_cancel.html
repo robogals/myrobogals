@@ -2,13 +2,13 @@
 {% load i18n %}
 {{cancelform.media}}
 
-{% block title %}{%trans "Cancel a School Visit" %}{% endblock %}
+{% block title %}{%trans "Cancel a workshop" %}{% endblock %}
 
-{% block pagetitle %}Cancel a School Visit{% endblock %}
+{% block pagetitle %}Cancel a workshop{% endblock %}
 
 {% block content %}
 <div class ="error">
-<strong>{% trans "Once a visit is cancelled it will be removed from the database and you will not be able to edit it again. Only cancel a visit if you are sure it is not happening." %} <strong>
+<strong>{% trans "Once a workshop is cancelled it will be removed from the database and you will not be able to edit it again. Only cancel a workshop if you are sure it is not happening." %}</strong>
 </div>
 <form action="/teaching/{{visit_id}}/cancel/" method="POST">
 {% if cancelform.errors %}
@@ -21,7 +21,7 @@
 {% endif %}
 <table>
   <tr>
-    <td valign="top"><strong>{% trans "Notification Email to Invitees" %}</strong></td>
+    <td valign="top"><strong>{% trans "Notification email to invitees" %}</strong></td>
   </tr>
 </table>
 <table id="cancelemail">
@@ -35,6 +35,6 @@
   </tr>
 	
 </table>
-<input type="submit" value={% trans "Cancel Visit and Send Email" %} />
+<input type="submit" value="{% trans "Cancel workshop and send email" %}" />
 </form>
 {% endblock %}

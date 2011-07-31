@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}Lesson for {{v.school}} on {{v.visit_start|date:"l j F Y"}}{% endblock %}
+{% block title %}{{v.school}} on {{v.visit_start|date:"D j M y"}}{% endblock %}
 
-{% block pagetitle %}Lesson for {{v.school}} on {{v.visit_start|date:"l j F Y"}}{% endblock %}
+{% block pagetitle %}{{v.school}} on {{v.visit_start|date:"D j M y"}}{% endblock %}
 
 {% block content %}
 <p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a>
-{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %} {% ifequal v.status 0 %}  | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit visit" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite/add to visit" %}</a><br><a href="/teaching/{{v.pk}}/email/">{% trans "Email Invitees" %}</a>
-| <a href="/teaching/{{v.pk}}/stats/">{% trans "Close and enter stats visit" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel visit" %}</a>{% endifequal %}
+{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %} {% ifequal v.status 0 %}  | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit visit" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite/add to visit" %}</a><br><a href="/teaching/{{v.pk}}/email/">{% trans "Email invitees" %}</a>
+| <a href="/teaching/{{v.pk}}/stats/">{% trans "Close visit and enter stats" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel visit" %}</a>{% endifequal %}
 {% endifequal %}{% endif %}
 </p>
 {% ifequal v.status 0 %}
@@ -57,11 +57,15 @@
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Time" %}</td>
-    <td>{{v.visit_start.time}} - {{v.visit_end.time}}</td>
+    <td>{{v.visit_start|date:"g:i a"}} - {{v.visit_end|date:"g:i a"}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Location" %}</td>
     <td>{{v.location}}</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top">{% trans "Notes" %}</td>
+    <td>{{v.notes}}</td>
   </tr>
   <tr>
     <td colspan="2"><strong>&nbsp;<br />{% trans "Info for volunteers" %}</strong></td>
@@ -72,7 +76,7 @@
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Meeting time" %}</td>
-    <td>{{v.meeting_time.time}}</td>
+    <td>{{v.meeting_time|date:"g:i a"}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Contact person" %}</td>
@@ -207,7 +211,7 @@
 <h4><strong>RSVP Messages: </strong></h4>
 	{% for eventmessage in eventmessages%}
 	 <div class="eventmessage">
-	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{% trans "Message sent at" %} {{eventmessage.date}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
+	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{{eventmessage.asdate|date:"g:i a, D j M y"}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
 	  <div class="message-box">
 		<div class="message-content">{{eventmessage.message|safe}}</div>
 	  </div>

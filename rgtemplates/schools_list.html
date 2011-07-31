@@ -12,7 +12,8 @@
     <td><strong>{% trans "Contact Person" %}</strong></td>
     <td><strong>{% trans "Email" %}</strong></td>
     <td><strong>{% trans "Phone" %}</strong></td>
-    <td></td>
+    <td> </td>
+    <td> </td>
   </tr>
 {% for s in schools %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -21,7 +22,7 @@
     <td>{{s.contact_email}}</td>
     <td>{{s.contact_phone}}</td>
     <td><a href="/teaching/schools/{{s.pk}}/">{% trans "View/Edit" %}</a></td>
-	<td><a href="/teaching/schools/{{s.pk}}/delete/">{% trans "Delete" %}</a></td>
+    <td><a href="/teaching/schools/{{s.pk}}/delete/">{% trans "Delete" %}</a></td>
   </tr>
 {% endfor %}
 </table>

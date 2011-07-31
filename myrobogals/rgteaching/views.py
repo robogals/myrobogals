@@ -32,11 +32,11 @@ class SchoolVisitFormOne(forms.Form):
 		(2, 'Do not allow anyone to RSVP'),
 	)
 
-	school = forms.ModelChoiceField(queryset=School.objects.none(), help_text=_('If the school is not listed here, it first needs to be added in Teaching > Add School'))
+	school = forms.ModelChoiceField(queryset=School.objects.none(), help_text=_('If the school is not listed here, it first needs to be added in Workshops > Add School'))
 	date = forms.DateField(label=_('School visit date'), widget=SelectDateWidget(years=range(2008,datetime.date.today().year + 3)), initial=datetime.date.today())
 	start_time = forms.TimeField(label=_('Start time'), initial='10:00:00')
 	end_time = forms.TimeField(label=_('End time'), initial='13:00:00')
-	location = forms.CharField(label=_("Location"), help_text=_("Where the teaching is taking place, at the school or elsewhere (can differ from meeting location, see below)"))
+	location = forms.CharField(label=_("Location"), help_text=_("Where the workshop is taking place, at the school or elsewhere (can differ from meeting location, see below)"))
 	allow_rsvp = forms.ChoiceField(label=_("Allowed RSVPs"), choices=ALLOW_RSVP_CHOICES, initial=1)
 
 	def __init__(self, *args, **kwargs):
@@ -368,7 +368,7 @@ class CancelForm(forms.Form):
 		del kwargs['visit']
 		super(CancelForm, self).__init__(*args, **kwargs)
 		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
-		self.fields['body'].initial = _("The visit to %(location)s at %(starttime)s has been cancelled, sorry for any inconvenience." %(visit.location, visit.visit_start))
+		self.fields['body'].initial = _("The workshop for %(school)s at %(starttime)s has been cancelled, sorry for any inconvenience." % {'school': visit.school, 'starttime': visit.visit_start})
 		
 @login_required
 def cancelvisit(request, visit_id):
@@ -380,7 +380,6 @@ def cancelvisit(request, visit_id):
 		cancelform = CancelForm(request.POST, user=request.user, visit=v)
 		if cancelform.is_valid():
 			data = cancelform.cleaned_data
-			
 			message = EmailMessage()
 			message.subject = data['subject']
 			message.body = data['body']
@@ -397,7 +396,6 @@ def cancelvisit(request, visit_id):
 			# which we need for entering the recipient entries
 			message.save()
 			
-			
 			#Email everyone who has been invited.
 			id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
 			users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
@@ -409,8 +407,7 @@ def cancelvisit(request, visit_id):
 				recipient.to_name = one_user.get_full_name()
 				recipient.to_address = one_user.email
 				recipient.save()
-				
-			
+
 			message.status = 0
 			message.save()
 			Event.objects.filter(id = v.id).delete()
@@ -563,14 +560,14 @@ def rsvp(request, event_id, user_id, rsvp_type):
 	chapter = request.user.chapter()
 	if rsvp_type == 'yes':
 		rsvp_id = 2
-		rsvp_string = _("RSVP'd as Attending")
-		title_string = _("RSVP as Attending")
+		rsvp_string = _("RSVP'd as attending")
+		title_string = _("RSVP as attending")
 	elif rsvp_type == 'no':
 		rsvp_id = 4
-		rsvp_string = _("RSVP'd as Not Attending")
-		title_string = _("RSVP as Not Attending")
+		rsvp_string = _("RSVP'd as not attending")
+		title_string = _("RSVP as not attending")
 	elif rsvp_type == 'remove':
-		title_string = _("Remove as Invitee")
+		title_string = _("Remove an invitee")
 		rsvp_string = _("Removed from this event")
 		rsvp_id = 0
 	else:
@@ -607,7 +604,7 @@ def deletemessage(request, visit_id, message_id):
 		raise Http404
 	if request.user.is_staff:	
 		m.delete()
-		request.user.message_set.create(message=unicode(_("Message Deleted")))
+		request.user.message_set.create(message=unicode(_("Message deleted")))
 	else:
 		raise Http404
 	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')
@@ -619,15 +616,15 @@ class StatsModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 class SchoolVisitStatsForm(forms.Form):
 	VISIT_TYPES = (
 		(-1, ''),
-		(0, 'Robogals robotics teaching'),
+		(0, 'Robogals robotics workshop'),
 		(1, 'Robogals career visit'),
 		(2, 'Robogals event'),
-		(3, 'Non-Robogals robotics teaching'),
+		(3, 'Non-Robogals robotics workshop'),
 		(4, 'Non-Robogals career visit'),
 		(5, 'Non-Robogals event'),
 		(6, 'Other (specify in notes below)'),
 	)
-	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=False)
+	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=False, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % 'help/')
 	primary_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	primary_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	primary_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
@@ -641,7 +638,7 @@ class SchoolVisitStatsForm(forms.Form):
 	other_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	other_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	attended = StatsModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Invitees"), False, attrs={'rows': 8}), required=False)
-	notes = forms.CharField(label=_("General Notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+	notes = forms.CharField(label=_("General notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	
 	def clean(self):
 		cleaned_data = self.cleaned_data
@@ -711,7 +708,16 @@ def stats(request, visit_id):
 	else:
 		form = SchoolVisitStatsForm(None, visit = v)
 	return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
-	
+
+@login_required
+def statshelp(request, visit_id):
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if v.school.chapter != request.user.chapter():
+		raise Http404
+	if not request.user.is_staff:
+		raise Http404
+	return render_to_response('visit_stats_help.html', {}, context_instance=RequestContext(request))
+
 class ReportSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Report start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
 	end_date = forms.DateField(label='Report end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())

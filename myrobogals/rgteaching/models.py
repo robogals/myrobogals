@@ -1,5 +1,6 @@
 from django.db import models
 from myrobogals.auth.models import Group, User
+from datetime import datetime
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
@@ -63,6 +64,9 @@ class EventMessage(models.Model):
 	user = models.ForeignKey(User)
 	date = models.CharField(max_length=50)
 	message = models.TextField("RSVP Message")
+	
+	def asdate(self):
+		return datetime.strptime(self.date, '%Y-%m-%d %H:%M')
 
 class TrainingSession(Event):
 	def __unicode__(self):
