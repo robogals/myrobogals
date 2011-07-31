@@ -211,7 +211,7 @@
 <h4><strong>RSVP Messages: </strong></h4>
 	{% for eventmessage in eventmessages%}
 	 <div class="eventmessage">
-	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{{eventmessage.asdate|date:"g:i a, D j M y"}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
+	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{{eventmessage.date|date:"g:i a, D j M y"}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
 	  <div class="message-box">
 		<div class="message-content">{{eventmessage.message|safe}}</div>
 	  </div>

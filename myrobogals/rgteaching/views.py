@@ -585,8 +585,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				utc_dt = utc.localize(datetime.datetime.now())
 				user_tz = request.user.tz_obj()
 				user_dt = user_tz.normalize(utc_dt.astimezone(user_tz))
-				fmt = '%Y-%m-%d %H:%M'
-				rsvpmessage.date = user_dt.strftime(fmt)
+				rsvpmessage.date = user_dt
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
 			request.user.message_set.create(message= unicode((rsvp_string)))

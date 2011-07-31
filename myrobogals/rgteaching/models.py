@@ -58,15 +58,15 @@ class SchoolVisit(Event):
 	class Meta:
 		ordering = ['-visit_start']
 
-	
+
 class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
-	date = models.CharField(max_length=50)
+	date = models.DateTimeField()
 	message = models.TextField("RSVP Message")
 	
-	def asdate(self):
-		return datetime.strptime(self.date, '%Y-%m-%d %H:%M')
+	#def asdate(self):
+	#	return datetime.strptime(self.date, '%Y-%m-%d %H:%M')
 
 class TrainingSession(Event):
 	def __unicode__(self):
