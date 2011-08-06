@@ -53,7 +53,7 @@ class SchoolVisit(Event):
 	otherprep = models.TextField("Other preparation", blank=True)
 	closing_comments = models.TextField("Closing comments", blank=True)	
 	def __unicode__(self):
-		return "Visit to " + str(self.school) + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
+		return str(self.school) + " on " + str(self.visit_start.date())
 	
 	class Meta:
 		ordering = ['-visit_start']
@@ -99,7 +99,6 @@ class EventAttendee(models.Model):
     	return self.user.get_full_name()
 
 class SchoolVisitStats(models.Model):
-
 	VISIT_TYPES = ( 
 		(0, 'Robogals robotics teaching'),
 		(1, 'Robogals career visit'),
@@ -109,6 +108,7 @@ class SchoolVisitStats(models.Model):
 		(5, 'Non-Robogals event'),
 		(6, 'Other (specify in notes below)'),
 	)
+
 	visit = models.ForeignKey(SchoolVisit, editable=False)
 	visit_type = models.IntegerField(choices=VISIT_TYPES, null=False)
 	primary_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -124,3 +124,29 @@ class SchoolVisitStats(models.Model):
 	other_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
 	other_boys_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
 	notes = models.TextField("General Notes", blank=True)
+
+	def num_girls(self):
+		sum = 0
+		if self.primary_girls_first:
+			sum += self.primary_girls_first
+		if self.primary_girls_repeat:
+			sum += self.primary_girls_repeat
+		if self.high_girls_first:
+			sum += self.high_girls_first
+		if self.high_girls_repeat:
+			sum += self.high_girls_repeat
+		if self.other_girls_first:
+			sum += self.other_girls_first
+		if self.other_girls_repeat:
+			sum += self.other_girls_repeat
+		return sum
+
+	def chapter(self):
+		return self.visit.chapter
+
+	def __unicode__(self):
+		return str(self.num_girls()) + " at " + self.visit.__unicode__()
+
+	class Meta:
+		verbose_name = "workshop stats"
+		verbose_name_plural = "workshop stats"

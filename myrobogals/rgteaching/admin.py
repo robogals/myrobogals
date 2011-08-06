@@ -1,5 +1,5 @@
 from myrobogals.auth.models import User, Group
-from myrobogals.rgteaching.models import School, SchoolVisit, TrainingSession, EventAttendee
+from myrobogals.rgteaching.models import School, SchoolVisit, SchoolVisitStats, TrainingSession, EventAttendee
 from myrobogals import admin
 
 class EventAttendeeAdmin(admin.TabularInline):
@@ -23,6 +23,7 @@ class SchoolVisitAdmin(admin.ModelAdmin):
 	)
 	inlines = (EventAttendeeAdmin,)
 
+'''
 class TrainingSessionAdmin(admin.ModelAdmin):
 	list_display = ('chapter', 'visit_start', 'location')
 	search_fields = ('location', 'chapter', 'visit_start')
@@ -32,7 +33,12 @@ class TrainingSessionAdmin(admin.ModelAdmin):
 		('Information for attendees', {'fields': ('meeting_location', 'meeting_time', 'contact', 'contact_email', 'contact_phone', 'notes')}),
 	)
 	inlines = (EventAttendeeAdmin,)
+'''
+
+class SchoolVisitStatsAdmin(admin.ModelAdmin):
+	list_display = ('visit', 'chapter', 'num_girls')
 
 admin.site.register(School, SchoolAdmin)
 admin.site.register(SchoolVisit, SchoolVisitAdmin)
-admin.site.register(TrainingSession, TrainingSessionAdmin)
+admin.site.register(SchoolVisitStats, SchoolVisitStatsAdmin)
+#admin.site.register(TrainingSession, TrainingSessionAdmin)
