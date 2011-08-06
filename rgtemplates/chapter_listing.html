@@ -23,7 +23,9 @@
             <li>
                 <strong>Special projects:</strong>
                 <ul>
-                    <li><a href="/chapters/rrr/">Robogals Rural &amp; Regional</a><br><em>Australia-wide</em></li>
+                {% for chapter in specialch %}
+                    <li><a href="/chapters/{{chapter.myrobogals_url}}/">{{chapter.short}}</a><br><em>{{chapter.location}}</em></li>
+                {% endfor %}
                 </ul>
             </li>
         </ul>

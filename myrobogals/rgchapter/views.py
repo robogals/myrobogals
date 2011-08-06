@@ -14,7 +14,7 @@ from django.db import connection
 
 def list(request):
 	listing = []
-	superchapters = Group.objects.filter(parent=1)		
+	superchapters = Group.objects.filter(parent=1).exclude(myrobogals_url='special')
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
 			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter)):
@@ -32,7 +32,8 @@ def list(request):
 					if chapter.status == 0:
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
-	return render_to_response('chapter_listing.html', {'listing': listing}, context_instance=RequestContext(request))
+		specialch = Group.objects.filter(parent__myrobogals_url='special')
+	return render_to_response('chapter_listing.html', {'listing': listing, 'specialch': specialch}, context_instance=RequestContext(request))
 
 def joinlist(request):
 	listing = []
