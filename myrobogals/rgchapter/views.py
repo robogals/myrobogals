@@ -120,13 +120,13 @@ class FormPartThree(forms.Form):
 
 class DPModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
-    	return obj.display_name_en
+    	return obj.display_name_local()
 
 class FormPartFour(forms.Form):
 	is_joinable = forms.BooleanField(label=_("Allow new members to sign up directly on myRobogals (highly recommended!)"), required=False)
 	welcomepage = forms.CharField(label=_("Welcome page"), required=False, widget=forms.Textarea)
 	joinpage = forms.CharField(label=_("Join page"), required=False, widget=forms.Textarea)
-	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('display_name_en'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True)
+	display_columns = DPModelMultipleChoiceField(queryset=DisplayColumn.objects.all().order_by('order'), label=_("Columns to display"), widget=FilteredSelectMultiple(_("Columns"), False, attrs={'rows': 10}), required=True)
 
 	# Future: use the correct language
 	def __init__(self, *args, **kwargs):

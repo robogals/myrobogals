@@ -1,13 +1,19 @@
 from django.db import models
+from django.utils import translation
 
 class DisplayColumn(models.Model):
 	field_name = models.CharField(max_length=64)
 	display_name_en = models.CharField(max_length=64)
-	display_name_de = models.CharField(max_length=64, blank=True)
+	display_name_nl = models.CharField(max_length=64, blank=True)
+	display_name_ja = models.CharField(max_length=64, blank=True)
 	order = models.IntegerField(default=10)
 	
 	def __unicode__(self):
 		return self.field_name
+	
+	def display_name_local(self):
+		print "display_name_" + translation.get_language()
+		return getattr(self, "display_name_" + translation.get_language())
 	
 	class Meta:
 		ordering = ('order','field_name')

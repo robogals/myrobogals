@@ -10,7 +10,7 @@
 <div style="background: #CCCCCC; padding: 10px; width: 220px; margin-bottom: 15px; margin-left: 15px">
 <div style="text-align: center">{% trans "Executive Committee" %}</div>
 {% for officer in officers %}
-<div style="margin-top: 7px"><a href="/profile/{{officer.user.username}}/">{{officer.user.first_name}} {{officer.user.last_name}}</a><br />
+<div style="margin-top: 7px"><a href="/profile/{{officer.user.username}}/">{{officer.user.get_full_name}}</a><br />
 <span style="font-size: 9pt; font-style: italic">{{officer.positionType}}</span></div>
 {% endfor %}
 </div>

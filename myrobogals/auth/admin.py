@@ -16,7 +16,7 @@ class GroupAdmin(admin.ModelAdmin):
     ordering = ('name',)
     #filter_horizontal = ('permissions',)
     fieldsets = (
-        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable')}),
+        (None, {'fields': ('name', 'short', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'name_display')}),
         ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
         ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label')}),
@@ -38,7 +38,7 @@ class PositionAdmin(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'name_display', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained')}),
         ('Chapter', {'fields': ('groups',)}),
         ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         ('Work info (industry members only)', {'fields': ('job_title', 'company')}),

@@ -7,7 +7,7 @@ from django.db import connection
 connection.queries
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats
+from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats, VISIT_TYPES
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 #from myrobogals.auth.models import Group
@@ -613,17 +613,7 @@ class StatsModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     	return obj.last_name + ", " + obj.first_name
 	
 class SchoolVisitStatsForm(forms.Form):
-	VISIT_TYPES = (
-		(-1, ''),
-		(0, 'Robogals robotics workshop'),
-		(1, 'Robogals career visit'),
-		(2, 'Robogals event'),
-		(3, 'Non-Robogals robotics workshop'),
-		(4, 'Non-Robogals career visit'),
-		(5, 'Non-Robogals event'),
-		(6, 'Other (specify in notes below)'),
-	)
-	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=False, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % 'help/')
+	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=False, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % '/teaching/statshelp/')
 	primary_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	primary_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
 	primary_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
@@ -709,10 +699,7 @@ def stats(request, visit_id):
 	return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
 
 @login_required
-def statshelp(request, visit_id):
-	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if v.school.chapter != request.user.chapter():
-		raise Http404
+def statshelp(request):
 	if not request.user.is_staff:
 		raise Http404
 	return render_to_response('visit_stats_help.html', {}, context_instance=RequestContext(request))
@@ -720,7 +707,7 @@ def statshelp(request, visit_id):
 class ReportSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Report start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
 	end_date = forms.DateField(label='Report end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
-
+	visit_type = forms.ChoiceField(choices=VISIT_TYPES, required=True, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % '/teaching/statshelp/')
 
 def xint(n):
 	if n is None:
@@ -775,6 +762,8 @@ def report_standard(request):
 				visited_schools[school.name]['obf'] = 0
 				visited_schools[school.name]['obr'] = 0
 				this_schools_visits = SchoolVisitStats.objects.filter(visit__school = school)
+				if int(formdata['visit_type']) != -1:
+					this_schools_visits = this_schools_visits.filter(visit_type = formdata['visit_type'])
 				for each_visit in this_schools_visits:
 					#Totals for this school 
 					visited_schools[school.name]['pgf'] += xint(each_visit.primary_girls_first)
@@ -805,9 +794,11 @@ def report_standard(request):
 					totals['obr'] += xint(each_visit.other_boys_repeat)	
 					totals['visits'] += 1
 				visited_schools[school.name]['gf'] = visited_schools[school.name]['pgf'] + visited_schools[school.name]['hgf'] + visited_schools[school.name]['ogf']
-				visited_schools[school.name]['gr'] = visited_schools[school.name]['pgr'] + visited_schools[school.name]['hgr'] + visited_schools[school.name]['ogr'] 
+				visited_schools[school.name]['gr'] = visited_schools[school.name]['pgr'] + visited_schools[school.name]['hgr'] + visited_schools[school.name]['ogr']
 				visited_schools[school.name]['bf'] = visited_schools[school.name]['pbf'] + visited_schools[school.name]['hbf'] + visited_schools[school.name]['obf']
-				visited_schools[school.name]['br'] = visited_schools[school.name]['pbr'] + visited_schools[school.name]['hbr'] + visited_schools[school.name]['obr'] 
+				visited_schools[school.name]['br'] = visited_schools[school.name]['pbr'] + visited_schools[school.name]['hbr'] + visited_schools[school.name]['obr']
+				if visited_schools[school.name]['visits'] == 0:
+					del visited_schools[school.name]
 				totals['gf'] = totals['pgf'] + totals['hgf'] + totals['ogf']
 				totals['gr'] = totals['pgr'] + totals['hgr'] + totals['ogr'] 
 				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
@@ -855,10 +846,12 @@ def report_global(request):
 				visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
 				event_list = set(event_list)
 				for school_id in event_list:
-					if SchoolVisitStats.objects.filter(visit__school__id = school_id, visit_type = 0):
+					this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id)
+					if int(formdata['visit_type']) != -1:
+						this_schools_visits = this_schools_visits.filter(visit_type = formdata['visit_type'])
+					if this_schools_visits:
 						chapter_totals[chapter.short]['schools'] += 1
-					this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id, visit_type = 0)
-					for each_visit in this_schools_visits: 
+					for each_visit in this_schools_visits:
 						chapter_totals[chapter.short]['first'] += xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
 						chapter_totals[chapter.short]['repeat'] += xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)	
 						chapter_totals[chapter.short]['workshops'] += 1	

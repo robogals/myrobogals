@@ -2,7 +2,7 @@ from myrobogals.rgchapter.models import DisplayColumn, ShirtSize, Award, AwardRe
 from myrobogals import admin
 
 class DisplayColumnAdmin(admin.ModelAdmin):
-	list_display = ('field_name', 'display_name_en', 'display_name_de', 'order')
+	list_display = ('field_name', 'display_name_en', 'display_name_nl', 'display_name_ja', 'order')
 
 class ShirtSizeAdmin(admin.ModelAdmin):
 	list_display = ('size_short', 'size_long', 'chapter', 'order')

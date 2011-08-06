@@ -6,8 +6,6 @@
 
 {% block content %}
 <form action="/globalreports/" method="post">
-        <fieldset style="margin-right: 20px;">
-                <legend>Filters</legend>
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}
@@ -19,8 +17,11 @@
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.end_date.name }}">{{ theform.end_date.label }}</label>
                                 {{ theform.end_date }} 
                         </div>
+                        <div>
+                                <label class="label-left" style="width:120px;" for="id_{{ theform.visit_type.name }}">{{ theform.visit_type.label }}</label>
+                                {{ theform.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{theform.visit_type.help_text}}{% endautoescape %}</span>
+                        </div>
                         <input type="submit" value="Fetch Report">
-        </fieldset>
 </form>
 {% if chapter_totals %}
 <fieldset style="margin-right: 20px;">
@@ -36,6 +37,7 @@
 			<td>Weighted girl-workshops</td>
 		</tr>
 		{% for name, chapter in chapter_totals %}
+		{% ifnotequal chapter.workshops 0 %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 			<td>{{ name }}</td>
 			<td>{{ chapter.workshops }} </td>
@@ -44,6 +46,7 @@
 			<td>{{ chapter.girl_workshops }}</td>
 			<td>{{ chapter.weighted }}</td>
 		</tr>
+		{% endifnotequal %}
 		{% endfor %}
 	</table>
 	<p><strong>Regions</strong></p>	

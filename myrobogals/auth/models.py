@@ -99,6 +99,12 @@ class EmailDomain(models.Model):
 	class Meta:
 		ordering = ('domainname',)
 
+NAME_DISPLAYS = (
+    (0, 'First Last (e.g. English)'),
+    (1, 'Last First (e.g. East Asian names in English characters)'),
+    (2, 'LastFirst (e.g. East Asian names in characters)')
+)
+
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
 
@@ -116,6 +122,7 @@ class Group(models.Model):
     name = models.CharField('Name', max_length=80, unique=True)
     permissions = models.ManyToManyField(Permission, blank=True)
     short = models.CharField('Short Name', max_length=80, help_text='Use city name (e.g. Melbourne) unless this is a regional body (e.g. Australia & New Zealand)')
+    short_en = models.CharField('English Short Name', max_length=80, help_text='Use city name (e.g. Melbourne) unless this is a regional body (e.g. Australia & New Zealand)')
     location = models.CharField('Location', help_text='Use the format: City, Country (e.g. Melbourne, Australia)', max_length=64, blank=True)
     myrobogals_url = models.CharField('myRobogals URL', max_length=16, unique=True, help_text="The chapter page will be https://my.robogals.org/chapters/&lt;url&gt;/ - our convention is to use lowercase city name")
     creation_date = models.DateField(default=date.today)
@@ -169,6 +176,7 @@ class Group(models.Model):
     tshirt_enable = models.BooleanField('Enable T-shirt drop-down')
     tshirt_required = models.BooleanField('Require T-shirt drop-down')
     tshirt_label = models.CharField('Label for T-shirt drop-down', max_length=64, blank=True)
+    name_display = models.IntegerField("Name display", choices=NAME_DISPLAYS, default=0)
 
     class Meta:
         verbose_name = 'chapter'
@@ -351,6 +359,7 @@ class User(models.Model):
     union_member = models.BooleanField(default=False)
     tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
     trained = models.BooleanField(default=False)
+    name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
     objects = UserManager()
 
     class Meta:
@@ -399,13 +408,20 @@ class User(models.Model):
     def chapter(self):
         return Group.objects.get(user=self)
 
-	# If they have set a timezone override, use that
-	# otherwise use their chapter's timezone
+    # If they have set a timezone override, use that
+    # otherwise use their chapter's timezone
     def tz_obj(self):
         if self.timezone:
             return self.timezone.tz_obj()
         else:
             return self.chapter().timezone.tz_obj()
+    
+    # Similar deal for name display
+    def get_name_display(self):
+        if self.name_display:
+            return self.name_display
+        else:
+            return self.chapter().name_display
 
     def graduation_year(self):
         return self.uni_end.strftime("%Y")
@@ -426,8 +442,12 @@ class User(models.Model):
         return True
 
     def get_full_name(self):
-        "Returns the first_name plus the last_name, with a space in between."
-        full_name = u'%s %s' % (self.first_name, self.last_name)
+        if self.get_name_display() == 0:
+	        full_name = u'%s %s' % (self.first_name, self.last_name)
+	elif self.get_name_display() == 1:
+	        full_name = u'%s %s' % (self.last_name, self.first_name)
+	elif self.get_name_display() == 2:
+	        full_name = u'%s%s' % (self.last_name, self.first_name)
         return full_name.strip()
 
     def set_password(self, raw_password):

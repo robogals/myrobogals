@@ -98,17 +98,18 @@ class EventAttendee(models.Model):
     def __unicode__(self):
     	return self.user.get_full_name()
 
-class SchoolVisitStats(models.Model):
-	VISIT_TYPES = ( 
-		(0, 'Robogals robotics teaching'),
-		(1, 'Robogals career visit'),
-		(2, 'Robogals event'),
-		(3, 'Non-Robogals robotics teaching'),
-		(4, 'Non-Robogals career visit'),
-		(5, 'Non-Robogals event'),
-		(6, 'Other (specify in notes below)'),
-	)
+VISIT_TYPES = (
+	(-1, ''),
+	(0, 'Robogals robotics workshop'),
+	(1, 'Robogals career talk'),
+	(2, 'Robogals event'),
+	(3, 'Non-Robogals robotics workshop'),
+	(4, 'Non-Robogals career talk'),
+	(5, 'Non-Robogals event'),
+	(6, 'Other (specify in notes below)'),
+)
 
+class SchoolVisitStats(models.Model):
 	visit = models.ForeignKey(SchoolVisit, editable=False)
 	visit_type = models.IntegerField(choices=VISIT_TYPES, null=False)
 	primary_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)

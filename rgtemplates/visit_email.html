@@ -1,9 +1,9 @@
 {% extends "base_tinymce.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Email Invitees of a School Visit" %}{% endblock %}
+{% block title %}{% trans "Email invitees of a school visit" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Email Invitees of a School Visit" %}{% endblock %}
+{% block pagetitle %}{% trans "Email invitees of a school visit" %}{% endblock %}
 
 {% block content %}
 <form action="/teaching/{{visit_id}}/email/" method="POST">
@@ -22,7 +22,7 @@
 		<table border="0" width="100%" cellpadding="0" cellspacing="0">
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="1" id="invitee_type1" checked="checked" /></td>
-          <td style="vertical-align: top"><label for="invitee_type1">{% trans "All Invitees" %}</label></td>
+          <td style="vertical-align: top"><label for="invitee_type1">{% trans "All invitees" %}</label></td>
         </tr>
 		<tr>
           <td style="vertical-align: top" width="30"><input name="invitee_type" type="radio" value="2" id="invitee_type2"/></td>
