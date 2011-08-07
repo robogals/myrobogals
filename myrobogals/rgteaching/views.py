@@ -834,13 +834,13 @@ def report_global(request):
 			global_totals = {}
 			chapters = Group.objects.all()
 			for chapter in chapters:
-				chapter_totals[chapter.short] = {}
-				chapter_totals[chapter.short]['workshops'] = 0
-				chapter_totals[chapter.short]['schools'] = 0
-				chapter_totals[chapter.short]['first'] = 0
-				chapter_totals[chapter.short]['repeat'] = 0
-				chapter_totals[chapter.short]['girl_workshops'] = 0
-				chapter_totals[chapter.short]['weighted'] = 0
+				chapter_totals[chapter.short_en] = {}
+				chapter_totals[chapter.short_en]['workshops'] = 0
+				chapter_totals[chapter.short_en]['schools'] = 0
+				chapter_totals[chapter.short_en]['first'] = 0
+				chapter_totals[chapter.short_en]['repeat'] = 0
+				chapter_totals[chapter.short_en]['girl_workshops'] = 0
+				chapter_totals[chapter.short_en]['weighted'] = 0
 				event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=chapter).values_list('id',flat=True)
 				event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
 				visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
@@ -850,31 +850,33 @@ def report_global(request):
 					if int(formdata['visit_type']) != -1:
 						this_schools_visits = this_schools_visits.filter(visit_type = formdata['visit_type'])
 					if this_schools_visits:
-						chapter_totals[chapter.short]['schools'] += 1
+						chapter_totals[chapter.short_en]['schools'] += 1
 					for each_visit in this_schools_visits:
-						chapter_totals[chapter.short]['first'] += xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
-						chapter_totals[chapter.short]['repeat'] += xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)	
-						chapter_totals[chapter.short]['workshops'] += 1	
-				chapter_totals[chapter.short]['girl_workshops'] += chapter_totals[chapter.short]['first'] + chapter_totals[chapter.short]['repeat']
-				chapter_totals[chapter.short]['weighted'] = chapter_totals[chapter.short]['first'] + (float(chapter_totals[chapter.short]['repeat'])/2)
-				#Regional and Global Totals
+						chapter_totals[chapter.short_en]['first'] += xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
+						chapter_totals[chapter.short_en]['repeat'] += xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)
+						chapter_totals[chapter.short_en]['workshops'] += 1	
+				chapter_totals[chapter.short_en]['girl_workshops'] += chapter_totals[chapter.short_en]['first'] + chapter_totals[chapter.short_en]['repeat']
+				chapter_totals[chapter.short_en]['weighted'] = chapter_totals[chapter.short_en]['first'] + (float(chapter_totals[chapter.short_en]['repeat'])/2)
+				# Regional and Global Totals
 				if chapter.parent:
-					if chapter.parent.short not in region_totals:
-						region_totals[chapter.parent.short] = {}
-					for key, value in chapter_totals[chapter.short].iteritems():
-						if key in region_totals[chapter.parent.short]:
-							region_totals[chapter.parent.short][key] += value							
+					if chapter.parent.short_en not in region_totals:
+						region_totals[chapter.parent.short_en] = {}
+					for key, value in chapter_totals[chapter.short_en].iteritems():
+						if key in region_totals[chapter.parent.short_en]:
+							region_totals[chapter.parent.short_en][key] += value
 						else:
-							region_totals[chapter.parent.short][key] = value	
+							region_totals[chapter.parent.short_en][key] = value
 						if key in global_totals:
 							global_totals[key] += value
 						else:
 							global_totals[key] = value
 					if chapter.parent.id == 1:
-						del chapter_totals[chapter.short]
+						del chapter_totals[chapter.short_en]
+					elif chapter_totals[chapter.short_en]['workshops'] == 0:
+						del chapter_totals[chapter.short_en]
 				elif chapter.id == 1:
-					del chapter_totals[chapter.short]
-			del region_totals['Global']	
+					del chapter_totals[chapter.short_en]
+			del region_totals['Global']
 		else:
 			totals = {}
 			chapter_totals = {}
