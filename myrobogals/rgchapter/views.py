@@ -17,11 +17,11 @@ def list(request):
 	superchapters = Group.objects.filter(parent=1).exclude(myrobogals_url='special')
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
-			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter)):
+			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter or request.user.is_superuser or request.user.chapter.parent == superchapter)):
 				chapters_all = Group.objects.filter(parent=superchapter)
 				chapters_display = []
 				for chapter in chapters_all:
-					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter() or request.user.is_superuser)):
+					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter or request.user.is_superuser)):
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
@@ -54,11 +54,11 @@ def localtimes(request):
 	superchapters = Group.objects.filter(parent=1)		
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
-			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter() or request.user.is_superuser or request.user.chapter().parent == superchapter)):
+			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter or request.user.is_superuser or request.user.chapter.parent == superchapter)):
 				chapters_all = Group.objects.filter(parent=superchapter)
 				chapters_display = []
 				for chapter in chapters_all:
-					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter() or request.user.is_superuser)):
+					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter or request.user.is_superuser)):
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
@@ -79,7 +79,7 @@ def detail(request, chapterurl):
 
 @login_required
 def redirtomy(request):
-	return HttpResponseRedirect("/chapters/" + request.user.chapter().myrobogals_url + "/")
+	return HttpResponseRedirect("/chapters/" + request.user.chapter.myrobogals_url + "/")
 
 
 def awards(request):
@@ -158,7 +158,7 @@ class FormPartFive(forms.Form):
 @login_required
 def editchapter(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if (request.user.is_staff and request.user.chapter() == c) or request.user.is_superuser:
+	if (request.user.is_staff and request.user.chapter == c) or request.user.is_superuser:
 		if request.method == 'POST':
 			formpart1 = FormPartOne(request.POST)
 			formpart2 = FormPartTwo(request.POST)

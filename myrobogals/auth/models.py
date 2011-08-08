@@ -120,7 +120,7 @@ class Group(models.Model):
     )
 
     name = models.CharField('Name', max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission, blank=True)
+    #permissions = models.ManyToManyField(Permission, blank=True)
     short = models.CharField('Short Name', max_length=80, help_text='Use city name (e.g. Melbourne) unless this is a regional body (e.g. Australia & New Zealand)')
     short_en = models.CharField('English Short Name', max_length=80, help_text='Use city name (e.g. Melbourne) unless this is a regional body (e.g. Australia & New Zealand)')
     location = models.CharField('Location', help_text='Use the format: City, Country (e.g. Melbourne, Australia)', max_length=64, blank=True)
@@ -322,12 +322,12 @@ class User(models.Model):
     password = models.CharField('Password', max_length=128, help_text="Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>.")
     is_staff = models.BooleanField('Exec access', default=False, help_text="Designates whether the user can use exec functions on the site. Note that this option is completely independent of positions defined below.")
     is_active = models.BooleanField('Active', default=True, help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.")
-    is_superuser = models.BooleanField('Superuser access', default=False, help_text="Designates that this user is able to access the Global Admin Panel.")
+    is_superuser = models.BooleanField('Superuser access', default=False, help_text="Designates that this user is able to access superuser functions on the site, and ALL functions in the Global Admin Panel.")
     last_login = models.DateTimeField('Last login', default=datetime.datetime.now)
     date_joined = models.DateTimeField('Date joined', default=datetime.datetime.now)
-    groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True,
-        help_text="In theory you can be a member of multiple chapters; in practice this is buggy so only have a single chapter for now. ")
-    user_permissions = models.ManyToManyField(Permission, verbose_name='User permissions', blank=True)
+    chapter = models.ForeignKey(Group, related_name='rgchapter')
+    groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True, help_text="In theory you can be a member of multiple chapters; in practice this is buggy so only have a single chapter for now. ")
+    user_permissions = models.ManyToManyField(Permission, verbose_name='Django user permissions', blank=True, help_text="Allow access to individual functions in the Global Admin Panel. The user must have exec access for this to work. Don't change this unless you really know what you're doing!")
     alt_email = models.EmailField('Alternate e-mail address', blank=True)
     dob = models.DateField(null=True, blank=True)
     dob_public = models.BooleanField("Display date of birth in profile", default=False)
@@ -405,8 +405,11 @@ class User(models.Model):
     		return 'Inactive'  # never had any member status
     '''
 
-    def chapter(self):
-        return Group.objects.get(user=self)
+    def getchapter(self):
+        try:
+            return Group.objects.get(user=self)
+        except Group.DoesNotExist:
+            return Group.objects.get(pk=1)
 
     # If they have set a timezone override, use that
     # otherwise use their chapter's timezone
@@ -414,14 +417,14 @@ class User(models.Model):
         if self.timezone:
             return self.timezone.tz_obj()
         else:
-            return self.chapter().timezone.tz_obj()
+            return self.chapter.timezone.tz_obj()
     
     # Similar deal for name display
     def get_name_display(self):
         if self.name_display:
             return self.name_display
         else:
-            return self.chapter().name_display
+            return self.chapter.name_display
 
     def graduation_year(self):
         return self.uni_end.strftime("%Y")
@@ -484,12 +487,14 @@ class User(models.Model):
         """
         Returns a list of permission strings that this user has through
         his/her groups. This method queries all available auth backends.
-        """
+
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
                 permissions.update(backend.get_group_permissions(self))
         return permissions
+        """
+        return set()
 
     def get_all_permissions(self):
         permissions = set()

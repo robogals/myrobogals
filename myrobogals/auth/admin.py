@@ -39,7 +39,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'name_display', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained')}),
-        ('Chapter', {'fields': ('groups',)}),
+        ('Chapter', {'fields': ('chapter',)}),
         ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         ('Work info (industry members only)', {'fields': ('job_title', 'company')}),
         ('Mobile info', {'fields': ('mobile', 'mobile_verified',)}),
@@ -49,13 +49,13 @@ class UserAdmin(admin.ModelAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
         ('Bio', {'fields': ('bio',)}),
         ('Internal notes', {'fields': ('internal_notes',)}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
     )
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
     list_display = ('username', 'first_name', 'last_name', 'email', 'mobile', 'chapter', 'is_staff', 'is_active')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'chapter')
     search_fields = ('username', 'first_name', 'last_name', 'email', 'mobile')
     ordering = ('username',)
     inlines = (MemberStatusAdmin, PositionAdmin)

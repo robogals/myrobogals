@@ -64,7 +64,7 @@ class SchoolVisitFormThree(forms.Form):
 		
 @login_required
 def editvisit(request, visit_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	if request.user.is_staff:
 		if visit_id == 0:
 			v = SchoolVisit()
@@ -151,7 +151,7 @@ def newvisit(request):
 
 @login_required
 def viewvisit(request, visit_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	if (v.chapter != chapter):
 		raise Http404
@@ -175,7 +175,7 @@ def viewvisit(request, visit_id):
 
 @login_required
 def listvisits(request):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	visits = SchoolVisit.objects.filter(chapter=chapter)
 	return render_to_response('visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
@@ -196,16 +196,16 @@ class InviteForm(forms.Form):
 		visit=kwargs['visit']
 		del kwargs['visit']
 		super(InviteForm, self).__init__(*args, **kwargs)
-		self.fields['memberselect'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_reminder_optin=True).order_by('last_name')
-		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+		self.fields['memberselect'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_reminder_optin=True).order_by('last_name')
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['body'].initial = _("Hello,\n\nThere will be an upcoming Robogals school visit:<br>")
 		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
 		self.fields['body'].initial += _("<br>Location: ") + visit.location + "\nSchool: " + visit.school.name
-		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit") + " https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter().name + "<br>"
+		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit") + " https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter.name + "<br>"
 
 @login_required
 def invitetovisit(request, visit_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	if (v.chapter != chapter):
 		raise Http404
@@ -230,11 +230,11 @@ def invitetovisit(request, visit_id):
 				message.save()
 
 			if request.POST['type'] == '1':
-				users = User.objects.filter(groups=chapter, is_active=True, email_reminder_optin=True)
+				users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True)
 			elif request.POST['type'] == '2':
-				users = User.objects.filter(groups=chapter, is_active=True, is_staff=True)
+				users = User.objects.filter(chapter=chapter, is_active=True, is_staff=True)
 			elif request.POST['type'] == '4':
-				users = User.objects.filter(groups=chapter, is_active=True, email_reminder_optin=True, trained=True)
+				users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True, trained=True)
 			elif request.POST['type'] == '5':
 				ul = data['list']
 				users = ul.users.all()
@@ -296,7 +296,7 @@ class EmailAttendeesForm(forms.Form):
 		
 @login_required
 def emailvisitattendees(request, visit_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	if (v.chapter != chapter):
 		raise Http404
@@ -372,7 +372,7 @@ class CancelForm(forms.Form):
 		
 @login_required
 def cancelvisit(request, visit_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	if (v.chapter != chapter):
 		raise Http404
@@ -427,7 +427,7 @@ class DeleteForm(forms.Form):
 			
 @login_required
 def deleteschool(request, school_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	s = get_object_or_404(School, pk=school_id)
 	if (s.chapter != chapter):
 		raise Http404
@@ -446,7 +446,7 @@ def deleteschool(request, school_id):
 	
 @login_required
 def listschools(request):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	schools = School.objects.filter(chapter=chapter)
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
 
@@ -465,7 +465,7 @@ class SchoolFormPartThree(forms.Form):
 
 @login_required
 def editschool(request, school_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	if request.user.is_staff:
 		if school_id == 0:
 			s = School()
@@ -532,7 +532,7 @@ def dorsvp(request, event_id, user_id, rsvp_status):
 		EventAttendee.objects.filter(user=user, event=event).delete()
 		ea = EventAttendee(user=user, event=event, rsvp_status=rsvp_status)
 		ea.save()
-	elif event.chapter == user.chapter() and user == request.user:
+	elif event.chapter == user.chapter and user == request.user:
 		if event.allow_rsvp == 0:  # Allow anyone to RSVP
 			EventAttendee.objects.filter(user=user, event=event).delete()
 			ea = EventAttendee(user=user, event=event, rsvp_status=rsvp_status)
@@ -557,7 +557,7 @@ class RSVPForm(forms.Form):
 		
 def rsvp(request, event_id, user_id, rsvp_type):
 	e = get_object_or_404(Event, pk=event_id)
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	if rsvp_type == 'yes':
 		rsvp_id = 2
 		rsvp_string = _("RSVP'd as attending")
@@ -596,7 +596,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 
 @login_required
 def deletemessage(request, visit_id, message_id):
-	chapter = request.user.chapter()
+	chapter = request.user.chapter
 	v = get_object_or_404(Event, pk=visit_id)
 	m = get_object_or_404(EventMessage, pk=message_id)
 	if (v.chapter != chapter):
@@ -640,14 +640,14 @@ class SchoolVisitStatsForm(forms.Form):
 		del kwargs['visit']
 		super(SchoolVisitStatsForm, self).__init__(*args, **kwargs)
 		attending = EventAttendee.objects.filter(rsvp_status=2, event__id=visit.id).values_list('user_id')
-		self.fields['attended'].queryset = User.objects.filter(is_active=True,groups=visit.school.chapter).order_by('last_name')
+		self.fields['attended'].queryset = User.objects.filter(is_active=True,chapter=visit.school.chapter).order_by('last_name')
 		self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in = attending)]
 		self.fields['visit_type'].initial = ''
 		self.fields['primary_girls_first'].initial = visit.numstudents
 @login_required
 def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if v.school.chapter != request.user.chapter():
+	if v.school.chapter != request.user.chapter:
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
@@ -720,7 +720,7 @@ def report_standard(request):
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
 			formdata = theform.cleaned_data
-			event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=request.user.chapter()).values_list('id',flat=True)
+			event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=request.user.chapter).values_list('id',flat=True)
 			stats_list = SchoolVisitStats.objects.filter(visit__id__in = event_id_list)
 			event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
 			visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
@@ -804,7 +804,7 @@ def report_standard(request):
 				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
 				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr'] 
 			#Attendance reporting
-			user_list = User.objects.filter(is_active=True,groups=request.user.chapter()).order_by('last_name')
+			user_list = User.objects.filter(is_active=True,chapter=request.user.chapter).order_by('last_name')
 			for volunteer in user_list:
 				attendance[volunteer.last_name + ", " + volunteer.first_name] = 0
 				for attended in EventAttendee.objects.filter(actual_status = 1, event__id__in = visit_ids, user__id = volunteer.id):

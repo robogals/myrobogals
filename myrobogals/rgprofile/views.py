@@ -57,7 +57,7 @@ def joinchapter(request, chapterurl):
 @login_required
 def viewlist(request, chapterurl, list_id):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter())):
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		l = get_object_or_404(UserList, pk=list_id, chapter=c)
 		users = l.users
 		search = ''
@@ -91,7 +91,7 @@ class EditListForm(forms.Form):
 		if user.is_superuser:
 			self.fields['users'].queryset = User.objects.filter(is_active=True).order_by('last_name')
 		else:
-			self.fields['users'].queryset = User.objects.filter(groups=user.chapter(), is_active=True).order_by('last_name')
+			self.fields['users'].queryset = User.objects.filter(chapter=user.chapter, is_active=True).order_by('last_name')
 
 @login_required
 def listuserlists(request, chapterurl):
@@ -110,7 +110,7 @@ def edituserlist(request, chapterurl, list_id):
 	else:
 		new = False
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter())):
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		if new:
 			l = UserList()
 		else:
@@ -149,8 +149,8 @@ def edituserlist(request, chapterurl, list_id):
 @login_required
 def editusers(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter())):
-		users = User.objects.filter(groups=c)
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+		users = User.objects.filter(chapter=c)
 		search = ''
 		if 'search' in request.GET:
 			search = request.GET['search']
@@ -164,8 +164,8 @@ def editusers(request, chapterurl):
 @login_required
 def editexecs(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter())):
-		users = User.objects.filter(groups=c).filter(is_staff = True)
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+		users = User.objects.filter(chapter=c).filter(is_staff = True)
 		search = ''
 		if 'search' in request.GET:
 			search = request.GET['search']
@@ -202,12 +202,12 @@ def detail(request, username):
 	elif u.privacy >= 5:
 		if not request.user.is_authenticated():
 			private = True
-		elif not (request.user.chapter() == u.chapter()):
+		elif not (request.user.chapter == u.chapter):
 			private = True
 	else:
 		if not request.user.is_authenticated():
 			private = True
-		elif not (request.user.chapter() == u.chapter()):
+		elif not (request.user.chapter == u.chapter):
 			private = True
 		elif not request.user.is_staff:
 			private = True
@@ -458,7 +458,7 @@ def edituser(request, username, chapter=None):
 	if username == '':
 		join = True
 		u = User()
-		if request.user.is_superuser or (request.user.is_staff and request.user.chapter() == chapter):
+		if request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter):
 			adduser = True
 		else:
 			adduser = False
@@ -468,8 +468,8 @@ def edituser(request, username, chapter=None):
 		if not request.user.is_authenticated():
 			return HttpResponseRedirect("/login/?next=/profile/edit/")
 		u = get_object_or_404(User, username__exact=username)
-		chapter = u.chapter()
-	if join or request.user.is_superuser or request.user.id == u.id or (request.user.is_staff and request.user.chapter() == u.chapter()):
+		chapter = u.chapter
+	if join or request.user.is_superuser or request.user.id == u.id or (request.user.is_staff and request.user.chapter == u.chapter):
 		if request.method == 'POST':
 			if join:
 				new_username = request.POST['username'].strip()
@@ -497,7 +497,7 @@ def edituser(request, username, chapter=None):
 									pwerr = _('Your password must be at least 5 characters long')
 								else:
 									u = User.objects.create_user(new_username, '', request.POST['password1'])
-									u.groups.add(chapter)
+									u.chapter = chapter
 									mt = MemberStatus(user_id=u.pk, statusType_id=1)
 									mt.save()
 									u.is_active = True
@@ -653,7 +653,7 @@ def edituser(request, username, chapter=None):
 			return_url = ''
 
 		chpass = (join or (request.user.is_staff and request.user != u))
-		exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter() == chapter)
+		exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter)
 		return render_to_response('profile_edit.html', {'join': join, 'adduser': adduser, 'chpass': chpass, 'exec_fields': exec_fields, 'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'u': u, 'chapter': chapter, 'usererr': usererr, 'pwerr': pwerr, 'new_username': new_username, 'return': return_url}, context_instance=RequestContext(request))
 	else:
 		raise Http404  # don't have permission to change
@@ -745,7 +745,7 @@ class DefaultsFormTwo(forms.Form):
 @login_required
 def importusers(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	errmsg = None
 	if request.method == 'POST':
@@ -756,7 +756,7 @@ def importusers(request, chapterurl):
 			defaultsform2 = DefaultsFormTwo(request.POST)
 			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
 				file = request.FILES['csvfile']
-				tmppath = "/tmp/" + request.user.chapter().myrobogals_url + request.user.username + str(time()) + ".csv"
+				tmppath = "/tmp/" + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
 				for chunk in file.chunks():
 					destination.write(chunk)
@@ -851,7 +851,7 @@ HELPINFO = (
 @login_required
 def importusershelp(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
 
@@ -871,8 +871,8 @@ class WelcomeEmailFormTwo(forms.Form):
 @login_required
 def genpw(request, username):
 	user = get_object_or_404(User, username__exact=username)
-	chapter = user.chapter()
-	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
+	chapter = user.chapter
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	if 'return' in request.GET:
 		return_url = request.GET['return']
@@ -900,7 +900,7 @@ def genpw(request, username):
 @login_required
 def unilist(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter()))):
+	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	unis = University.objects.all()
 	return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))

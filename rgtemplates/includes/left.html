@@ -18,6 +18,12 @@
                     <a href="/chpass/">{% trans "Change password" %}</a><br />
                     {% if request.user.is_superuser %}
                     <a href="/topsecretarea/">{% trans "Admin panel" %}</a><br />
+                    {% else %}
+                      {% if request.user.is_staff %}
+                        {% ifnotequal request.user.user_permissions.count 0 %}
+                    <a href="/topsecretarea/">{% trans "Admin panel" %}</a><br />
+                        {% endifnotequal %}
+                      {% endif %}
                     {% endif %}
                     <a href="/logout/">{% trans "Logout" %}</a>
                 {% else %}

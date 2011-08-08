@@ -259,11 +259,11 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 				setattr(newuser, key, value)
 
 		# And finally...
+		newuser.chapter = chapter
 		newuser.save()
 
 		# Must be called after save() because the primary key
 		# is required for these
-		newuser.groups.add(chapter)
 		mt = MemberStatus(user_id=newuser.pk, statusType_id=1)
 		mt.save()
 

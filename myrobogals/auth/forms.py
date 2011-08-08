@@ -132,7 +132,7 @@ class PasswordResetForm(forms.Form):
             message.body = t.render(Context(c))
             message.from_address = 'my@robogals.org'
             message.reply_address = 'my@robogals.org'
-            message.from_name = user.chapter().name
+            message.from_name = user.chapter.name
             message.sender = User.objects.get(username='edit')
             message.html = False
             message.status = -1

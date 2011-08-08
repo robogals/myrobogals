@@ -57,14 +57,14 @@ class WriteEmailForm(forms.Form):
 		if user.is_superuser:
 			self.fields['recipients'].queryset = User.objects.filter(is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
 		else:
-			self.fields['recipients'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
-		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+			self.fields['recipients'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['from_type'].choices = (
 			(0, "Robogals <" + user.email + ">"),
-			(1, user.chapter().name + " <" + user.email + ">"),
+			(1, user.chapter.name + " <" + user.email + ">"),
 			(2, user.get_full_name() + " <" + user.email + ">")
 		)
-		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 
@@ -107,7 +107,7 @@ def writeemail(request):
 				if int(data['from_type']) == 0:
 					message.from_name = "Robogals"
 				elif int(data['from_type']) == 1:
-					message.from_name = request.user.chapter().name
+					message.from_name = request.user.chapter.name
 				else:
 					message.from_name = request.user.get_full_name()
 				
@@ -122,15 +122,15 @@ def writeemail(request):
 					# "Email all members worldwide" feature disabled Nov 2010 - too much potential for abuse.
 					# Can be re-enabled by uncommenting the following line, commenting the exception,
 					# and removing the disabled tag from the relevant radio button in email_write.html
-					#users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
+					#users = User.objects.filter(chapter__in=data['chapters'], is_active=True, email_chapter_optin=True)
 					raise Exception
 				else:
-					users = User.objects.filter(groups=request.user.chapter(), is_active=True, email_chapter_optin=True).exclude(email='')
+					users = User.objects.filter(chapter=request.user.chapter, is_active=True, email_chapter_optin=True).exclude(email='')
 			elif request.POST['type'] == '2':
 				if request.user.is_superuser:
-					users = User.objects.filter(groups__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(email='')
+					users = User.objects.filter(chapter__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(email='')
 				else:
-					users = User.objects.filter(groups=request.user.chapter(), is_active=True, is_staff=True).exclude(email='')
+					users = User.objects.filter(chapter=request.user.chapter, is_active=True, is_staff=True).exclude(email='')
 			elif request.POST['type'] == '5':
 				ul = data['list']
 				users = ul.users.all().exclude(email='')
@@ -174,7 +174,7 @@ def writeemail(request):
 			typesel = '1'
 		schedsel = '0'
 		emailform = WriteEmailForm(None, user=request.user)
-	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter(), 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
+	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
 
 class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -203,8 +203,8 @@ class WriteSMSForm(forms.Form):
 		if user.is_superuser:
 			self.fields['recipients'].queryset = User.objects.filter(is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
 		else:
-			self.fields['recipients'].queryset = User.objects.filter(groups=user.chapter(), is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
-		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter())
+			self.fields['recipients'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
+		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 
@@ -223,7 +223,7 @@ def writesms(request):
 				message = SMSMessage()
 				message.body = data['body']
 				message.sender = request.user
-				message.chapter = request.user.chapter()
+				message.chapter = request.user.chapter
 				message.senderid = '61429558100'
 				if request.POST['scheduling'] == '1':
 					message.scheduled = True
@@ -250,15 +250,15 @@ def writesms(request):
 					# "SMS all members worldwide" feature disabled - too much potential for abuse.
 					# Can be re-enabled by uncommenting the following line, commenting the exception,
 					# and removing the disabled tag from the relevant radio button in email_write.html
-					#users = User.objects.filter(groups__in=data['chapters'], is_active=True, email_chapter_optin=True)
+					#users = User.objects.filter(chapter__in=data['chapters'], is_active=True, email_chapter_optin=True)
 						raise Exception
 					else:
-						users = User.objects.filter(groups=request.user.chapter(), is_active=True, mobile_marketing_optin=True).exclude(mobile='')
+						users = User.objects.filter(chapter=request.user.chapter, is_active=True, mobile_marketing_optin=True).exclude(mobile='')
 				elif request.POST['type'] == '2':
 					if request.user.is_superuser:
-						users = User.objects.filter(groups__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(mobile='')
+						users = User.objects.filter(chapter__in=data['chapters_exec'], is_active=True, is_staff=True).exclude(mobile='')
 					else:
-						users = 	User.objects.filter(groups=request.user.chapter(), is_active=True, is_staff=True).exclude(mobile='')
+						users = 	User.objects.filter(chapter=request.user.chapter, is_active=True, is_staff=True).exclude(mobile='')
 				elif request.POST['type'] == '5':
 					ul = data['list']
 					users = ul.users.all().exclude(mobile='')
@@ -280,7 +280,7 @@ def writesms(request):
 				for obj in sms_this_month_obj:
 					sms_this_month += obj.credits_used()
 				sms_this_month += message.credits_used()
-				if sms_this_month > request.user.chapter().sms_limit:
+				if sms_this_month > request.user.chapter.sms_limit:
 					message.status = 3
 					message.save()
 					return HttpResponseRedirect('/messages/sms/overlimit/')
@@ -300,7 +300,7 @@ def writesms(request):
 			typesel = '1'
 		schedsel = '0'
 		smsform = WriteSMSForm(None, user=request.user)
-	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter(), 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
+	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
 
 @login_required
 def smsdone(request):
@@ -312,7 +312,7 @@ def smsdone(request):
 def smsoverlimit(request):
 	if not request.user.is_staff:
 		raise Http404
-	return render_to_response('sms_overlimit.html', {'chapter': request.user.chapter()}, context_instance=RequestContext(request))
+	return render_to_response('sms_overlimit.html', {'chapter': request.user.chapter}, context_instance=RequestContext(request))
 
 def serveimg(request, msgid, filename):
 	try:
@@ -505,7 +505,7 @@ class DefaultsForm(forms.Form):
 @login_required
 def importsubscribers(request, newsletter_id):
 	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
-	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter.pk == 1)):
 		raise Http404
 	errmsg = None
 	if request.method == 'POST':
@@ -582,7 +582,7 @@ HELPINFO = (
 @login_required
 def importsubscribershelp(request, newsletter_id):
 	newsletter = get_object_or_404(Newsletter, pk=newsletter_id)
-	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter.pk == 1)):
 		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
 
@@ -617,6 +617,6 @@ def newslettercp(request, newsletter_id):
 		message_details['opened'] = len(EmailRecipient.objects.filter(message=message, status=7))
 		message_details['percent'] = (Decimal((message_details['opened']))/(message_details['total_sent'])) * 100
 		history.append(message_details)
-	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter().pk == 1)):
+	if not (request.user.is_superuser or (request.user.is_staff and request.user.chapter.pk == 1)):
 		raise Http404
 	return render_to_response('newsletter_cp.html', {'newsletter': newsletter, 'history': history, 'sub_totals': sorted(sub_totals.items(), key=itemgetter(1), reverse=True), 'total': total}, context_instance=RequestContext(request))
