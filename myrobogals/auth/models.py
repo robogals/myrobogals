@@ -326,7 +326,7 @@ class User(models.Model):
     last_login = models.DateTimeField('Last login', default=datetime.datetime.now)
     date_joined = models.DateTimeField('Date joined', default=datetime.datetime.now)
     chapter = models.ForeignKey(Group, related_name='rgchapter')
-    groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True, help_text="In theory you can be a member of multiple chapters; in practice this is buggy so only have a single chapter for now. ")
+    #groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True, help_text="In theory you can be a member of multiple chapters; in practice this is buggy so only have a single chapter for now. ")
     user_permissions = models.ManyToManyField(Permission, verbose_name='Django user permissions', blank=True, help_text="Allow access to individual functions in the Global Admin Panel. The user must have exec access for this to work. Don't change this unless you really know what you're doing!")
     alt_email = models.EmailField('Alternate e-mail address', blank=True)
     dob = models.DateField(null=True, blank=True)
@@ -405,11 +405,13 @@ class User(models.Model):
     		return 'Inactive'  # never had any member status
     '''
 
+    '''
     def getchapter(self):
         try:
             return Group.objects.get(user=self)
         except Group.DoesNotExist:
             return Group.objects.get(pk=1)
+    '''
 
     # If they have set a timezone override, use that
     # otherwise use their chapter's timezone
