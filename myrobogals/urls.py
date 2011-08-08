@@ -84,3 +84,5 @@ urlpatterns = patterns('',
 	(r'^i18n/', include('django.conf.urls.i18n')),
 	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
+
+handler500 = 'rgmain.views.servererror'
