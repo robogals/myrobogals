@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.hashcompat import md5_constructor, sha_constructor
 from django.db.models.fields import PositiveIntegerField
-from myrobogals.rgprofile.usermodels import University, Country, MobileRegexCollection
+from myrobogals.rgmain.models import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from django.db import connection, transaction

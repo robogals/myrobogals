@@ -4,7 +4,7 @@ from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
 from myrobogals.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgprofile.usermodels import University, MobileRegex
+from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.auth import authenticate, login
 #from django.forms.validators import email_re
 from django import forms

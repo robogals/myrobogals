@@ -19,7 +19,7 @@ from myrobogals.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 from time import time
 from pytz import utc
-from myrobogals.rgprofile.usermodels import Country
+from myrobogals.rgmain.models import Country
 
 @login_required
 def teachhome(request):

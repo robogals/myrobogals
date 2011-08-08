@@ -16,7 +16,7 @@ from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime, date
 from tinymce.widgets import TinyMCE
-from myrobogals.rgprofile.usermodels import Country
+from myrobogals.rgmain.models import Country
 from django.utils.translation import ugettext_lazy as _
 from myrobogals.auth.decorators import login_required
 from time import time

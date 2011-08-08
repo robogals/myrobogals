@@ -1,5 +1,5 @@
 from myrobogals.auth.models import User, Group, MemberStatus
-from myrobogals.rgprofile.usermodels import Country
+from myrobogals.rgmain.models import Country
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, NewsletterSubscriber, Newsletter, SubscriberType
 from datetime import datetime, date
 import re

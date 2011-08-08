@@ -1,6 +1,6 @@
 from myrobogals.auth.models import User
 from myrobogals.rgprofile.models import PositionType, UserList
-from myrobogals.rgprofile.usermodels import University, MobileRegexCollection, MobileRegex
+from myrobogals.rgmain.models import University, MobileRegexCollection, MobileRegex
 from myrobogals import admin
 
 class PositionTypeAdmin(admin.ModelAdmin):

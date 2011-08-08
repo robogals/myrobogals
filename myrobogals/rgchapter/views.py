@@ -1,6 +1,6 @@
 from myrobogals.rgprofile.models import Position
 from myrobogals.auth.models import Group, User
-from myrobogals.rgprofile.usermodels import Country
+from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from myrobogals.auth.decorators import login_required
