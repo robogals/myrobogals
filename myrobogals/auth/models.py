@@ -204,7 +204,7 @@ class Group(models.Model):
                     ids_csv = ids_csv + ', ' + str(ids[0])
                 else:
                     break
-        cursor.execute('SELECT COUNT(user_id) FROM auth_user_groups WHERE group_id IN (' + str(self.pk) + ids_csv + ')')
+        cursor.execute('SELECT COUNT(id) FROM auth_user WHERE is_active = 1 AND chapter_id IN (' + str(self.pk) + ids_csv + ')')
         count = cursor.fetchone()
         if count:
             return int(count[0])
@@ -326,7 +326,6 @@ class User(models.Model):
     last_login = models.DateTimeField('Last login', default=datetime.datetime.now)
     date_joined = models.DateTimeField('Date joined', default=datetime.datetime.now)
     chapter = models.ForeignKey(Group, related_name='rgchapter')
-    #groups = models.ManyToManyField(Group, verbose_name='Chapters', blank=True, help_text="In theory you can be a member of multiple chapters; in practice this is buggy so only have a single chapter for now. ")
     user_permissions = models.ManyToManyField(Permission, verbose_name='Django user permissions', blank=True, help_text="Allow access to individual functions in the Global Admin Panel. The user must have exec access for this to work. Don't change this unless you really know what you're doing!")
     alt_email = models.EmailField('Alternate e-mail address', blank=True)
     dob = models.DateField(null=True, blank=True)
@@ -602,7 +601,7 @@ class AnonymousUser(object):
     is_staff = False
     is_active = False
     is_superuser = False
-    _groups = EmptyManager()
+    #_groups = EmptyManager()
     _user_permissions = EmptyManager()
 
     def __init__(self):
@@ -635,9 +634,9 @@ class AnonymousUser(object):
     def check_password(self, raw_password):
         raise NotImplementedError
 
-    def _get_groups(self):
-        return self._groups
-    groups = property(_get_groups)
+    #def _get_groups(self):
+    #    return self._groups
+    #groups = property(_get_groups)
 
     def _get_user_permissions(self):
         return self._user_permissions
