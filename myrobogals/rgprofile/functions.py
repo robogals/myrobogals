@@ -27,7 +27,7 @@ def stringval(colname, cell, newuser, defaults):
 def dateval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	try:
-		date = datetime.strptime(data, "%d %b %Y, %I:%M%p")
+		date = datetime.strptime(data, "%Y-%m-%d")
 		setattr(newuser, colname, date)
 	except ValueError:
 		if colname in defaults:

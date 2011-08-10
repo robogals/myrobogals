@@ -12,7 +12,6 @@ class DisplayColumn(models.Model):
 		return self.field_name
 	
 	def display_name_local(self):
-		print "display_name_" + translation.get_language()
 		return getattr(self, "display_name_" + translation.get_language())
 	
 	class Meta:
