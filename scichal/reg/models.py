@@ -75,7 +75,7 @@ class JosDonations(models.Model):
     )
 
     id = models.IntegerField(primary_key=True)
-    firstname = models.CharField(max_length=765, verbose_name="Name")
+    firstname = models.CharField(max_length=765, verbose_name="Girl's name")
     lastname = models.CharField(max_length=765)
     title = models.CharField(max_length=765)
     organization = models.CharField(max_length=765, verbose_name="Age")

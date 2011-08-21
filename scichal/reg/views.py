@@ -1,14 +1,17 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 from reg.models import JosDonations, JosDonate
 import re
 import MySQLdb
 
+@login_required
 def list(request):
 	entrants = JosDonations.objects.all()
 	return render_to_response('list.html', {'entrants': entrants}, context_instance=RequestContext(request))
 
+@login_required
 def mark_paid(request, entrant_id):
 	e = get_object_or_404(JosDonations, pk=entrant_id)
 	o = JosDonate.objects.get(id=1)
@@ -73,7 +76,7 @@ def mark_paid(request, entrant_id):
 	"%s",
 	"%s",
 	0,
-	NULL)""" % (c.lastrowid, e.mentor(), e.email))
+	NOW())""" % (c.lastrowid, e.mentor(), e.email))
 	e.xaction_result = 'Completed '
 	e.save()
 	return HttpResponseRedirect('/admin/reg/josdonations/')
