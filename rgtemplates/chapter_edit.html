@@ -35,7 +35,7 @@ Most options can be modified here, but you will need to contact <a href="mailto:
   </tr>
   <tr class="odd">
     <td>{% trans "Established" %}</td>
-    <td>{{c.creation_date|date:"j F Y"}}</td>
+    <td>{{c.creation_date|date:_("DATE_FORMAT_LONG")}}</td>
   </tr>
   <tr class="even">
     <td>{% trans "Parent" %}</td>

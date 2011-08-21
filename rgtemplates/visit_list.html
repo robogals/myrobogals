@@ -16,7 +16,7 @@
 {% for v in visits %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td>{{v.school}}</td>
-    <td>{{v.visit_start|date:"l j F Y"}}</td>
+    <td>{{v.visit_start|date:_("DATE_FORMAT_LONG")}}</td>
     <td>{{v.location}}</td>
     <td><a href="/teaching/{{v.pk}}/">{% trans "View" %}</a></td>
   </tr>

@@ -1,0 +1,22 @@
+# Language file for English to give us Australian date formats
+
+msgid "DATE_FORMAT"
+msgstr "D j M y"
+
+msgid "DATE_FORMAT_NODAY"
+msgstr "j F Y"
+
+msgid "DATE_FORMAT_LONG"
+msgstr "l j F Y"
+
+msgid "TIME_FORMAT"
+msgstr "g:i a"
+
+msgid "DATETIME_FORMAT"
+msgstr "g:i a, D j M y"
+
+msgid "DATETIME_FORMAT_LONG"
+msgstr "g:i a, l j F Y"
+
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "g:ia l"

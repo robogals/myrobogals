@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{{v.school}} on {{v.visit_start|date:"D j M y"}}{% endblock %}
+{% block title %}{{v.school}} on {{v.visit_start|date:_("DATE_FORMAT")}}{% endblock %}
 
-{% block pagetitle %}{{v.school}} on {{v.visit_start|date:"D j M y"}}{% endblock %}
+{% block pagetitle %}{{v.school}} on {{v.visit_start|date:_("DATE_FORMAT")}}{% endblock %}
 
 {% block content %}
 <p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a>
@@ -53,11 +53,11 @@
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Date" %}</td>
-    <td>{{v.visit_start|date:"l j F Y"}}</td>
+    <td>{{v.visit_start|date:_("DATE_FORMAT_LONG")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Time" %}</td>
-    <td>{{v.visit_start|date:"g:i a"}} - {{v.visit_end|date:"g:i a"}}</td>
+    <td>{{v.visit_start|date:_("TIME_FORMAT")}} - {{v.visit_end|date:_("TIME_FORMAT")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Location" %}</td>
@@ -76,7 +76,7 @@
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Meeting time" %}</td>
-    <td>{{v.meeting_time|date:"g:i a"}}</td>
+    <td>{{v.meeting_time|date:_("TIME_FORMAT")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Contact person" %}</td>
@@ -181,24 +181,24 @@
 		</tr>
 		<tr class="odd">
 			<td>Primary School</td>
-			<td>{{ stats.primary_girls_first }}</td>
-			<td>{{ stats.primary_girls_repeat }}</td>
-			<td>{{ stats.primary_boys_first }}</td>
-			<td>{{ stats.primary_boys_repeat }}</td>
+			<td>{{ stats.primary_girls_first|default_if_none:"" }}</td>
+			<td>{{ stats.primary_girls_repeat|default_if_none:"" }}</td>
+			<td>{{ stats.primary_boys_first|default_if_none:"" }}</td>
+			<td>{{ stats.primary_boys_repeat|default_if_none:"" }}</td>
 		</tr>
 		<tr class="even">
 			<td>High School</td>
-			<td>{{ stats.high_girls_first }}</td>
-			<td>{{ stats.high_girls_repeat }}</td>
-			<td>{{ stats.high_boys_first }}</td>
-			<td>{{ stats.high_boys_repeat }}</td>
+			<td>{{ stats.high_girls_first|default_if_none:"" }}</td>
+			<td>{{ stats.high_girls_repeat|default_if_none:"" }}</td>
+			<td>{{ stats.high_boys_first|default_if_none:"" }}</td>
+			<td>{{ stats.high_boys_repeat|default_if_none:"" }}</td>
 		</tr>
 		<tr class="odd">
 			<td>Other</td>
-			<td>{{ stats.other_girls_first }}</td>
-			<td>{{ stats.other_girls_repeat }}</td>
-			<td>{{ stats.other_boys_first }}</td>
-			<td>{{ stats.other_boys_repeat }}</td>
+			<td>{{ stats.other_girls_first|default_if_none:"" }}</td>
+			<td>{{ stats.other_girls_repeat|default_if_none:"" }}</td>
+			<td>{{ stats.other_boys_first|default_if_none:"" }}</td>
+			<td>{{ stats.other_boys_repeat|default_if_none:"" }}</td>
 		</tr>
 	</table></p>
 	{% if stats.notes %}
@@ -209,9 +209,9 @@
 {% if request.user.is_staff %}
 {% if eventmessages %}
 <h4><strong>RSVP Messages: </strong></h4>
-	{% for eventmessage in eventmessages%}
+	{% for eventmessage in eventmessages %}
 	 <div class="eventmessage">
-	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{{eventmessage.date|date:"g:i a, D j M y"}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
+	  <div class="topbar">{{eventmessage.user.get_full_name}}  {% trans "said:" %} <span style="position: absolute; right: 0.5em;">{{eventmessage.date|date:_("DATETIME_FORMAT")}} | <a href="/teaching/{{v.pk}}/deletemessage/{{eventmessage.id}}/">{% trans "Delete" %}</a></span></div>
 	  <div class="message-box">
 		<div class="message-content">{{eventmessage.message|safe}}</div>
 	  </div>

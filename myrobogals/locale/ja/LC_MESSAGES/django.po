@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "DATETIME_FORMAT_LONG"
+msgstr "Y/m/d H:i"
+
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "DH:i"
+
+msgid "DATE_FORMAT_LONG"
+msgstr "Y/m/d"
+
+msgid "DATE_FORMAT_NODAY"
+msgstr "Y/m/d"
+
 #: admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -499,10 +511,6 @@ msgstr ""
 
 #: admin/templates/admin/object_history.html:24
 msgid "Action"
-msgstr ""
-
-#: admin/templates/admin/object_history.html:30
-msgid "DATETIME_FORMAT"
 msgstr ""
 
 #: admin/templates/admin/object_history.html:38

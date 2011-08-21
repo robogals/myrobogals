@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "DATETIME_FORMAT_LONG"
+msgstr "j-n-Y H:i"
+
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "H:i l"
+
+msgid "DATE_FORMAT_LONG"
+msgstr "j-n-Y"
+
+msgid "DATE_FORMAT_NODAY"
+msgstr "j-n-Y"
+
 #: admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."

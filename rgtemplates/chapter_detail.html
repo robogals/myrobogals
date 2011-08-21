@@ -33,7 +33,7 @@
 <img src="{{chapter.photo.url}}" style="margin-bottom: 15px"><br />
 {% endif %}
 {% if chapter.university %}<span style="font-size: 12pt"><strong>{% trans "Host university:" %}</strong> {{chapter.university}}<br /><strong>Location:</strong> {{chapter.location}}</span><br /> <br />{% endif %}
-<strong>{% trans "Established:" %}</strong> {{chapter.creation_date|date:"j F Y"}}<br />
+<strong>{% trans "Established:" %}</strong> {{chapter.creation_date|date:_("DATE_FORMAT_LONG")}}<br />
 {% if chapter.parent %}<strong>{% trans "Parent:" %}</strong> <a href="/chapters/{{chapter.parent.myrobogals_url}}/">{{chapter.parent.name}}</a><br />{% endif %}
 <br />
 {% if chapter.faculty_contact %}<strong>{% trans "Faculty contact:" %}</strong><br />{{chapter.faculty_contact}}<br />{{chapter.faculty_position}}<br />{{chapter.faculty_department}}<br />

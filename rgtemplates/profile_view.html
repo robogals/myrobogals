@@ -16,10 +16,10 @@
 {% endif %}
 -->
 <strong>{% trans "Chapter:" %}</strong> <a href="/chapters/{{user.chapter.myrobogals_url}}/">{{user.chapter}}</a><br />
-<strong>{% trans "Joined:" %}</strong> {{user.date_joined_local|date:"j F Y"}}<br />
+<strong>{% trans "Joined:" %}</strong> {{user.date_joined_local|date:_("DATE_FORMAT_NODAY")}}<br />
 <strong>{% trans "Membership type:" %}</strong> {{user.membertype}}<br />
 {% if user.dob_public %}
-<strong>{% trans "Date of birth:" %}</strong> {{user.dob|date:"j F Y"}} (age {{user.age}})<br />
+<strong>{% trans "Date of birth:" %}</strong> {{user.dob|date:_("DATE_FORMAT_NODAY")}} ({% blocktrans with user.age as age %}age {{age}}{% endblocktrans %})<br />
 {% endif %}
 {% if user.email_public %}
 <strong>{% trans "Email address:" %}</strong> {% hide_email user.email %}<br />
