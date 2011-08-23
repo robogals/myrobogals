@@ -22,10 +22,12 @@ class ModelBackend(object):
             return None
 
     def get_group_permissions(self, user_obj):
+        return set()
         """
         Returns a set of permission strings that this user has through his/her
         groups.
         """
+        '''
         if not hasattr(user_obj, '_group_perm_cache'):
             cursor = connection.cursor()
             # The SQL below works out to the following, after DB quoting:
@@ -54,6 +56,7 @@ class ModelBackend(object):
             cursor.execute(sql, [user_obj.id])
             user_obj._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return user_obj._group_perm_cache
+        '''
 
     def get_all_permissions(self, user_obj):
         if not hasattr(user_obj, '_perm_cache'):
