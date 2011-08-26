@@ -135,6 +135,13 @@ class JosDonations(models.Model):
 
     def school(self):
     	return self.other.split('|')[2]
+
+    def has_submitted(self):
+    	c = JosContent.objects.filter(created_by=self.user.pk)
+    	if len(c) > 0:
+    		return True
+    	else:
+    		return False
     	
     def submitted(self):
     	c = JosContent.objects.filter(created_by=self.user.pk)
