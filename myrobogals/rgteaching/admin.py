@@ -12,7 +12,6 @@ class SchoolAdmin(admin.ModelAdmin):
 
 class SchoolVisitAdmin(admin.ModelAdmin):
 	list_display = ('school', 'chapter', 'visit_start')
-	search_fields = ('school', 'chapter', 'visit_start')
 	fieldsets = (
 		(None, {'fields': ('school', 'chapter', 'creator', 'status', 'allow_rsvp')}),
 		('Dates', {'fields': ('visit_start', 'visit_end')}),
@@ -21,6 +20,7 @@ class SchoolVisitAdmin(admin.ModelAdmin):
 		('Information for volunteers', {'fields': ('location', 'meeting_location', 'meeting_time', 'contact', 'contact_email', 'contact_phone')}),
 		('Closing comments', {'fields': ('closing_comments',)})
 	)
+	list_filter = ('chapter',)
 	inlines = (EventAttendeeAdmin,)
 
 '''
