@@ -684,7 +684,9 @@ def process_login(request):
 	if email_re.match(username):
 		try:
 			users = User.objects.filter(email=username)
-			if len(users) > 1:
+			if len(users) == 0:
+				return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
+			elif len(users) > 1:
 				return render_to_response('login_form.html', {'username': username, 'error': 'That email address has multiple users associated with it. Please log in using your username.', 'next': next}, context_instance=RequestContext(request))
 			else:
 				username = users[0].username
