@@ -23,6 +23,7 @@ import csv
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
+from django.forms.fields import email_re
 
 '''
 def joinstart(request):
@@ -671,9 +672,6 @@ def show_login(request):
 def process_login(request):
 	if request.method != 'POST':
 		return HttpResponseRedirect('/login/')
-#   if email_re.match(username)
-	username = request.POST['username']
-	password = request.POST['password']
 	try:
 		next = request.POST['next']
 	except KeyError:
@@ -681,6 +679,17 @@ def process_login(request):
 			next = request.GET['next']
 		except KeyError:
 			next = '/'
+	username = request.POST['username']
+	password = request.POST['password']
+	if email_re.match(username):
+		try:
+			users = User.objects.filter(email=username)
+		except User.DoesNotExist:
+			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
+		if len(users) > 1:
+			return render_to_response('login_form.html', {'username': username, 'error': 'That email address has multiple users associated with it. Please log in using your username.', 'next': next}, context_instance=RequestContext(request))
+		else:
+			username = users[0].username
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		if user.is_active:
