@@ -690,6 +690,9 @@ def process_login(request):
 			return render_to_response('login_form.html', {'username': username, 'error': 'That email address has multiple users associated with it. Please log in using your username.', 'next': next}, context_instance=RequestContext(request))
 		else:
 			username = users[0].username
+			emaillogin = True
+	else:
+		emaillogin = False
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		if user.is_active:
@@ -698,7 +701,10 @@ def process_login(request):
 		else:
 			return render_to_response('login_form.html', {'username': username, 'error': 'Your account has been disabled', 'next': next}, context_instance=RequestContext(request))
 	else:
-		return render_to_response('login_form.html', {'username': username, 'error': 'Invalid username or password', 'next': next}, context_instance=RequestContext(request))
+		if emaillogin:
+			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
+		else:
+			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid username or password', 'next': next}, context_instance=RequestContext(request))
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()
