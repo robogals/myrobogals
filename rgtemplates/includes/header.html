@@ -196,7 +196,7 @@
                         <span>{% trans "Reporting" %}</span>
                     <a>
                 </li>
-	{% else %}
+{% else %}
 		{% if request.user.is_staff %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/reports/">
@@ -204,7 +204,17 @@
                     <a>
                 </li>
 		{% endif %}
-	{% endif %}
+{% endif %}
+                    <li class="item71" >
+            <a class="orphan item bullet" href="/teaching/video/"  >
+            <span>
+                        {% trans "Video tutorial" %}
+            </span>
+
+        </a>
+        
+        
+</li>   
 {% endif %}
                             </ul>
         </div>
