@@ -39,7 +39,7 @@ class Award(models.Model):
 	
 	award_name = models.CharField(max_length=64)
 	award_type = models.IntegerField(choices=AWARD_TYPE_CHOICES, default=0)
-	award_description = models.CharField(max_length= 128)
+	award_description = models.TextField(blank=True)
 	
 	def __unicode__(self):
 		return self.award_name
@@ -54,12 +54,11 @@ REGION_CHOICES = (
 )
 
 class AwardRecipient(models.Model):
-
 	award = models.ForeignKey(Award)
 	chapter = models.ForeignKey('auth.Group')
 	year = models.IntegerField(default=2000)
 	region = models.IntegerField(choices=REGION_CHOICES, default=0)
-	description = models.CharField(max_length=128)
+	description = models.TextField(blank=True)
 	
 	def __unicode__(self):
 		return self.award.award_name
