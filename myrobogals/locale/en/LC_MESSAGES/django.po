@@ -1,22 +1,1431 @@
-# Language file for English to give us Australian date formats
+#: admin/actions.py:60
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr ""
 
-msgid "DATE_FORMAT"
-msgstr "D j M y"
+#: admin/actions.py:67 admin/options.py:1027
+msgid "Are you sure?"
+msgstr ""
 
-msgid "DATE_FORMAT_NODAY"
-msgstr "j F Y"
+#: admin/actions.py:85
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr ""
 
-msgid "DATE_FORMAT_LONG"
-msgstr "l j F Y"
+#: admin/filterspecs.py:44
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
 
-msgid "TIME_FORMAT"
-msgstr "g:i a"
+#: admin/filterspecs.py:75 admin/filterspecs.py:92 admin/filterspecs.py:147
+#: admin/filterspecs.py:173
+msgid "All"
+msgstr ""
 
+#: admin/filterspecs.py:113
+msgid "Any date"
+msgstr ""
+
+#: admin/filterspecs.py:114
+msgid "Today"
+msgstr ""
+
+#: admin/filterspecs.py:117
+msgid "Past 7 days"
+msgstr ""
+
+#: admin/filterspecs.py:119
+msgid "This month"
+msgstr ""
+
+#: admin/filterspecs.py:121
+msgid "This year"
+msgstr ""
+
+#: admin/filterspecs.py:147
+msgid "Yes"
+msgstr ""
+
+#: admin/filterspecs.py:147
+msgid "No"
+msgstr ""
+
+#: admin/filterspecs.py:154
+msgid "Unknown"
+msgstr ""
+
+#: admin/helpers.py:14
+msgid "Action:"
+msgstr ""
+
+#: admin/models.py:19
+msgid "action time"
+msgstr ""
+
+#: admin/models.py:22
+msgid "object id"
+msgstr ""
+
+#: admin/models.py:23
+msgid "object repr"
+msgstr ""
+
+#: admin/models.py:24
+msgid "action flag"
+msgstr ""
+
+#: admin/models.py:25
+msgid "change message"
+msgstr ""
+
+#: admin/models.py:28
+msgid "log entry"
+msgstr ""
+
+#: admin/models.py:29
+msgid "log entries"
+msgstr ""
+
+#: admin/options.py:133 admin/options.py:147
+msgid "None"
+msgstr ""
+
+#: admin/options.py:519
+#, python-format
+msgid "Changed %s."
+msgstr ""
+
+#: admin/options.py:519 admin/options.py:529
+msgid "and"
+msgstr ""
+
+#: admin/options.py:524
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr ""
+
+#: admin/options.py:528
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr ""
+
+#: admin/options.py:533
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr ""
+
+#: admin/options.py:537
+msgid "No fields changed."
+msgstr ""
+
+#: admin/options.py:599
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr ""
+
+#: admin/options.py:603 admin/options.py:636
+msgid "You may edit it again below."
+msgstr ""
+
+#: admin/options.py:613 admin/options.py:646
+#, python-format
+msgid "You may add another %s below."
+msgstr ""
+
+#: admin/options.py:634
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr ""
+
+#: admin/options.py:642
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+
+#: admin/options.py:773
+#, python-format
+msgid "Add %s"
+msgstr ""
+
+#: admin/options.py:804 admin/options.py:1005
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: admin/options.py:861
+#, python-format
+msgid "Change %s"
+msgstr ""
+
+#: admin/options.py:905
+msgid "Database error"
+msgstr ""
+
+#: admin/options.py:941
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/options.py:1020
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: admin/options.py:1057
+#, python-format
+msgid "Change history: %s"
+msgstr ""
+
+#: admin/sites.py:21 admin/views/decorators.py:14 auth/forms.py:82
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+
+#: admin/sites.py:285 admin/views/decorators.py:40
+msgid "Please log in again, because your session has expired."
+msgstr ""
+
+#: admin/sites.py:292 admin/views/decorators.py:47
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+
+#: admin/sites.py:308 admin/sites.py:314 admin/views/decorators.py:66
+msgid "Usernames cannot contain the '@' character."
+msgstr ""
+
+#: admin/sites.py:311 admin/views/decorators.py:62
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr ""
+
+#: admin/sites.py:367
+msgid "Site administration"
+msgstr ""
+
+#: admin/sites.py:381 admin/templates/admin/login.html:26
+#: admin/templates/registration/password_reset_complete.html:14
+#: admin/views/decorators.py:20
+msgid "Log in"
+msgstr ""
+
+#: admin/sites.py:426
+#, python-format
+msgid "%s administration"
+msgstr ""
+
+#: admin/util.py:168
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr ""
+
+#: admin/util.py:173
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr ""
+
+#: admin/widgets.py:72
+msgid "Date:"
+msgstr ""
+
+#: admin/widgets.py:72
+msgid "Time:"
+msgstr ""
+
+#: admin/widgets.py:96
+msgid "Currently:"
+msgstr ""
+
+#: admin/widgets.py:96
+msgid "Change:"
+msgstr ""
+
+#: admin/widgets.py:125
+msgid "Lookup"
+msgstr ""
+
+#: admin/widgets.py:237
+msgid "Add Another"
+msgstr ""
+
+#: admin/templates/admin/404.html:4 admin/templates/admin/404.html.py:8
+msgid "Page not found"
+msgstr ""
+
+#: admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr ""
+
+#: admin/templates/admin/500.html:4 admin/templates/admin/app_index.html:8
+#: admin/templates/admin/base.html:54
+#: admin/templates/admin/change_form.html:17
+#: admin/templates/admin/change_list.html:25
+#: admin/templates/admin/delete_confirmation.html:6
+#: admin/templates/admin/delete_selected_confirmation.html:6
+#: admin/templates/admin/invalid_setup.html:4
+#: admin/templates/admin/object_history.html:6
+#: admin/templates/admin/auth/user/change_password.html:10
+#: admin/templates/registration/logged_out.html:4
+#: admin/templates/registration/password_change_done.html:4
+#: admin/templates/registration/password_change_form.html:4
+#: admin/templates/registration/password_reset_complete.html:4
+#: admin/templates/registration/password_reset_confirm.html:4
+#: admin/templates/registration/password_reset_done.html:4
+#: admin/templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr ""
+
+#: admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr ""
+
+#: admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr ""
+
+#: admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr ""
+
+#: admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+
+#: admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr ""
+
+#: admin/templates/admin/actions.html:4
+msgid "Go"
+msgstr ""
+
+#: admin/templates/admin/app_index.html:10 admin/templates/admin/index.html:19
+#, python-format
+msgid "%(name)s"
+msgstr ""
+
+#: admin/templates/admin/base.html:27
+msgid "Welcome,"
+msgstr ""
+
+#: admin/templates/admin/base.html:32
+#: admin/templates/registration/password_change_done.html:3
+#: admin/templates/registration/password_change_form.html:3
+msgid "Documentation"
+msgstr ""
+
+#: admin/templates/admin/base.html:40
+#: admin/templates/admin/auth/user/change_password.html:14
+#: admin/templates/admin/auth/user/change_password.html:47
+#: admin/templates/registration/password_change_done.html:3
+#: admin/templates/registration/password_change_form.html:3
+msgid "Change password"
+msgstr ""
+
+#: admin/templates/admin/base.html:47
+#: admin/templates/registration/password_change_done.html:3
+#: admin/templates/registration/password_change_form.html:3
+msgid "Log out"
+msgstr ""
+
+#: admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr ""
+
+#: admin/templates/admin/change_form.html:20
+#: admin/templates/admin/index.html:29
+msgid "Add"
+msgstr ""
+
+#: admin/templates/admin/change_form.html:27
+#: admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr ""
+
+#: admin/templates/admin/change_form.html:28
+#: admin/templates/admin/edit_inline/stacked.html:13
+#: admin/templates/admin/edit_inline/tabular.html:28
+msgid "View on site"
+msgstr ""
+
+#: admin/templates/admin/change_form.html:38
+#: admin/templates/admin/change_list.html:54
+#: admin/templates/admin/auth/user/change_password.html:23
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/templates/admin/change_list.html:46
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: admin/templates/admin/change_list.html:65
+msgid "Filter"
+msgstr ""
+
+#: admin/templates/admin/delete_confirmation.html:10
+#: admin/templates/admin/submit_line.html:4
+msgid "Delete"
+msgstr ""
+
+#: admin/templates/admin/delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: admin/templates/admin/delete_confirmation.html:23
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: admin/templates/admin/delete_confirmation.html:28
+#: admin/templates/admin/delete_selected_confirmation.html:33
+msgid "Yes, I'm sure"
+msgstr ""
+
+#: admin/templates/admin/delete_selected_confirmation.html:9
+msgid "Delete multiple objects"
+msgstr ""
+
+#: admin/templates/admin/delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the %(object_name)s would result in deleting related objects, but "
+"your account doesn't have permission to delete the following types of "
+"objects:"
+msgstr ""
+
+#: admin/templates/admin/delete_selected_confirmation.html:22
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(object_name)s objects? All of "
+"the following objects and their related items will be deleted:"
+msgstr ""
+
+#: admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: admin/templates/admin/index.html:18
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr ""
+
+#: admin/templates/admin/index.html:35
+msgid "Change"
+msgstr ""
+
+#: admin/templates/admin/index.html:45
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: admin/templates/admin/index.html:53
+msgid "Recent Actions"
+msgstr ""
+
+#: admin/templates/admin/index.html:54
+msgid "My Actions"
+msgstr ""
+
+#: admin/templates/admin/index.html:58
+msgid "None available"
+msgstr ""
+
+#: admin/templates/admin/index.html:72
+msgid "Unknown content"
+msgstr ""
+
+#: admin/templates/admin/invalid_setup.html:7
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+
+#: admin/templates/admin/login.html:19
+msgid "Username:"
+msgstr ""
+
+#: admin/templates/admin/login.html:22
+msgid "Password:"
+msgstr ""
+
+#: admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr ""
+
+#: admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr ""
+
+#: admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr ""
+
+#: admin/templates/admin/object_history.html:30
 msgid "DATETIME_FORMAT"
 msgstr "g:i a, D j M y"
 
-msgid "DATETIME_FORMAT_LONG"
-msgstr "g:i a, l j F Y"
+#: admin/templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
 
-msgid "DATETIME_FORMAT_SPECIAL"
-msgstr "g:ia l"
+#: admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr ""
+
+#: admin/templates/admin/pagination.html:11
+#: admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr ""
+
+#: admin/templates/admin/search_form.html:8
+msgid "Search"
+msgstr ""
+
+#: admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: admin/templates/admin/submit_line.html:5
+msgid "Save as new"
+msgstr ""
+
+#: admin/templates/admin/submit_line.html:6
+msgid "Save and add another"
+msgstr ""
+
+#: admin/templates/admin/submit_line.html:7
+msgid "Save and continue editing"
+msgstr ""
+
+#: admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+
+#: admin/templates/admin/auth/user/add_form.html:13 auth/forms.py:16
+#: auth/forms.py:49 auth/forms.py:61
+msgid "Username"
+msgstr ""
+
+#: admin/templates/admin/auth/user/add_form.html:20
+#: admin/templates/admin/auth/user/change_password.html:34 auth/forms.py:19
+#: auth/forms.py:62 auth/forms.py:196
+msgid "Password"
+msgstr ""
+
+#: admin/templates/admin/auth/user/add_form.html:26
+#: admin/templates/admin/auth/user/change_password.html:40 auth/forms.py:197
+msgid "Password (again)"
+msgstr ""
+
+#: admin/templates/admin/auth/user/add_form.html:27
+#: admin/templates/admin/auth/user/change_password.html:41
+msgid "Enter the same password as above, for verification."
+msgstr ""
+
+#: admin/templates/admin/auth/user/change_password.html:27
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: admin/templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr ""
+
+#: admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr ""
+
+#: admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr ""
+
+#: admin/templates/registration/password_change_done.html:4
+#: admin/templates/registration/password_change_form.html:4
+#: admin/templates/registration/password_change_form.html:6
+#: admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr ""
+
+#: admin/templates/registration/password_change_done.html:6
+#: admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr ""
+
+#: admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr ""
+
+#: admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+#: admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr ""
+
+#: admin/templates/registration/password_change_form.html:19
+#: admin/templates/registration/password_reset_confirm.html:18
+msgid "New password:"
+msgstr ""
+
+#: admin/templates/registration/password_change_form.html:21
+#: admin/templates/registration/password_reset_confirm.html:20
+msgid "Confirm password:"
+msgstr ""
+
+#: admin/templates/registration/password_change_form.html:23
+#: admin/templates/registration/password_reset_confirm.html:21
+msgid "Change my password"
+msgstr ""
+
+#: admin/templates/registration/password_reset_complete.html:4
+#: admin/templates/registration/password_reset_confirm.html:6
+#: admin/templates/registration/password_reset_done.html:4
+#: admin/templates/registration/password_reset_form.html:4
+#: admin/templates/registration/password_reset_form.html:6
+#: admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr ""
+
+#: admin/templates/registration/password_reset_complete.html:6
+#: admin/templates/registration/password_reset_complete.html:10
+msgid "Password reset complete"
+msgstr ""
+
+#: admin/templates/registration/password_reset_complete.html:12
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: admin/templates/registration/password_reset_confirm.html:4
+msgid "Password reset confirmation"
+msgstr ""
+
+#: admin/templates/registration/password_reset_confirm.html:12
+msgid "Enter new password"
+msgstr ""
+
+#: admin/templates/registration/password_reset_confirm.html:14
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: admin/templates/registration/password_reset_confirm.html:26
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: admin/templates/registration/password_reset_confirm.html:28
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: admin/templates/registration/password_reset_done.html:6
+#: admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr ""
+
+#: admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed you instructions for setting your password to the e-mail "
+"address you submitted. You should be receiving it shortly."
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:9
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:11
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: admin/templates/registration/password_reset_email.html:13
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll e-mail "
+"instructions for setting a new one."
+msgstr ""
+
+#: admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr ""
+
+#: admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr ""
+
+#: admin/templatetags/admin_list.py:299
+msgid "All dates"
+msgstr ""
+
+#: admin/views/main.py:70
+#, python-format
+msgid "Select %s"
+msgstr ""
+
+#: admin/views/main.py:70
+#, python-format
+msgid "Select %s to change"
+msgstr ""
+
+#: admin/views/template.py:37
+msgid "site"
+msgstr ""
+
+#: admin/views/template.py:39
+msgid "template"
+msgstr ""
+
+#: auth/forms.py:17 auth/forms.py:50
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr ""
+
+#: auth/forms.py:18 auth/forms.py:51
+msgid "This value must contain only letters, numbers and underscores."
+msgstr ""
+
+#: auth/forms.py:20
+msgid "Password confirmation"
+msgstr ""
+
+#: auth/forms.py:32
+msgid "A user with that username already exists."
+msgstr ""
+
+#: auth/forms.py:38 auth/forms.py:166 auth/forms.py:208
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: auth/forms.py:84
+msgid "This account is inactive."
+msgstr ""
+
+#: auth/forms.py:89
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+
+#: auth/forms.py:102
+msgid "E-mail"
+msgstr ""
+
+#: auth/forms.py:111
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: auth/forms.py:114
+msgid ""
+"The password for that account cannot be reset through this form. Please "
+"contact my@robogals.org to reset your password."
+msgstr ""
+
+#: auth/forms.py:154
+msgid "New password"
+msgstr ""
+
+#: auth/forms.py:155
+msgid "New password confirmation"
+msgstr ""
+
+#: auth/forms.py:180
+msgid "Old password"
+msgstr ""
+
+#: auth/forms.py:188
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: auth/views.py:56
+msgid "Logged out"
+msgstr ""
+
+#: auth/views.py:157
+msgid "Password changed"
+msgstr ""
+
+#: auth/management/commands/createsuperuser.py:23
+msgid "Enter a valid e-mail address."
+msgstr ""
+
+#: rgchapter/views.py:104
+msgid "About this chapter"
+msgstr ""
+
+#: rgchapter/views.py:104
+msgid ""
+"This is shown on your chapter page. Full HTML is allowed, including images! "
+"Please keep it somewhat professional - this is a corporate web portal, not "
+"MySpace :)"
+msgstr ""
+
+#: rgchapter/views.py:105
+msgid "Website URL"
+msgstr ""
+
+#: rgchapter/views.py:106
+msgid "Facebook URL"
+msgstr ""
+
+#: rgchapter/views.py:109
+msgid "Person"
+msgstr ""
+
+#: rgchapter/views.py:109
+msgid "e.g. Professor John Doe"
+msgstr ""
+
+#: rgchapter/views.py:110 rgteaching/views.py:465
+msgid "Position"
+msgstr ""
+
+#: rgchapter/views.py:110
+msgid "e.g. Associate Dean"
+msgstr ""
+
+#: rgchapter/views.py:111
+msgid "Department"
+msgstr ""
+
+#: rgchapter/views.py:111
+msgid "e.g. Faculty of Engineering"
+msgstr ""
+
+#: rgchapter/views.py:112 rgprofile/views.py:374 rgteaching/views.py:58
+#: rgteaching/views.py:466
+msgid "Email"
+msgstr ""
+
+#: rgchapter/views.py:112
+msgid ""
+"This is kept strictly confidential. It is not shown on the chapter page."
+msgstr ""
+
+#: rgchapter/views.py:113 rgteaching/views.py:59 rgteaching/views.py:467
+msgid "Phone"
+msgstr ""
+
+#: rgchapter/views.py:113
+msgid ""
+"This is kept strictly confidential. It is not shown on the chapter page. Use "
+"international format, e.g. +61 3 8344 4000"
+msgstr ""
+
+#: rgchapter/views.py:116
+msgid "Street address or PO Box"
+msgstr ""
+
+#: rgchapter/views.py:117
+msgid "City/Suburb"
+msgstr ""
+
+#: rgchapter/views.py:118
+msgid "State/Province"
+msgstr ""
+
+#: rgchapter/views.py:118
+msgid "Use the abbreviation, e.g. 'VIC' not 'Victoria'"
+msgstr ""
+
+#: rgchapter/views.py:119
+msgid "Postcode"
+msgstr ""
+
+#: rgchapter/views.py:127
+msgid ""
+"Allow new members to sign up directly on myRobogals (highly recommended!)"
+msgstr ""
+
+#: rgchapter/views.py:128
+msgid "Welcome page"
+msgstr ""
+
+#: rgchapter/views.py:129
+msgid "Join page"
+msgstr ""
+
+#: rgchapter/views.py:130 rgprofile/views.py:85
+msgid "Columns to display"
+msgstr ""
+
+#: rgchapter/views.py:130 rgprofile/views.py:85
+msgid "Columns"
+msgstr ""
+
+#: rgchapter/views.py:138
+#, python-format
+msgid ""
+"This is shown when new users have just signed up.<br>Full HTML is allowed. "
+"After saving, you can preview this page at:<br><a href=\"https://my.robogals."
+"org/welcome/%(chapter)s/\" target=\"blank\">https://my.robogals.org/welcome/%"
+"(chapter)s/</a>"
+msgstr ""
+
+#: rgchapter/views.py:139
+#, python-format
+msgid ""
+"This is shown if people try to join, but your chapter doesn't allow<br>new "
+"members to sign up to myRobogals directly. In this case, put a<br>message "
+"here about how they <em>should</em> sign up. Full HTML is allowed.<br>After "
+"saving, and if the above checkbox is unchecked, you can preview this page at:"
+"<br><a href=\"https://my.robogals.org/join/%(chapter)s/\" target=\"blank"
+"\">https://my.robogals.org/join/%(chapter)s/</a>"
+msgstr ""
+
+#: rgchapter/views.py:153
+msgid "Send a welcome email to new signups"
+msgstr ""
+
+#: rgchapter/views.py:196
+msgid "Chapter info updated"
+msgstr ""
+
+#: rgmessages/views.py:43
+msgid "Chapter name"
+msgstr ""
+
+#: rgmessages/views.py:43
+msgid "Your name"
+msgstr ""
+
+#: rgmessages/views.py:44 rgteaching/views.py:195 rgteaching/views.py:292
+msgid "Recipients"
+msgstr ""
+
+#: rgmessages/views.py:45 rgmessages/views.py:46
+msgid "Chapters"
+msgstr ""
+
+#: rgmessages/views.py:189
+msgid "Put your message here.  To opt-out reply 'stop'"
+msgstr ""
+
+#: rgmessages/views.py:347
+msgid "Message History"
+msgstr ""
+
+#: rgmessages/views.py:491
+msgid "Add subscribers, and send welcome email"
+msgstr ""
+
+#: rgmessages/views.py:491
+msgid "Add subscribers, with no further action"
+msgstr ""
+
+#: rgmessages/views.py:491
+msgid "Add subscribers, and send welcome email if send_email = 1"
+msgstr ""
+
+#: rgmessages/views.py:500
+msgid "Subscriber type"
+msgstr ""
+
+#: rgmessages/views.py:501
+msgid "Country"
+msgstr ""
+
+#: rgmessages/views.py:502
+msgid "Details verified"
+msgstr ""
+
+#: rgmessages/views.py:503
+msgid "Send most recent newsletter upon subscribing"
+msgstr ""
+
+#: rgmessages/views.py:543
+#, python-format
+msgid "%d subscribers imported!"
+msgstr ""
+
+#: rgprofile/views.py:84
+msgid "Members"
+msgstr ""
+
+#: rgprofile/views.py:131
+msgid "User list \""
+msgstr ""
+
+#: rgprofile/views.py:348
+msgid "Mobile phone"
+msgstr ""
+
+#: rgprofile/views.py:372
+msgid "First name"
+msgstr ""
+
+#: rgprofile/views.py:373
+msgid "Last name"
+msgstr ""
+
+#: rgprofile/views.py:378
+msgid "Alternate email"
+msgstr ""
+
+#: rgprofile/views.py:390
+msgid "Everyone (the whole internet)"
+msgstr ""
+
+#: rgprofile/views.py:391
+msgid "Only Robogals members"
+msgstr ""
+
+#: rgprofile/views.py:392
+msgid "Only Robogals members in my chapter"
+msgstr ""
+
+#: rgprofile/views.py:393
+msgid "Only committee"
+msgstr ""
+
+#: rgprofile/views.py:396
+msgid "Who can see my profile?"
+msgstr ""
+
+#: rgprofile/views.py:397
+msgid "Show date of birth in my profile"
+msgstr ""
+
+#: rgprofile/views.py:398
+msgid "Show email address in my profile"
+msgstr ""
+
+#: rgprofile/views.py:409
+msgid "Undergraduate"
+msgstr ""
+
+#: rgprofile/views.py:410
+msgid "Postgraduate"
+msgstr ""
+
+#: rgprofile/views.py:415
+msgid "Local"
+msgstr ""
+
+#: rgprofile/views.py:416
+msgid "International"
+msgstr ""
+
+#: rgprofile/views.py:419
+msgid "Date of birth"
+msgstr ""
+
+#: rgprofile/views.py:420
+msgid "Course"
+msgstr ""
+
+#: rgprofile/views.py:421 rgprofile/views.py:749
+msgid "Started university"
+msgstr ""
+
+#: rgprofile/views.py:422 rgprofile/views.py:750
+msgid "Will finish university"
+msgstr ""
+
+#: rgprofile/views.py:424 rgprofile/views.py:752
+msgid "Course level"
+msgstr ""
+
+#: rgprofile/views.py:425 rgprofile/views.py:753
+msgid "Student type"
+msgstr ""
+
+#: rgprofile/views.py:426
+msgid "About me (for profile page)"
+msgstr ""
+
+#: rgprofile/views.py:436
+#, python-format
+msgid "Allow %s to send me email updates"
+msgstr ""
+
+#: rgprofile/views.py:437
+#, python-format
+msgid "Allow %s to send me SMS updates"
+msgstr ""
+
+#: rgprofile/views.py:439
+msgid "Allow email reminders about my upcoming school visits"
+msgstr ""
+
+#: rgprofile/views.py:440
+msgid "Allow SMS reminders about my upcoming school visits"
+msgstr ""
+
+#: rgprofile/views.py:443 rgprofile/views.py:760
+msgid ""
+"Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
+msgstr ""
+
+#: rgprofile/views.py:452
+msgid "Trained and approved to teach"
+msgstr ""
+
+#: rgprofile/views.py:453
+msgid "Internal notes"
+msgstr ""
+
+#: rgprofile/views.py:486
+msgid "Your username must be 3 or more characters"
+msgstr ""
+
+#: rgprofile/views.py:488
+msgid "Your username must be less than 30 characters"
+msgstr ""
+
+#: rgprofile/views.py:491
+msgid "Your username must contain only letters, numbers and underscores"
+msgstr ""
+
+#: rgprofile/views.py:498
+msgid "Your password must be at least 5 characters long"
+msgstr ""
+
+#: rgprofile/views.py:509 rgprofile/views.py:517
+msgid "The password and repeated password did not match. Please try again"
+msgstr ""
+
+#: rgprofile/views.py:511
+msgid "That username is already taken"
+msgstr ""
+
+#: rgprofile/views.py:560 rgprofile/views.py:597
+msgid "Profile and settings updated!"
+msgstr ""
+
+#: rgprofile/views.py:723
+msgid "Add members, and send welcome email"
+msgstr ""
+
+#: rgprofile/views.py:723
+msgid "Add members, with no further action"
+msgstr ""
+
+#: rgprofile/views.py:747
+msgid "Date joined"
+msgstr ""
+
+#: rgprofile/views.py:756
+msgid "Allow email reminders about upcoming school visits"
+msgstr ""
+
+#: rgprofile/views.py:757
+msgid "Allow SMS reminders about upcoming school visits"
+msgstr ""
+
+#: rgprofile/views.py:758
+msgid "Allow email updates from local Robogals chapter"
+msgstr ""
+
+#: rgprofile/views.py:759
+msgid "Allow SMS updates from local Robogals chapter"
+msgstr ""
+
+#: rgprofile/views.py:806
+#, python-format
+msgid "%d users imported!"
+msgstr ""
+
+#: rgprofile/views.py:808
+#, python-format
+msgid "%d users imported and emailed!"
+msgstr ""
+
+#: rgprofile/views.py:907
+msgid "Password generated and emailed"
+msgstr ""
+
+#: rgteaching/views.py:41
+msgid ""
+"If the school is not listed here, it first needs to be added in Workshops > "
+"Add School"
+msgstr ""
+
+#: rgteaching/views.py:42
+msgid "School visit date"
+msgstr ""
+
+#: rgteaching/views.py:43
+msgid "Start time"
+msgstr ""
+
+#: rgteaching/views.py:44
+msgid "End time"
+msgstr ""
+
+#: rgteaching/views.py:45
+msgid "Location"
+msgstr ""
+
+#: rgteaching/views.py:45
+msgid ""
+"Where the workshop is taking place, at the school or elsewhere (can differ "
+"from meeting location, see below)"
+msgstr ""
+
+#: rgteaching/views.py:46
+msgid "Allowed RSVPs"
+msgstr ""
+
+#: rgteaching/views.py:55
+msgid "Meeting location"
+msgstr ""
+
+#: rgteaching/views.py:55
+msgid ""
+"Where people will meet at university to go as a group to the school, if "
+"applicable"
+msgstr ""
+
+#: rgteaching/views.py:55
+msgid "N/A"
+msgstr ""
+
+#: rgteaching/views.py:56
+msgid "Meeting time"
+msgstr ""
+
+#: rgteaching/views.py:56
+msgid "What time people can meet to go to the school"
+msgstr ""
+
+#: rgteaching/views.py:57
+msgid "Contact person"
+msgstr ""
+
+#: rgteaching/views.py:59
+msgid "Mobile number to call if people get lost"
+msgstr ""
+
+#: rgteaching/views.py:62
+msgid "Expected number of students"
+msgstr ""
+
+#: rgteaching/views.py:63
+msgid "Year level"
+msgstr ""
+
+#: rgteaching/views.py:64
+msgid "Number of robots to bring"
+msgstr ""
+
+#: rgteaching/views.py:65
+msgid "Lesson number"
+msgstr ""
+
+#: rgteaching/views.py:66
+msgid "To print"
+msgstr ""
+
+#: rgteaching/views.py:67
+msgid "To bring"
+msgstr ""
+
+#: rgteaching/views.py:68
+msgid "Other preparation"
+msgstr ""
+
+#: rgteaching/views.py:69
+msgid "Other notes"
+msgstr ""
+
+#: rgteaching/views.py:118
+msgid "School visit info updated"
+msgstr ""
+
+#: rgteaching/views.py:197
+msgid "Invite members"
+msgstr ""
+
+#: rgteaching/views.py:197
+msgid "Add members as attending"
+msgstr ""
+
+#: rgteaching/views.py:207
+msgid ""
+"Hello,\n"
+"\n"
+"There will be an upcoming Robogals school visit:<br>"
+msgstr ""
+
+#: rgteaching/views.py:209
+msgid "<br>Location: "
+msgstr ""
+
+#: rgteaching/views.py:210
+msgid "<br><br>To accept or decline this invitation, please visit"
+msgstr ""
+
+#: rgteaching/views.py:276
+msgid "Invitations have been sent to the selected volunteers"
+msgstr ""
+
+#: rgteaching/views.py:278
+msgid "Selected volunteers have been added as attending"
+msgstr ""
+
+#: rgteaching/views.py:360
+msgid "Email sent succesfully"
+msgstr ""
+
+#: rgteaching/views.py:377
+#, python-format
+msgid ""
+"The workshop for %(school)s at %(starttime)s has been cancelled, sorry for "
+"any inconvenience."
+msgstr ""
+
+#: rgteaching/views.py:420
+msgid "Visit cancelled successfully"
+msgstr ""
+
+#: rgteaching/views.py:443
+msgid "You cannot delete this school as it has a visit in the database."
+msgstr ""
+
+#: rgteaching/views.py:447
+msgid "School sucessfully deleted."
+msgstr ""
+
+#: rgteaching/views.py:460 rgteaching/views.py:464
+msgid "Name"
+msgstr ""
+
+#: rgteaching/views.py:461
+msgid "Address"
+msgstr ""
+
+#: rgteaching/views.py:470
+msgid "Notes"
+msgstr ""
+
+#: rgteaching/views.py:504
+msgid "School info updated"
+msgstr ""
+
+#: rgteaching/views.py:569
+msgid "RSVP'd as attending"
+msgstr ""
+
+#: rgteaching/views.py:570
+msgid "RSVP as attending"
+msgstr ""
+
+#: rgteaching/views.py:573
+msgid "RSVP'd as not attending"
+msgstr ""
+
+#: rgteaching/views.py:574
+msgid "RSVP as not attending"
+msgstr ""
+
+#: rgteaching/views.py:576
+msgid "Remove an invitee"
+msgstr ""
+
+#: rgteaching/views.py:577
+msgid "Removed from this event"
+msgstr ""
+
+#: rgteaching/views.py:612
+msgid "Message deleted"
+msgstr ""
+
+#: rgteaching/views.py:622 rgteaching/views.py:716
+#, python-format
+msgid ""
+"For an explanation of each type please see <a href=\"%s\" target=\"_blank"
+"\">here</a> (opens in new window)"
+msgstr ""
+
+#: rgteaching/views.py:635
+msgid "Invitees"
+msgstr ""
+
+#: rgteaching/views.py:636
+msgid "General notes"
+msgstr ""
+
+#: rgteaching/views.py:701
+msgid "Stats saved successfully, visit closed."
+msgstr ""
+
+#: tinymce/views.py:67
+msgid "Error running spellchecker"
+msgstr ""
+
+# Language file for English to give us Australian date formats
+#~ msgid "DATE_FORMAT"
+#~ msgstr "D j M y"
+
+#~ msgid "DATE_FORMAT_NODAY"
+#~ msgstr "j F Y"
+
+#~ msgid "DATE_FORMAT_LONG"
+#~ msgstr "l j F Y"
+
+#~ msgid "TIME_FORMAT"
+#~ msgstr "g:i a"
+
+#~ msgid "DATETIME_FORMAT_LONG"
+#~ msgstr "g:i a, l j F Y"
+
+#~ msgid "DATETIME_FORMAT_SPECIAL"
+#~ msgstr "g:ia l"

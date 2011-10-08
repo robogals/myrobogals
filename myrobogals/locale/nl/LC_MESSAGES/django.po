@@ -8,25 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-11 12:27+1000\n"
+"POT-Creation-Date: 2011-10-04 14:05+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-msgid "DATETIME_FORMAT_LONG"
-msgstr "j-n-Y H:i"
-
-msgid "DATETIME_FORMAT_SPECIAL"
-msgstr "H:i l"
-
-msgid "DATE_FORMAT_LONG"
-msgstr "j-n-Y"
-
-msgid "DATE_FORMAT_NODAY"
-msgstr "j-n-Y"
 
 #: admin/actions.py:60
 #, python-format
@@ -836,111 +824,111 @@ msgstr ""
 msgid "Enter a valid e-mail address."
 msgstr ""
 
-#: rgchapter/views.py:103
+#: rgchapter/views.py:104
 msgid "About this chapter"
 msgstr ""
 
-#: rgchapter/views.py:103
+#: rgchapter/views.py:104
 msgid ""
 "This is shown on your chapter page. Full HTML is allowed, including images! "
 "Please keep it somewhat professional - this is a corporate web portal, not "
 "MySpace :)"
 msgstr ""
 
-#: rgchapter/views.py:104
+#: rgchapter/views.py:105
 msgid "Website URL"
 msgstr ""
 
-#: rgchapter/views.py:105
+#: rgchapter/views.py:106
 msgid "Facebook URL"
 msgstr ""
 
-#: rgchapter/views.py:108
+#: rgchapter/views.py:109
 msgid "Person"
 msgstr ""
 
-#: rgchapter/views.py:108
+#: rgchapter/views.py:109
 msgid "e.g. Professor John Doe"
 msgstr ""
 
-#: rgchapter/views.py:109 rgteaching/views.py:476
+#: rgchapter/views.py:110 rgteaching/views.py:465
 msgid "Position"
 msgstr ""
 
-#: rgchapter/views.py:109
+#: rgchapter/views.py:110
 msgid "e.g. Associate Dean"
 msgstr ""
 
-#: rgchapter/views.py:110
+#: rgchapter/views.py:111
 msgid "Department"
 msgstr ""
 
-#: rgchapter/views.py:110
+#: rgchapter/views.py:111
 msgid "e.g. Faculty of Engineering"
 msgstr ""
 
-#: rgchapter/views.py:111 rgprofile/views.py:373 rgteaching/views.py:52
-#: rgteaching/views.py:477
+#: rgchapter/views.py:112 rgprofile/views.py:374 rgteaching/views.py:58
+#: rgteaching/views.py:466
 msgid "Email"
 msgstr ""
 
-#: rgchapter/views.py:111
+#: rgchapter/views.py:112
 msgid ""
 "This is kept strictly confidential. It is not shown on the chapter page."
 msgstr ""
 
-#: rgchapter/views.py:112 rgteaching/views.py:53 rgteaching/views.py:478
+#: rgchapter/views.py:113 rgteaching/views.py:59 rgteaching/views.py:467
 msgid "Phone"
 msgstr ""
 
-#: rgchapter/views.py:112
+#: rgchapter/views.py:113
 msgid ""
 "This is kept strictly confidential. It is not shown on the chapter page. Use "
 "international format, e.g. +61 3 8344 4000"
 msgstr ""
 
-#: rgchapter/views.py:115
+#: rgchapter/views.py:116
 msgid "Street address or PO Box"
 msgstr ""
 
-#: rgchapter/views.py:116
+#: rgchapter/views.py:117
 msgid "City/Suburb"
 msgstr ""
 
-#: rgchapter/views.py:117
+#: rgchapter/views.py:118
 msgid "State/Province"
 msgstr ""
 
-#: rgchapter/views.py:117
+#: rgchapter/views.py:118
 msgid "Use the abbreviation, e.g. 'VIC' not 'Victoria'"
 msgstr ""
 
-#: rgchapter/views.py:118
+#: rgchapter/views.py:119
 msgid "Postcode"
 msgstr ""
 
-#: rgchapter/views.py:126
+#: rgchapter/views.py:127
 msgid ""
 "Allow new members to sign up directly on myRobogals (highly recommended!)"
 msgstr ""
 
-#: rgchapter/views.py:127
+#: rgchapter/views.py:128
 msgid "Welcome page"
 msgstr ""
 
-#: rgchapter/views.py:128
+#: rgchapter/views.py:129
 msgid "Join page"
 msgstr ""
 
-#: rgchapter/views.py:129 rgprofile/views.py:84
+#: rgchapter/views.py:130 rgprofile/views.py:85
 msgid "Columns to display"
 msgstr ""
 
-#: rgchapter/views.py:129 rgprofile/views.py:84
+#: rgchapter/views.py:130 rgprofile/views.py:85
 msgid "Columns"
 msgstr ""
 
-#: rgchapter/views.py:137
+#: rgchapter/views.py:138
 #, python-format
 msgid ""
 "This is shown when new users have just signed up.<br>Full HTML is allowed. "
@@ -949,7 +937,7 @@ msgid ""
 "(chapter)s/</a>"
 msgstr ""
 
-#: rgchapter/views.py:138
+#: rgchapter/views.py:139
 #, python-format
 msgid ""
 "This is shown if people try to join, but your chapter doesn't allow<br>new "
@@ -960,11 +948,11 @@ msgid ""
 "\">https://my.robogals.org/join/%(chapter)s/</a>"
 msgstr ""
 
-#: rgchapter/views.py:152
+#: rgchapter/views.py:153
 msgid "Send a welcome email to new signups"
 msgstr ""
 
-#: rgchapter/views.py:195
+#: rgchapter/views.py:196
 msgid "Chapter info updated"
 msgstr ""
 
@@ -976,7 +964,7 @@ msgstr ""
 msgid "Your name"
 msgstr ""
 
-#: rgmessages/views.py:44 rgteaching/views.py:189 rgteaching/views.py:286
+#: rgmessages/views.py:44 rgteaching/views.py:195 rgteaching/views.py:292
 msgid "Recipients"
 msgstr ""
 
@@ -1025,401 +1013,430 @@ msgstr ""
 msgid "%d subscribers imported!"
 msgstr ""
 
-#: rgprofile/views.py:83
+#: rgprofile/views.py:84
 msgid "Members"
 msgstr ""
 
-#: rgprofile/views.py:130
+#: rgprofile/views.py:131
 msgid "User list \""
 msgstr ""
 
-#: rgprofile/views.py:347
+#: rgprofile/views.py:348
 msgid "Mobile phone"
 msgstr ""
 
-#: rgprofile/views.py:371
+#: rgprofile/views.py:372
 msgid "First name"
 msgstr ""
 
-#: rgprofile/views.py:372
+#: rgprofile/views.py:373
 msgid "Last name"
 msgstr ""
 
-#: rgprofile/views.py:377
+#: rgprofile/views.py:378
 msgid "Alternate email"
 msgstr ""
 
-#: rgprofile/views.py:389
+#: rgprofile/views.py:390
 msgid "Everyone (the whole internet)"
 msgstr ""
 
-#: rgprofile/views.py:390
+#: rgprofile/views.py:391
 msgid "Only Robogals members"
 msgstr ""
 
-#: rgprofile/views.py:391
+#: rgprofile/views.py:392
 msgid "Only Robogals members in my chapter"
 msgstr ""
 
-#: rgprofile/views.py:392
+#: rgprofile/views.py:393
 msgid "Only committee"
 msgstr ""
 
-#: rgprofile/views.py:395
+#: rgprofile/views.py:396
 msgid "Who can see my profile?"
 msgstr ""
 
-#: rgprofile/views.py:396
+#: rgprofile/views.py:397
 msgid "Show date of birth in my profile"
 msgstr ""
 
-#: rgprofile/views.py:397
+#: rgprofile/views.py:398
 msgid "Show email address in my profile"
 msgstr ""
 
-#: rgprofile/views.py:408
+#: rgprofile/views.py:409
 msgid "Undergraduate"
 msgstr ""
 
-#: rgprofile/views.py:409
+#: rgprofile/views.py:410
 msgid "Postgraduate"
 msgstr ""
 
-#: rgprofile/views.py:414
+#: rgprofile/views.py:415
 msgid "Local"
 msgstr ""
 
-#: rgprofile/views.py:415
+#: rgprofile/views.py:416
 msgid "International"
 msgstr ""
 
-#: rgprofile/views.py:418
+#: rgprofile/views.py:419
 msgid "Date of birth"
 msgstr ""
 
-#: rgprofile/views.py:419
+#: rgprofile/views.py:420
 msgid "Course"
 msgstr ""
 
-#: rgprofile/views.py:420 rgprofile/views.py:732
+#: rgprofile/views.py:421 rgprofile/views.py:749
 msgid "Started university"
 msgstr ""
 
-#: rgprofile/views.py:421 rgprofile/views.py:733
+#: rgprofile/views.py:422 rgprofile/views.py:750
 msgid "Will finish university"
 msgstr ""
 
-#: rgprofile/views.py:423 rgprofile/views.py:735
+#: rgprofile/views.py:424 rgprofile/views.py:752
 msgid "Course level"
 msgstr ""
 
-#: rgprofile/views.py:424 rgprofile/views.py:736
+#: rgprofile/views.py:425 rgprofile/views.py:753
 msgid "Student type"
 msgstr ""
 
-#: rgprofile/views.py:425
+#: rgprofile/views.py:426
 msgid "About me (for profile page)"
 msgstr ""
 
-#: rgprofile/views.py:438
-msgid "Allow email reminders about my upcoming school visits"
+#: rgprofile/views.py:436
+#, python-format
+msgid "Allow %s to send me email updates"
+msgstr ""
+
+#: rgprofile/views.py:437
+#, python-format
+msgid "Allow %s to send me SMS updates"
 msgstr ""
 
 #: rgprofile/views.py:439
+msgid "Allow email reminders about my upcoming school visits"
+msgstr ""
+
+#: rgprofile/views.py:440
 msgid "Allow SMS reminders about my upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:442 rgprofile/views.py:743
+#: rgprofile/views.py:443 rgprofile/views.py:760
 msgid ""
 "Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
 msgstr ""
 
-#: rgprofile/views.py:451
+#: rgprofile/views.py:452
 msgid "Trained and approved to teach"
 msgstr ""
 
-#: rgprofile/views.py:452
+#: rgprofile/views.py:453
 msgid "Internal notes"
 msgstr ""
 
-#: rgprofile/views.py:485
+#: rgprofile/views.py:486
 msgid "Your username must be 3 or more characters"
 msgstr ""
 
-#: rgprofile/views.py:487
+#: rgprofile/views.py:488
 msgid "Your username must be less than 30 characters"
 msgstr ""
 
-#: rgprofile/views.py:490
+#: rgprofile/views.py:491
 msgid "Your username must contain only letters, numbers and underscores"
 msgstr ""
 
-#: rgprofile/views.py:497
+#: rgprofile/views.py:498
 msgid "Your password must be at least 5 characters long"
 msgstr ""
 
-#: rgprofile/views.py:508 rgprofile/views.py:516
+#: rgprofile/views.py:509 rgprofile/views.py:517
 msgid "The password and repeated password did not match. Please try again"
 msgstr ""
 
-#: rgprofile/views.py:510
+#: rgprofile/views.py:511
 msgid "That username is already taken"
 msgstr ""
 
-#: rgprofile/views.py:559 rgprofile/views.py:596
+#: rgprofile/views.py:560 rgprofile/views.py:597
 msgid "Profile and settings updated!"
 msgstr ""
 
-#: rgprofile/views.py:706
+#: rgprofile/views.py:723
 msgid "Add members, and send welcome email"
 msgstr ""
 
-#: rgprofile/views.py:706
+#: rgprofile/views.py:723
 msgid "Add members, with no further action"
 msgstr ""
 
-#: rgprofile/views.py:730
+#: rgprofile/views.py:747
 msgid "Date joined"
 msgstr ""
 
-#: rgprofile/views.py:739
+#: rgprofile/views.py:756
 msgid "Allow email reminders about upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:740
+#: rgprofile/views.py:757
 msgid "Allow SMS reminders about upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:741
+#: rgprofile/views.py:758
 msgid "Allow email updates from local Robogals chapter"
 msgstr ""
 
-#: rgprofile/views.py:742
+#: rgprofile/views.py:759
 msgid "Allow SMS updates from local Robogals chapter"
 msgstr ""
 
-#: rgprofile/views.py:789
+#: rgprofile/views.py:806
 #, python-format
 msgid "%d users imported!"
 msgstr ""
 
-#: rgprofile/views.py:791
+#: rgprofile/views.py:808
 #, python-format
 msgid "%d users imported and emailed!"
 msgstr ""
 
-#: rgprofile/views.py:890
+#: rgprofile/views.py:907
 msgid "Password generated and emailed"
 msgstr ""
 
-#: rgteaching/views.py:35
+#: rgteaching/views.py:41
 msgid ""
-"If the school is not listed here, it first needs to be added in Teaching > "
+"If the school is not listed here, it first needs to be added in Workshops > "
 "Add School"
 msgstr ""
 
-#: rgteaching/views.py:36
+#: rgteaching/views.py:42
 msgid "School visit date"
 msgstr ""
 
-#: rgteaching/views.py:37
+#: rgteaching/views.py:43
 msgid "Start time"
 msgstr ""
 
-#: rgteaching/views.py:38
+#: rgteaching/views.py:44
 msgid "End time"
 msgstr ""
 
-#: rgteaching/views.py:39
+#: rgteaching/views.py:45
 msgid "Location"
 msgstr ""
 
-#: rgteaching/views.py:39
+#: rgteaching/views.py:45
 msgid ""
-"Where the teaching is taking place, at the school or elsewhere (can differ "
+"Where the workshop is taking place, at the school or elsewhere (can differ "
 "from meeting location, see below)"
 msgstr ""
 
-#: rgteaching/views.py:40
+#: rgteaching/views.py:46
 msgid "Allowed RSVPs"
 msgstr ""
 
-#: rgteaching/views.py:49
+#: rgteaching/views.py:55
 msgid "Meeting location"
 msgstr ""
 
-#: rgteaching/views.py:49
+#: rgteaching/views.py:55
 msgid ""
 "Where people will meet at university to go as a group to the school, if "
 "applicable"
 msgstr ""
 
-#: rgteaching/views.py:49
+#: rgteaching/views.py:55
 msgid "N/A"
 msgstr ""
 
-#: rgteaching/views.py:50
+#: rgteaching/views.py:56
 msgid "Meeting time"
 msgstr ""
 
-#: rgteaching/views.py:50
+#: rgteaching/views.py:56
 msgid "What time people can meet to go to the school"
 msgstr ""
 
-#: rgteaching/views.py:51
+#: rgteaching/views.py:57
 msgid "Contact person"
 msgstr ""
 
-#: rgteaching/views.py:53
+#: rgteaching/views.py:59
 msgid "Mobile number to call if people get lost"
 msgstr ""
 
-#: rgteaching/views.py:56
+#: rgteaching/views.py:62
 msgid "Expected number of students"
 msgstr ""
 
-#: rgteaching/views.py:57
+#: rgteaching/views.py:63
 msgid "Year level"
 msgstr ""
 
-#: rgteaching/views.py:58
+#: rgteaching/views.py:64
 msgid "Number of robots to bring"
 msgstr ""
 
-#: rgteaching/views.py:59
+#: rgteaching/views.py:65
 msgid "Lesson number"
 msgstr ""
 
-#: rgteaching/views.py:60
+#: rgteaching/views.py:66
 msgid "To print"
 msgstr ""
 
-#: rgteaching/views.py:61
+#: rgteaching/views.py:67
 msgid "To bring"
 msgstr ""
 
-#: rgteaching/views.py:62
+#: rgteaching/views.py:68
 msgid "Other preparation"
 msgstr ""
 
-#: rgteaching/views.py:63
+#: rgteaching/views.py:69
 msgid "Other notes"
 msgstr ""
 
-#: rgteaching/views.py:112
+#: rgteaching/views.py:118
 msgid "School visit info updated"
 msgstr ""
 
-#: rgteaching/views.py:191
+#: rgteaching/views.py:197
 msgid "Invite members"
 msgstr ""
 
-#: rgteaching/views.py:191
+#: rgteaching/views.py:197
 msgid "Add members as attending"
 msgstr ""
 
-#: rgteaching/views.py:201
+#: rgteaching/views.py:207
 msgid ""
 "Hello,\n"
 "\n"
 "There will be an upcoming Robogals school visit:<br>"
 msgstr ""
 
-#: rgteaching/views.py:203
+#: rgteaching/views.py:209
 msgid "<br>Location: "
 msgstr ""
 
-#: rgteaching/views.py:204
+#: rgteaching/views.py:210
 msgid "<br><br>To accept or decline this invitation, please visit"
 msgstr ""
 
-#: rgteaching/views.py:270
+#: rgteaching/views.py:276
 msgid "Invitations have been sent to the selected volunteers"
 msgstr ""
 
-#: rgteaching/views.py:272
+#: rgteaching/views.py:278
 msgid "Selected volunteers have been added as attending"
 msgstr ""
 
-#: rgteaching/views.py:368
+#: rgteaching/views.py:360
 msgid "Email sent succesfully"
 msgstr ""
 
-#: rgteaching/views.py:385
+#: rgteaching/views.py:377
 #, python-format
 msgid ""
-"The visit to %(location)s at %(starttime)s has been cancelled, sorry for any "
-"inconvenience."
+"The workshop for %(school)s at %(starttime)s has been cancelled, sorry for "
+"any inconvenience."
 msgstr ""
 
-#: rgteaching/views.py:431
+#: rgteaching/views.py:420
 msgid "Visit cancelled successfully"
 msgstr ""
 
-#: rgteaching/views.py:454
+#: rgteaching/views.py:443
 msgid "You cannot delete this school as it has a visit in the database."
 msgstr ""
 
-#: rgteaching/views.py:458
+#: rgteaching/views.py:447
 msgid "School sucessfully deleted."
 msgstr ""
 
-#: rgteaching/views.py:471 rgteaching/views.py:475
+#: rgteaching/views.py:460 rgteaching/views.py:464
 msgid "Name"
 msgstr ""
 
-#: rgteaching/views.py:472
+#: rgteaching/views.py:461
 msgid "Address"
 msgstr ""
 
-#: rgteaching/views.py:481
+#: rgteaching/views.py:470
 msgid "Notes"
 msgstr ""
 
-#: rgteaching/views.py:515
+#: rgteaching/views.py:504
 msgid "School info updated"
 msgstr ""
 
-#: rgteaching/views.py:580
-msgid "RSVP'd as Attending"
+#: rgteaching/views.py:569
+msgid "RSVP'd as attending"
 msgstr ""
 
-#: rgteaching/views.py:581
-msgid "RSVP as Attending"
+#: rgteaching/views.py:570
+msgid "RSVP as attending"
 msgstr ""
 
-#: rgteaching/views.py:584
-msgid "RSVP'd as Not Attending"
+#: rgteaching/views.py:573
+msgid "RSVP'd as not attending"
 msgstr ""
 
-#: rgteaching/views.py:585
-msgid "RSVP as Not Attending"
+#: rgteaching/views.py:574
+msgid "RSVP as not attending"
 msgstr ""
 
-#: rgteaching/views.py:587
-msgid "Remove as Invitee"
+#: rgteaching/views.py:576
+msgid "Remove an invitee"
 msgstr ""
 
-#: rgteaching/views.py:588
+#: rgteaching/views.py:577
 msgid "Removed from this event"
 msgstr ""
 
-#: rgteaching/views.py:624
-msgid "Message Deleted"
+#: rgteaching/views.py:612
+msgid "Message deleted"
 msgstr ""
 
-#: rgteaching/views.py:657
+#: rgteaching/views.py:622 rgteaching/views.py:716
+#, python-format
+msgid ""
+"For an explanation of each type please see <a href=\"%s\" target=\"_blank"
+"\">here</a> (opens in new window)"
+msgstr ""
+
+#: rgteaching/views.py:635
 msgid "Invitees"
 msgstr ""
 
-#: rgteaching/views.py:658
-msgid "General Notes"
+#: rgteaching/views.py:636
+msgid "General notes"
 msgstr ""
 
-#: rgteaching/views.py:723
+#: rgteaching/views.py:701
 msgid "Stats saved successfully, visit closed."
 msgstr ""
 
 #: tinymce/views.py:67
 msgid "Error running spellchecker"
 msgstr ""
+
+#~ msgid "DATETIME_FORMAT_LONG"
+#~ msgstr "j-n-Y H:i"
+
+#~ msgid "DATETIME_FORMAT_SPECIAL"
+#~ msgstr "H:i l"
+
+#~ msgid "DATE_FORMAT_LONG"
+#~ msgstr "j-n-Y"
+
+#~ msgid "DATE_FORMAT_NODAY"
+#~ msgstr "j-n-Y"

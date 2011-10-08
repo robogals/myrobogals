@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-11 12:27+1000\n"
+"POT-Creation-Date: 2011-10-04 14:06+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgid "The page you were looking for could not be found."
 msgstr ""
 
 #: 500.html:4 500.html.py:6
-msgid "Internal Server Error"
+msgid "500: Internal Server Error"
 msgstr ""
 
 #: 500.html:9
@@ -36,15 +36,16 @@ msgstr ""
 msgid ""
 "Please email my@robogals.org and describe exactly what you were doing when "
 "this error appeared, as well as any other information that may help us to "
-"reproduce (and fix!) the problem."
+"reproduce (and fix!) the problem. Some technical information has been sent "
+"to the site administrators already."
 msgstr ""
 
-#: base.html:6 base_tinymce.html:5 includes/header.html:13
+#: base.html:6 base_tinymce.html:5 admin/base.html:51 includes/header.html:13
 msgid "Home"
 msgstr ""
 
 #: chapter_award.html:4 chapter_award.html.py:6
-msgid "Chapters' awards"
+msgid "Chapter awards"
 msgstr ""
 
 #: chapter_award.html:23
@@ -55,62 +56,67 @@ msgstr ""
 msgid "Executive Committee"
 msgstr ""
 
-#: chapter_detail.html:20
+#: chapter_detail.html:19
 msgid "Members:"
 msgstr ""
 
-#: chapter_detail.html:25 chapter_detail.html.py:30
+#: chapter_detail.html:23 chapter_detail.html.py:28
 msgid "Edit this chapter"
 msgstr ""
 
-#: chapter_detail.html:25 chapter_detail.html.py:30 chapter_edit.html:9
+#: chapter_detail.html:23 chapter_detail.html.py:28 chapter_edit.html:9
 #: exec_list.html:14 includes/header.html:89
 msgid "Manage members"
 msgstr ""
 
-#: chapter_detail.html:37
+#: chapter_detail.html:35
 msgid "Host university:"
 msgstr ""
 
-#: chapter_detail.html:38
+#: chapter_detail.html:36
 msgid "Established:"
 msgstr ""
 
-#: chapter_detail.html:39
+#: chapter_detail.html:36 chapter_edit.html:38 visit_list.html:19
+#: visit_view.html:56
+msgid "DATE_FORMAT_LONG"
+msgstr ""
+
+#: chapter_detail.html:37
 msgid "Parent:"
 msgstr ""
 
-#: chapter_detail.html:41
+#: chapter_detail.html:39
 msgid "Faculty contact:"
 msgstr ""
 
-#: chapter_detail.html:44
+#: chapter_detail.html:42
 msgid "About us:"
 msgstr ""
 
-#: chapter_detail.html:52
+#: chapter_detail.html:50
 msgid "Awards:"
 msgstr ""
 
-#: chapter_detail.html:60
+#: chapter_detail.html:58
 msgid " ("
 msgstr ""
 
-#: chapter_detail.html:60
+#: chapter_detail.html:58
 msgid ") "
 msgstr ""
 
-#: chapter_detail.html:66
+#: chapter_detail.html:64
 #, python-format
 msgid "Join %(chapter)s"
 msgstr ""
 
-#: chapter_detail.html:67
+#: chapter_detail.html:65
 #, python-format
 msgid "Visit %(chapter)s's website"
 msgstr ""
 
-#: chapter_detail.html:68
+#: chapter_detail.html:66
 #, python-format
 msgid "Visit %(chapter)s on Facebook"
 msgstr ""
@@ -207,15 +213,7 @@ msgid "Credits"
 msgstr ""
 
 #: credits.html:12
-msgid "Concept:"
-msgstr ""
-
-#: credits.html:15
-msgid "Project manager:"
-msgstr ""
-
-#: credits.html:19
-msgid "Software engineers:"
+msgid "Contributors:"
 msgstr ""
 
 #: edit_user_list.html:3 edit_user_list.html.py:5 list_user_lists.html:8
@@ -238,7 +236,7 @@ msgstr ""
 msgid "Columns to display"
 msgstr ""
 
-#: edit_user_list.html:55
+#: edit_user_list.html:55 visit_view.html:67
 msgid "Notes"
 msgstr ""
 
@@ -314,15 +312,15 @@ msgstr ""
 msgid "Message:"
 msgstr ""
 
-#: email_write.html:121 sms_write.html:121 visit_email.html:65
+#: email_write.html:121 sms_write.html:121
 msgid "Scheduling:"
 msgstr ""
 
-#: email_write.html:126 sms_write.html:126 visit_email.html:70
+#: email_write.html:126 sms_write.html:126
 msgid "Send immediately"
 msgstr ""
 
-#: email_write.html:130 sms_write.html:130 visit_email.html:74
+#: email_write.html:130 sms_write.html:130
 msgid "Send later"
 msgstr ""
 
@@ -399,7 +397,7 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: files.html:4 files.html.py:6 includes/header.html:272
+#: files.html:4 files.html.py:6
 msgid "Files"
 msgstr ""
 
@@ -591,7 +589,7 @@ msgid ""
 msgstr ""
 
 #: join_already_logged_in.html:3 join_already_logged_in.html.py:5
-#: join_listing.html:4 join_listing.html.py:6 includes/left.html:46
+#: join_listing.html:4 join_listing.html.py:6 includes/left.html:52
 msgid "Join Robogals"
 msgstr ""
 
@@ -647,7 +645,7 @@ msgstr ""
 msgid "<span style=\"color: #ff0000\">*</span> required fields"
 msgstr ""
 
-#: new_visit.html:25 visit_edit.html:30 visit_view.html:67
+#: new_visit.html:25 visit_edit.html:30 visit_view.html:71
 msgid "Info for volunteers"
 msgstr ""
 
@@ -669,7 +667,7 @@ msgstr ""
 msgid "This section is optional"
 msgstr ""
 
-#: newsletter_cp.html:3 newsletter_cp.html.py:5 includes/header.html:245
+#: newsletter_cp.html:3 newsletter_cp.html.py:5 includes/header.html:270
 msgid "Newsletter CP"
 msgstr ""
 
@@ -710,7 +708,7 @@ msgid "Percentage Opened"
 msgstr ""
 
 #: password_change_form.html:4 password_change_form.html.py:6
-#: includes/left.html:18
+#: admin/base.html:40 includes/left.html:18
 msgid "Change password"
 msgstr ""
 
@@ -834,7 +832,7 @@ msgid "Chapter"
 msgstr ""
 
 #: profile_edit.html:67
-msgid "To move to another chapter, please contact secretary@robogals.org"
+msgid "To move to another chapter, please contact my@robogals.org"
 msgstr ""
 
 #: profile_edit.html:70
@@ -878,12 +876,21 @@ msgstr ""
 msgid "Joined:"
 msgstr ""
 
+#: profile_view.html:19 profile_view.html.py:22
+msgid "DATE_FORMAT_NODAY"
+msgstr ""
+
 #: profile_view.html:20
 msgid "Membership type:"
 msgstr ""
 
 #: profile_view.html:22
 msgid "Date of birth:"
+msgstr ""
+
+#: profile_view.html:22
+#, python-format
+msgid "age %(age)s"
 msgstr ""
 
 #: profile_view.html:25
@@ -942,8 +949,8 @@ msgstr ""
 msgid " school"
 msgstr ""
 
-#: school_edit.html:8 schools_list.html:8 visit_edit.html:8 visit_list.html:8
-#: visit_stats.html:8 visit_view.html:8
+#: school_edit.html:8 schools_list.html:8 visit_list.html:8 visit_stats.html:8
+#: visit_view.html:8
 msgid "Return to teaching home"
 msgstr ""
 
@@ -951,7 +958,7 @@ msgstr ""
 msgid "Return to school list"
 msgstr ""
 
-#: school_edit.html:30 visit_view.html:78
+#: school_edit.html:30 visit_view.html:82
 msgid "Contact person"
 msgstr ""
 
@@ -967,19 +974,19 @@ msgstr ""
 msgid "Contact Person"
 msgstr ""
 
-#: schools_list.html:13 visit_view.html:82
+#: schools_list.html:13 visit_view.html:86
 msgid "Email"
 msgstr ""
 
-#: schools_list.html:14 visit_view.html:86
+#: schools_list.html:14 visit_view.html:90
 msgid "Phone"
 msgstr ""
 
-#: schools_list.html:23
+#: schools_list.html:24
 msgid "View/Edit"
 msgstr ""
 
-#: schools_list.html:24 visit_view.html:209
+#: schools_list.html:25 visit_view.html:214
 msgid "Delete"
 msgstr ""
 
@@ -1071,8 +1078,8 @@ msgid ""
 "\"http://www.robogals.org/\">robogals.org</a> "
 msgstr ""
 
-#: teaching.html:4 teaching.html.py:6
-msgid "Teaching"
+#: teaching.html:4 teaching.html.py:6 includes/header.html:117
+msgid "Workshops"
 msgstr ""
 
 #: teaching.html:10
@@ -1107,6 +1114,11 @@ msgstr ""
 msgid "Global"
 msgstr ""
 
+#: timezone_listing.html:12 timezone_listing.html.py:16
+#: timezone_listing.html:19
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr ""
+
 #: uni_ids_list.html:3 uni_ids_list.html.py:5
 msgid "University IDs for CSV import"
 msgstr ""
@@ -1120,27 +1132,35 @@ msgstr ""
 msgid "Show exec committee members"
 msgstr ""
 
+#: video.html:3 video.html.py:5
+msgid "Workshops tutorial video"
+msgstr ""
+
 #: visit_cancel.html:5
-msgid "Cancel a School Visit"
+msgid "Cancel a workshop"
 msgstr ""
 
 #: visit_cancel.html:11
 msgid ""
-"Once a visit is cancelled it will be removed from the database and you will "
-"not be able to edit it again. Only cancel a visit if you are sure it is not "
-"happening."
+"Once a workshop is cancelled it will be removed from the database and you "
+"will not be able to edit it again. Only cancel a workshop if you are sure it "
+"is not happening."
 msgstr ""
 
 #: visit_cancel.html:24
-msgid "Notification Email to Invitees"
+msgid "Notification email to invitees"
 msgstr ""
 
 #: visit_cancel.html:38
-msgid "Cancel Visit and Send Email"
+msgid "Cancel workshop and send email"
 msgstr ""
 
 #: visit_edit.html:3 visit_edit.html.py:5
 msgid "school visit"
+msgstr ""
+
+#: visit_edit.html:8
+msgid "Return to workshops home"
 msgstr ""
 
 #: visit_edit.html:8 visit_stats.html:8 visit_view.html:8
@@ -1156,11 +1176,11 @@ msgid "Submit"
 msgstr ""
 
 #: visit_email.html:4 visit_email.html.py:6
-msgid "Email Invitees of a School Visit"
+msgid "Email invitees of a school visit"
 msgstr ""
 
 #: visit_email.html:25
-msgid "All Invitees"
+msgid "All invitees"
 msgstr ""
 
 #: visit_email.html:29
@@ -1179,12 +1199,7 @@ msgstr ""
 msgid "Selected Invitees"
 msgstr ""
 
-#: visit_email.html:80
-#, python-format
-msgid " at %(schedule_time)s on %(schedule_date)s "
-msgstr ""
-
-#: visit_email.html:86
+#: visit_email.html:65
 msgid "Send Email"
 msgstr ""
 
@@ -1229,7 +1244,15 @@ msgid "View"
 msgstr ""
 
 #: visit_stats.html:3 visit_stats.html.py:5
-msgid "Enter School Visit Stats"
+msgid "Enter workshop statistics"
+msgstr ""
+
+#: visit_stats_help.html:5 visit_stats_help.html.py:7
+msgid "Enter workshop statistics: categories"
+msgstr ""
+
+#: visit_view.html:3 visit_view.html.py:5
+msgid "DATE_FORMAT"
 msgstr ""
 
 #: visit_view.html:9
@@ -1241,11 +1264,11 @@ msgid "Invite/add to visit"
 msgstr ""
 
 #: visit_view.html:9
-msgid "Email Invitees"
+msgid "Email invitees"
 msgstr ""
 
 #: visit_view.html:10
-msgid "Close and enter stats visit"
+msgid "Close visit and enter stats"
 msgstr ""
 
 #: visit_view.html:10
@@ -1300,77 +1323,90 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: visit_view.html:70
+#: visit_view.html:60 visit_view.html.py:79
+msgid "TIME_FORMAT"
+msgstr ""
+
+#: visit_view.html:74
 msgid "Meeting location"
 msgstr ""
 
-#: visit_view.html:71
+#: visit_view.html:75
 msgid ""
 "Where people will meet at university to go as a group to the school, if "
 "applicable"
 msgstr ""
 
-#: visit_view.html:74
+#: visit_view.html:78
 msgid "Meeting time"
 msgstr ""
 
-#: visit_view.html:87
+#: visit_view.html:91
 msgid "Call this number if you get lost!"
 msgstr ""
 
-#: visit_view.html:91
+#: visit_view.html:95
 msgid "Attending"
 msgstr ""
 
-#: visit_view.html:98 visit_view.html.py:125
+#: visit_view.html:102 visit_view.html.py:129
 msgid "change RSVP to not attending"
 msgstr ""
 
-#: visit_view.html:98 visit_view.html.py:111 visit_view.html.py:125
+#: visit_view.html:102 visit_view.html.py:115 visit_view.html.py:129
 msgid "remove"
 msgstr ""
 
-#: visit_view.html:104
+#: visit_view.html:108
 msgid "Not Attending"
 msgstr ""
 
-#: visit_view.html:111 visit_view.html.py:124
+#: visit_view.html:115 visit_view.html.py:128
 msgid "change RSVP to attending"
 msgstr ""
 
-#: visit_view.html:117
+#: visit_view.html:121
 msgid "Awaiting Reply"
 msgstr ""
 
-#: visit_view.html:134
+#: visit_view.html:139
 msgid "Attended"
 msgstr ""
 
-#: visit_view.html:209
+#: visit_view.html:214
 msgid "said:"
 msgstr ""
 
-#: visit_view.html:209
-msgid "Message sent at"
+#: visit_view.html:214
+msgid "DATETIME_FORMAT"
 msgstr ""
 
 #: welcome.html:3 welcome.html.py:5
 msgid "Welcome to Robogals!"
 msgstr ""
 
-#: welcome.html:9
-#, python-format
-msgid ""
-"\n"
-"%(welcome_page)s\n"
-msgstr ""
-
-#: wiki.html:3 wiki.html.py:5 includes/header.html:260
+#: wiki.html:3 wiki.html.py:5 includes/header.html:285
 msgid "Wiki"
 msgstr ""
 
 #: wiki.html:8
 msgid "Wiki coming soon :)"
+msgstr ""
+
+#: admin/base.html:27
+msgid "Welcome,"
+msgstr ""
+
+#: admin/base.html:32
+msgid "Documentation"
+msgstr ""
+
+#: admin/base.html:42
+msgid "Back to myRobogals"
+msgstr ""
+
+#: admin/base.html:44
+msgid "Log out"
 msgstr ""
 
 #: includes/footer.html:54
@@ -1406,11 +1442,7 @@ msgid "Manage lists"
 msgstr ""
 
 #: includes/header.html:105
-msgid "View chapters' awards"
-msgstr ""
-
-#: includes/header.html:117
-msgid "Workshops"
+msgid "View chapter awards"
 msgstr ""
 
 #: includes/header.html:154
@@ -1421,19 +1453,27 @@ msgstr ""
 msgid "List schools"
 msgstr ""
 
-#: includes/header.html:201
-msgid "Email &amp; SMS"
+#: includes/header.html:196 includes/header.html.py:203
+msgid "Reporting"
 msgstr ""
 
-#: includes/header.html:215
-msgid "Send email"
+#: includes/header.html:211
+msgid "Video tutorial"
 msgstr ""
 
 #: includes/header.html:226
+msgid "Email &amp; SMS"
+msgstr ""
+
+#: includes/header.html:240
+msgid "Send email"
+msgstr ""
+
+#: includes/header.html:251
 msgid "Send SMS"
 msgstr ""
 
-#: includes/header.html:234
+#: includes/header.html:259
 msgid "Message history"
 msgstr ""
 
@@ -1450,27 +1490,27 @@ msgstr ""
 msgid "Edit profile and settings"
 msgstr ""
 
-#: includes/left.html:20
+#: includes/left.html:20 includes/left.html.py:24
 msgid "Admin panel"
 msgstr ""
 
-#: includes/left.html:22
+#: includes/left.html:28
 msgid "Logout"
 msgstr ""
 
-#: includes/left.html:24
+#: includes/left.html:30
 msgid "Login Form"
 msgstr ""
 
-#: includes/left.html:50
+#: includes/left.html:56
 msgid "Reset password"
 msgstr ""
 
-#: includes/left.html:71
+#: includes/left.html:77
 msgid "Become a fan!"
 msgstr ""
 
-#: includes/left.html:72
+#: includes/left.html:78
 msgid "You know you want to :)"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-06 18:30+1000\n"
+"POT-Creation-Date: 2011-10-04 14:05+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,578 +16,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#
-# Context: https://my.robogals.org/chapters/global/edit/
-#
-#: rgchapter/views.py:103
-msgid "About this chapter"
-msgstr "支部についての説明"
-
-#: rgchapter/views.py:103
-msgid ""
-"This is shown on your chapter page. Full HTML is allowed, including images! "
-"Please keep it somewhat professional - this is a corporate web portal, not "
-"MySpace :)"
-msgstr ""
-
-#: rgchapter/views.py:104
-msgid "Website URL"
-msgstr "Website URL"
-
-#: rgchapter/views.py:105
-msgid "Facebook URL"
-msgstr "Facebook URL"
-
-#: rgchapter/views.py:108
-msgid "Person"
-msgstr "担当者"
-
-#: rgchapter/views.py:108
-msgid "e.g. Professor John Doe"
-msgstr "例）John Doe 教授"
-
-#: rgchapter/views.py:109 rgteaching/views.py:459
-msgid "Position"
-msgstr "役職"
-
-#: rgchapter/views.py:109
-msgid "e.g. Associate Dean"
-msgstr "例．副学部長"
-
-#: rgchapter/views.py:110
-msgid "Department"
-msgstr "学部"
-
-#: rgchapter/views.py:110
-msgid "e.g. Faculty of Engineering"
-msgstr "例．工学部"
-
-#: rgchapter/views.py:111 rgprofile/views.py:373 rgteaching/views.py:52
-#: rgteaching/views.py:460
-msgid "Email"
-msgstr "Email"
-
-#: rgchapter/views.py:111
-msgid ""
-"This is kept strictly confidential. It is not shown on the chapter page."
-msgstr ""
-
-#: rgchapter/views.py:112 rgteaching/views.py:53 rgteaching/views.py:461
-msgid "Phone"
-msgstr "Phone"
-
-#: rgchapter/views.py:112
-msgid ""
-"This is kept strictly confidential. It is not shown on the chapter page. Use "
-"international format, e.g. +61 3 8344 4000"
-msgstr ""
-
-#: rgchapter/views.py:115
-msgid "Street address or PO Box"
-msgstr ""
-
-#: rgchapter/views.py:116
-msgid "City/Suburb"
-msgstr ""
-
-#: rgchapter/views.py:117
-msgid "State/Province"
-msgstr ""
-
-#: rgchapter/views.py:117
-msgid "Use the abbreviation, e.g. 'VIC' not 'Victoria'"
-msgstr ""
-
-#: rgchapter/views.py:118
-msgid "Postcode"
-msgstr ""
-
-#: rgchapter/views.py:126
-msgid ""
-"Allow new members to sign up directly on myRobogals (highly recommended!)"
-msgstr ""
-
-#: rgchapter/views.py:127
-msgid "Welcome page"
-msgstr ""
-
-#: rgchapter/views.py:128
-msgid "Join page"
-msgstr ""
-
-#: rgchapter/views.py:129 rgprofile/views.py:84
-msgid "Columns to display"
-msgstr ""
-
-#: rgchapter/views.py:129 rgprofile/views.py:84
-msgid "Columns"
-msgstr ""
-
-#: rgchapter/views.py:137
-#, python-format
-msgid ""
-"This is shown when new users have just signed up.<br>Full HTML is allowed. "
-"After saving, you can preview this page at:<br><a href=\"https://my.robogals."
-"org/welcome/%(chapter)s/\" target=\"blank\">https://my.robogals.org/welcome/%"
-"(chapter)s/</a>"
-msgstr ""
-
-#: rgchapter/views.py:138
-#, python-format
-msgid ""
-"This is shown if people try to join, but your chapter doesn't allow<br>new "
-"members to sign up to myRobogals directly. In this case, put a<br>message "
-"here about how they <em>should</em> sign up. Full HTML is allowed.<br>After "
-"saving, and if the above checkbox is unchecked, you can preview this page at:"
-"<br><a href=\"https://my.robogals.org/join/%(chapter)s/\" target=\"blank"
-"\">https://my.robogals.org/join/%(chapter)s/</a>"
-msgstr ""
-
-#: rgchapter/views.py:152
-msgid "Send a welcome email to new signups"
-msgstr ""
-
-#: rgchapter/views.py:195
-msgid "Chapter info updated"
-msgstr ""
-
-#: rgmessages/views.py:43
-msgid "Chapter name"
-msgstr ""
-
-#: rgmessages/views.py:43
-msgid "Your name"
-msgstr ""
-
-#
-# Context: select recipients of an email
-#
-#: rgmessages/views.py:44 rgteaching/views.py:189 rgteaching/views.py:286
-msgid "Recipients"
-msgstr ""
-
-#: rgmessages/views.py:45 rgmessages/views.py:46
-msgid "Chapters"
-msgstr "謾ｯ驛ｨ"
-
-#
-# Context: default SMS message
-#
-#: rgmessages/views.py:189
-msgid "Put your message here.  To opt-out reply 'stop'"
-msgstr ""
-
-#: rgmessages/views.py:347
-msgid "Message History"
-msgstr ""
-
-#
-# Context: user profile stuff (editing and viewing)
-#
-#: rgprofile/views.py:83
-msgid "Members"
-msgstr ""
-
-#: rgprofile/views.py:130
-msgid "User list \""
-msgstr ""
-
-#: rgprofile/views.py:347
-msgid "Mobile phone"
-msgstr ""
-
-#: rgprofile/views.py:371
-msgid "First name"
-msgstr ""
-
-#: rgprofile/views.py:372
-msgid "Last name"
-msgstr ""
-
-#: rgprofile/views.py:377
-msgid "Alternate email"
-msgstr ""
-
-#: rgprofile/views.py:389
-msgid "Everyone (the whole internet)"
-msgstr ""
-
-#: rgprofile/views.py:390
-msgid "Only Robogals members"
-msgstr ""
-
-#: rgprofile/views.py:391
-msgid "Only Robogals members in my chapter"
-msgstr ""
-
-#: rgprofile/views.py:392
-msgid "Only committee"
-msgstr ""
-
-#: rgprofile/views.py:395
-msgid "Who can see my profile?"
-msgstr ""
-
-#: rgprofile/views.py:396
-msgid "Show date of birth in my profile"
-msgstr ""
-
-#: rgprofile/views.py:397
-msgid "Show email address in my profile"
-msgstr ""
-
-#: rgprofile/views.py:408
-msgid "Undergraduate"
-msgstr ""
-
-#: rgprofile/views.py:409
-msgid "Postgraduate"
-msgstr ""
-
-#: rgprofile/views.py:414
-msgid "Local"
-msgstr ""
-
-#: rgprofile/views.py:415
-msgid "International"
-msgstr ""
-
-#: rgprofile/views.py:418
-msgid "Date of birth"
-msgstr ""
-
-#: rgprofile/views.py:419
-msgid "Course"
-msgstr ""
-
-#: rgprofile/views.py:420 rgprofile/views.py:732
-msgid "Started university"
-msgstr ""
-
-#: rgprofile/views.py:421 rgprofile/views.py:733
-msgid "Will finish university"
-msgstr ""
-
-#: rgprofile/views.py:423 rgprofile/views.py:735
-msgid "Course level"
-msgstr ""
-
-#: rgprofile/views.py:424 rgprofile/views.py:736
-msgid "Student type"
-msgstr ""
-
-#: rgprofile/views.py:425
-msgid "About me (for profile page)"
-msgstr ""
-
-#: rgprofile/views.py:438
-msgid "Allow email reminders about my upcoming school visits"
-msgstr ""
-
-#: rgprofile/views.py:439
-msgid "Allow SMS reminders about my upcoming school visits"
-msgstr ""
-
-#: rgprofile/views.py:442 rgprofile/views.py:743
-msgid ""
-"Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
-msgstr ""
-
-#: rgprofile/views.py:451
-msgid "Trained and approved to teach"
-msgstr ""
-
-#: rgprofile/views.py:452
-msgid "Internal notes"
-msgstr ""
-
-#: rgprofile/views.py:485
-msgid "Your username must be 3 or more characters"
-msgstr ""
-
-#: rgprofile/views.py:487
-msgid "Your username must be less than 30 characters"
-msgstr ""
-
-#: rgprofile/views.py:490
-msgid "Your username must contain only letters, numbers and underscores"
-msgstr ""
-
-#: rgprofile/views.py:497
-msgid "Your password must be at least 5 characters long"
-msgstr ""
-
-#: rgprofile/views.py:508 rgprofile/views.py:516
-msgid "The password and repeated password did not match. Please try again"
-msgstr ""
-
-#: rgprofile/views.py:510
-msgid "That username is already taken"
-msgstr ""
-
-#: rgprofile/views.py:559 rgprofile/views.py:596
-msgid "Profile and settings updated!"
-msgstr ""
-
-#: rgprofile/views.py:706
-msgid "Add members, and send welcome email"
-msgstr ""
-
-#: rgprofile/views.py:706
-msgid "Add members, with no further action"
-msgstr ""
-
-#: rgprofile/views.py:730
-msgid "Date joined"
-msgstr ""
-
-#: rgprofile/views.py:739
-msgid "Allow email reminders about upcoming school visits"
-msgstr ""
-
-#: rgprofile/views.py:740
-msgid "Allow SMS reminders about upcoming school visits"
-msgstr ""
-
-#: rgprofile/views.py:741
-msgid "Allow email updates from local Robogals chapter"
-msgstr ""
-
-#: rgprofile/views.py:742
-msgid "Allow SMS updates from local Robogals chapter"
-msgstr ""
-
-#: rgprofile/views.py:789
-#, python-format
-msgid "%d users imported!"
-msgstr ""
-
-#: rgprofile/views.py:791
-#, python-format
-msgid "%d users imported and emailed!"
-msgstr ""
-
-#: rgprofile/views.py:890
-msgid "Password generated and emailed"
-msgstr ""
-
-#
-# Context: https://my.robogals.org/teaching/new/
-#
-#: rgteaching/views.py:35
-msgid ""
-"If the school is not listed here, it first needs to be added in Workshops > "
-"Add School"
-msgstr ""
-
-#: rgteaching/views.py:36
-msgid "School visit date"
-msgstr ""
-
-#: rgteaching/views.py:37
-msgid "Start time"
-msgstr ""
-
-#: rgteaching/views.py:38
-msgid "End time"
-msgstr ""
-
-#: rgteaching/views.py:39
-msgid "Location"
-msgstr ""
-
-#: rgteaching/views.py:39
-msgid ""
-"Where the workshop is taking place, at the school or elsewhere (can differ "
-"from meeting location, see below)"
-msgstr ""
-
-#: rgteaching/views.py:40
-msgid "Allowed RSVPs"
-msgstr ""
-
-#: rgteaching/views.py:49
-msgid "Meeting location"
-msgstr ""
-
-#: rgteaching/views.py:49
-msgid ""
-"Where people will meet at university to go as a group to the school, if "
-"applicable"
-msgstr ""
-
-#: rgteaching/views.py:49
-msgid "N/A"
-msgstr ""
-
-#: rgteaching/views.py:50
-msgid "Meeting time"
-msgstr ""
-
-#: rgteaching/views.py:50
-msgid "What time people can meet to go to the school"
-msgstr ""
-
-#: rgteaching/views.py:51
-msgid "Contact person"
-msgstr ""
-
-#: rgteaching/views.py:53
-msgid "Mobile number to call if people get lost"
-msgstr ""
-
-#: rgteaching/views.py:56
-msgid "Expected number of students"
-msgstr ""
-
-#: rgteaching/views.py:57
-msgid "Year level"
-msgstr ""
-
-#: rgteaching/views.py:58
-msgid "Number of robots to bring"
-msgstr ""
-
-#: rgteaching/views.py:59
-msgid "Lesson number"
-msgstr ""
-
-#: rgteaching/views.py:60
-msgid "To print"
-msgstr ""
-
-#: rgteaching/views.py:61
-msgid "To bring"
-msgstr ""
-
-#: rgteaching/views.py:62
-msgid "Other preparation"
-msgstr ""
-
-#: rgteaching/views.py:63
-msgid "Other notes"
-msgstr ""
-
-#: rgteaching/views.py:112
-msgid "School visit info updated"
-msgstr ""
-
-#: rgteaching/views.py:191
-msgid "Invite members"
-msgstr ""
-
-#: rgteaching/views.py:191
-msgid "Add members as attending"
-msgstr ""
-
-#: rgteaching/views.py:270
-msgid "Invitations have been sent to the selected volunteers"
-msgstr ""
-
-#: rgteaching/views.py:272
-msgid "Selected volunteers have been added as attending"
-msgstr ""
-
-#: rgteaching/views.py:354
-msgid "Email sent succesfully"
-msgstr ""
-
-#: rgteaching/views.py:371
-#, python-format
-msgid ""
-"The workshop for %(school)s at %(starttime)s has been cancelled, sorry for "
-"any inconvenience."
-msgstr ""
-
-#: rgteaching/views.py:414
-msgid "Visit cancelled successfully"
-msgstr ""
-
-#: rgteaching/views.py:437
-msgid "You cannot delete this school as it has a visit in the database."
-msgstr ""
-
-#: rgteaching/views.py:441
-msgid "School sucessfully deleted."
-msgstr ""
-
-#: rgteaching/views.py:454 rgteaching/views.py:458
-msgid "Name"
-msgstr ""
-
-#: rgteaching/views.py:455
-msgid "Address"
-msgstr ""
-
-#: rgteaching/views.py:464
-msgid "Notes"
-msgstr ""
-
-#: rgteaching/views.py:498
-msgid "School info updated"
-msgstr ""
-
-#: rgteaching/views.py:563
-msgid "RSVP'd as attending"
-msgstr ""
-
-#: rgteaching/views.py:564
-msgid "RSVP as attending"
-msgstr ""
-
-#: rgteaching/views.py:567
-msgid "RSVP'd as not attending"
-msgstr ""
-
-#: rgteaching/views.py:568
-msgid "RSVP as not attending"
-msgstr ""
-
-#: rgteaching/views.py:570
-msgid "Remove an invitee"
-msgstr ""
-
-#: rgteaching/views.py:571
-msgid "Removed from this event"
-msgstr ""
-
-#: rgteaching/views.py:606
-msgid "Message deleted"
-msgstr ""
-
-#: rgteaching/views.py:616 rgteaching/views.py:710
-#, python-format
-msgid ""
-"For an explanation of each type please see <a href=\"%s\" target=\"_blank"
-"\">here</a> (opens in new window)"
-msgstr ""
-
-#: rgteaching/views.py:629
-msgid "Invitees"
-msgstr ""
-
-#: rgteaching/views.py:630
-msgid "General notes"
-msgstr ""
-
-#: rgteaching/views.py:695
-msgid "Stats saved successfully, visit closed."
-msgstr ""
-
-#: tinymce/views.py:67
-msgid "Error running spellchecker"
-msgstr ""
-
-
-###########################################################################
+# ##########################################################################
 #                                                                         #
 #                 NO NEED TO TRANSLATE BELOW THIS LINE                    #
 #                                                                         #
 #  THESE STRINGS ARE EITHER ADMIN-ONLY, OR ALREADY TRANSLATED BY DJANGO   #
 #                                                                         #
-###########################################################################
-
-
+# ##########################################################################
 #: admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -1396,6 +831,186 @@ msgstr ""
 msgid "Enter a valid e-mail address."
 msgstr ""
 
+#
+# Context: https://my.robogals.org/chapters/global/edit/
+#
+#: rgchapter/views.py:104
+msgid "About this chapter"
+msgstr "支部についての説明"
+
+#: rgchapter/views.py:104
+msgid ""
+"This is shown on your chapter page. Full HTML is allowed, including images! "
+"Please keep it somewhat professional - this is a corporate web portal, not "
+"MySpace :)"
+msgstr ""
+"これはあなたの支部のページに表されます．画像を含め，全てHTML形式で書いてくだ"
+"さい．ここは団体の公的なウェブポータルです．適切な文体・表現を心がけてくださ"
+"い．"
+
+#: rgchapter/views.py:105
+msgid "Website URL"
+msgstr "Website URL"
+
+#: rgchapter/views.py:106
+msgid "Facebook URL"
+msgstr "Facebook URL"
+
+#: rgchapter/views.py:109
+msgid "Person"
+msgstr "担当者"
+
+#: rgchapter/views.py:109
+msgid "e.g. Professor John Doe"
+msgstr "例）山田 太郎 教授"
+
+#: rgchapter/views.py:110 rgteaching/views.py:465
+msgid "Position"
+msgstr "役職"
+
+#: rgchapter/views.py:110
+msgid "e.g. Associate Dean"
+msgstr "例) 副学部長"
+
+#: rgchapter/views.py:111
+msgid "Department"
+msgstr "学部"
+
+#: rgchapter/views.py:111
+msgid "e.g. Faculty of Engineering"
+msgstr "例) 工学部"
+
+#: rgchapter/views.py:112 rgprofile/views.py:374 rgteaching/views.py:58
+#: rgteaching/views.py:466
+msgid "Email"
+msgstr "Email"
+
+#: rgchapter/views.py:112
+msgid ""
+"This is kept strictly confidential. It is not shown on the chapter page."
+msgstr "この情報は厳正に管理されています．支部のページには表示されません．"
+
+#: rgchapter/views.py:113 rgteaching/views.py:59 rgteaching/views.py:467
+msgid "Phone"
+msgstr "電話番号"
+
+#: rgchapter/views.py:113
+msgid ""
+"This is kept strictly confidential. It is not shown on the chapter page. Use "
+"international format, e.g. +61 3 8344 4000"
+msgstr ""
+"この情報は厳正に管理されています．支部のページには表示されません．国際規格を"
+"用いて記入してください．例．+81 3 0000 0000"
+
+#: rgchapter/views.py:116
+msgid "Street address or PO Box"
+msgstr "番地"
+
+#: rgchapter/views.py:117
+msgid "City/Suburb"
+msgstr "市町村"
+
+#: rgchapter/views.py:118
+msgid "State/Province"
+msgstr "都道府県"
+
+#: rgchapter/views.py:118
+msgid "Use the abbreviation, e.g. 'VIC' not 'Victoria'"
+msgstr "　"
+
+#: rgchapter/views.py:119
+msgid "Postcode"
+msgstr "郵便番号"
+
+#: rgchapter/views.py:127
+msgid ""
+"Allow new members to sign up directly on myRobogals (highly recommended!)"
+msgstr "新しいメンバーが直接myRobogalsに登録できるようにする（推奨）"
+
+#: rgchapter/views.py:128
+msgid "Welcome page"
+msgstr "Welcome page"
+
+#: rgchapter/views.py:129
+msgid "Join page"
+msgstr "Join page"
+
+#: rgchapter/views.py:130 rgprofile/views.py:85
+msgid "Columns to display"
+msgstr "表示する項目"
+
+#: rgchapter/views.py:130 rgprofile/views.py:85
+msgid "Columns"
+msgstr "項目"
+
+#: rgchapter/views.py:138
+#, python-format
+msgid ""
+"This is shown when new users have just signed up.<br>Full HTML is allowed. "
+"After saving, you can preview this page at:<br><a href=\"https://my.robogals."
+"org/welcome/%(chapter)s/\" target=\"blank\">https://my.robogals.org/welcome/%"
+"(chapter)s/</a>"
+msgstr ""
+"これは新しいメンバーの登録時に表示されます．HTML形式で記述してください．文章"
+"を保存した後，このページのプレビューを次のURLで見ることができます．<br><a "
+"href=\"https://my.robogals.org/welcome/%(chapter)s/\" target=\"blank"
+"\">https://my.robogals.org/welcome/%(chapter)s/</a>"
+
+#: rgchapter/views.py:139
+#, python-format
+msgid ""
+"This is shown if people try to join, but your chapter doesn't allow<br>new "
+"members to sign up to myRobogals directly. In this case, put a<br>message "
+"here about how they <em>should</em> sign up. Full HTML is allowed.<br>After "
+"saving, and if the above checkbox is unchecked, you can preview this page at:"
+"<br><a href=\"https://my.robogals.org/join/%(chapter)s/\" target=\"blank"
+"\">https://my.robogals.org/join/%(chapter)s/</a>"
+msgstr ""
+"これはあなたの支部が，新しいメンバーが直接myRobogalsへ登録することを許可して"
+"いない場合に表示されます．どのように登録すれば良いのかをHTML形式で記述してく"
+"ださい．上のチェックボックスがチェックされていない場合，文章を保存した後にこ"
+"のページのプレビューを次のURLで見ることができます．<br><a href=\"https://my."
+"robogals.org/join/%(chapter)s/\" target=\"blank\">https://my.robogals.org/"
+"join/%(chapter)s/</a>"
+
+#: rgchapter/views.py:153
+msgid "Send a welcome email to new signups"
+msgstr "新しい登録メンバーにwelcomeメールを送る"
+
+#: rgchapter/views.py:196
+msgid "Chapter info updated"
+msgstr "支部情報が更新されました"
+
+#: rgmessages/views.py:43
+msgid "Chapter name"
+msgstr "支部名"
+
+#: rgmessages/views.py:43
+msgid "Your name"
+msgstr "名前"
+
+#
+# Context: select recipients of an email
+#
+#: rgmessages/views.py:44 rgteaching/views.py:195 rgteaching/views.py:292
+msgid "Recipients"
+msgstr "受信者"
+
+#: rgmessages/views.py:45 rgmessages/views.py:46
+msgid "Chapters"
+msgstr "支部"
+
+#
+# Context: default SMS message
+#
+#: rgmessages/views.py:189
+msgid "Put your message here.  To opt-out reply 'stop'"
+msgstr "メッセージをここに記入してください．"
+
+#: rgmessages/views.py:347
+msgid "Message History"
+msgstr "メッセージ履歴"
+
 #: rgmessages/views.py:491
 msgid "Add subscribers, and send welcome email"
 msgstr ""
@@ -1429,17 +1044,432 @@ msgstr ""
 msgid "%d subscribers imported!"
 msgstr ""
 
-#: rgteaching/views.py:201
+#
+# Context: user profile stuff (editing and viewing)
+#
+#: rgprofile/views.py:84
+msgid "Members"
+msgstr "メンバー"
+
+#: rgprofile/views.py:131
+msgid "User list \""
+msgstr "ユーザーリスト"
+
+#: rgprofile/views.py:348
+msgid "Mobile phone"
+msgstr "携帯電話"
+
+#: rgprofile/views.py:372
+msgid "First name"
+msgstr "名前"
+
+#: rgprofile/views.py:373
+msgid "Last name"
+msgstr "苗字"
+
+#: rgprofile/views.py:378
+msgid "Alternate email"
+msgstr "予備のemail"
+
+#: rgprofile/views.py:390
+msgid "Everyone (the whole internet)"
+msgstr "インターネット上の誰でも"
+
+#: rgprofile/views.py:391
+msgid "Only Robogals members"
+msgstr "Robogalsメンバーのみ"
+
+#: rgprofile/views.py:392
+msgid "Only Robogals members in my chapter"
+msgstr "同じ支部のRobogalsメンバーのみ"
+
+#: rgprofile/views.py:393
+msgid "Only committee"
+msgstr "committeeのみ"
+
+#: rgprofile/views.py:396
+msgid "Who can see my profile?"
+msgstr "プロフィールの公開範囲"
+
+#: rgprofile/views.py:397
+msgid "Show date of birth in my profile"
+msgstr "誕生日を表示する"
+
+#: rgprofile/views.py:398
+msgid "Show email address in my profile"
+msgstr "Eメールアドレスを表示する"
+
+#: rgprofile/views.py:409
+msgid "Undergraduate"
+msgstr "学部"
+
+#: rgprofile/views.py:410
+msgid "Postgraduate"
+msgstr "大学院"
+
+#: rgprofile/views.py:415
+msgid "Local"
+msgstr "ローカルの学生"
+
+#: rgprofile/views.py:416
+msgid "International"
+msgstr "留学生"
+
+#: rgprofile/views.py:419
+msgid "Date of birth"
+msgstr "誕生日"
+
+#: rgprofile/views.py:420
+msgid "Course"
+msgstr "専攻"
+
+#: rgprofile/views.py:421 rgprofile/views.py:749
+msgid "Started university"
+msgstr "入学時期"
+
+#: rgprofile/views.py:422 rgprofile/views.py:750
+msgid "Will finish university"
+msgstr "卒業予定時期"
+
+#: rgprofile/views.py:424 rgprofile/views.py:752
+msgid "Course level"
+msgstr "コースレベル"
+
+#: rgprofile/views.py:425 rgprofile/views.py:753
+msgid "Student type"
+msgstr "Student type"
+
+#: rgprofile/views.py:426
+msgid "About me (for profile page)"
+msgstr "自己紹介（プロフィールページに表示）"
+
+#: rgprofile/views.py:436
+#, python-format
+msgid "Allow %s to send me email updates"
+msgstr "%sからのemailアップデートを受け取る"
+
+#: rgprofile/views.py:437
+#, python-format
+msgid "Allow %s to send me SMS updates"
+msgstr "%sからのSMSアップデートを受け取る"
+
+#: rgprofile/views.py:439
+msgid "Allow email reminders about my upcoming school visits"
+msgstr ""
+"今後の自分が参加するスクールビジットについてemailリマインダーを受け取る"
+
+#: rgprofile/views.py:440
+msgid "Allow SMS reminders about my upcoming school visits"
+msgstr "今後の自分が参加するスクールビジットについてSMSリマインダーを受け取る"
+
+#: rgprofile/views.py:443 rgprofile/views.py:760
+msgid ""
+"Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
+msgstr "AMplifier（Robogals Globalからの月刊メールニュース）を申し込む"
+
+#: rgprofile/views.py:452
+msgid "Trained and approved to teach"
+msgstr "トレーニング済みでワークショップで教えることができる"
+
+#: rgprofile/views.py:453
+msgid "Internal notes"
+msgstr "ノート"
+
+#: rgprofile/views.py:486
+msgid "Your username must be 3 or more characters"
+msgstr "ユーザー名は3文字以上にしてください．"
+
+#: rgprofile/views.py:488
+msgid "Your username must be less than 30 characters"
+msgstr "ユーザー名は30文字未満にしてください．"
+
+#: rgprofile/views.py:491
+msgid "Your username must contain only letters, numbers and underscores"
+msgstr "ユーザー名は文字，数字，アンダースコアのみにしてください．"
+
+#: rgprofile/views.py:498
+msgid "Your password must be at least 5 characters long"
+msgstr "パスワードは5文字以上にしてください．"
+
+#: rgprofile/views.py:509 rgprofile/views.py:517
+msgid "The password and repeated password did not match. Please try again"
+msgstr "パスワードが一致しません．もう一度入力してください．"
+
+#: rgprofile/views.py:511
+msgid "That username is already taken"
+msgstr "このユーザー名は既に使われています．"
+
+#: rgprofile/views.py:560 rgprofile/views.py:597
+msgid "Profile and settings updated!"
+msgstr "プロフィールと設定が更新されました!"
+
+#: rgprofile/views.py:723
+msgid "Add members, and send welcome email"
+msgstr "メンバーを追加して，welcome emailを送る"
+
+#: rgprofile/views.py:723
+msgid "Add members, with no further action"
+msgstr "メンバーを追加する"
+
+#: rgprofile/views.py:747
+msgid "Date joined"
+msgstr "参加した日付"
+
+#: rgprofile/views.py:756
+msgid "Allow email reminders about upcoming school visits"
+msgstr "今後のスクールビジットについてemailリマインダーを受け取る"
+
+#: rgprofile/views.py:757
+msgid "Allow SMS reminders about upcoming school visits"
+msgstr "今後のスクールビジットについてSMSリマインダーを受け取る"
+
+#: rgprofile/views.py:758
+msgid "Allow email updates from local Robogals chapter"
+msgstr "ローカル支部からのemailアップデートを受け取る"
+
+#: rgprofile/views.py:759
+msgid "Allow SMS updates from local Robogals chapter"
+msgstr "ローカル支部からのSMSアップデートを受け取る"
+
+#: rgprofile/views.py:806
+#, python-format
+msgid "%d users imported!"
+msgstr "%d ユーザーがインポートされました!"
+
+#: rgprofile/views.py:808
+#, python-format
+msgid "%d users imported and emailed!"
+msgstr "%d ユーザーがインポートされ，emailが送信されました!"
+
+#: rgprofile/views.py:907
+msgid "Password generated and emailed"
+msgstr "パスワードがemailで送信されました"
+
+#
+# Context: https://my.robogals.org/teaching/new/
+#
+#: rgteaching/views.py:41
+msgid ""
+"If the school is not listed here, it first needs to be added in Workshops > "
+"Add School"
+msgstr ""
+"学校がリストに無い場合は，“ワークショップ ＞ 学校を追加する”で新たに追加して"
+"ください．"
+
+#: rgteaching/views.py:42
+msgid "School visit date"
+msgstr "スクールビジットの日程"
+
+#: rgteaching/views.py:43
+msgid "Start time"
+msgstr "開始時間"
+
+#: rgteaching/views.py:44
+msgid "End time"
+msgstr "終了時間"
+
+#: rgteaching/views.py:45
+msgid "Location"
+msgstr "場所"
+
+#: rgteaching/views.py:45
+msgid ""
+"Where the workshop is taking place, at the school or elsewhere (can differ "
+"from meeting location, see below)"
+msgstr ""
+"ワークショップが行われる場所（学校もしくはその他のどこか）を記入して下さい．"
+"下の集合場所とは違っても構いません．"
+
+#: rgteaching/views.py:46
+msgid "Allowed RSVPs"
+msgstr "RSVPsを許可する"
+
+#: rgteaching/views.py:55
+msgid "Meeting location"
+msgstr "集合場所"
+
+#: rgteaching/views.py:55
+msgid ""
+"Where people will meet at university to go as a group to the school, if "
+"applicable"
+msgstr "大学の中での集合場所（可能であれば，団体として学校へ向かう為）"
+
+#: rgteaching/views.py:55
+msgid "N/A"
+msgstr "N/A"
+
+#: rgteaching/views.py:56
+msgid "Meeting time"
+msgstr "集合時間"
+
+#: rgteaching/views.py:56
+msgid "What time people can meet to go to the school"
+msgstr "学校へ向かうのに何時に集合するか"
+
+#: rgteaching/views.py:57
+msgid "Contact person"
+msgstr "代表者"
+
+#: rgteaching/views.py:59
+msgid "Mobile number to call if people get lost"
+msgstr "道に迷った場合に連絡する携帯電話番号"
+
+#: rgteaching/views.py:62
+msgid "Expected number of students"
+msgstr "学生数（予定）"
+
+#: rgteaching/views.py:63
+msgid "Year level"
+msgstr "学年"
+
+#: rgteaching/views.py:64
+msgid "Number of robots to bring"
+msgstr "持参するロボット数"
+
+#: rgteaching/views.py:65
+msgid "Lesson number"
+msgstr "レッスン番号"
+
+#: rgteaching/views.py:66
+msgid "To print"
+msgstr "印刷するもの"
+
+#: rgteaching/views.py:67
+msgid "To bring"
+msgstr "持参するもの"
+
+#: rgteaching/views.py:68
+msgid "Other preparation"
+msgstr "その他に必要な準備"
+
+#: rgteaching/views.py:69
+msgid "Other notes"
+msgstr "その他"
+
+#: rgteaching/views.py:118
+msgid "School visit info updated"
+msgstr "スクールビジット情報が更新されました"
+
+#: rgteaching/views.py:197
+msgid "Invite members"
+msgstr "メンバーを招待する"
+
+#: rgteaching/views.py:197
+msgid "Add members as attending"
+msgstr "参加者を追加する"
+
+#: rgteaching/views.py:207
 msgid ""
 "Hello,\n"
 "\n"
 "There will be an upcoming Robogals school visit:<br>"
 msgstr ""
 
-#: rgteaching/views.py:203
+#: rgteaching/views.py:209
 msgid "<br>Location: "
 msgstr ""
 
-#: rgteaching/views.py:204
+#: rgteaching/views.py:210
 msgid "<br><br>To accept or decline this invitation, please visit"
 msgstr ""
+
+#: rgteaching/views.py:276
+msgid "Invitations have been sent to the selected volunteers"
+msgstr "選択したボランティアに招待状が送信されました"
+
+#: rgteaching/views.py:278
+msgid "Selected volunteers have been added as attending"
+msgstr "選択したボランティアが参加者として追加されました"
+
+#: rgteaching/views.py:360
+msgid "Email sent succesfully"
+msgstr "Eメールが送信されました．"
+
+#: rgteaching/views.py:377
+#, python-format
+msgid ""
+"The workshop for %(school)s at %(starttime)s has been cancelled, sorry for "
+"any inconvenience."
+msgstr ""
+"%(school)s での %(starttime)s からのワークショップはキャンセルされました．"
+
+#: rgteaching/views.py:420
+msgid "Visit cancelled successfully"
+msgstr "ビジットはキャンセルされました"
+
+#: rgteaching/views.py:443
+msgid "You cannot delete this school as it has a visit in the database."
+msgstr "この学校はデータベース内にビジットがあるので消去することはできません"
+
+#: rgteaching/views.py:447
+msgid "School sucessfully deleted."
+msgstr "学校は消去されました"
+
+#: rgteaching/views.py:460 rgteaching/views.py:464
+msgid "Name"
+msgstr "名前"
+
+#: rgteaching/views.py:461
+msgid "Address"
+msgstr "住所"
+
+#: rgteaching/views.py:470
+msgid "Notes"
+msgstr ""
+
+#: rgteaching/views.py:504
+msgid "School info updated"
+msgstr "学校情報が更新されました"
+
+#: rgteaching/views.py:569
+msgid "RSVP'd as attending"
+msgstr "参加者として登録しました"
+
+#: rgteaching/views.py:570
+msgid "RSVP as attending"
+msgstr "参加者として登録する"
+
+#: rgteaching/views.py:573
+msgid "RSVP'd as not attending"
+msgstr "参加者としてではなく登録されました"
+
+#: rgteaching/views.py:574
+msgid "RSVP as not attending"
+msgstr "参加者としてではなく登録"
+
+#: rgteaching/views.py:576
+msgid "Remove an invitee"
+msgstr "招待者を外す"
+
+#: rgteaching/views.py:577
+msgid "Removed from this event"
+msgstr "このイベントから外されました"
+
+#: rgteaching/views.py:612
+msgid "Message deleted"
+msgstr "メッセージは消去されました"
+
+#: rgteaching/views.py:622 rgteaching/views.py:716
+#, python-format
+msgid ""
+"For an explanation of each type please see <a href=\"%s\" target=\"_blank"
+"\">here</a> (opens in new window)"
+msgstr ""
+"それぞれのタイプについての説明は <a href=\"%s\" target=\"_blank\">here</a> を"
+"参照してください（新しいウィンドウが開きます）"
+
+#: rgteaching/views.py:635
+msgid "Invitees"
+msgstr "招待者"
+
+#: rgteaching/views.py:636
+msgid "General notes"
+msgstr "ノート"
+
+#: rgteaching/views.py:701
+msgid "Stats saved successfully, visit closed."
+msgstr "スタッツが保存されました．ビジットを閉じます．"
+
+#: tinymce/views.py:67
+msgid "Error running spellchecker"
+msgstr "スペルチェッカーでエラーが見つかりました"

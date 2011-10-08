@@ -377,7 +377,7 @@ class FormPartOne(forms.Form):
 	tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
-	gender = forms.ChoiceField(choices=GENDERS, initial=2)
+	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS, initial=2)
 
 # Privacy settings
 class FormPartTwo(forms.Form):
@@ -420,7 +420,7 @@ class FormPartThree(forms.Form):
 	course = forms.CharField(label=_('Course'), max_length=128, required=False)
 	uni_start = forms.DateField(label=_('Started university'), widget=SelectMonthYearWidget(), required=False)
 	uni_end = forms.DateField(label=_('Will finish university'), widget=SelectMonthYearWidget(), required=False)
-	university = forms.ModelChoiceField(queryset=University.objects.all(), required=False)
+	university = forms.ModelChoiceField(label=_('University'), queryset=University.objects.all(), required=False)
 	course_type = forms.ChoiceField(label=_('Course level'), choices=COURSE_TYPE_CHOICES, required=False)
 	student_type = forms.ChoiceField(label=_('Student type'), choices=STUDENT_TYPE_CHOICES, required=False)
 	bio = forms.CharField(label=_('About me (for profile page)'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
@@ -433,8 +433,8 @@ class FormPartFour(forms.Form):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
 		super(FormPartFour, self).__init__(*args, **kwargs)
-		self.fields['email_chapter_optin'].label='Allow ' + chapter.name + ' to send me email updates'
-		self.fields['mobile_marketing_optin'].label='Allow ' + chapter.name + ' to send me SMS updates'
+		self.fields['email_chapter_optin'].label=_('Allow %s to send me email updates') % chapter.name
+		self.fields['mobile_marketing_optin'].label=_('Allow %s to send me SMS updates') % chapter.name
 
 	email_reminder_optin = forms.BooleanField(label=_('Allow email reminders about my upcoming school visits'), initial=True, required=False)
 	mobile_reminder_optin = forms.BooleanField(label=_('Allow SMS reminders about my upcoming school visits'), initial=True, required=False)
