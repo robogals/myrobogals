@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-04 14:05+1100\n"
+"POT-Creation-Date: 2011-10-08 23:28+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -981,6 +981,30 @@ msgstr "新しい登録メンバーにwelcomeメールを送る"
 msgid "Chapter info updated"
 msgstr "支部情報が更新されました"
 
+#: rgmain/views.py:33
+msgid "DATE_FORMAT"
+msgstr "Y/m/d"
+
+#: rgmain/views.py:34
+msgid "DATE_FORMAT_NODAY"
+msgstr "Y/m/d"
+
+#: rgmain/views.py:35
+msgid "DATE_FORMAT_LONG"
+msgstr "Y/m/d"
+
+#: rgmain/views.py:36
+msgid "TIME_FORMAT"
+msgstr "H:i"
+
+#: rgmain/views.py:37
+msgid "DATETIME_FORMAT_LONG"
+msgstr "Y/m/d H:i"
+
+#: rgmain/views.py:38
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "DH:i"
+
 #: rgmessages/views.py:43
 msgid "Chapter name"
 msgstr "支部名"
@@ -1071,6 +1095,10 @@ msgstr "苗字"
 msgid "Alternate email"
 msgstr "予備のemail"
 
+#: rgprofile/views.py:380
+msgid "Gender"
+msgstr ""
+
 #: rgprofile/views.py:390
 msgid "Everyone (the whole internet)"
 msgstr "インターネット上の誰でも"
@@ -1130,6 +1158,11 @@ msgstr "入学時期"
 #: rgprofile/views.py:422 rgprofile/views.py:750
 msgid "Will finish university"
 msgstr "卒業予定時期"
+
+#: rgprofile/views.py:423
+#, fuzzy
+msgid "University"
+msgstr "入学時期"
 
 #: rgprofile/views.py:424 rgprofile/views.py:752
 msgid "Course level"

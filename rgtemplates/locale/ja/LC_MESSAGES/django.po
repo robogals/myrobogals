@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-04 14:06+1100\n"
+"POT-Creation-Date: 2011-10-08 23:28+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,9 +78,8 @@ msgstr ""
 msgid "Established:"
 msgstr ""
 
-#: chapter_detail.html:36 chapter_edit.html:38 visit_list.html:19
-#: visit_view.html:56
-msgid "DATE_FORMAT_LONG"
+#: chapter_detail.html:36 profile_view.html:19 profile_view.html.py:22
+msgid "DATE_FORMAT_NODAY"
 msgstr ""
 
 #: chapter_detail.html:37
@@ -151,6 +150,10 @@ msgstr ""
 
 #: chapter_edit.html:37
 msgid "Established"
+msgstr ""
+
+#: chapter_edit.html:38 visit_list.html:19 visit_view.html:56
+msgid "DATE_FORMAT_LONG"
 msgstr ""
 
 #: chapter_edit.html:41
@@ -875,10 +878,6 @@ msgstr ""
 
 #: profile_view.html:19
 msgid "Joined:"
-msgstr ""
-
-#: profile_view.html:19 profile_view.html.py:22
-msgid "DATE_FORMAT_NODAY"
 msgstr ""
 
 #: profile_view.html:20

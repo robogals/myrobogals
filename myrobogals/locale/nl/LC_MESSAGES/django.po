@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-04 14:05+1100\n"
+"POT-Creation-Date: 2011-10-08 23:28+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -956,6 +956,32 @@ msgstr ""
 msgid "Chapter info updated"
 msgstr ""
 
+#: rgmain/views.py:33
+#, fuzzy
+msgid "DATE_FORMAT"
+msgstr "j-n-Y"
+
+#: rgmain/views.py:34
+msgid "DATE_FORMAT_NODAY"
+msgstr "j-n-Y"
+
+#: rgmain/views.py:35
+msgid "DATE_FORMAT_LONG"
+msgstr "j-n-Y"
+
+#: rgmain/views.py:36
+#, fuzzy
+msgid "TIME_FORMAT"
+msgstr "j-n-Y H:i"
+
+#: rgmain/views.py:37
+msgid "DATETIME_FORMAT_LONG"
+msgstr "j-n-Y H:i"
+
+#: rgmain/views.py:38
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "H:i l"
+
 #: rgmessages/views.py:43
 msgid "Chapter name"
 msgstr ""
@@ -1037,6 +1063,10 @@ msgstr ""
 msgid "Alternate email"
 msgstr ""
 
+#: rgprofile/views.py:380
+msgid "Gender"
+msgstr ""
+
 #: rgprofile/views.py:390
 msgid "Everyone (the whole internet)"
 msgstr ""
@@ -1095,6 +1125,10 @@ msgstr ""
 
 #: rgprofile/views.py:422 rgprofile/views.py:750
 msgid "Will finish university"
+msgstr ""
+
+#: rgprofile/views.py:423
+msgid "University"
 msgstr ""
 
 #: rgprofile/views.py:424 rgprofile/views.py:752
@@ -1428,15 +1462,3 @@ msgstr ""
 #: tinymce/views.py:67
 msgid "Error running spellchecker"
 msgstr ""
-
-#~ msgid "DATETIME_FORMAT_LONG"
-#~ msgstr "j-n-Y H:i"
-
-#~ msgid "DATETIME_FORMAT_SPECIAL"
-#~ msgstr "H:i l"
-
-#~ msgid "DATE_FORMAT_LONG"
-#~ msgstr "j-n-Y"
-
-#~ msgid "DATE_FORMAT_NODAY"
-#~ msgstr "j-n-Y"

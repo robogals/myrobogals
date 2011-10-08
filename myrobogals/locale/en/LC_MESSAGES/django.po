@@ -938,6 +938,31 @@ msgstr ""
 msgid "Chapter info updated"
 msgstr ""
 
+# Language file for English to give us Australian date formats
+#: rgmain/views.py:33
+msgid "DATE_FORMAT"
+msgstr "D j M y"
+
+#: rgmain/views.py:34
+msgid "DATE_FORMAT_NODAY"
+msgstr "j F Y"
+
+#: rgmain/views.py:35
+msgid "DATE_FORMAT_LONG"
+msgstr "l j F Y"
+
+#: rgmain/views.py:36
+msgid "TIME_FORMAT"
+msgstr "g:i a"
+
+#: rgmain/views.py:37
+msgid "DATETIME_FORMAT_LONG"
+msgstr "g:i a, l j F Y"
+
+#: rgmain/views.py:38
+msgid "DATETIME_FORMAT_SPECIAL"
+msgstr "g:ia l"
+
 #: rgmessages/views.py:43
 msgid "Chapter name"
 msgstr ""
@@ -1019,6 +1044,10 @@ msgstr ""
 msgid "Alternate email"
 msgstr ""
 
+#: rgprofile/views.py:380
+msgid "Gender"
+msgstr ""
+
 #: rgprofile/views.py:390
 msgid "Everyone (the whole internet)"
 msgstr ""
@@ -1077,6 +1106,10 @@ msgstr ""
 
 #: rgprofile/views.py:422 rgprofile/views.py:750
 msgid "Will finish university"
+msgstr ""
+
+#: rgprofile/views.py:423
+msgid "University"
 msgstr ""
 
 #: rgprofile/views.py:424 rgprofile/views.py:752
@@ -1410,22 +1443,3 @@ msgstr ""
 #: tinymce/views.py:67
 msgid "Error running spellchecker"
 msgstr ""
-
-# Language file for English to give us Australian date formats
-#~ msgid "DATE_FORMAT"
-#~ msgstr "D j M y"
-
-#~ msgid "DATE_FORMAT_NODAY"
-#~ msgstr "j F Y"
-
-#~ msgid "DATE_FORMAT_LONG"
-#~ msgstr "l j F Y"
-
-#~ msgid "TIME_FORMAT"
-#~ msgstr "g:i a"
-
-#~ msgid "DATETIME_FORMAT_LONG"
-#~ msgstr "g:i a, l j F Y"
-
-#~ msgid "DATETIME_FORMAT_SPECIAL"
-#~ msgstr "g:ia l"
