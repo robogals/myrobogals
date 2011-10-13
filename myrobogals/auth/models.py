@@ -133,7 +133,7 @@ class Group(models.Model):
     city = models.CharField('City/Suburb', max_length=64, blank=True)
     state = models.CharField('State/Province', max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'", blank=True)
     postcode = models.CharField('Postcode', max_length=16, blank=True)
-    country = models.ForeignKey(Country, verbose_name="Country", default="AU")
+    country = models.ForeignKey(Country, verbose_name="Country", default="AU", blank=True, null=True)
     timezone = models.ForeignKey(Timezone)
     faculty_contact = models.CharField('Name', max_length=64, blank=True, help_text="e.g. Professor John Doe")
     faculty_position = models.CharField('Position', max_length=64, blank=True, help_text="e.g. Associate Dean")
