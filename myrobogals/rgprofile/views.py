@@ -6,11 +6,12 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.auth import authenticate, login
-#from django.forms.validators import email_re
+from django.core.validators import email_re
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from myrobogals.rgmain.utils import SelectDateWidget
 import datetime
+from datetime import date
 import re
 from django.forms.widgets import Widget, Select, TextInput
 from django.utils.dates import MONTHS
@@ -20,10 +21,11 @@ from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import MEDIA_ROOT
 from time import time
 import csv
+from django.db import connection
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
-from django.forms.fields import email_re
+#from django.forms.fields import email_re
 
 '''
 def joinstart(request):
@@ -94,6 +96,19 @@ class EditListForm(forms.Form):
 		else:
 			self.fields['users'].queryset = User.objects.filter(chapter=user.chapter, is_active=True).order_by('last_name')
 
+class EditStatusForm(forms.Form):
+	status = forms.CharField()
+	users = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Members"), False, attrs={'rows': 20}), required=True)
+	
+	def __init__(self, *args, **kwargs):
+		user=kwargs['user']
+		del kwargs['user']
+		super(EditStatusForm, self).__init__(*args, **kwargs)
+		if user.is_superuser:
+			self.fields['users'].queryset = User.objects.filter(is_active=True).order_by('last_name')
+		else:
+			self.fields['users'].queryset = User.objects.filter(chapter=user.chapter, is_active=True).order_by('last_name')
+
 @login_required
 def listuserlists(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
@@ -150,15 +165,31 @@ def edituserlist(request, chapterurl, list_id):
 @login_required
 def editusers(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	memberstatustypes = MemberStatusType.objects.all()
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		users = User.objects.filter(chapter=c)
 		search = ''
+		searchsql = ''
 		if 'search' in request.GET:
 			search = request.GET['search']
-			users = users.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(email__icontains=search) | Q(mobile__icontains=search))
-		users = users.order_by('last_name', 'first_name')
+			search_fields = ['username', 'first_name', 'last_name', 'email', 'mobile']
+			for field in search_fields:
+				searchsql = searchsql + ' OR ' + field + ' LIKE "%%' + search + '%%" '
+			searchsql = 'AND (' + searchsql[4:] + ')'
+		if 'status' in request.GET:
+			status = request.GET['status']
+		else:
+			status = '1'   # Default to student members
+
+		if(status != '0'):
+			users = User.objects.raw('SELECT u.* FROM auth_user AS u, auth_memberstatus AS ms WHERE u.chapter_id ' +
+					'= '+ str(c.pk) +' AND u.id = ms.user_id AND ms.statusType_id = '+ status +' AND ms.status_date_end IS NULL ' +
+					searchsql + ' ORDER BY last_name, first_name')
+		#for blah in users:
+		#	pass
+		#print connection.queries		
 		display_columns = c.display_columns.all()
-		return render_to_response('user_list.html', {'users': users, 'search': search, 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 
@@ -176,7 +207,53 @@ def editexecs(request, chapterurl):
 		return render_to_response('exec_list.html', {'users': users, 'search': search, 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
 		raise Http404
-	
+
+@login_required
+def editstatus(request, chapterurl):
+	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	memberstatustypes = MemberStatusType.objects.all()
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+		users = []
+		if request.method == 'POST':
+			#status = request.POST['status']
+			ulform = EditStatusForm(request.POST, user=request.user)
+			#valid = ulform.is_valid()
+			if ulform.is_valid():
+				data = ulform.cleaned_data
+				status = data['status']
+				users = data['users'] #l:queryset
+				users_already = ""
+				users_changed = ""
+				for user in users:
+					u = User.objects.get(username__exact = user.username)
+					old_status = u.memberstatus_set.get(status_date_end__isnull=True)
+					if old_status.statusType == MemberStatusType.objects.get(pk=int(status)):
+						if(users_already):						
+							users_already = users_already + ", " + u.username
+						else:
+							users_already = u.username
+					else:
+						if user.membertype().description != 'Inactive':
+							old_status.status_date_end = date.today()
+							old_status.save()
+						new_status=MemberStatus()
+						new_status.user = u
+						new_status.statusType = MemberStatusType.objects.get(pk=int(status))
+						new_status.status_date_start = date.today()
+						new_status.save()
+						if(users_changed):						
+							users_changed = users_changed + ", " + u.username
+						else:
+							users_changed = u.username
+				if(users_already):
+					request.user.message_set.create(message=unicode(_(users_already + " are already marked as " + old_status.statusType.description)))
+				if(users_changed):
+					request.user.message_set.create(message=unicode(_(users_changed + " have been marked as " + new_status.statusType.description)))
+				return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/users/')
+		else:
+			ulform = EditStatusForm(None, user=request.user)
+			return render_to_response('edit_user_status.html', {'ulform': ulform, 'chapter': c, 'memberstatustypes': memberstatustypes}, context_instance=RequestContext(request))
+
 @login_required
 def adduser(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)

@@ -256,7 +256,6 @@ class MemberStatusType(models.Model):
 		(1, 'Student'),
 		(2, 'Employed'),
 	)
-
 	description = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Group, null=True, blank=True)
 	type_of_person = models.IntegerField(choices=PERSONTYPES, default=0)
@@ -377,15 +376,7 @@ class User(models.Model):
         if len(m) > 0:
         	return m[0].statusType
         else:
-        	# this will be ordered with the most recent first due to model config
-        	m = list(MemberStatus.objects.filter(user=self))
-        	if len(m) > 0:
-        		if m[0].statusType.type_of_person == 1:  # Student
-        			return MemberStatusType(description='Alumni')
-        		else:
-        			return MemberStatusType(description='Inactive')
-        	else:
-        		return MemberStatusType(description='Inactive')
+        	return MemberStatusType(description='Inactive')
     '''
     	cursor = connection.cursor()
     	cursor.execute('SELECT * FROM `rgprofile_memberstatus` WHERE user_id = ' + str(self.pk) + ' LIMIT 1')
