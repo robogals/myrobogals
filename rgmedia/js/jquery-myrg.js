@@ -14,6 +14,7 @@
 					$('#from_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
+					$('#form_status').show();
 					break;
 				case '2':
 					$('#form_table_chapters').hide();
@@ -26,6 +27,7 @@
 					$('#from_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
+					$('#form_status').show();
 					break;
 				case '3':
 					$('#form_table_chapters').hide();
@@ -38,6 +40,7 @@
 					$('#from_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
+					$('#form_status').show();
 					break;
 				case '4':
 					$('#form_table_chapters').hide();
@@ -50,6 +53,7 @@
 					$('#from_newsletter').show();
 					$('#html_normal').hide();
 					$('#from_normal').hide();
+					$('#form_status').hide();
 					break;
 				case '5':
 					$('#form_table_chapters').hide();
@@ -62,6 +66,7 @@
 					$('#from_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
+					$('#form_status').show();
 					break;
 			}
 		});

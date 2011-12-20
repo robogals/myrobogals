@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Edit user status:" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Edit user status:" %}{% endblock %}
+
+{% block content %}
+<p>
+<a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a>  | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/">{% trans "Manage members" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/#cols">{% trans "Add/remove columns" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/execs/">{% trans "Show exec committee members" %}</a>
+</p>
+
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/status/" method="POST">
+
+<p>{% trans "Choose a status to mark members:" %}
+<select name="status">
+{% for memberstatustype in memberstatustypes %}
+<option value = {{memberstatustype.id}} {%ifequal memberstatustype.id status %} selected {% endifequal %}>{{memberstatustype.description}}</option>
+{% endfor %}
+</select>
+</p>
+
+{% trans "Choose members to be marked as the status:" %}
+</br>
+
+<table>
+
+{% if ulform.users.errors %}
+{% for error in ulform.users.errors %}
+  <tr>
+    <td style="vertical-align: top" colspan="2"><div class="error">{{error}}</div></td>
+  </tr>
+{% endfor %}
+{% endif %}
+  <tr>
+    <td style="vertical-align: top" width="30">{% trans "Members" %}</td>
+    <td style="vertical-align: top">{{ ulform.users }}</td>
+  </tr>
+
+
+  <tr>
+    <td style="vertical-align: top" width="30">&nbsp;</td>
+    <td style="vertical-align: top"><input type="submit" value="Submit" /></td>
+  </tr>
+</table>
+</form>
+{% endblock %}

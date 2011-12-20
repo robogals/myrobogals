@@ -5,8 +5,7 @@ from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.auth.models import Group
-from myrobogals.auth.models import User
+from myrobogals.auth.models import User, Group, MemberStatusType
 from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
@@ -26,6 +25,7 @@ from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from pytz import utc
 from decimal import *
 from operator import itemgetter
+
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -70,11 +70,15 @@ class WriteEmailForm(forms.Form):
 
 @login_required
 def writeemail(request):
+	memberstatustypes = MemberStatusType.objects.all()
 	if not request.user.is_staff:
 		raise Http404
 	if request.method == 'POST':
 		typesel = request.POST['type']
 		schedsel = request.POST['scheduling']
+
+		statussel = request.POST['status']
+		
 		emailform = WriteEmailForm(request.POST, user=request.user)
 		if emailform.is_valid():
 			data = emailform.cleaned_data
@@ -144,13 +148,23 @@ def writeemail(request):
 			else:
 				users = data['recipients']
 
-			for one_user in users:
-				recipient = EmailRecipient()
-				recipient.message = message
-				recipient.user = one_user
-				recipient.to_name = one_user.get_full_name()
-				recipient.to_address = one_user.email
-				recipient.save()
+			if statussel != '0' and request.POST['type'] != '4':
+				for one_user in users:
+					if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk =(int(statussel)))):
+						recipient = EmailRecipient()
+						recipient.message = message
+						recipient.user = one_user
+						recipient.to_name = one_user.get_full_name()
+						recipient.to_address = one_user.email
+						recipient.save()
+			else:
+				for one_user in users:
+					recipient = EmailRecipient()
+					recipient.message = message
+					recipient.user = one_user
+					recipient.to_name = one_user.get_full_name()
+					recipient.to_address = one_user.email
+					recipient.save()
 			
 			if request.POST['type'] == '4' and request.user.is_superuser:
 				for one_subscriber in NewsletterSubscriber.objects.filter(newsletter=data['newsletters'], active=True):
@@ -174,7 +188,7 @@ def writeemail(request):
 			typesel = '1'
 		schedsel = '0'
 		emailform = WriteEmailForm(None, user=request.user)
-	return render_to_response('email_write.html', {'emailform': emailform, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
+	return render_to_response('email_write.html', {'memberstatustypes': memberstatustypes, 'emailform': emailform, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
 
 class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
