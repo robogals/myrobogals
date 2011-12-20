@@ -59,6 +59,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email', 'mobile')
     ordering = ('username',)
     inlines = (MemberStatusAdmin, PositionAdmin)
+    filter_horizontal = ('user_permissions',)
 
     def __call__(self, request, url):
         # this should not be here, but must be due to the way __call__ routes

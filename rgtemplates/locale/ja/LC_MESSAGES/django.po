@@ -1,28 +1,27 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Japanese language translation for myRobogals
+# Copyright (C) 2011 Robogals Global
+# Translator: Makiko Nagasawa <makiko@robogals.org>, 2011.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 23:28+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2011-11-19 16:24+1100\n"
+"PO-Revision-Date: 2011-08-06 17:59+1000\n"
+"Last-Translator: Makiko Nagasawa <makiko@robogals.org>\n"
+"Language-Team: Makiko Nagasawa <makiko@robogals.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: 404.html:3 404.html.py:5
 msgid "Page Not Found"
-msgstr ""
+msgstr "ページが見つかりません"
 
 #: 404.html:8
 msgid "The page you were looking for could not be found."
-msgstr ""
+msgstr "探しているページは見つかりませんでした"
 
 #: 500.html:4 500.html.py:6
 msgid "500: Internal Server Error"
@@ -47,299 +46,299 @@ msgstr "ホーム"
 #: chapter_award.html:4 chapter_award.html.py:6
 #, fuzzy
 msgid "Chapter awards"
-msgstr "支部"
+msgstr "支部賞"
 
 #: chapter_award.html:23
 msgid " : "
-msgstr ""
+msgstr "："
 
 #: chapter_detail.html:11
 msgid "Executive Committee"
-msgstr ""
+msgstr "幹部"
 
 #: chapter_detail.html:19
 msgid "Members:"
-msgstr ""
+msgstr "メンバー"
 
 #: chapter_detail.html:23 chapter_detail.html.py:28
 msgid "Edit this chapter"
-msgstr ""
+msgstr "支部情報の編集"
 
 #: chapter_detail.html:23 chapter_detail.html.py:28 chapter_edit.html:9
 #: exec_list.html:14 includes/header.html:89
 msgid "Manage members"
-msgstr ""
+msgstr "メンバーの管理"
 
 #: chapter_detail.html:35
 msgid "Host university:"
-msgstr ""
+msgstr "ホスト大学"
 
 #: chapter_detail.html:36
 msgid "Established:"
-msgstr ""
+msgstr "設立"
 
-#: chapter_detail.html:36 profile_view.html:19 profile_view.html.py:22
+#: chapter_detail.html:36 profile_view.html:20 profile_view.html.py:23
 msgid "DATE_FORMAT_NODAY"
-msgstr ""
+msgstr "Y/m/d"
 
 #: chapter_detail.html:37
 msgid "Parent:"
-msgstr ""
+msgstr "親支部:"
 
 #: chapter_detail.html:39
 msgid "Faculty contact:"
-msgstr ""
+msgstr "顧問教員:"
 
 #: chapter_detail.html:42
 msgid "About us:"
-msgstr ""
+msgstr "支部について"
 
 #: chapter_detail.html:50
 msgid "Awards:"
-msgstr ""
+msgstr "受賞暦:"
 
 #: chapter_detail.html:58
 msgid " ("
-msgstr ""
+msgstr "（"
 
 #: chapter_detail.html:58
 msgid ") "
-msgstr ""
+msgstr "）"
 
 #: chapter_detail.html:64
 #, python-format
 msgid "Join %(chapter)s"
-msgstr ""
+msgstr "%(chapter)sに加入する"
 
 #: chapter_detail.html:65
 #, python-format
 msgid "Visit %(chapter)s's website"
-msgstr ""
+msgstr "%(chapter)sのウェブサイトを訪問"
 
 #: chapter_detail.html:66
 #, python-format
 msgid "Visit %(chapter)s on Facebook"
-msgstr ""
+msgstr "%(chapter)sのFacebookページを訪問"
 
 #: chapter_edit.html:3 chapter_edit.html.py:5
 #, python-format
 msgid "Edit chapter: %(chapter)s"
-msgstr ""
+msgstr "支部情報の編集： %(chapter)s"
 
 #: chapter_edit.html:9 exec_list.html:14 list_user_list.html:11
-#: list_user_lists.html:8 user_list.html:14
+#: list_user_lists.html:8 user_list.html:26
 msgid "Return to chapter page"
-msgstr ""
+msgstr "支部のページに戻る"
 
 #: chapter_edit.html:22 new_visit.html:11 profile_edit.html:20
 #: school_edit.html:16 visit_edit.html:16 visit_view.html:48
 msgid "Basic information"
-msgstr ""
+msgstr "基本情報"
 
 #: chapter_edit.html:25
 msgid "Chapter name"
-msgstr ""
+msgstr "支部名"
 
 #: chapter_edit.html:29 visit_list.html:13 visit_view.html:63
 msgid "Location"
-msgstr ""
+msgstr "所在地"
 
 #: chapter_edit.html:33
 msgid "University"
-msgstr ""
+msgstr "大学"
 
 #: chapter_edit.html:37
 msgid "Established"
-msgstr ""
+msgstr "設立"
 
 #: chapter_edit.html:38 visit_list.html:19 visit_view.html:56
 msgid "DATE_FORMAT_LONG"
-msgstr ""
+msgstr "Y/m/d"
 
 #: chapter_edit.html:41
 msgid "Parent"
-msgstr ""
+msgstr "親支部"
 
 #: chapter_edit.html:45
 msgid "Timezone"
-msgstr ""
+msgstr "タイムゾーン"
 
 #: chapter_edit.html:49
 msgid "Student number field"
-msgstr ""
+msgstr "学籍番号欄"
 
 #: chapter_edit.html:54
 msgid "Student number label"
-msgstr ""
+msgstr "学籍番号欄の表示"
 
 #: chapter_edit.html:59
 msgid "Union member checkbox"
-msgstr ""
+msgstr "学生組合会員チェックボックス"
 
 #: chapter_edit.html:64
 msgid "Union member label"
-msgstr ""
+msgstr "学生組合会員欄の表示"
 
 #: chapter_edit.html:69
 msgid "T-shirt drop-down menu"
-msgstr ""
+msgstr "Tシャツ"
 
 #: chapter_edit.html:75
 msgid "Chapter page information"
-msgstr ""
+msgstr "支部情報"
 
 #: chapter_edit.html:89
 msgid "Faculty contact person"
-msgstr ""
+msgstr "顧問教員"
 
 #: chapter_edit.html:103
 msgid "Postal address"
-msgstr ""
+msgstr "所在地"
 
 #: chapter_edit.html:117
 msgid "Welcome email"
-msgstr ""
+msgstr "Welcomeメール"
 
 #: chapter_edit.html:128 newsletter_cp.html:31
 msgid "Subject"
-msgstr ""
+msgstr "題名"
 
 #: chapter_edit.html:148
 msgid "Miscellaneous settings"
-msgstr ""
+msgstr "その他の設定"
 
 #: chapter_listing.html:4 chapter_listing.html.py:6
 msgid "Robogals Chapters"
-msgstr ""
+msgstr "Robogals支部"
 
 #: credits.html:3 credits.html.py:5 includes/footer.html:54
 msgid "Credits"
-msgstr ""
+msgstr "クレジット"
 
 #: credits.html:12
 msgid "Contributors:"
-msgstr ""
+msgstr "貢献者:"
 
 #: edit_user_list.html:3 edit_user_list.html.py:5 list_user_lists.html:8
 msgid "Create new list"
-msgstr ""
+msgstr "新しいリストの作成"
 
 #: edit_user_list.html:3 edit_user_list.html.py:5
 msgid "Edit list:"
-msgstr ""
+msgstr "リストの編集"
 
 #: edit_user_list.html:22
 msgid "Name"
-msgstr ""
+msgstr "リスト名"
 
 #: edit_user_list.html:33
 msgid "Members"
-msgstr ""
+msgstr "メンバー"
 
 #: edit_user_list.html:44
 msgid "Columns to display"
-msgstr ""
+msgstr "表示する項目"
 
 #: edit_user_list.html:55 visit_view.html:67
 msgid "Notes"
-msgstr ""
+msgstr "備考"
 
 #: email_done.html:4 email_done.html.py:6 email_write.html:4
 #: email_write.html.py:6
 msgid "Send bulk email"
-msgstr ""
+msgstr "Emailの一斉送信"
 
 #: email_done.html:9
 msgid "Your email has been sent!"
-msgstr ""
+msgstr "あなたのEmailは送信されました！"
 
 #: email_write.html:12 event_rsvp.html:13 visit_stats.html:12
 msgid "Please correct the following field(s)"
-msgstr ""
+msgstr "以下の欄を訂正してください"
 
 #: email_write.html:26
 msgid "All members who have opted to receive email from the following chapters"
-msgstr ""
+msgstr "Email受信設定をしている以下の支部の全てのメンバー"
 
 #: email_write.html:29
 #, python-format
 msgid "All members of %(chapter)s who have opted to receive email"
-msgstr ""
+msgstr "Email受信設定をしている%(chapter)sの全てのメンバー"
 
 #: email_write.html:45 sms_write.html:50
 msgid "Executive committee members of the following chapters"
-msgstr ""
+msgstr "以下の支部の幹部メンバー"
 
 #: email_write.html:48 sms_write.html:53
 #, python-format
 msgid "Executive committee members of %(chapter)s"
-msgstr ""
+msgstr "%(chapter)sの幹部メンバー"
 
 #: email_write.html:63 sms_write.html:68
 msgid "To a member list"
-msgstr ""
+msgstr "メンバーリストへ送信する"
 
 #: email_write.html:69
 msgid ""
 "Message will only be sent to list members who have opted to receive email"
-msgstr ""
+msgstr "メッセージはEmail受信設定をしているリストメンバーのみに送信されます"
 
 #: email_write.html:79 sms_write.html:84 visit_invite.html:53
 msgid "Select individual members"
-msgstr ""
+msgstr "メンバーを個々に選択する"
 
 #: email_write.html:85
 msgid "Only members who have opted to receive email are shown"
-msgstr ""
+msgstr "Email受信設定をしているメンバーのみ表示されています"
 
 #: email_write.html:96
 msgid "Send newsletter"
-msgstr ""
+msgstr "newsletterを送信する"
 
 #: email_write.html:109 sms_write.html:100
 msgid "From:"
-msgstr ""
+msgstr "送信者:"
 
 #: email_write.html:110
 msgid "From address set according to newsletter options"
-msgstr ""
+msgstr "送信者アドレスはnewsletter送信の選択に応じて設定されます"
 
 #: email_write.html:113 genpw.html:24 import_subscribers_1.html:47
 #: import_users_1.html:35 visit_cancel.html:29 visit_email.html:57
 #: visit_invite.html:70
 msgid "Subject:"
-msgstr ""
+msgstr "題名:"
 
 #: email_write.html:117 event_rsvp.html:21 import_subscribers_1.html:51
 #: import_users_1.html:39 sms_write.html:104 visit_cancel.html:33
 #: visit_email.html:61 visit_invite.html:74
 msgid "Message:"
-msgstr ""
+msgstr "メッセージ:"
 
 #: email_write.html:121 sms_write.html:121
 msgid "Scheduling:"
-msgstr ""
+msgstr "スケジューリング"
 
 #: email_write.html:126 sms_write.html:126
 msgid "Send immediately"
-msgstr ""
+msgstr "すぐに送信する"
 
 #: email_write.html:130 sms_write.html:130
 msgid "Send later"
-msgstr ""
+msgstr "後で送信する"
 
 #: email_write.html:136 sms_write.html:136
 msgid "at"
-msgstr ""
+msgstr "at(時刻)"
 
 #: email_write.html:136 sms_write.html:136
 msgid "on"
-msgstr ""
+msgstr "on(年月日)"
 
 #: email_write.html:136 sms_write.html:136 timezone_listing.html:12
 #: timezone_listing.html.py:16
 msgid "in"
-msgstr ""
+msgstr "in(タイムゾーン)"
 
 #: email_write.html:143
 msgid ""
@@ -347,6 +346,9 @@ msgid ""
 "showing, then the option you have selected is the real thing and NOT a test. "
 "Please ensure:"
 msgstr ""
+"このnewsletterは何百人もの人に送信されます．このメッセージが表示されていると"
+"いう事は，あなたが選択した動作がテストではなく実際に実行されるということで"
+"す．以下のことを確認してください:"
 
 #: email_write.html:145
 msgid ""
@@ -357,10 +359,15 @@ msgid ""
 "\"view it online\"</li>\n"
 "  "
 msgstr ""
+"\n"
+"  <li>このnewsletterに関する全ての編集処理が完了している</li>\n"
+"  <li>最新のweb版がアップロードされていて \"view it online\"で見ることができ"
+"る</li>\n"
+"  "
 
 #: email_write.html:149
 msgid "{{email_id}}"
-msgstr ""
+msgstr "{{email_id}}"
 
 #: email_write.html:149
 msgid ""
@@ -370,34 +377,39 @@ msgstr ""
 
 #: event_rsvp.html:20
 msgid "Leave a message:"
-msgstr ""
+msgstr "メッセージを残す"
 
 #: exec_list.html:5 exec_list.html.py:7
 #, python-format
 msgid "Exec listing: %(chapter)s"
-msgstr ""
+msgstr "幹部リスト: %(chapter)s"
 
 #: exec_list.html:11 list_user_list.html:19 user_list.html:11
 msgid "Search:"
-msgstr ""
+msgstr "検索:"
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Add/remove columns"
-msgstr ""
+msgstr "表示項目の追加/削除"
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Add new member"
-msgstr ""
+msgstr "新しいメンバーの追加"
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Manage user lists"
-msgstr ""
+msgstr "ユーザーリストの管理"
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Import CSV file"
-msgstr ""
+msgstr "CSVファイルのインポート"
 
-#: exec_list.html:18 list_user_list.html:24 user_list.html:18
+#: exec_list.html:14 user_list.html:26
+#, fuzzy
+msgid "Edit member status"
+msgstr "メンバーリスト"
+
+#: exec_list.html:18 list_user_list.html:24 user_list.html:32
 msgid "Username"
 msgstr ""
 
@@ -411,30 +423,32 @@ msgstr ""
 
 #: genpw.html:3 genpw.html.py:5
 msgid "Generate and email password:"
-msgstr ""
+msgstr "パスワードの作成・Email送信:"
 
 #: genpw.html:9
 msgid ""
 "In the email below, the field names are the same as for importing a CSV file."
-msgstr ""
+msgstr "下記のEmailの中の項目名は，インポートしているCSVファイルと同じです．"
 
 #: genpw.html:9
 msgid "Full list of field names"
-msgstr ""
+msgstr "項目名一覧"
 
 #: genpw.html:16
 msgid "Notification email:"
-msgstr ""
+msgstr "Email通知"
 
 #: genpw.html:38 import_subscribers_1.html:56 import_users_1.html:44
 msgid ""
 "Treat this message as HTML (note that line breaks will <b>not</b> be "
 "automatically converted to"
 msgstr ""
+"このメッセージをHTMLとして扱う（改行は自動的には<br>に変換<b>されない</b>こと"
+"に注意してください）"
 
 #: home.html:6
 msgid "Welcome to myRobogals"
-msgstr ""
+msgstr "ようこそmyRobogalsへ"
 
 #: home.html:8
 msgid ""
@@ -457,6 +471,10 @@ msgid ""
 "know you want to :)<br>\n"
 "<br>\n"
 msgstr ""
+
+#: home.html:18
+msgid "DATETIME_FORMAT_LONG"
+msgstr "Y/m/d H:i"
 
 #: import_subscribers_1.html:3 import_subscribers_2.html:3
 #: import_subscribers_2.html.py:5
@@ -544,6 +562,8 @@ msgid ""
 "contained in the file. A full list of possible field names is available <a "
 "href=\"help/\">here</a>. "
 msgstr ""
+"CSVファイルの一行目には，ファイルに含まれるデータの項目名を記入する必要があり"
+"ます．<a href=\"help/\">使用可能な項目名一覧</a>を参照してください．"
 
 #: import_users_1.html:11
 msgid ""
@@ -553,37 +573,42 @@ msgid ""
 "simply be ignored.</strong> This is to prevent an error interrupting the "
 "middle of the batch when some have already been processed and others haven't."
 msgstr ""
+"必須の項目として名前，苗字，Emailアドレスは必ず含まれている必要があります．他"
+"はすべて任意の項目です．不明な名前を持つ項目は無視されます．<strong>無効な値"
+"は無視されますが，エラーを返しません．</strong>これはエラーによって処理が途中"
+"で中断されるのを防ぐ為です．"
 
 #: import_users_1.html:15
 #, python-format
 msgid "%(error)s "
-msgstr ""
+msgstr "%(error)s "
 
 #: import_users_1.html:43
 msgid "HTML:"
-msgstr ""
+msgstr "HTML:"
 
 #: import_users_1.html:59
 msgid "If blank, today's date is used"
-msgstr ""
+msgstr "空欄にした場合，本日の日付が使用されます"
 
 #: import_users_2.html:4 import_users_2.html.py:6
 msgid "Import users"
-msgstr ""
+msgstr "ユーザーのインポート"
 
 #: import_users_2.html:11
 msgid ""
 "Green columns have a valid field name. <strong>Red columns are unrecognised "
 "and will be ignored.</strong>"
 msgstr ""
+"緑の列は有効な項目名です．<strong>赤い列は認識されず無視されます．</strong>"
 
 #: import_users_2.html:31
 msgid "Add members"
-msgstr ""
+msgstr "メンバーを追加する"
 
 #: import_users_help.html:3 import_users_help.html.py:5
 msgid "Import users: field names"
-msgstr ""
+msgstr "ユーザーのインポート: 項目名"
 
 #: import_users_help.html:10
 msgid ""
@@ -591,85 +616,94 @@ msgid ""
 "included. All other fields are optional. Fields with an unrecognised name "
 "are ignored - it doesn't hurt to have them in your file."
 msgstr ""
+"必須の項目として名前，苗字，Emailは必ず含まれている必要があります．他はすべて"
+"任意の項目です．不明な名前を持つ項目は無視されます．（これらによってファイル"
+"が傷付くことは有りません）"
 
 #: join_already_logged_in.html:3 join_already_logged_in.html.py:5
 #: join_listing.html:4 join_listing.html.py:6 includes/left.html:52
 msgid "Join Robogals"
-msgstr ""
+msgstr "Robogalsに加入する"
 
 #: join_already_logged_in.html:8
 msgid ""
 "You can't join Robogals - you're already a member (i.e. already logged in)!"
 msgstr ""
+"あなたは既にメンバーなので（既にログインしています），新しく加入することはで"
+"きません！"
 
 #: join_already_logged_in.html:10
 msgid "Log out and then try again"
-msgstr ""
+msgstr "ログアウトした後にやり直してください"
 
 #: join_listing.html:9
 msgid "Please select the chapter you wish to join:"
-msgstr ""
+msgstr "あなたが加入したい支部を選んでください"
 
 #: joininfo.html:3 joininfo.html.py:5 profile_edit.html:3
 #: profile_edit.html.py:5
 msgid "Join"
-msgstr ""
+msgstr "加入"
 
 #: list_user_list.html:5 list_user_list.html.py:7
 #, python-format
 msgid "View list: %(userlist)s"
-msgstr ""
+msgstr "リストを見る: %(userlist)s"
 
 #: list_user_list.html:11
 msgid "Edit this list"
-msgstr ""
+msgstr "リストの編集"
 
 #: list_user_list.html:11 list_user_lists.html:8
 msgid "Return to manage users"
-msgstr ""
+msgstr "ユーザー管理に戻る"
 
 #: list_user_list.html:11
 msgid "Return to list of lists"
-msgstr ""
+msgstr "リスト一覧に戻る"
 
 #: list_user_list.html:14
 msgid "Notes:"
-msgstr ""
+msgstr "備考:"
 
 #: list_user_lists.html:11
 msgid "Select a list to view/edit:"
-msgstr ""
+msgstr "見る/編集するリストを選ぶ:"
 
 #: login_form.html:12
 msgid "This page requires you to be logged in. Please log in to the left."
 msgstr ""
+"このページを見るにはログインする必要があります．画面の左側からログインしてく"
+"ださい．"
 
 #: new_visit.html:11 profile_edit.html:20 school_edit.html:16
 #: visit_edit.html:16
 msgid "<span style=\"color: #ff0000\">*</span> required fields"
-msgstr ""
+msgstr "<span style=\"color: #ff0000\">*</span> 必須項目"
 
 #: new_visit.html:25 visit_edit.html:30 visit_view.html:71
 msgid "Info for volunteers"
-msgstr ""
+msgstr "ボランティア向けの情報"
 
 #: new_visit.html:39
 msgid "Reminders"
-msgstr ""
+msgstr "リマインダー"
 
 #: new_visit.html:39
 msgid ""
 "This section is optional. It allows you to send reminders to people who have "
 "RSVPed for a school visit"
 msgstr ""
+"この欄は任意です．ワークショップに参加登録した人にリマインダーを送ることがで"
+"きます．"
 
 #: new_visit.html:53 school_edit.html:44 visit_edit.html:44
 msgid "Extra info"
-msgstr ""
+msgstr "追加情報"
 
 #: new_visit.html:53
 msgid "This section is optional"
-msgstr ""
+msgstr "この欄は任意です．"
 
 #: newsletter_cp.html:3 newsletter_cp.html.py:5 includes/header.html:270
 msgid "Newsletter CP"
@@ -818,18 +852,19 @@ msgid ""
 "This user has their profile set as private, you do not have permission to "
 "view it."
 msgstr ""
+"このユーザーはプロフィールを非公開に設定している為，見ることができません．"
 
 #: profile_edit.html:3 profile_edit.html.py:5
 msgid "Add member"
-msgstr ""
+msgstr "メンバーを追加する"
 
 #: profile_edit.html:3 profile_edit.html.py:5
 msgid "Edit Profile:"
-msgstr ""
+msgstr "プロフィールの編集:"
 
 #: profile_edit.html:50
 msgid "Generate and email new password"
-msgstr ""
+msgstr "新しいパスワードの作成・Email送信"
 
 #: profile_edit.html:66 includes/header.html:62
 msgid "Chapter"
@@ -837,15 +872,15 @@ msgstr "支部"
 
 #: profile_edit.html:67
 msgid "To move to another chapter, please contact my@robogals.org"
-msgstr ""
+msgstr "他の支部に移動するには，my@robogals.orgに連絡してください"
 
 #: profile_edit.html:70
 msgid "Privacy settings"
-msgstr ""
+msgstr "プライバシー設定"
 
 #: profile_edit.html:83
 msgid "Profile information"
-msgstr ""
+msgstr "プロフィール情報"
 
 #: profile_edit.html:83
 msgid ""
@@ -853,151 +888,155 @@ msgid ""
 "demographics of the organisation a bit better. It also makes your profile "
 "page more interesting :)"
 msgstr ""
+"この欄は<strong>任意</strong>ですが，団体の人員構成をより良く把握する助けにな"
+"ります．またあなたのプロフィールページをより充実させることにもなります:)"
 
 #: profile_edit.html:98
 msgid "Email and SMS settings"
-msgstr ""
+msgstr "Email/SMS設定"
 
 #: profile_edit.html:107
 msgid "Exec-only fields"
-msgstr ""
+msgstr "幹部のみ"
 
-#: profile_view.html:7
+#: profile_view.html:8
 #, python-format
 msgid "Profile - %(name)s"
 msgstr "プロフィール - %(name)s"
 
-#: profile_view.html:9
+#: profile_view.html:10
 #, python-format
 msgid "Profile: %(name)s"
 msgstr "プロフィール: %(name)s"
 
-#: profile_view.html:18
-msgid "Chapter:"
-msgstr ""
-
 #: profile_view.html:19
-msgid "Joined:"
-msgstr ""
+msgid "Chapter:"
+msgstr "支部:"
 
 #: profile_view.html:20
+msgid "Joined:"
+msgstr "加入:"
+
+#: profile_view.html:21
 msgid "Membership type:"
-msgstr ""
+msgstr "メンバーシップの種類:"
 
-#: profile_view.html:22
+#: profile_view.html:23
 msgid "Date of birth:"
-msgstr ""
+msgstr "生年月日:"
 
-#: profile_view.html:22
+#: profile_view.html:23
 #, python-format
 msgid "age %(age)s"
 msgstr ""
 
-#: profile_view.html:25
+#: profile_view.html:26
 msgid "Email address:"
-msgstr ""
+msgstr "Emailアドレス:"
 
-#: profile_view.html:29
+#: profile_view.html:30
 msgid "Course:"
-msgstr ""
+msgstr "コース:"
 
-#: profile_view.html:38
+#: profile_view.html:39
 msgid "Occupation:"
-msgstr ""
+msgstr "在籍期間:"
 
-#: profile_view.html:43
+#: profile_view.html:44
 msgid "Current position:"
-msgstr ""
+msgstr "現在の役職"
 
-#: profile_view.html:49
+#: profile_view.html:50
 msgid "Past positions:"
-msgstr ""
+msgstr "過去の役職"
 
-#: profile_view.html:58
+#: profile_view.html:59
 msgid "About me:"
-msgstr ""
+msgstr "自己紹介"
 
 #: school_delete.html:9
 msgid ""
 "Only schools that have never had a visit assigned to them can be deleted."
 "<br><br> Deleted schools cannot be retrived.<strong>"
 msgstr ""
+"ワークショップの登録をされたことが無い学校のみ削除することができます．"
+"<br><br>削除された学校は復元することはできません．<strong>"
 
 #: school_delete.html:18
 msgid "Return to schools list"
-msgstr ""
+msgstr "学校一覧に戻る"
 
 #: school_delete.html:20
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "削除してよろしいですか？"
 
 #: school_edit.html:3 school_edit.html.py:5 visit_edit.html:3
 #: visit_edit.html.py:5 includes/header.html:166
 msgid "Create new"
-msgstr ""
+msgstr "新規作成"
 
 #: school_edit.html:3 school_edit.html.py:5 visit_edit.html:3
 #: visit_edit.html.py:5
 msgid "Edit"
-msgstr ""
+msgstr "編集"
 
 #: school_edit.html:3
 msgid "school"
-msgstr ""
+msgstr "学校"
 
 #: school_edit.html:5
 msgid " school"
-msgstr ""
+msgstr "学校"
 
 #: school_edit.html:8 schools_list.html:8 visit_list.html:8 visit_stats.html:8
 #: visit_view.html:8
 msgid "Return to teaching home"
-msgstr ""
+msgstr "ワークショップホームに戻る"
 
 #: school_edit.html:8
 msgid "Return to school list"
-msgstr ""
+msgstr "学校一覧に戻る"
 
 #: school_edit.html:30 visit_view.html:82
 msgid "Contact person"
-msgstr ""
+msgstr "代表者"
 
 #: schools_list.html:8 includes/header.html:186
 msgid "Add new school"
-msgstr ""
+msgstr "新しい学校の追加"
 
 #: schools_list.html:11
 msgid "School Name"
-msgstr ""
+msgstr "学校名"
 
 #: schools_list.html:12
 msgid "Contact Person"
-msgstr ""
+msgstr "代表者"
 
 #: schools_list.html:13 visit_view.html:86
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: schools_list.html:14 visit_view.html:90
 msgid "Phone"
-msgstr ""
+msgstr "電話番号"
 
 #: schools_list.html:24
 msgid "View/Edit"
-msgstr ""
+msgstr "見る/編集"
 
 #: schools_list.html:25 visit_view.html:214
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: sms_done.html:4 sms_done.html.py:6 sms_overlimit.html:4
 #: sms_overlimit.html.py:6 sms_write.html:4 sms_write.html.py:6
 msgid "Send bulk SMS"
-msgstr ""
+msgstr "SMSの一斉送信"
 
 #: sms_done.html:9
 msgid "Your SMS has been sent!"
-msgstr ""
+msgstr "あなたのSMSは送信されました！"
 
 #: sms_overlimit.html:9
 #, python-format
@@ -1014,28 +1053,38 @@ msgid ""
 "<br>\n"
 "For %(chapter.name)s, the monthly limit is currently %(chapter.sms_limit)s.\n"
 msgstr ""
+"\n"
+"あなたの支部は今月のSMS使用制限に達しました．<strong>あなたのSMSは送信されま"
+"せんでした．</strong><br>\n"
+"<br>\n"
+"月間使用量に制限をかけているのは，悪用（例えば，メンバーのパスワードが漏洩し"
+"てしまった場合等）を防ぐ為であり，正当な利用を制限する為ではありません．正当"
+"な理由でSMSの一斉送信を行いたい場合は，Robogals GlobalのITマネージャーに連絡"
+"してください．あなたの支部の月間使用可能量を増やすことができます．<br>\n"
+"<br>\n"
+" %(chapter.name)sの現在の月間使用可能量は%(chapter.sms_limit)sです．\n"
 
 #: sms_write.html:12 visit_cancel.html:16 visit_email.html:12
 #: visit_invite.html:12
 msgid "Please correct the following field(s):"
-msgstr ""
+msgstr "以下の欄を訂正してください"
 
 #: sms_write.html:31
 msgid "All members who have opted to receive SMS from the following chapters"
-msgstr ""
+msgstr "SMS受信設定をしている以下の支部の全てのメンバー"
 
 #: sms_write.html:34
 #, python-format
 msgid "All members of %(chapter)s who have opted to receive SMS"
-msgstr ""
+msgstr "SMS受信設定をしている%(chapter)sの全てのメンバー"
 
 #: sms_write.html:74
 msgid "Message will only be sent to list members who have opted to receive SMS"
-msgstr ""
+msgstr "メッセージはSMS受信設定をしているリストメンバーのみに送信されます"
 
 #: sms_write.html:90
 msgid "Only members who have opted to receive SMS are shown"
-msgstr ""
+msgstr "SMS受信設定をしているメンバーのみ表示されています"
 
 #: sms_write.html:110
 msgid ""
@@ -1052,22 +1101,34 @@ msgid ""
 "      </ul>\n"
 "      "
 msgstr ""
+"\n"
+"      以下のことを送信前に確認してください:\n"
+"      <ul>\n"
+"        <li>メッセージの送信番号からは送信者がわからない場合もあるので，"
+"Robogalsと（または）あなた自身についてメッセージの中で名乗るようにしてくださ"
+"い</li>\n"
+"        <li>迷惑メール対策の規則に従い，大きなグループ宛に送信する場合はメッ"
+"セージの最後に<strong>\"メッセージの受信を止めるには'stop'と返信してください"
+"\"</strong>と記載してください．これは一人のメンバーに送る場合や幹部内でのやり"
+"取りの場合はそこまで重要なことではありません．</li>\n"
+"      </ul>\n"
+"      "
 
 #: sms_write.html:142
 msgid "Send SMS!"
-msgstr ""
+msgstr "SMSを送信する！"
 
 #: sms_write.html:142
 msgid "Are you sure you want to send this SMS to all the selected recipients?"
-msgstr ""
+msgstr "このSMSを選択したメンバーに送信してよろしいですか？"
 
 #: support.html:4 includes/footer.html:54
 msgid "Support"
-msgstr ""
+msgstr "サポート"
 
 #: support.html:6
 msgid "myRobogals Support"
-msgstr ""
+msgstr "myRobogals サポート"
 
 #: support.html:9
 msgid ""
@@ -1077,6 +1138,11 @@ msgid ""
 "For other questions about Robogals please see the contact details on <a href="
 "\"http://www.robogals.org/\">robogals.org</a> "
 msgstr ""
+"myRobogalsに関するすべての質問は<strong>my@robogals.org</strong>にEmailで問い"
+"合わせてください．<br>\n"
+"<br>\n"
+"Robogalsに関する他のすべての質問は<a href=\"http://www.robogals.org/"
+"\">robogals.org</a> で連絡先を確認してください．"
 
 #: teaching.html:4 teaching.html.py:6 includes/header.html:117
 msgid "Workshops"
@@ -1084,23 +1150,23 @@ msgstr "ワークショップ"
 
 #: teaching.html:10
 msgid "View upcoming and past school visits"
-msgstr ""
+msgstr "今後のワークショップの予定と過去のワークショップの記録を見る"
 
 #: teaching.html:12 visit_list.html:8
 msgid "Create new school visit"
-msgstr ""
+msgstr "新しいワークショップの予定を作成する"
 
 #: teaching.html:13
 msgid "View schools list"
-msgstr ""
+msgstr "学校一覧を見る"
 
 #: teaching.html:14
 msgid "Add school"
-msgstr ""
+msgstr "学校を追加する"
 
 #: timezone_listing.html:4 timezone_listing.html.py:6 includes/header.html:100
 msgid "Current local times"
-msgstr ""
+msgstr "現在時刻（現地時間）"
 
 #: timezone_listing.html:9
 msgid ""
@@ -1109,28 +1175,36 @@ msgid ""
 "<strong>daylight savings</strong>. It can be very beneficial when scheduling "
 "a Skype meeting or phone call with other Robogals chapters. "
 msgstr ""
+"このページは<strong>時差</strong>と<strong>夏時間</strong>を考慮したRobogals"
+"の各支部の現地時間を表示しています．他の支部とのスカイプ会議や電話の予定を立"
+"てる時に有益です. "
 
 #: timezone_listing.html:12
 msgid "Global"
-msgstr ""
+msgstr "Global"
 
 #: timezone_listing.html:12 timezone_listing.html.py:16
 #: timezone_listing.html:19
 msgid "DATETIME_FORMAT_SPECIAL"
-msgstr ""
+msgstr "DH:i"
 
 #: uni_ids_list.html:3 uni_ids_list.html.py:5
 msgid "University IDs for CSV import"
-msgstr ""
+msgstr "CSVインポートの為の大学ID"
 
 #: user_list.html:5 user_list.html.py:7
 #, python-format
 msgid "Member listing: %(chapter)s"
-msgstr ""
+msgstr "メンバーリスト: %(chapter)s"
 
-#: user_list.html:14
+#: user_list.html:13
+#, fuzzy
+msgid "Show specific status members:"
+msgstr "幹部メンバーの表示"
+
+#: user_list.html:26
 msgid "Show exec committee members"
-msgstr ""
+msgstr "幹部メンバーの表示"
 
 #: video.html:3 video.html.py:5
 msgid "Workshops tutorial video"
@@ -1138,7 +1212,7 @@ msgstr ""
 
 #: visit_cancel.html:5
 msgid "Cancel a workshop"
-msgstr ""
+msgstr "ワークショップをキャンセルする"
 
 #: visit_cancel.html:11
 msgid ""
@@ -1146,264 +1220,271 @@ msgid ""
 "will not be able to edit it again. Only cancel a workshop if you are sure it "
 "is not happening."
 msgstr ""
+"キャンセルされたワークショップはデータベースから削除され，再び編集することは"
+"できなくなります．ワークショップのキャンセルは，確実に開催されないとわかって"
+"いる時のみ行ってください．"
 
 #: visit_cancel.html:24
 msgid "Notification email to invitees"
-msgstr ""
+msgstr "招待者へのEmail通知"
 
 #: visit_cancel.html:38
 msgid "Cancel workshop and send email"
-msgstr ""
+msgstr "ワークショップをキャンセルしてEmailを送る"
 
 #: visit_edit.html:3 visit_edit.html.py:5
 msgid "school visit"
-msgstr ""
+msgstr "ワークショップ"
 
 #: visit_edit.html:8
 msgid "Return to workshops home"
-msgstr ""
+msgstr "ワークショップホームに戻る"
 
 #: visit_edit.html:8 visit_stats.html:8 visit_view.html:8
 msgid "Return to visit list"
-msgstr ""
+msgstr "ワークショップ一覧に戻る"
 
 #: visit_edit.html:8 visit_stats.html:8
 msgid "Return to visit"
-msgstr ""
+msgstr "ワークショップに戻る"
 
 #: visit_edit.html:58
 msgid "Submit"
-msgstr ""
+msgstr "送信する"
 
 #: visit_email.html:4 visit_email.html.py:6
 msgid "Email invitees of a school visit"
-msgstr ""
+msgstr "ワークショップの招待者へのEmail送信"
 
 #: visit_email.html:25
 msgid "All invitees"
-msgstr ""
+msgstr "すべての招待者"
 
 #: visit_email.html:29
 msgid "Invitees who have RSVP'd as attending"
-msgstr ""
+msgstr "参加登録済みの招待者"
 
 #: visit_email.html:33
 msgid "Invitees who have RSVP'd as not attending"
-msgstr ""
+msgstr "欠席登録済みの招待者"
 
 #: visit_email.html:37
 msgid "Invitees who have yet to RSVP"
-msgstr ""
+msgstr "出欠未登録の招待者"
 
 #: visit_email.html:41
 msgid "Selected Invitees"
-msgstr ""
+msgstr "選択された招待者"
 
 #: visit_email.html:65
 msgid "Send Email"
-msgstr ""
+msgstr "Emailを送る"
 
 #: visit_invite.html:4 visit_invite.html.py:6
 msgid "Invite/add to school visit"
-msgstr ""
+msgstr "ワークショップへの招待/追加"
 
 #: visit_invite.html:29
 msgid "All members of"
-msgstr ""
+msgstr "すべてのメンバー of"
 
 #: visit_invite.html:33
 msgid "Trained members of"
-msgstr ""
+msgstr "トレーニング済みのメンバー of"
 
 #: visit_invite.html:37
 msgid "Executive committee members of"
-msgstr ""
+msgstr "幹部メンバー of"
 
 #: visit_invite.html:41
 msgid "A member list"
-msgstr ""
+msgstr "メンバーリスト"
 
 #: visit_invite.html:67
 msgid "Invitation email:"
-msgstr ""
+msgstr "招待メール:"
 
 #: visit_invite.html:78
 msgid "Invite"
-msgstr ""
+msgstr "招待する"
 
 #: visit_list.html:3 visit_list.html.py:5
 msgid "School visits"
-msgstr ""
+msgstr "ワークショップ"
 
 #: visit_list.html:11 visit_view.html:51
 msgid "School"
-msgstr ""
+msgstr "学校"
 
 #: visit_list.html:21
 msgid "View"
-msgstr ""
+msgstr "見る"
 
 #: visit_stats.html:3 visit_stats.html.py:5
 msgid "Enter workshop statistics"
-msgstr ""
+msgstr "ワークショップ統計情報の入力"
 
 #: visit_stats_help.html:5 visit_stats_help.html.py:7
 msgid "Enter workshop statistics: categories"
-msgstr ""
+msgstr "ワークショップ統計情報の入力: ワークショップの種類"
 
 #: visit_view.html:3 visit_view.html.py:5
 msgid "DATE_FORMAT"
-msgstr ""
+msgstr "Y/m/d"
 
 #: visit_view.html:9
 msgid "Edit visit"
-msgstr ""
+msgstr "ワークショップの編集"
 
 #: visit_view.html:9
 msgid "Invite/add to visit"
-msgstr ""
+msgstr "ワークショップへの招待/追加"
 
 #: visit_view.html:9
 msgid "Email invitees"
-msgstr ""
+msgstr "招待者へのEmail送信"
 
 #: visit_view.html:10
 msgid "Close visit and enter stats"
-msgstr ""
+msgstr "統計情報の入力"
 
 #: visit_view.html:10
 msgid "Cancel visit"
-msgstr ""
+msgstr "ワークショップのキャンセル"
 
 #: visit_view.html:16
 msgid "You have not RSVP'd to this event. Your RSVP:"
-msgstr ""
+msgstr "あなたはこのイベントへの出欠登録をしていません．出欠登録:"
 
 #: visit_view.html:16 visit_view.html.py:22 visit_view.html.py:25
 msgid "attending"
-msgstr ""
+msgstr "参加"
 
 #: visit_view.html:16 visit_view.html.py:22 visit_view.html.py:28
 msgid "not attending"
-msgstr ""
+msgstr "欠席"
 
 #: visit_view.html:18
 msgid "This is a closed event. You must be invited to RSVP."
-msgstr ""
+msgstr "これは非公開のイベントです．出欠登録をするには招待が必要です．"
 
 #: visit_view.html:22
 msgid "You have been invited to this event but have not yet RSVP'd. Your RSVP:"
 msgstr ""
+"あなたはこのイベントに招待されていますが出欠登録をしていません．出欠登録:"
 
 #: visit_view.html:25 visit_view.html.py:28
 msgid "Your RSVP status is"
-msgstr ""
+msgstr "あなたの出欠登録状況は"
 
 #: visit_view.html:25
 msgid "Change to not attending"
-msgstr ""
+msgstr "欠席に変更する"
 
 #: visit_view.html:28
 msgid "Change to attending"
-msgstr ""
+msgstr "参加に変更する"
 
 #: visit_view.html:36
 msgid "This event is over. You attended this event."
-msgstr ""
+msgstr "このイベントは終了しました．あなたはこのイベントに参加しました．"
 
 #: visit_view.html:38
 msgid "This event is over."
-msgstr ""
+msgstr "このイベントは終了しました．"
 
 #: visit_view.html:42
 msgid "This event has been cancelled"
-msgstr ""
+msgstr "このイベントはキャンセルされました．"
 
 #: visit_view.html:59
 msgid "Time"
-msgstr ""
+msgstr "時刻"
 
 #: visit_view.html:60 visit_view.html.py:79
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "H:i"
 
 #: visit_view.html:74
 msgid "Meeting location"
-msgstr ""
+msgstr "集合場所"
 
 #: visit_view.html:75
 msgid ""
 "Where people will meet at university to go as a group to the school, if "
 "applicable"
-msgstr ""
+msgstr "大学出の集合場所（可能であれば，団体として学校へ向かう為）"
 
 #: visit_view.html:78
 msgid "Meeting time"
-msgstr ""
+msgstr "集合時間"
 
 #: visit_view.html:91
 msgid "Call this number if you get lost!"
-msgstr ""
+msgstr "道に迷った場合はこの番号に連絡してください！"
 
 #: visit_view.html:95
 msgid "Attending"
-msgstr ""
+msgstr "参加"
 
 #: visit_view.html:102 visit_view.html.py:129
 msgid "change RSVP to not attending"
-msgstr ""
+msgstr "出欠登録を欠席に変更する"
 
 #: visit_view.html:102 visit_view.html.py:115 visit_view.html.py:129
 msgid "remove"
-msgstr ""
+msgstr "外す"
 
 #: visit_view.html:108
 msgid "Not Attending"
-msgstr ""
+msgstr "欠席"
 
 #: visit_view.html:115 visit_view.html.py:128
 msgid "change RSVP to attending"
-msgstr ""
+msgstr "出欠登録を出席に変更する"
 
 #: visit_view.html:121
 msgid "Awaiting Reply"
-msgstr ""
+msgstr "出欠未登録"
 
 #: visit_view.html:139
 msgid "Attended"
-msgstr ""
+msgstr "参加済み"
 
 #: visit_view.html:214
 msgid "said:"
-msgstr ""
+msgstr "一言:"
 
 #: visit_view.html:214
 msgid "DATETIME_FORMAT"
-msgstr ""
+msgstr "Y/m/d H:i"
 
 #: welcome.html:3 welcome.html.py:5
 msgid "Welcome to Robogals!"
-msgstr ""
+msgstr "ようこそRobogalsへ！"
 
 #: wiki.html:3 wiki.html.py:5 includes/header.html:285
 msgid "Wiki"
-msgstr ""
+msgstr "Wiki"
 
 #: wiki.html:8
 msgid "Wiki coming soon :)"
-msgstr ""
+msgstr "Wiki coming soon :)"
 
 #: admin/base.html:27
+#, fuzzy
 msgid "Welcome,"
-msgstr ""
+msgstr "Welcomeメール"
 
 #: admin/base.html:32
+#, fuzzy
 msgid "Documentation"
-msgstr ""
+msgstr "所在地"
 
 #: admin/base.html:42
+#, fuzzy
 msgid "Back to myRobogals"
-msgstr ""
+msgstr "ようこそmyRobogalsへ"
 
 #: admin/base.html:44
 #, fuzzy
@@ -1412,7 +1493,7 @@ msgstr "ログアウト"
 
 #: includes/footer.html:54
 msgid "Go to robogals.org"
-msgstr ""
+msgstr "Robogals公式HPへ"
 
 #: includes/header.html:23
 msgid "Profile"
@@ -1420,43 +1501,43 @@ msgstr "プロフィール"
 
 #: includes/header.html:36
 msgid "View Profile"
-msgstr ""
+msgstr "プロフィールを見る"
 
 #: includes/header.html:47
 msgid "Edit Profile"
-msgstr ""
+msgstr "プロフィールの編集"
 
 #: includes/header.html:72
 msgid "View my chapter"
-msgstr ""
+msgstr "自分の支部を見る"
 
 #: includes/header.html:78
 msgid "List all chapters"
-msgstr ""
+msgstr "支部一覧"
 
 #: includes/header.html:84
 msgid "Edit my chapter"
-msgstr ""
+msgstr "支部の編集"
 
 #: includes/header.html:94
 msgid "Manage lists"
-msgstr ""
+msgstr "リストの管理"
 
 #: includes/header.html:105
 msgid "View chapter awards"
-msgstr ""
+msgstr "支部賞を見る"
 
 #: includes/header.html:154
 msgid "List school visits"
-msgstr ""
+msgstr "ワークショップ一覧"
 
 #: includes/header.html:176
 msgid "List schools"
-msgstr ""
+msgstr "学校一覧"
 
 #: includes/header.html:196 includes/header.html.py:203
 msgid "Reporting"
-msgstr ""
+msgstr "報告"
 
 #: includes/header.html:211
 msgid "Video tutorial"
@@ -1464,36 +1545,36 @@ msgstr ""
 
 #: includes/header.html:226
 msgid "Email &amp; SMS"
-msgstr "メール"
+msgstr "Eメール &amp; SMS"
 
 #: includes/header.html:240
 msgid "Send email"
-msgstr ""
+msgstr "Eメールを送る"
 
 #: includes/header.html:251
 msgid "Send SMS"
-msgstr ""
+msgstr "SMSを送る"
 
 #: includes/header.html:259
 msgid "Message history"
-msgstr ""
+msgstr "メッセージ履歴"
 
 #: includes/left.html:15
 #, python-format
 msgid "Welcome, %(first_name)s"
-msgstr ""
+msgstr "ようこそ %(first_name)s"
 
 #: includes/left.html:16
 msgid "View profile"
-msgstr ""
+msgstr "プロフィールを見る"
 
 #: includes/left.html:17
 msgid "Edit profile and settings"
-msgstr ""
+msgstr "プロフィールと設定の編集"
 
 #: includes/left.html:20 includes/left.html.py:24
 msgid "Admin panel"
-msgstr ""
+msgstr "管理画面"
 
 #: includes/left.html:28
 msgid "Logout"
@@ -1501,11 +1582,11 @@ msgstr "ログアウト"
 
 #: includes/left.html:30
 msgid "Login Form"
-msgstr ""
+msgstr "ログインフォーム"
 
 #: includes/left.html:56
 msgid "Reset password"
-msgstr "パスワードをリセット"
+msgstr "パスワードの再設定"
 
 #: includes/left.html:77
 msgid "Become a fan!"
@@ -1517,4 +1598,4 @@ msgstr ""
 
 #: profileimages/image_upload.html:4 profileimages/image_upload.html.py:6
 msgid "Login"
-msgstr ""
+msgstr "ログイン"

@@ -3,7 +3,7 @@ from myrobogals.rgmain.models import Country
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, NewsletterSubscriber, Newsletter, SubscriberType
 from datetime import datetime, date
 import re
-from django.forms.fields import email_re
+from django.core.validators import email_re
 
 class RgImportCsvException(Exception):
 	def __init__(self, errmsg):

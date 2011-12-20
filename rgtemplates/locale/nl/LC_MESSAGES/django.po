@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 23:28+1100\n"
+"POT-Creation-Date: 2011-11-19 16:24+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,7 +77,7 @@ msgstr ""
 msgid "Established:"
 msgstr ""
 
-#: chapter_detail.html:36 profile_view.html:19 profile_view.html.py:22
+#: chapter_detail.html:36 profile_view.html:20 profile_view.html.py:23
 msgid "DATE_FORMAT_NODAY"
 msgstr ""
 
@@ -126,7 +126,7 @@ msgid "Edit chapter: %(chapter)s"
 msgstr ""
 
 #: chapter_edit.html:9 exec_list.html:14 list_user_list.html:11
-#: list_user_lists.html:8 user_list.html:14
+#: list_user_lists.html:8 user_list.html:26
 msgid "Return to chapter page"
 msgstr ""
 
@@ -380,23 +380,27 @@ msgstr ""
 msgid "Search:"
 msgstr ""
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Add/remove columns"
 msgstr ""
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Add new member"
 msgstr ""
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Manage user lists"
 msgstr ""
 
-#: exec_list.html:14 user_list.html:14
+#: exec_list.html:14 user_list.html:26
 msgid "Import CSV file"
 msgstr ""
 
-#: exec_list.html:18 list_user_list.html:24 user_list.html:18
+#: exec_list.html:14 user_list.html:26
+msgid "Edit member status"
+msgstr ""
+
+#: exec_list.html:18 list_user_list.html:24 user_list.html:32
 msgid "Username"
 msgstr ""
 
@@ -455,6 +459,10 @@ msgid ""
 "<strong>And while you're here...</strong> 'Like' Robogals on Facebook! You "
 "know you want to :)<br>\n"
 "<br>\n"
+msgstr ""
+
+#: home.html:18
+msgid "DATETIME_FORMAT_LONG"
 msgstr ""
 
 #: import_subscribers_1.html:3 import_subscribers_2.html:3
@@ -861,58 +869,58 @@ msgstr ""
 msgid "Exec-only fields"
 msgstr ""
 
-#: profile_view.html:7
+#: profile_view.html:8
 #, python-format
 msgid "Profile - %(name)s"
 msgstr ""
 
-#: profile_view.html:9
+#: profile_view.html:10
 #, python-format
 msgid "Profile: %(name)s"
 msgstr ""
 
-#: profile_view.html:18
+#: profile_view.html:19
 msgid "Chapter:"
 msgstr ""
 
-#: profile_view.html:19
+#: profile_view.html:20
 msgid "Joined:"
 msgstr ""
 
-#: profile_view.html:20
+#: profile_view.html:21
 msgid "Membership type:"
 msgstr ""
 
-#: profile_view.html:22
+#: profile_view.html:23
 msgid "Date of birth:"
 msgstr ""
 
-#: profile_view.html:22
+#: profile_view.html:23
 #, python-format
 msgid "age %(age)s"
 msgstr ""
 
-#: profile_view.html:25
+#: profile_view.html:26
 msgid "Email address:"
 msgstr ""
 
-#: profile_view.html:29
+#: profile_view.html:30
 msgid "Course:"
 msgstr ""
 
-#: profile_view.html:38
+#: profile_view.html:39
 msgid "Occupation:"
 msgstr ""
 
-#: profile_view.html:43
+#: profile_view.html:44
 msgid "Current position:"
 msgstr ""
 
-#: profile_view.html:49
+#: profile_view.html:50
 msgid "Past positions:"
 msgstr ""
 
-#: profile_view.html:58
+#: profile_view.html:59
 msgid "About me:"
 msgstr ""
 
@@ -1127,7 +1135,11 @@ msgstr ""
 msgid "Member listing: %(chapter)s"
 msgstr ""
 
-#: user_list.html:14
+#: user_list.html:13
+msgid "Show specific status members:"
+msgstr ""
+
+#: user_list.html:26
 msgid "Show exec committee members"
 msgstr ""
 

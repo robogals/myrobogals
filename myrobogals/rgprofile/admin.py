@@ -5,7 +5,7 @@ from myrobogals import admin
 
 class PositionTypeAdmin(admin.ModelAdmin):
 	list_display = ('description', 'chapter', 'rank')
-	search_fields = ('description', 'chapter', 'rank')
+	search_fields = ('description',)
 
 class UniversityAdmin(admin.ModelAdmin):
 	list_display = ('name',)

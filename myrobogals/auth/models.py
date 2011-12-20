@@ -247,7 +247,7 @@ class PositiveBigIntegerField(PositiveIntegerField):
 	def get_internal_type(self):
 		return "PositiveBigIntegerField"
 	
-	def db_type(self):
+	def db_type(self, connection):
 		return "bigint UNSIGNED"
 
 class MemberStatusType(models.Model):

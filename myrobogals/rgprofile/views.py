@@ -25,7 +25,6 @@ from django.db import connection
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
-#from django.forms.fields import email_re
 
 '''
 def joinstart(request):

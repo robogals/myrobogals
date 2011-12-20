@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-08 23:28+1100\n"
+"POT-Creation-Date: 2011-11-19 16:24+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,13 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# ##########################################################################
-#                                                                         #
-#                 NO NEED TO TRANSLATE BELOW THIS LINE                    #
-#                                                                         #
-#  THESE STRINGS ARE EITHER ADMIN-ONLY, OR ALREADY TRANSLATED BY DJANGO   #
-#                                                                         #
-# ##########################################################################
 #: admin/actions.py:60
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -831,9 +824,6 @@ msgstr ""
 msgid "Enter a valid e-mail address."
 msgstr ""
 
-#
-# Context: https://my.robogals.org/chapters/global/edit/
-#
 #: rgchapter/views.py:104
 msgid "About this chapter"
 msgstr "支部についての説明"
@@ -844,9 +834,8 @@ msgid ""
 "Please keep it somewhat professional - this is a corporate web portal, not "
 "MySpace :)"
 msgstr ""
-"これはあなたの支部のページに表されます．画像を含め，全てHTML形式で書いてくだ"
-"さい．ここは団体の公的なウェブポータルです．適切な文体・表現を心がけてくださ"
-"い．"
+"この文章はあなたの支部のページに表示されます．画像を含め，全てHTML形式で書い"
+"てください．公式なウェブサイトなので，適切な文体・表現を心がけてください．"
 
 #: rgchapter/views.py:105
 msgid "Website URL"
@@ -858,7 +847,7 @@ msgstr "Facebook URL"
 
 #: rgchapter/views.py:109
 msgid "Person"
-msgstr "担当者"
+msgstr "顧問教員"
 
 #: rgchapter/views.py:109
 msgid "e.g. Professor John Doe"
@@ -880,7 +869,7 @@ msgstr "学部"
 msgid "e.g. Faculty of Engineering"
 msgstr "例) 工学部"
 
-#: rgchapter/views.py:112 rgprofile/views.py:374 rgteaching/views.py:58
+#: rgchapter/views.py:112 rgprofile/views.py:451 rgteaching/views.py:58
 #: rgteaching/views.py:466
 msgid "Email"
 msgstr "Email"
@@ -935,11 +924,11 @@ msgstr "Welcome page"
 msgid "Join page"
 msgstr "Join page"
 
-#: rgchapter/views.py:130 rgprofile/views.py:85
+#: rgchapter/views.py:130 rgprofile/views.py:87
 msgid "Columns to display"
 msgstr "表示する項目"
 
-#: rgchapter/views.py:130 rgprofile/views.py:85
+#: rgchapter/views.py:130 rgprofile/views.py:87
 msgid "Columns"
 msgstr "項目"
 
@@ -975,7 +964,7 @@ msgstr ""
 
 #: rgchapter/views.py:153
 msgid "Send a welcome email to new signups"
-msgstr "新しい登録メンバーにwelcomeメールを送る"
+msgstr "新しい登録メンバーにwelcome emailを送る"
 
 #: rgchapter/views.py:196
 msgid "Chapter info updated"
@@ -983,27 +972,27 @@ msgstr "支部情報が更新されました"
 
 #: rgmain/views.py:33
 msgid "DATE_FORMAT"
-msgstr "Y/m/d"
+msgstr ""
 
 #: rgmain/views.py:34
 msgid "DATE_FORMAT_NODAY"
-msgstr "Y/m/d"
+msgstr ""
 
 #: rgmain/views.py:35
 msgid "DATE_FORMAT_LONG"
-msgstr "Y/m/d"
+msgstr ""
 
 #: rgmain/views.py:36
 msgid "TIME_FORMAT"
-msgstr "H:i"
+msgstr ""
 
 #: rgmain/views.py:37
 msgid "DATETIME_FORMAT_LONG"
-msgstr "Y/m/d H:i"
+msgstr ""
 
 #: rgmain/views.py:38
 msgid "DATETIME_FORMAT_SPECIAL"
-msgstr "DH:i"
+msgstr ""
 
 #: rgmessages/views.py:43
 msgid "Chapter name"
@@ -1011,11 +1000,8 @@ msgstr "支部名"
 
 #: rgmessages/views.py:43
 msgid "Your name"
-msgstr "名前"
+msgstr "氏名"
 
-#
-# Context: select recipients of an email
-#
 #: rgmessages/views.py:44 rgteaching/views.py:195 rgteaching/views.py:292
 msgid "Recipients"
 msgstr "受信者"
@@ -1024,9 +1010,6 @@ msgstr "受信者"
 msgid "Chapters"
 msgstr "支部"
 
-#
-# Context: default SMS message
-#
 #: rgmessages/views.py:189
 msgid "Put your message here.  To opt-out reply 'stop'"
 msgstr "メッセージをここに記入してください．"
@@ -1068,219 +1051,221 @@ msgstr ""
 msgid "%d subscribers imported!"
 msgstr ""
 
-#
-# Context: user profile stuff (editing and viewing)
-#
-#: rgprofile/views.py:84
+#: rgprofile/views.py:86 rgprofile/views.py:101
 msgid "Members"
 msgstr "メンバー"
 
-#: rgprofile/views.py:131
+#: rgprofile/views.py:146
 msgid "User list \""
 msgstr "ユーザーリスト"
 
-#: rgprofile/views.py:348
+#: rgprofile/views.py:249
+msgid " are already marked as "
+msgstr ""
+
+#: rgprofile/views.py:251
+msgid " have been marked as "
+msgstr ""
+
+#: rgprofile/views.py:425
 msgid "Mobile phone"
 msgstr "携帯電話"
 
-#: rgprofile/views.py:372
+#: rgprofile/views.py:449
 msgid "First name"
 msgstr "名前"
 
-#: rgprofile/views.py:373
+#: rgprofile/views.py:450
 msgid "Last name"
 msgstr "苗字"
 
-#: rgprofile/views.py:378
+#: rgprofile/views.py:455
 msgid "Alternate email"
-msgstr "予備のemail"
+msgstr "予備のEmail"
 
-#: rgprofile/views.py:380
+#: rgprofile/views.py:457
 msgid "Gender"
 msgstr ""
 
-#: rgprofile/views.py:390
+#: rgprofile/views.py:467
 msgid "Everyone (the whole internet)"
 msgstr "インターネット上の誰でも"
 
-#: rgprofile/views.py:391
+#: rgprofile/views.py:468
 msgid "Only Robogals members"
 msgstr "Robogalsメンバーのみ"
 
-#: rgprofile/views.py:392
+#: rgprofile/views.py:469
 msgid "Only Robogals members in my chapter"
 msgstr "同じ支部のRobogalsメンバーのみ"
 
-#: rgprofile/views.py:393
+#: rgprofile/views.py:470
 msgid "Only committee"
-msgstr "committeeのみ"
+msgstr "幹部のみ"
 
-#: rgprofile/views.py:396
+#: rgprofile/views.py:473
 msgid "Who can see my profile?"
 msgstr "プロフィールの公開範囲"
 
-#: rgprofile/views.py:397
+#: rgprofile/views.py:474
 msgid "Show date of birth in my profile"
 msgstr "誕生日を表示する"
 
-#: rgprofile/views.py:398
+#: rgprofile/views.py:475
 msgid "Show email address in my profile"
-msgstr "Eメールアドレスを表示する"
+msgstr "Emailアドレスを表示する"
 
-#: rgprofile/views.py:409
+#: rgprofile/views.py:486
 msgid "Undergraduate"
 msgstr "学部"
 
-#: rgprofile/views.py:410
+#: rgprofile/views.py:487
 msgid "Postgraduate"
 msgstr "大学院"
 
-#: rgprofile/views.py:415
+#: rgprofile/views.py:492
 msgid "Local"
-msgstr "ローカルの学生"
+msgstr "いいえ(Local student)"
 
-#: rgprofile/views.py:416
+#: rgprofile/views.py:493
 msgid "International"
-msgstr "留学生"
+msgstr "はい(International student)"
 
-#: rgprofile/views.py:419
+#: rgprofile/views.py:496
 msgid "Date of birth"
 msgstr "誕生日"
 
-#: rgprofile/views.py:420
+#: rgprofile/views.py:497
 msgid "Course"
 msgstr "専攻"
 
-#: rgprofile/views.py:421 rgprofile/views.py:749
+#: rgprofile/views.py:498 rgprofile/views.py:826
 msgid "Started university"
 msgstr "入学時期"
 
-#: rgprofile/views.py:422 rgprofile/views.py:750
+#: rgprofile/views.py:499 rgprofile/views.py:827
 msgid "Will finish university"
 msgstr "卒業予定時期"
 
-#: rgprofile/views.py:423
+#: rgprofile/views.py:500
 #, fuzzy
 msgid "University"
 msgstr "入学時期"
 
-#: rgprofile/views.py:424 rgprofile/views.py:752
+#: rgprofile/views.py:501 rgprofile/views.py:829
 msgid "Course level"
-msgstr "コースレベル"
+msgstr "コース"
 
-#: rgprofile/views.py:425 rgprofile/views.py:753
+#: rgprofile/views.py:502 rgprofile/views.py:830
 msgid "Student type"
-msgstr "Student type"
+msgstr "留学生？"
 
-#: rgprofile/views.py:426
+#: rgprofile/views.py:503
 msgid "About me (for profile page)"
 msgstr "自己紹介（プロフィールページに表示）"
 
-#: rgprofile/views.py:436
+#: rgprofile/views.py:513
 #, python-format
 msgid "Allow %s to send me email updates"
-msgstr "%sからのemailアップデートを受け取る"
+msgstr ""
 
-#: rgprofile/views.py:437
+#: rgprofile/views.py:514
 #, python-format
 msgid "Allow %s to send me SMS updates"
-msgstr "%sからのSMSアップデートを受け取る"
+msgstr ""
 
-#: rgprofile/views.py:439
+#: rgprofile/views.py:516
 msgid "Allow email reminders about my upcoming school visits"
 msgstr ""
-"今後の自分が参加するスクールビジットについてemailリマインダーを受け取る"
+"今後の自分が参加するスクールビジットについてEmailリマインダーを受け取る"
 
-#: rgprofile/views.py:440
+#: rgprofile/views.py:517
 msgid "Allow SMS reminders about my upcoming school visits"
 msgstr "今後の自分が参加するスクールビジットについてSMSリマインダーを受け取る"
 
-#: rgprofile/views.py:443 rgprofile/views.py:760
+#: rgprofile/views.py:520 rgprofile/views.py:837
 msgid ""
 "Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
 msgstr "AMplifier（Robogals Globalからの月刊メールニュース）を申し込む"
 
-#: rgprofile/views.py:452
+#: rgprofile/views.py:529
 msgid "Trained and approved to teach"
-msgstr "トレーニング済みでワークショップで教えることができる"
+msgstr "ワークショップで教えることができる（トレーニング済）"
 
-#: rgprofile/views.py:453
+#: rgprofile/views.py:530
 msgid "Internal notes"
-msgstr "ノート"
+msgstr "備考"
 
-#: rgprofile/views.py:486
+#: rgprofile/views.py:563
 msgid "Your username must be 3 or more characters"
 msgstr "ユーザー名は3文字以上にしてください．"
 
-#: rgprofile/views.py:488
+#: rgprofile/views.py:565
 msgid "Your username must be less than 30 characters"
 msgstr "ユーザー名は30文字未満にしてください．"
 
-#: rgprofile/views.py:491
+#: rgprofile/views.py:568
 msgid "Your username must contain only letters, numbers and underscores"
 msgstr "ユーザー名は文字，数字，アンダースコアのみにしてください．"
 
-#: rgprofile/views.py:498
+#: rgprofile/views.py:575
 msgid "Your password must be at least 5 characters long"
 msgstr "パスワードは5文字以上にしてください．"
 
-#: rgprofile/views.py:509 rgprofile/views.py:517
+#: rgprofile/views.py:586 rgprofile/views.py:594
 msgid "The password and repeated password did not match. Please try again"
 msgstr "パスワードが一致しません．もう一度入力してください．"
 
-#: rgprofile/views.py:511
+#: rgprofile/views.py:588
 msgid "That username is already taken"
 msgstr "このユーザー名は既に使われています．"
 
-#: rgprofile/views.py:560 rgprofile/views.py:597
+#: rgprofile/views.py:637 rgprofile/views.py:674
 msgid "Profile and settings updated!"
 msgstr "プロフィールと設定が更新されました!"
 
-#: rgprofile/views.py:723
+#: rgprofile/views.py:800
 msgid "Add members, and send welcome email"
-msgstr "メンバーを追加して，welcome emailを送る"
+msgstr "メンバーを追加して，welcome Emailを送る"
 
-#: rgprofile/views.py:723
+#: rgprofile/views.py:800
 msgid "Add members, with no further action"
 msgstr "メンバーを追加する"
 
-#: rgprofile/views.py:747
+#: rgprofile/views.py:824
 msgid "Date joined"
 msgstr "参加した日付"
 
-#: rgprofile/views.py:756
+#: rgprofile/views.py:833
 msgid "Allow email reminders about upcoming school visits"
-msgstr "今後のスクールビジットについてemailリマインダーを受け取る"
+msgstr "今後のスクールビジットについてEmailリマインダーを受け取る"
 
-#: rgprofile/views.py:757
+#: rgprofile/views.py:834
 msgid "Allow SMS reminders about upcoming school visits"
 msgstr "今後のスクールビジットについてSMSリマインダーを受け取る"
 
-#: rgprofile/views.py:758
+#: rgprofile/views.py:835
 msgid "Allow email updates from local Robogals chapter"
-msgstr "ローカル支部からのemailアップデートを受け取る"
+msgstr "ローカル支部からのEmailアップデートを受け取る"
 
-#: rgprofile/views.py:759
+#: rgprofile/views.py:836
 msgid "Allow SMS updates from local Robogals chapter"
 msgstr "ローカル支部からのSMSアップデートを受け取る"
 
-#: rgprofile/views.py:806
+#: rgprofile/views.py:883
 #, python-format
 msgid "%d users imported!"
 msgstr "%d ユーザーがインポートされました!"
 
-#: rgprofile/views.py:808
+#: rgprofile/views.py:885
 #, python-format
 msgid "%d users imported and emailed!"
-msgstr "%d ユーザーがインポートされ，emailが送信されました!"
+msgstr "%d ユーザーがインポートされ，Emailが送信されました!"
 
-#: rgprofile/views.py:907
+#: rgprofile/views.py:984
 msgid "Password generated and emailed"
-msgstr "パスワードがemailで送信されました"
+msgstr "パスワードがEmailで送信されました"
 
-#
-# Context: https://my.robogals.org/teaching/new/
-#
 #: rgteaching/views.py:41
 msgid ""
 "If the school is not listed here, it first needs to be added in Workshops > "
@@ -1315,7 +1300,7 @@ msgstr ""
 
 #: rgteaching/views.py:46
 msgid "Allowed RSVPs"
-msgstr "RSVPsを許可する"
+msgstr "出欠返答の許可"
 
 #: rgteaching/views.py:55
 msgid "Meeting location"
@@ -1337,7 +1322,7 @@ msgstr "集合時間"
 
 #: rgteaching/views.py:56
 msgid "What time people can meet to go to the school"
-msgstr "学校へ向かうのに何時に集合するか"
+msgstr "学校へ向かうのに集合する時間"
 
 #: rgteaching/views.py:57
 msgid "Contact person"
@@ -1345,7 +1330,7 @@ msgstr "代表者"
 
 #: rgteaching/views.py:59
 msgid "Mobile number to call if people get lost"
-msgstr "道に迷った場合に連絡する携帯電話番号"
+msgstr "道に迷った場合に連絡するべき携帯電話番号"
 
 #: rgteaching/views.py:62
 msgid "Expected number of students"
@@ -1377,7 +1362,7 @@ msgstr "その他に必要な準備"
 
 #: rgteaching/views.py:69
 msgid "Other notes"
-msgstr "その他"
+msgstr "その他の備考"
 
 #: rgteaching/views.py:118
 msgid "School visit info updated"
@@ -1440,7 +1425,7 @@ msgstr "学校は消去されました"
 
 #: rgteaching/views.py:460 rgteaching/views.py:464
 msgid "Name"
-msgstr "名前"
+msgstr "氏名"
 
 #: rgteaching/views.py:461
 msgid "Address"
@@ -1448,7 +1433,7 @@ msgstr "住所"
 
 #: rgteaching/views.py:470
 msgid "Notes"
-msgstr ""
+msgstr "備考"
 
 #: rgteaching/views.py:504
 msgid "School info updated"
@@ -1460,15 +1445,15 @@ msgstr "参加者として登録しました"
 
 #: rgteaching/views.py:570
 msgid "RSVP as attending"
-msgstr "参加者として登録する"
+msgstr "参加登録をする"
 
 #: rgteaching/views.py:573
 msgid "RSVP'd as not attending"
-msgstr "参加者としてではなく登録されました"
+msgstr "欠席者として登録されました"
 
 #: rgteaching/views.py:574
 msgid "RSVP as not attending"
-msgstr "参加者としてではなく登録"
+msgstr "欠席登録をする"
 
 #: rgteaching/views.py:576
 msgid "Remove an invitee"
@@ -1497,7 +1482,7 @@ msgstr "招待者"
 
 #: rgteaching/views.py:636
 msgid "General notes"
-msgstr "ノート"
+msgstr "備考"
 
 #: rgteaching/views.py:701
 msgid "Stats saved successfully, visit closed."

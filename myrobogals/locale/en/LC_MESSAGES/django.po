@@ -849,7 +849,7 @@ msgstr ""
 msgid "e.g. Faculty of Engineering"
 msgstr ""
 
-#: rgchapter/views.py:112 rgprofile/views.py:374 rgteaching/views.py:58
+#: rgchapter/views.py:112 rgprofile/views.py:451 rgteaching/views.py:58
 #: rgteaching/views.py:466
 msgid "Email"
 msgstr ""
@@ -902,11 +902,11 @@ msgstr ""
 msgid "Join page"
 msgstr ""
 
-#: rgchapter/views.py:130 rgprofile/views.py:85
+#: rgchapter/views.py:130 rgprofile/views.py:87
 msgid "Columns to display"
 msgstr ""
 
-#: rgchapter/views.py:130 rgprofile/views.py:85
+#: rgchapter/views.py:130 rgprofile/views.py:87
 msgid "Columns"
 msgstr ""
 
@@ -1020,208 +1020,216 @@ msgstr ""
 msgid "%d subscribers imported!"
 msgstr ""
 
-#: rgprofile/views.py:84
+#: rgprofile/views.py:86 rgprofile/views.py:101
 msgid "Members"
 msgstr ""
 
-#: rgprofile/views.py:131
+#: rgprofile/views.py:146
 msgid "User list \""
 msgstr ""
 
-#: rgprofile/views.py:348
+#: rgprofile/views.py:249
+msgid " are already marked as "
+msgstr ""
+
+#: rgprofile/views.py:251
+msgid " have been marked as "
+msgstr ""
+
+#: rgprofile/views.py:425
 msgid "Mobile phone"
 msgstr ""
 
-#: rgprofile/views.py:372
+#: rgprofile/views.py:449
 msgid "First name"
 msgstr ""
 
-#: rgprofile/views.py:373
+#: rgprofile/views.py:450
 msgid "Last name"
 msgstr ""
 
-#: rgprofile/views.py:378
+#: rgprofile/views.py:455
 msgid "Alternate email"
 msgstr ""
 
-#: rgprofile/views.py:380
+#: rgprofile/views.py:457
 msgid "Gender"
 msgstr ""
 
-#: rgprofile/views.py:390
+#: rgprofile/views.py:467
 msgid "Everyone (the whole internet)"
 msgstr ""
 
-#: rgprofile/views.py:391
+#: rgprofile/views.py:468
 msgid "Only Robogals members"
 msgstr ""
 
-#: rgprofile/views.py:392
+#: rgprofile/views.py:469
 msgid "Only Robogals members in my chapter"
 msgstr ""
 
-#: rgprofile/views.py:393
+#: rgprofile/views.py:470
 msgid "Only committee"
 msgstr ""
 
-#: rgprofile/views.py:396
+#: rgprofile/views.py:473
 msgid "Who can see my profile?"
 msgstr ""
 
-#: rgprofile/views.py:397
+#: rgprofile/views.py:474
 msgid "Show date of birth in my profile"
 msgstr ""
 
-#: rgprofile/views.py:398
+#: rgprofile/views.py:475
 msgid "Show email address in my profile"
 msgstr ""
 
-#: rgprofile/views.py:409
+#: rgprofile/views.py:486
 msgid "Undergraduate"
 msgstr ""
 
-#: rgprofile/views.py:410
+#: rgprofile/views.py:487
 msgid "Postgraduate"
 msgstr ""
 
-#: rgprofile/views.py:415
+#: rgprofile/views.py:492
 msgid "Local"
 msgstr ""
 
-#: rgprofile/views.py:416
+#: rgprofile/views.py:493
 msgid "International"
 msgstr ""
 
-#: rgprofile/views.py:419
+#: rgprofile/views.py:496
 msgid "Date of birth"
 msgstr ""
 
-#: rgprofile/views.py:420
+#: rgprofile/views.py:497
 msgid "Course"
 msgstr ""
 
-#: rgprofile/views.py:421 rgprofile/views.py:749
+#: rgprofile/views.py:498 rgprofile/views.py:826
 msgid "Started university"
 msgstr ""
 
-#: rgprofile/views.py:422 rgprofile/views.py:750
+#: rgprofile/views.py:499 rgprofile/views.py:827
 msgid "Will finish university"
 msgstr ""
 
-#: rgprofile/views.py:423
+#: rgprofile/views.py:500
 msgid "University"
 msgstr ""
 
-#: rgprofile/views.py:424 rgprofile/views.py:752
+#: rgprofile/views.py:501 rgprofile/views.py:829
 msgid "Course level"
 msgstr ""
 
-#: rgprofile/views.py:425 rgprofile/views.py:753
+#: rgprofile/views.py:502 rgprofile/views.py:830
 msgid "Student type"
 msgstr ""
 
-#: rgprofile/views.py:426
+#: rgprofile/views.py:503
 msgid "About me (for profile page)"
 msgstr ""
 
-#: rgprofile/views.py:436
+#: rgprofile/views.py:513
 #, python-format
 msgid "Allow %s to send me email updates"
 msgstr ""
 
-#: rgprofile/views.py:437
+#: rgprofile/views.py:514
 #, python-format
 msgid "Allow %s to send me SMS updates"
 msgstr ""
 
-#: rgprofile/views.py:439
+#: rgprofile/views.py:516
 msgid "Allow email reminders about my upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:440
+#: rgprofile/views.py:517
 msgid "Allow SMS reminders about my upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:443 rgprofile/views.py:760
+#: rgprofile/views.py:520 rgprofile/views.py:837
 msgid ""
 "Subscribe to The Amplifier, the monthly email newsletter of Robogals Global"
 msgstr ""
 
-#: rgprofile/views.py:452
+#: rgprofile/views.py:529
 msgid "Trained and approved to teach"
 msgstr ""
 
-#: rgprofile/views.py:453
+#: rgprofile/views.py:530
 msgid "Internal notes"
 msgstr ""
 
-#: rgprofile/views.py:486
+#: rgprofile/views.py:563
 msgid "Your username must be 3 or more characters"
 msgstr ""
 
-#: rgprofile/views.py:488
+#: rgprofile/views.py:565
 msgid "Your username must be less than 30 characters"
 msgstr ""
 
-#: rgprofile/views.py:491
+#: rgprofile/views.py:568
 msgid "Your username must contain only letters, numbers and underscores"
 msgstr ""
 
-#: rgprofile/views.py:498
+#: rgprofile/views.py:575
 msgid "Your password must be at least 5 characters long"
 msgstr ""
 
-#: rgprofile/views.py:509 rgprofile/views.py:517
+#: rgprofile/views.py:586 rgprofile/views.py:594
 msgid "The password and repeated password did not match. Please try again"
 msgstr ""
 
-#: rgprofile/views.py:511
+#: rgprofile/views.py:588
 msgid "That username is already taken"
 msgstr ""
 
-#: rgprofile/views.py:560 rgprofile/views.py:597
+#: rgprofile/views.py:637 rgprofile/views.py:674
 msgid "Profile and settings updated!"
 msgstr ""
 
-#: rgprofile/views.py:723
+#: rgprofile/views.py:800
 msgid "Add members, and send welcome email"
 msgstr ""
 
-#: rgprofile/views.py:723
+#: rgprofile/views.py:800
 msgid "Add members, with no further action"
 msgstr ""
 
-#: rgprofile/views.py:747
+#: rgprofile/views.py:824
 msgid "Date joined"
 msgstr ""
 
-#: rgprofile/views.py:756
+#: rgprofile/views.py:833
 msgid "Allow email reminders about upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:757
+#: rgprofile/views.py:834
 msgid "Allow SMS reminders about upcoming school visits"
 msgstr ""
 
-#: rgprofile/views.py:758
+#: rgprofile/views.py:835
 msgid "Allow email updates from local Robogals chapter"
 msgstr ""
 
-#: rgprofile/views.py:759
+#: rgprofile/views.py:836
 msgid "Allow SMS updates from local Robogals chapter"
 msgstr ""
 
-#: rgprofile/views.py:806
+#: rgprofile/views.py:883
 #, python-format
 msgid "%d users imported!"
 msgstr ""
 
-#: rgprofile/views.py:808
+#: rgprofile/views.py:885
 #, python-format
 msgid "%d users imported and emailed!"
 msgstr ""
 
-#: rgprofile/views.py:907
+#: rgprofile/views.py:984
 msgid "Password generated and emailed"
 msgstr ""
 
