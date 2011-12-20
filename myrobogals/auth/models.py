@@ -213,6 +213,9 @@ class Group(models.Model):
 
     def local_time(self):
     	return datetime.datetime.utcnow().replace(tzinfo=utc).astimezone(self.timezone.tz_obj())        
+    
+    def get_absolute_url(self):
+    	return "/chapters/%s/" % self.myrobogals_url
 
 class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
@@ -425,7 +428,7 @@ class User(models.Model):
         return self.tz_obj().fromutc(self.date_joined)
 
     def get_absolute_url(self):
-        return "/users/%s/" % urllib.quote(smart_str(self.username))
+        return "/profile/%s/" % urllib.quote(smart_str(self.username))
 
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."

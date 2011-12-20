@@ -54,6 +54,9 @@ class SchoolVisit(Event):
 	closing_comments = models.TextField("Closing comments", blank=True)	
 	def __unicode__(self):
 		return str(self.school) + " on " + str(self.visit_start.date())
+		
+	def get_absolute_url(self):
+		return "/teaching/%d/" % self.pk
 	
 	class Meta:
 		ordering = ['-visit_start']
@@ -71,7 +74,7 @@ class EventMessage(models.Model):
 class TrainingSession(Event):
 	def __unicode__(self):
 		return "Training session at " + self.location + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
-
+	
 	class Meta:
 		verbose_name = "training session"
 

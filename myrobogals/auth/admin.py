@@ -14,7 +14,6 @@ from django.utils.html import escape
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
-    #filter_horizontal = ('permissions',)
     fieldsets = (
         (None, {'fields': ('name', 'short', 'short_en', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'name_display')}),
         ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
@@ -59,7 +58,6 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email', 'mobile')
     ordering = ('username',)
     inlines = (MemberStatusAdmin, PositionAdmin)
-    filter_horizontal = ('user_permissions',)
 
     def __call__(self, request, url):
         # this should not be here, but must be due to the way __call__ routes
