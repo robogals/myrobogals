@@ -99,6 +99,10 @@ def awards(request):
 	
 	return render_to_response('chapter_award.html', {'award_dic': award_dic_s}, context_instance=RequestContext(request))
 
+def awardsdesc(request, award_id):
+	recipient = AwardRecipient.objects.get(id=award_id)
+	return render_to_response('award_view.html', {'recipient': recipient}, context_instance=RequestContext(request))
+
 # forms for editing a chapter
 class FormPartOne(forms.Form):
 	infobox = forms.CharField(label=_("About this chapter"), help_text = _("This is shown on your chapter page. Full HTML is allowed, including images! Please keep it somewhat professional - this is a corporate web portal, not MySpace :)"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))

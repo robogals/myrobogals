@@ -142,7 +142,7 @@ def edituserlist(request, chapterurl, list_id):
 				l.users = data['users']
 				l.display_columns = data['display_columns']
 				l.save()
-				request.user.message_set.create(message=unicode(_("User list \"" + l.name + "\" has been updated")))
+				request.user.message_set.create(message=unicode(_("User list \"%(listname)s\" has been updated") % {'listname': l.name}))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:
@@ -214,9 +214,7 @@ def editstatus(request, chapterurl):
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		users = []
 		if request.method == 'POST':
-			#status = request.POST['status']
 			ulform = EditStatusForm(request.POST, user=request.user)
-			#valid = ulform.is_valid()
 			if ulform.is_valid():
 				data = ulform.cleaned_data
 				status = data['status']
@@ -245,9 +243,9 @@ def editstatus(request, chapterurl):
 						else:
 							users_changed = u.username
 				if(users_already):
-					request.user.message_set.create(message=unicode(_(users_already + " are already marked as " + old_status.statusType.description)))
+					request.user.message_set.create(message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
 				if(users_changed):
-					request.user.message_set.create(message=unicode(_(users_changed + " have been marked as " + new_status.statusType.description)))
+					request.user.message_set.create(message=unicode(_("%(usernames)s have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/users/')
 		else:
 			ulform = EditStatusForm(None, user=request.user)
