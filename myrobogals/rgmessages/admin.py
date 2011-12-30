@@ -38,6 +38,7 @@ class SMSMessageAdmin(admin.ModelAdmin):
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
 	list_display = ('email', 'newsletter', 'first_name', 'last_name', 'company', 'country')
 	search_fields = ('email', 'first_name', 'last_name', 'company')
+	list_filter = ('newsletter',)
 
 class SubscriberTypeAdmin(admin.ModelAdmin):
 	list_display = ('description', 'order', 'public')

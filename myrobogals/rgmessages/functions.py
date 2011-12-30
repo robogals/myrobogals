@@ -98,7 +98,7 @@ def importcsv(filerows, welcomeemail, defaults, newsletter, user):
 					stringval(colname, cell, newsubscriber, defaults)
 					if not email_re.match(newsubscriber.email):
 						raise SkipRowException
-					if NewsletterSubscriber.objects.filter(email=newsubscriber.email).count() > 0:
+					if NewsletterSubscriber.objects.filter(email=newsubscriber.email, newsletter=newsletter).count() > 0:
 						raise SkipRowException   # This email address is already subscribed
 				elif colname == 'first_name':
 					stringval(colname, cell, newsubscriber, defaults)
@@ -148,11 +148,14 @@ def importcsv(filerows, welcomeemail, defaults, newsletter, user):
 	
 			# Apply any unapplied defaults
 			if 'type' not in columns:
-				newsubscriber.subscriber_type_id = defaults['subscriber_type_id']
+				if 'subscriber_type_id' in defaults:
+					newsubscriber.subscriber_type_id = defaults['subscriber_type_id']
 			if 'details_verified' not in columns:
-				newsubscriber.details_verified = defaults['details_verified']
+				if 'details_verified' in defaults:
+					newsubscriber.details_verified = defaults['details_verified']
 			if 'country' not in columns:
-				newsubscriber.country = defaults['country']
+				if 'country' in defaults:
+					newsubscriber.country = defaults['country']
 	
 			# Set some other important attributes
 			newsubscriber.newsletter = newsletter
