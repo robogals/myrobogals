@@ -12,9 +12,10 @@
 					$('#newsletter_warning').hide();
 					$('#html_newsletter').hide();
 					$('#from_newsletter').hide();
+					$('#status_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
-					$('#form_status').show();
+					$('#status_normal').show();
 					break;
 				case '2':
 					$('#form_table_chapters').hide();
@@ -25,9 +26,10 @@
 					$('#newsletter_warning').hide();
 					$('#html_newsletter').hide();
 					$('#from_newsletter').hide();
+					$('#status_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
-					$('#form_status').show();
+					$('#status_normal').show();
 					break;
 				case '3':
 					$('#form_table_chapters').hide();
@@ -38,9 +40,10 @@
 					$('#newsletter_warning').hide();
 					$('#html_newsletter').hide();
 					$('#from_newsletter').hide();
+					$('#status_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
-					$('#form_status').show();
+					$('#status_normal').show();
 					break;
 				case '4':
 					$('#form_table_chapters').hide();
@@ -51,9 +54,10 @@
 					$('#newsletter_warning').show();
 					$('#html_newsletter').show();
 					$('#from_newsletter').show();
+					$('#status_newsletter').show();
 					$('#html_normal').hide();
 					$('#from_normal').hide();
-					$('#form_status').hide();
+					$('#status_normal').hide();
 					break;
 				case '5':
 					$('#form_table_chapters').hide();
@@ -64,9 +68,10 @@
 					$('#newsletter_warning').hide();
 					$('#html_newsletter').hide();
 					$('#from_newsletter').hide();
+					$('#status_newsletter').hide();
 					$('#html_normal').show();
 					$('#from_normal').show();
-					$('#form_status').show();
+					$('#status_normal').show();
 					break;
 			}
 		});

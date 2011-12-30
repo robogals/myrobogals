@@ -188,7 +188,7 @@ def editusers(request, chapterurl):
 		#	pass
 		#print connection.queries		
 		display_columns = c.display_columns.all()
-		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'numusers': len(list(users)), 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 

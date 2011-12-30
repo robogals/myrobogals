@@ -106,19 +106,18 @@
     </td>
   </tr>
 </table>
-<table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_status">
- <tr>
+<table border="0" width="100%" cellpadding="0" cellspacing="0">
+  <tr>
     <td valign="top"><strong>{% trans "Filter by:" %}</strong></td>
-    <td>
-    <select name="status">
+    <td><span id="status_normal"><select name="status">
 	{% for memberstatustype in memberstatustypes %}
-	<option value = {{memberstatustype.id}} {% ifequal memberstatustype.id status %} selected {% endifequal %}>{{memberstatustype.description}}</option>
+	<option value="{{memberstatustype.id}}" {% ifequal memberstatustype.idstr statussel %}selected="selected"{% endifequal %}>{{memberstatustype.description}}</option>
 	{% endfor %}
-	<option value = 0 {% ifequal 0 status %} selected {% endifequal %}>All</option>
-	</select>
-	</td>
- </tr>
-
+	<option value="0" {% ifequal '0' statussel %}selected="selected"{% endifequal %}>All</option>
+	</select></span>
+	<span id="status_newsletter" style="display: none">{% trans "Newsletter subscribers only" %}</span>
+    </td>
+  </tr>
   <tr>
     <td valign="top"><strong>{% trans "From:" %}</strong></td>
     <td><span id="from_normal">{{ emailform.from_type }}</span><span id="from_newsletter" style="display: none">{% trans "From address set according to newsletter options" %}</span></td>

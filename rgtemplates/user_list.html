@@ -8,24 +8,22 @@
 
 {% block content %}
 <form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET">
-{% trans "Search:" %} <input type="text" name="search" value="{{search}}">
-
-<p>{% trans "Show specific status members:" %}
+{% trans "Username, name, email or mobile contains:" %} <input type="text" name="search" value="{{search}}"><br>
+{% trans "Member status:" %}
 <select name="status">
 {% for memberstatustype in memberstatustypes %}
-<option value = {{memberstatustype.id}} {% ifequal memberstatustype.id status %} selected {% endifequal %}>{{memberstatustype.description}}</option>
+<option value="{{memberstatustype.id}}" {% ifequal memberstatustype.id status %}selected="selected"{% endifequal %}>{{memberstatustype.description}}</option>
 {% endfor %}
-<option value = 0 {% ifequal 0 status %} selected {% endifequal %}>All</option>
-</select>
-</p>
-<input type="submit" value="Go">
+<option value="0" {% ifequal 0 status %}selected="selected"{% endifequal %}>All</option>
+</select><br>
+<input type="submit" value="{% trans "Apply filters" %}">
 </form>
 
 <p>
 <a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/#cols">{% trans "Add/remove columns" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/execs/">{% trans "Show exec committee members" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/status/">{% trans "Edit member status" %}</a>
 </p>
 
-<p align="right"><b>Total Users: {{ users|length }} </b></p>
+<p align="right"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "Username" %}</strong></td>
@@ -42,5 +40,5 @@
   </tr>
 {% endfor %}
 </table>
-<p align="right"><b>Total Users: {{ users|length }} </b></p>
+<p align="right"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
 {% endblock %}

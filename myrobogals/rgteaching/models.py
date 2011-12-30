@@ -104,6 +104,7 @@ class EventAttendee(models.Model):
 VISIT_TYPES = (
 	(-1, ''),
 	(0, 'Robogals robotics workshop'),
+	(7, 'Robogals robotics workshop (RRR funded trip)'),
 	(1, 'Robogals career talk'),
 	(2, 'Robogals event'),
 	(3, 'Non-Robogals robotics workshop'),

@@ -262,6 +262,9 @@ class MemberStatusType(models.Model):
 	description = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Group, null=True, blank=True)
 	type_of_person = models.IntegerField(choices=PERSONTYPES, default=0)
+	
+	def idstr(self):
+		return str(self.id)
 
 	def __unicode__(self):
 		return self.description

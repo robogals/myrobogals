@@ -76,7 +76,6 @@ def writeemail(request):
 	if request.method == 'POST':
 		typesel = request.POST['type']
 		schedsel = request.POST['scheduling']
-
 		statussel = request.POST['status']
 		
 		emailform = WriteEmailForm(request.POST, user=request.user)
@@ -150,7 +149,7 @@ def writeemail(request):
 
 			if statussel != '0' and request.POST['type'] != '4':
 				for one_user in users:
-					if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk =(int(statussel)))):
+					if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk=(int(statussel)))):
 						recipient = EmailRecipient()
 						recipient.message = message
 						recipient.user = one_user
@@ -187,8 +186,9 @@ def writeemail(request):
 		else:
 			typesel = '1'
 		schedsel = '0'
+		statussel = '1'
 		emailform = WriteEmailForm(None, user=request.user)
-	return render_to_response('email_write.html', {'memberstatustypes': memberstatustypes, 'emailform': emailform, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
+	return render_to_response('email_write.html', {'memberstatustypes': memberstatustypes, 'emailform': emailform, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel, 'statussel': statussel}, context_instance=RequestContext(request))
 
 class SMSModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -224,12 +224,15 @@ class WriteSMSForm(forms.Form):
 
 @login_required
 def writesms(request):
+	memberstatustypes = MemberStatusType.objects.all()
 	if not request.user.is_staff:
 		raise Http404
 	smserror = None
 	if request.method == 'POST':
 		typesel = request.POST['type']
 		schedsel = request.POST['scheduling']
+		statussel = request.POST['status']
+		
 		smsform = WriteSMSForm(request.POST, user=request.user)
 		try:
 			if smsform.is_valid():
@@ -281,12 +284,21 @@ def writesms(request):
 					# those users with a blank mobile number
 					users = data['recipients']
 
-				for one_user in users:
-					recipient = SMSRecipient()
-					recipient.message = message
-					recipient.user = one_user
-					recipient.to_number = one_user.mobile
-					recipient.save()
+				if statussel != '0':
+					for one_user in users:
+						if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk=(int(statussel)))):
+							recipient = SMSRecipient()
+							recipient.message = message
+							recipient.user = one_user
+							recipient.to_number = one_user.mobile
+							recipient.save()
+				else:
+					for one_user in users:
+						recipient = SMSRecipient()
+						recipient.message = message
+						recipient.user = one_user
+						recipient.to_number = one_user.mobile
+						recipient.save()
 			
 				# Check that we haven't used too many credits
 				sms_this_month = 0
@@ -313,8 +325,9 @@ def writesms(request):
 		else:
 			typesel = '1'
 		schedsel = '0'
+		statussel = '1'
 		smsform = WriteSMSForm(None, user=request.user)
-	return render_to_response('sms_write.html', {'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel}, context_instance=RequestContext(request))
+	return render_to_response('sms_write.html', {'memberstatustypes': memberstatustypes, 'smsform': smsform, 'smserror': smserror, 'chapter': request.user.chapter, 'typesel': typesel, 'schedsel': schedsel, 'statussel': statussel}, context_instance=RequestContext(request))
 
 @login_required
 def smsdone(request):

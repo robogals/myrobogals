@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% trans "Edit user status:" %}{% endblock %}
+{% block title %}{% trans "Edit member status" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Edit user status:" %}{% endblock %}
+{% block pagetitle %}{% trans "Edit member status" %}{% endblock %}
 
 {% block content %}
 <p>
@@ -10,20 +10,7 @@
 </p>
 
 <form action="/chapters/{{chapter.myrobogals_url}}/edit/status/" method="POST">
-
-<p>{% trans "Choose a status to mark members:" %}
-<select name="status">
-{% for memberstatustype in memberstatustypes %}
-<option value = {{memberstatustype.id}} {%ifequal memberstatustype.id status %} selected {% endifequal %}>{{memberstatustype.description}}</option>
-{% endfor %}
-</select>
-</p>
-
-{% trans "Choose members to be marked as the status:" %}
-</br>
-
 <table>
-
 {% if ulform.users.errors %}
 {% for error in ulform.users.errors %}
   <tr>
@@ -32,11 +19,18 @@
 {% endfor %}
 {% endif %}
   <tr>
-    <td style="vertical-align: top" width="30">{% trans "Members" %}</td>
+    <td style="vertical-align: top; white-space: nowrap;" width="30">{% trans "New status:" %}</td>
+    <td style="vertical-align: top"><select name="status">
+{% for memberstatustype in memberstatustypes %}
+<option value = {{memberstatustype.id}} {%ifequal memberstatustype.id status %} selected {% endifequal %}>{{memberstatustype.description}}</option>
+{% endfor %}
+</select>
+</td>
+  </tr>
+  <tr>
+    <td style="vertical-align: top; white-space: nowrap;" width="30">{% trans "Apply to:" %}</td>
     <td style="vertical-align: top">{{ ulform.users }}</td>
   </tr>
-
-
   <tr>
     <td style="vertical-align: top" width="30">&nbsp;</td>
     <td style="vertical-align: top"><input type="submit" value="Submit" /></td>

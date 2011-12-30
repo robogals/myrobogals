@@ -97,6 +97,16 @@
     </td>
   </tr>
   <tr>
+    <td valign="top"><strong>{% trans "Filter by:" %}</strong></td>
+    <td><select name="status">
+	{% for memberstatustype in memberstatustypes %}
+	<option value="{{memberstatustype.id}}" {% ifequal memberstatustype.idstr statussel %}selected="selected"{% endifequal %}>{{memberstatustype.description}}</option>
+	{% endfor %}
+	<option value="0" {% ifequal '0' statussel %}selected="selected"{% endifequal %}>All</option>
+	</select>
+    </td>
+  </tr>
+  <tr>
     <td valign="top"><strong>{% trans "From:" %}</strong></td>
     <td><span id="from_normal">{{ smsform.from_type }}</span></td>
   </tr>
