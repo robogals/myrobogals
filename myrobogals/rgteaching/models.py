@@ -51,12 +51,33 @@ class SchoolVisit(Event):
 	toprint = models.TextField("Materials to be printed", blank=True)
 	tobring = models.TextField("Stuff to bring", blank=True)
 	otherprep = models.TextField("Other preparation", blank=True)
-	closing_comments = models.TextField("Closing comments", blank=True)	
+	closing_comments = models.TextField("Closing comments", blank=True)
+
 	def __unicode__(self):
 		return str(self.school) + " on " + str(self.visit_start.date())
 		
 	def get_absolute_url(self):
 		return "/teaching/%d/" % self.pk
+	
+	def get_stats(self):
+		try:
+			return self.schoolvisitstats_set.all()[0]
+		except IndexError:
+			return None
+	
+	def get_type(self):
+		stats = self.get_stats()
+		if stats == None:
+			return ""
+		else:
+			return stats.get_visit_type_display()
+	
+	def get_num_girls_display(self):
+		stats = self.get_stats()
+		if stats == None:
+			return ""
+		else:
+			return str(stats.num_girls())
 	
 	class Meta:
 		ordering = ['-visit_start']
