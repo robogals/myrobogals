@@ -186,7 +186,7 @@ class Group(models.Model):
         return self.name
     
     # N.B. this function only works with three levels or less
-    def membercount(self):
+    def do_membercount(self, type):
         cursor = connection.cursor()
         cursor.execute('SELECT id FROM auth_group WHERE parent_id = ' + str(self.pk))
         ids_csv = ''
@@ -204,15 +204,24 @@ class Group(models.Model):
                     ids_csv = ids_csv + ', ' + str(ids[0])
                 else:
                     break
-        cursor.execute('SELECT COUNT(id) FROM auth_user WHERE is_active = 1 AND chapter_id IN (' + str(self.pk) + ids_csv + ')')
+        if type == 0:
+            cursor.execute('SELECT COUNT(id) FROM auth_user WHERE is_active = 1 AND chapter_id IN (' + str(self.pk) + ids_csv + ')')
+        else:
+            cursor.execute('SELECT COUNT(u.id) FROM auth_user AS u, auth_memberstatus AS ms WHERE u.is_active = 1 AND u.chapter_id IN (' + str(self.pk) + ids_csv + ') AND u.id = ms.user_id AND ms.statusType_id = ' + str(type) + ' AND ms.status_date_end IS NULL')
         count = cursor.fetchone()
         if count:
             return int(count[0])
         else:
             return 0
 
+    def membercount(self):
+    	return self.do_membercount(0)
+
+    def membercount_student(self):
+    	return self.do_membercount(1)
+
     def local_time(self):
-    	return datetime.datetime.utcnow().replace(tzinfo=utc).astimezone(self.timezone.tz_obj())        
+    	return datetime.datetime.utcnow().replace(tzinfo=utc).astimezone(self.timezone.tz_obj())
     
     def get_absolute_url(self):
     	return "/chapters/%s/" % self.myrobogals_url
