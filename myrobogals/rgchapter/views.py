@@ -81,12 +81,8 @@ def detail(request, chapterurl):
 def redirtomy(request):
 	return HttpResponseRedirect("/chapters/" + request.user.chapter.myrobogals_url + "/")
 
-
 def awards(request):
-	# awards = AwardRecipient.objects.all()
-	
 	cursor = connection.cursor()
-
 	cursor.execute("SELECT DISTINCT YEAR FROM rgchapter_awardrecipient")
 	#year_list = cursor.fetchone()
 	award_dic = {}
@@ -94,9 +90,7 @@ def awards(request):
 		award_dic[row[0]] = {}
 		for i in range(len(REGION_CHOICES)):
 			award_dic[row[0]][REGION_CHOICES[i][1]]= AwardRecipient.objects.filter(year=int(row[0])).filter(region=i)
-
-	award_dic_s = sorted(award_dic.items(), reverse=True)
-	
+	award_dic_s = sorted(award_dic.items(), reverse=True)	
 	return render_to_response('chapter_award.html', {'award_dic': award_dic_s}, context_instance=RequestContext(request))
 
 def awardsdesc(request, award_id):

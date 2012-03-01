@@ -42,6 +42,11 @@ def get_user_attr(user, attr):
 	if field_type == 'BooleanField':
 		return _boolean_icon(val)
 	
+	if attr == 'has_cur_pos' or attr == 'has_robogals_email':
+		display_func = getattr(user, attr)
+		boolval = display_func()
+		return _boolean_icon(boolval)
+	
 	if field_obj:
 		if field_obj._choices != []:
 			display_func = getattr(user, 'get_' + attr + '_display')

@@ -16,16 +16,20 @@
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "Username" %}</strong></td>
-    {% for col in display_columns %}
-    <td><strong>{{col.display_name_en}}</strong></td>
-    {% endfor %}
+    <td><strong>{% trans "Name" %}</strong></td>
+    <td><strong>{% trans "Email" %}</strong></td>
+    <td><strong>{% trans "Exec access" %}</strong></td>
+    <td><strong>{% trans "Exec position" %}</strong></td>
+    <td><strong>{% trans "Robogals email" %}</strong></td>
   </tr>
 {% for u in users %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
-	{% for col in display_columns %}
-    <td>{% get_user_attr u col.field_name %}</td>
-    {% endfor %}
+    <td>{% get_user_attr u "get_full_name" %}</td>
+    <td>{% get_user_attr u "email" %}</td>
+    <td>{% get_user_attr u "is_staff" %}</td>
+    <td>{% get_user_attr u "has_cur_pos" %}</td>
+    <td>{% get_user_attr u "has_robogals_email" %}</td>
   </tr>
 {% endfor %}
 </table>

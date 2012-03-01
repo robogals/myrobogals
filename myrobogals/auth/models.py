@@ -451,6 +451,26 @@ class User(models.Model):
 	        full_name = u'%s%s' % (self.last_name, self.first_name)
         return full_name.strip()
 
+    def has_cur_pos(self):
+    	cursor = connection.cursor()
+    	cursor.execute('SELECT COUNT(user_id) FROM `rgprofile_position` WHERE user_id = ' + str(self.pk) + ' AND position_date_end IS NULL')
+    	ms = cursor.fetchone()
+        if ms[0] > 0:
+           return True
+        else:
+           return False
+
+    def has_robogals_email(self):
+        try:
+            domain = self.email.split('@', 1)[1]
+            rgemail = EmailDomain.objects.filter(domainname=domain).count()
+            if rgemail > 0:
+                return True
+            else:
+                return False
+        except IndexError:
+            return False
+            
     def set_password(self, raw_password):
         import random
         algo = 'sha1'

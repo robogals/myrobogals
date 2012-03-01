@@ -340,3 +340,6 @@ def genandsendpw(user, welcomeemail, chapter):
 	recipient.save()
 	message.status = 0
 	message.save()
+
+def any_exec_attr(u):
+	return (u.is_staff or u.has_cur_pos() or u.has_robogals_email())
