@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %}{{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block title %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %} {{u.username}}{% endif %}{% endif %}{% endblock %}
 
-{% block pagetitle %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %}{{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block pagetitle %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %} {{u.username}}{% endif %}{% endif %}{% endblock %}
 
 {% block content %}
 <!-- form for editing profile information -->
