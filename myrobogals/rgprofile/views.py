@@ -409,6 +409,31 @@ class MobileField(forms.CharField):
 		except ValueError:
 			raise forms.ValidationError(self.chapter.mobile_regexes.errmsg)
 
+# Custom student number field
+class StudentNumField(forms.CharField):
+	chapter = None
+
+	def __init__(self, *args, **kwargs):
+		self.chapter=None
+		self.user_id=None
+		super(StudentNumField, self).__init__(*args, **kwargs)
+
+	# This function checks for the uniqueness of the student number within the chapter.
+	# Student numbers may not necessarily be unique globally across all universities,
+	# thus one cannot simply use the built-in Django functionality to specify this field
+	# as a unique field.
+	def clean(self, value):
+		if value == '':
+			if self.required:
+				raise forms.ValidationError(_('This field is required.'))
+			else:
+				return ''
+		if User.objects.filter(Q(chapter=self.chapter), ~Q(pk=self.user_id), Q(student_number=value)).count() > 0:
+			raise forms.ValidationError(_('There is already a member with that student number. Click "forgot password" to the left to recover your existing account, if necessary.'))
+		else:
+			return value
+
+# Custom t-shirt size selection field
 class ShirtChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.size_long
@@ -418,11 +443,15 @@ class FormPartOne(forms.Form):
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
+		user_id=kwargs['user_id']
+		del kwargs['user_id']
 		super(FormPartOne, self).__init__(*args, **kwargs)
 		self.fields['mobile'] = MobileField(label=_('Mobile phone'), max_length=20, required=False, widget=MobileTextInput(), chapter=chapter)
 		if chapter.student_number_enable:
 			self.fields['student_number'].label = chapter.student_number_label
 			self.fields['student_number'].required = chapter.student_number_required
+			self.fields['student_number'].chapter = chapter
+			self.fields['student_number'].user_id = user_id
 		else:
 			del self.fields['student_number']
 		if chapter.student_union_enable:
@@ -446,7 +475,7 @@ class FormPartOne(forms.Form):
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
 	email = forms.EmailField(label=_('Email'), max_length=64)
-	student_number = forms.CharField(max_length=32)
+	student_number = StudentNumField(max_length=32)
 	union_member = forms.BooleanField()
 	tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
@@ -548,7 +577,7 @@ def edituser(request, username, chapter=None):
 		if request.method == 'POST':
 			if join:
 				new_username = request.POST['username'].strip()
-			formpart1 = FormPartOne(request.POST, chapter=chapter)
+			formpart1 = FormPartOne(request.POST, chapter=chapter, user_id=u.id)
 			formpart2 = FormPartTwo(request.POST, chapter=chapter)
 			formpart3 = FormPartThree(request.POST, chapter=chapter)
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
@@ -672,7 +701,7 @@ def edituser(request, username, chapter=None):
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
-				formpart1 = FormPartOne(None, chapter=chapter)
+				formpart1 = FormPartOne(None, chapter=chapter, user_id=0)
 				formpart2 = FormPartTwo(None, chapter=chapter)
 				formpart3 = FormPartThree(None, chapter=chapter)
 				formpart4 = FormPartFour(None, chapter=chapter)
@@ -691,7 +720,7 @@ def edituser(request, username, chapter=None):
 					'gender': u.gender,
 					'student_number': u.student_number,
 					'union_member': u.union_member,
-					'tshirt': tshirt_id}, chapter=chapter)
+					'tshirt': tshirt_id}, chapter=chapter, user_id=u.pk)
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,
