@@ -166,7 +166,6 @@ def editusers(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	memberstatustypes = MemberStatusType.objects.all()
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
-		users = User.objects.filter(chapter=c)
 		search = ''
 		searchsql = ''
 		if 'search' in request.GET:
@@ -180,13 +179,14 @@ def editusers(request, chapterurl):
 		else:
 			status = '1'   # Default to student members
 
-		if(status != '0'):
+		if (status != '0'):
 			users = User.objects.raw('SELECT u.* FROM auth_user AS u, auth_memberstatus AS ms WHERE u.chapter_id ' +
 					'= '+ str(c.pk) +' AND u.id = ms.user_id AND ms.statusType_id = '+ status +' AND ms.status_date_end IS NULL ' +
 					searchsql + ' ORDER BY last_name, first_name')
-		#for blah in users:
-		#	pass
-		#print connection.queries		
+		else:
+			users = User.objects.raw('SELECT u.* FROM auth_user AS u WHERE u.chapter_id ' +
+					'= '+ str(c.pk) + ' ' +
+					searchsql + ' ORDER BY last_name, first_name')
 		display_columns = c.display_columns.all()
 		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'numusers': len(list(users)), 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 	else:
