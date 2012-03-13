@@ -58,6 +58,7 @@ a {text-decoration: none;}
 a:hover {text-decoration: underline;}
 .clr, .clear {clear: both;font-size: 0;}
 .rokradios, .rokchecks {padding: 1px 5px 5px 22px;line-height: 120%;}
+.nopadtitle {padding-bottom: 0px;}
 
 /* Header */
 .banner-module .moduletable {margin: 0;padding: 0 20px;float: right;}
@@ -239,6 +240,7 @@ div.pagination div.page-block {padding: 0 4px;float: left;margin-right: 6px;}
 
 /* Main Body Modules */
 .moduletable h3 {margin-top: 0;font-size: 160%;}
+.moduletablenobottom {margin-bottom: 0;}
 .module-inner {position: relative;z-index: 4;padding: 15px 20px;}
 #inset-block-right .mainblock-module, #inset-block-left .mainblock-module {padding-bottom: 10px;}
 #showmodules, #featuremodules, #mainmodules, #mainmodules2, #mainmodules3, #mainmodules4, #mainmodules5 {overflow: hidden;}
@@ -246,7 +248,8 @@ div.pagination div.page-block {padding: 0 4px;float: left;margin-right: 6px;}
 .spacer.w99 .block {width: 99.8%;}
 .spacer.w49 .block {width: 49.8%;}
 .spacer.w33 .block {width: 33.3%;}
-.moduletable {padding: 15px 20px;margin-bottom: 5px;}
+.moduletableold {padding: 15px 20px;margin-bottom: 5px;}
+.moduletable {padding: 6px 8px;margin-bottom: 5px;}
 .round .module-surround, .round2 .module-surround, .round3 .module-surround, .round4 .module-surround, .round5 .module-surround, .square .module-surround, .square2 .module-surround, .square3 .module-surround, .square4 .module-surround, .square5 .module-surround {position: relative;padding: 0;z-index: 1;}
 .round .module-grad, .round2 .module-grad, .round3 .module-grad, .round4 .module-grad, .round5 .module-grad, .square .module-grad, .square2 .module-grad, .square3 .module-grad, .square4 .module-grad, .square5 .module-grad {position: absolute;top: 0;left: 0;width: 100%;height: 55px;z-index: 2;}
 .round .module-surround2, .round2 .module-surround2, .round3 .module-surround2, .round4 .module-surround2, .round5 .module-surround2, .round .module-surround3, .round2 .module-surround3, .round3 .module-surround3, .round4 .module-surround3, .round5 .module-surround3 {position: absolute;height: 55px;width: 12px;z-index: 4;}

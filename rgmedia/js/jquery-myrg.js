@@ -125,4 +125,81 @@
 			}
 		});
 		$('input[name=invitee_type]:radio').change();
+		
+		$('#basic-info-title').click(function() {
+			$('#basic-info-table').toggle(0, function() {
+				if ($('#basic-info-table').is(':hidden')) {
+					$('#basic-info-title').addClass('nopadtitle moduletablenobottom');
+					$('#basic-info-collapse').hide();
+					$('#basic-info-expand').show();
+				} else {
+					$('#basic-info-title').removeClass('nopadtitle moduletablenobottom');
+					$('#basic-info-collapse').show();
+					$('#basic-info-expand').hide();
+				}
+			});
+		});
+
+		$('#privacy-setting-title').click(function() {
+			$('#privacy-setting-table').toggle(0, function() {
+				if ($('#privacy-setting-table').is(':hidden')) {
+					$('#privacy-setting-title').addClass('nopadtitle moduletablenobottom');
+					$('#privacy-setting-collapse').hide();
+					$('#privacy-setting-expand').show();
+				} else {
+					$('#privacy-setting-title').removeClass('nopadtitle moduletablenobottom');
+					$('#privacy-setting-collapse').show();
+					$('#privacy-setting-expand').hide();
+				}
+			});
+		});
+
+		$('#profile-info-title').click(function() {
+			$('#profile-info-table').toggle(0, function() {
+				if ($('#profile-info-table').is(':hidden')) {
+					$('#profile-info-title').addClass('nopadtitle moduletablenobottom');
+					$('#profile-info-collapse').hide();
+					$('#profile-info-expand').show();
+				} else {
+					$('#profile-info-title').removeClass('nopadtitle moduletablenobottom');
+					$('#profile-info-collapse').show();
+					$('#profile-info-expand').hide();
+				}
+			});
+		});
+		
+		$('#email-sms-title').click(function() {
+			$('#email-sms-table').toggle(0, function() {
+				if ($('#email-sms-table').is(':hidden')) {
+					$('#email-sms-title').addClass('nopadtitle moduletablenobottom');
+					$('#email-sms-collapse').hide();
+					$('#email-sms-expand').show();
+				} else {
+					$('#email-sms-title').removeClass('nopadtitle moduletablenobottom');
+					$('#email-sms-collapse').show();
+					$('#email-sms-expand').hide();
+				}
+			});
+		});
+
+		$('#exec-fields-title').click(function() {
+			$('#exec-fields-table').toggle(0, function() {
+				if ($('#exec-fields-table').is(':hidden')) {
+					$('#exec-fields-title').addClass('nopadtitle moduletablenobottom');
+					$('#exec-fields-collapse').hide();
+					$('#exec-fields-expand').show();
+				} else {
+					$('#exec-fields-title').removeClass('nopadtitle moduletablenobottom');
+					$('#exec-fields-collapse').show();
+					$('#exec-fields-expand').hide();
+				}
+			});
+		});
+		
+		if ($('#profile-info-table').hasClass('jqerror')) {
+			$('#profile-info-title').removeClass('nopadtitle moduletablenobottom');
+			$('#profile-info-collapse').show();
+			$('#profile-info-expand').hide();
+			$('#profile-info-table').show();
+		}
 	});
