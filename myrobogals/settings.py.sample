@@ -132,6 +132,7 @@ INSTALLED_APPS = (
 	'myrobogals.rgchapter',
 	'myrobogals.rgteaching',
 	'myrobogals.rgmessages',
+	'myrobogals.rgweb',
 	'myrobogals.filters',
 )
 
