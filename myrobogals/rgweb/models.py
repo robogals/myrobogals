@@ -17,3 +17,6 @@ class Website(models.Model):
 	joomla_admin_url = models.CharField(max_length=64, blank=True)
 	joomla_user = models.CharField(max_length=64, blank=True)
 	joomla_pass = models.CharField(max_length=64, blank=True)
+
+	def __unicode__(self):
+		return self.site_name + " (" + self.site_url + ")"
