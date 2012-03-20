@@ -434,8 +434,11 @@ class User(models.Model):
             return self.chapter.name_display
 
     def graduation_year(self):
-        return self.uni_end.strftime("%Y")
-    
+        if self.uni_end:
+            return self.uni_end.strftime("%Y")
+        else:
+            return ""
+
     def date_joined_local(self):
         return self.tz_obj().fromutc(self.date_joined)
 

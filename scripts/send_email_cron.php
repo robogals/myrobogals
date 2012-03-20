@@ -5,10 +5,17 @@
 	
 	The "send email" page in myRobogals actually just adds outgoing
 	email to a queue in MySQL; this script does the actual sending.
-	It should be running constantly in the background on the server.
+	It should be running on a cron job in the background on the server.
 */
 
-set_time_limit(59);
+set_time_limit(0);
+
+// kill script if alredy running
+if ($fp = @fopen("/tmp/robogals-cron-email-lock", 'r')) die();
+
+// create lockfile
+$fp = fopen("/tmp/robogals-cron-email-lock", 'w');
+fclose($fp);
 
 require_once "Mail.php";
 
@@ -145,6 +152,10 @@ Content-Transfer-Encoding: base64
 
 	}
 	mysql_free_result($result);
+
+
+	// remove lock file
+	unlink("/tmp/robogals-cron-email-lock");
 	
 	// Wait 0.5 seconds before looking in the database again
 //	sleep(0.5);

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import sys
+sys.path.insert(0, '/usr/local/django1.3.1')
 from django.core.management import execute_manager
 try:
     import settings # Assumed to be in the same directory.
