@@ -2,6 +2,8 @@ from myrobogals.auth.models import User, Group, MemberStatus
 from myrobogals.rgmain.models import MobileRegex, University
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
+from django.utils.translation import ugettext_lazy as _
+from django.db import connection, transaction
 import re
 
 class RgImportCsvException(Exception):
@@ -11,6 +13,12 @@ class RgImportCsvException(Exception):
 		return self.errmsg
 
 class RgGenAndSendPwException(Exception):
+	def __init__(self, errmsg):
+		self.errmsg = errmsg
+	def __str__(self):
+		return self.errmsg
+
+class SubToNewsException(Exception):
 	def __init__(self, errmsg):
 		self.errmsg = errmsg
 	def __str__(self):
@@ -121,7 +129,7 @@ def generate_unique_username(row, columns):
 		if (check_username(uname)): return uname
 	
 	# Should never reach here, since the last case is pretty far-reaching
-	raise RgImportCsvException('Could not generate unique username')
+	raise RgImportCsvException(_('Could not generate unique username'))
 
 def importcsv(filerows, welcomeemail, defaults, chapter):
 	columns = None
@@ -135,11 +143,11 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 		if (columns == None):
 			columns = row
 			if 'first_name' not in columns:
-				raise RgImportCsvException('You must specify a first_name field')
+				raise RgImportCsvException(_('You must specify a first_name field'))
 			if 'last_name' not in columns:
-				raise RgImportCsvException('You must specify a last_name field')
+				raise RgImportCsvException(_('You must specify a last_name field'))
 			if 'email' not in columns:
-				raise RgImportCsvException('You must specify an email field')
+				raise RgImportCsvException(_('You must specify an email field'))
 			continue
 		
 		# Create new user
@@ -277,7 +285,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 					plaintext_password=plaintext_password)
 			except Exception:
 				newuser.delete()
-				raise RgImportCsvException('Welcome email subject format is invalid')
+				raise RgImportCsvException(_('Welcome email subject format is invalid'))
 			try:
 				message.body = welcomeemail['body'].format(
 					chapter=chapter,
@@ -285,7 +293,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 					plaintext_password=plaintext_password)
 			except Exception:
 				newuser.delete()
-				raise RgImportCsvException('Welcome email format is invalid')
+				raise RgImportCsvException(_('Welcome email format is invalid'))
 			message.from_address = 'my@robogals.org'
 			message.reply_address = 'my@robogals.org'
 			message.from_name = chapter.name
@@ -317,14 +325,14 @@ def genandsendpw(user, welcomeemail, chapter):
 			user=user,
 			plaintext_password=plaintext_password)
 	except Exception:
-		raise RgGenAndSendPwException('Email subject contains invalid fields')
+		raise RgGenAndSendPwException(_('Email subject contains invalid fields'))
 	try:
 		message.body = welcomeemail['body'].format(
 			chapter=chapter,
 			user=user,
 			plaintext_password=plaintext_password)
 	except Exception:
-		raise RgGenAndSendPwException('Email body contains invalid fields')
+		raise RgGenAndSendPwException(_('Email body contains invalid fields'))
 	message.from_address = 'my@robogals.org'
 	message.reply_address = 'my@robogals.org'
 	message.from_name = chapter.name
@@ -343,3 +351,46 @@ def genandsendpw(user, welcomeemail, chapter):
 
 def any_exec_attr(u):
 	return (u.is_staff or u.has_cur_pos() or u.has_robogals_email())
+
+def subtonews(first_name, last_name, email, chapter_id):
+        cursor = connection.cursor()
+        cursor.execute('SELECT u.id, u.email_chapter_optin FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
+        user = cursor.fetchone()
+        if user:
+        	if int(user[1]) == 1:
+        		raise SubToNewsException(_('That email address is already subscribed'))
+        	else:
+        		# reinstate a previous subscriber's subscription
+        		user = User.objects.get(pk=user[0])
+        		user.email_chapter_optin = True
+        		user.first_name = first_name
+        		user.last_name = last_name
+        		user.save()
+        else:
+        	user = User()
+        	columns = ['first_name', 'last_name', 'email']
+        	row = [first_name, last_name, email]
+        	user.username = generate_unique_username(row, columns)
+        	user.first_name = first_name
+        	user.last_name = last_name
+        	user.email = email
+        	user.chapter_id = chapter_id
+        	user.email_chapter_optin = True
+        	user.date_joined = datetime.now()
+		user.save()
+
+		# Must be called after save() because the primary key
+		# is required for these
+		mt = MemberStatus(user_id=user.pk, statusType_id=8)
+		mt.save()
+
+def unsubtonews(email, chapter_id):
+        cursor = connection.cursor()
+        cursor.execute('SELECT u.id FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
+        user = cursor.fetchone()
+        if user:
+        	user = User.objects.get(pk=user[0])
+        	user.email_chapter_optin = False
+        	user.save()
+        else:
+        	raise SubToNewsException(_('That email address is not subscribed'))

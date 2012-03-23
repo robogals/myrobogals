@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with c.name as chapter %}Subscribe to {{chapter}} newsletter{% endblocktrans %}{% endblock %}
+
+{% block pagetitle %}{% blocktrans with c.name as chapter %}Subscribe to {{chapter}} newsletter{% endblocktrans %}{% endblock %}
+
+{% block content %}
+<p>{% trans "Thanks for subscribing!" %}</p>
+<p><a href="{{c.website_url}}">{% blocktrans with c.name as chapter %}Return to {{chapter}}'s website{% endblocktrans %}</a></p>
+{% endblock %}
