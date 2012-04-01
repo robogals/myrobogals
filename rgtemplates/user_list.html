@@ -18,6 +18,18 @@
 </select><br>
 <input type="submit" value="{% trans "Apply filters" %}">
 </form>
+<br>
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/export/" method="GET">
+{% trans "Member status:" %}
+<select name="status">
+{% for memberstatustype in memberstatustypes %}
+<option value="{{memberstatustype.id}}" {% ifequal memberstatustype.id status %}selected="selected"{% endifequal %}>{{memberstatustype.description}}</option>
+{% endfor %}
+<option value="0" {% ifequal 0 status %}selected="selected"{% endifequal %}>All</option>
+</select>
+<input type="submit" value="{% trans "Export to CSV file" %}">
+</form>
+
 
 <p>
 <a href="/chapters/{{chapter.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/#cols">{% trans "Add/remove columns" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/add/?return={{return|urlencode}}">{% trans "Add new member" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/lists/">{% trans "Manage user lists" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/users/import/">{% trans "Import CSV file" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/execs/">{% trans "Show exec committee members" %}</a> | <a href="/chapters/{{chapter.myrobogals_url}}/edit/status/">{% trans "Edit member status" %}</a>

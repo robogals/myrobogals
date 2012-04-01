@@ -920,6 +920,38 @@ def importusers(request, chapterurl):
 		defaultsform2 = DefaultsFormTwo()
 	return render_to_response('import_users_1.html', {'chapter': chapter, 'form': form, 'welcomeform': welcomeform, 'defaultsform1': defaultsform1, 'defaultsform2': defaultsform2, 'errmsg': errmsg}, context_instance=RequestContext(request))
 
+@login_required
+def exportusers(request, chapterurl):
+	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+		if 'status' in request.GET:
+			status = request.GET['status']
+		else:
+			status = '1'   # Default to student members
+
+		if (status != '0'):
+			users = MemberStatus.objects.filter(
+				user__chapter=request.user.chapter,
+				statusType__pk=status,
+				status_date_end__isnull=True
+			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
+		else:
+			users = MemberStatus.objects.filter(
+				user__chapter=request.user.chapter,
+				status_date_end__isnull=True
+			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
+
+		response = HttpResponse(mimetype='text/csv')
+		filename = str(request.user.chapter) + ' ' + str(date.today()) + '.csv'
+		response['Content-Disposition'] = 'attachment; filename=' + filename
+		writer = csv.writer(response)
+		writer.writerow(['username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number'])
+		for user in users:
+			writer.writerow([user['user__username'], user['user__first_name'], user['user__last_name'], user['user__email'], user['user__mobile'], user['user__course'], user['user__university__name'], user['user__student_number']])
+		return response
+	else:
+		raise Http404
+
 COMPULSORY_FIELDS = (
 	('first_name', 'First name'),
 	('last_name', 'Last name'),
