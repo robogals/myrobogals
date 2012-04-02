@@ -931,13 +931,13 @@ def exportusers(request, chapterurl):
 
 		if (status != '0'):
 			users = MemberStatus.objects.filter(
-				user__chapter=request.user.chapter,
+				user__chapter=c,
 				statusType__pk=status,
 				status_date_end__isnull=True
 			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
 		else:
 			users = MemberStatus.objects.filter(
-				user__chapter=request.user.chapter,
+				user__chapter=c,
 				status_date_end__isnull=True
 			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
 
