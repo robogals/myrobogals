@@ -934,20 +934,20 @@ def exportusers(request, chapterurl):
 				user__chapter=c,
 				statusType__pk=status,
 				status_date_end__isnull=True
-			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
+			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number', 'user__alt_email', 'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end', 'user__course_type', 'user__student_type').distinct()
 		else:
 			users = MemberStatus.objects.filter(
 				user__chapter=c,
 				status_date_end__isnull=True
-			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number').distinct()
+			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number', 'user__alt_email', 'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end', 'user__course_type', 'user__student_type').distinct()
 
 		response = HttpResponse(mimetype='text/csv')
-		filename = str(request.user.chapter) + ' ' + str(date.today()) + '.csv'
+		filename = 'robogals-' + c.myrobogals_url + '-' + str(date.today()) + '.csv'
 		response['Content-Disposition'] = 'attachment; filename=' + filename
 		writer = csv.writer(response)
-		writer.writerow(['username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number'])
+		writer.writerow(['username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'])
 		for user in users:
-			writer.writerow([user['user__username'], user['user__first_name'], user['user__last_name'], user['user__email'], user['user__mobile'], user['user__course'], user['user__university__name'], user['user__student_number']])
+			writer.writerow([user['user__username'], user['user__first_name'], user['user__last_name'], user['user__email'], user['user__mobile'], user['user__course'], user['user__university__name'], user['user__student_number'], user['user__alt_email'], user['user__date_joined'], user['user__dob'], user['user__gender'], user['user__uni_start'], user['user__uni_end'], user['user__course_type'], user['user__student_type']])
 		return response
 	else:
 		raise Http404
