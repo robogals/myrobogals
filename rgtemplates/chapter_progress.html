@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Robogals Chapters" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Robogals Chapters" %}{% endblock %}
+
+{% block content %}
+<ul>
+{% if is_superuser %}
+    <li>
+        <a href="/chapters/global/">Global</a> {{ glob.1 }}
+        <ul>
+        {% for item in listing %}
+            <li>
+                <a href="/chapters/{{item.super.0.myrobogals_url}}/">{% if item.super.0.status == 2 %}<i>{{item.super.0.short}} (Hidden)</i>{% else %}{{item.super.0.short}}{% endif %}</a> {{ item.super.1 }}
+                <ul>
+                {% for chapter in item.chapters %}
+                    <li><a href="/chapters/{{chapter.0.myrobogals_url}}/">{% if chapter.0.status == 2 %}<i>{{chapter.0.short}} (Hidden)</i>{% else %}{{chapter.0.short}}{% endif %}</a> {{ chapter.1 }} <br><em>{{chapter.0.university}}</em></li>
+                {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+        </ul>
+    </li>
+{% else %}
+	<li>
+		<a href="/chapters/{{ request.user.chapter.myrobogals_url }}/">{% if request.user.chapter.status == 2 %}<i>{{ request.user.chapter.short }} (Hidden)</i>{% else %}{{ request.user.chapter.short }}{% endif %}</a> {{ glob_sum }}
+	</li>
+{% endif %}
+</ul>
+{% endblock %}
