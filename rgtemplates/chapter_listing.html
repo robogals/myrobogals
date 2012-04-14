@@ -12,10 +12,10 @@
         <ul>
         {% for item in listing %}
             <li>
-                <a href="/chapters/{{item.super.myrobogals_url}}/">{{item.super.short}}</a>
+                <a href="/chapters/{{item.super.myrobogals_url}}/">{% if item.super.status == 2 %}<i>{{item.super.short}} (Hidden)</i>{% else %}{{item.super.short}}{% endif %}</a>
                 <ul>
                 {% for chapter in item.chapters %}
-                    <li><a href="/chapters/{{chapter.myrobogals_url}}/">{{chapter.short}}</a><br><em>{{chapter.university}}</em></li>
+                    <li><a href="/chapters/{{chapter.myrobogals_url}}/">{% if chapter.status == 2 %}<i>{{chapter.short}} (Hidden)</i>{% else %}{{chapter.short}}{% endif %}</a><br><em>{{chapter.university}}</em></li>
                 {% endfor %}
                 </ul>
             </li>

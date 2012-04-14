@@ -177,6 +177,8 @@ class Group(models.Model):
     tshirt_required = models.BooleanField('Require T-shirt drop-down')
     tshirt_label = models.CharField('Label for T-shirt drop-down', max_length=64, blank=True)
     name_display = models.IntegerField("Name display", choices=NAME_DISPLAYS, default=0)
+    goal = models.IntegerField("Number of students taught", default=0)
+    goal_start = models.DateField(default=date.today)
 
     class Meta:
         verbose_name = 'chapter'

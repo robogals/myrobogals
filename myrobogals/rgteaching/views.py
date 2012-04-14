@@ -185,6 +185,13 @@ def listvisits(request):
 	visits = SchoolVisit.objects.filter(chapter=chapter)
 	return render_to_response('visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
+@login_required
+def printlistvisits(request):
+	chapter = request.user.chapter
+	visits = SchoolVisitStats.objects.filter(visit__chapter=chapter).order_by('-visit__visit_start')
+	return render_to_response('print_visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
+
+
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
     	return obj.last_name + ", " + obj.first_name

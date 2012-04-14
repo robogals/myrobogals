@@ -1,6 +1,7 @@
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
+from myrobogals.rgteaching.models import EventAttendee
 from myrobogals.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgprofile.models import Position, UserList
@@ -303,7 +304,8 @@ def detail(request, username):
 		show_job = True
 	else:
 		show_job = False
-	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job}, context_instance=RequestContext(request))
+	visits = EventAttendee.objects.filter(user=u).order_by('-event__visit_start')
+	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
 
 
 # Widget that shows a month and year field only

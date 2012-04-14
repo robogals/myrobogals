@@ -80,6 +80,11 @@
                 </li>
 {% if request.user.is_staff %}
                 <li class="item147">
+                    <a class="orphan item bullet" href="/chapters/progress/">
+                        <span>{% trans "Chapter progress" %}</span>
+                    <a>
+                </li>
+                <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
                         <span>{% trans "Edit my chapter" %}</span>
                     <a>
@@ -152,6 +157,16 @@
             <a class="orphan item bullet" href="/teaching/list/"  >
             <span>
                         {% trans "List school visits" %}          
+            </span>
+        </a>
+
+        
+        
+</li>   
+                    <li class="item68" >
+            <a class="orphan item bullet" href="/teaching/printlist/"  >
+            <span>
+                        {% trans "Printable list" %}          
             </span>
         </a>
 

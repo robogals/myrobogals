@@ -1,4 +1,5 @@
 from myrobogals.rgprofile.models import Position
+from myrobogals.rgteaching.models import SchoolVisitStats
 from myrobogals.auth.models import Group, User
 from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
@@ -11,6 +12,7 @@ from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
 from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
+from django.db.models import Q
 
 def list(request):
 	listing = []
@@ -102,6 +104,8 @@ class FormPartOne(forms.Form):
 	infobox = forms.CharField(label=_("About this chapter"), help_text = _("This is shown on your chapter page. Full HTML is allowed, including images! Please keep it somewhat professional - this is a corporate web portal, not MySpace :)"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	website_url = forms.CharField(max_length=128, label=_("Website URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	facebook_url = forms.CharField(max_length=128, label=_("Facebook URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	goal = forms.CharField(max_length=32, label=_("Goal"), help_text=_("Number of students"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("Goal set date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 
 class FormPartTwo(forms.Form):
 	faculty_contact = forms.CharField(max_length=64, label=_("Person"), help_text=_("e.g. Professor John Doe"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
@@ -154,6 +158,59 @@ class FormPartFive(forms.Form):
 	welcome_email_html = forms.BooleanField(required=False)
 
 @login_required
+def progresschapter(request):
+	glob_sum = 0
+	supe_sum = 0
+	indv_sum = 0
+	glob = None
+	is_superuser = None
+	listing = []
+	if request.user.is_superuser:
+		is_superuser = True
+		superchapters = Group.objects.filter(parent=1)
+		for superchapter in superchapters:
+			chapters_all = Group.objects.filter(parent=superchapter)
+			chapters_display = []
+			for chapter in chapters_all:
+				school_visits = SchoolVisitStats.objects.filter(visit__chapter=chapter)
+				for school_visit in school_visits:
+					indv_sum = indv_sum + school_visit.num_girls()
+				chapters_display.append((chapter, indv_sum))
+				supe_sum = supe_sum + indv_sum
+				indv_sum = 0
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=superchapter)
+			for school_visit in school_visits:
+				supe_sum = supe_sum + school_visit.num_girls()
+			listing.append({'super': (superchapter, supe_sum), 'chapters': chapters_display})
+			glob_sum = glob_sum + supe_sum
+			supe_sum = 0
+		glob = Group.objects.get(pk=1)
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=glob)
+		for school_visit in school_visits:
+			glob_sum = glob_sum + school_visit.num_girls()
+	elif request.user.is_staff:
+		is_superuser = False
+		c = request.user.chapter
+		children = Group.objects.filter(parent=c)
+		for child in children:
+			grandchildren = Group.objects.filter(parent=child)
+			for grandchild in grandchildren:
+				school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild)
+				for school_visit in school_visits:
+					indv_sum = indv_sum + school_visit.num_girls()
+				supe_sum = supe_sum + indv_sum
+				indv_sum = 0
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child)
+			for school_visit in school_visits:
+				supe_sum = supe_sum + school_visit.num_girls()
+			glob_sum = glob_sum + supe_sum
+			supe_sum = 0
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=c)
+		for school_visit in school_visits:
+			glob_sum = glob_sum + school_visit.num_girls()
+	return render_to_response('chapter_progress.html', {'glob': (glob, glob_sum), 'listing': listing, 'is_superuser': is_superuser, 'glob_sum': glob_sum}, context_instance=RequestContext(request))
+
+@login_required
 def editchapter(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if (request.user.is_staff and request.user.chapter == c) or request.user.is_superuser:
@@ -168,6 +225,8 @@ def editchapter(request, chapterurl):
 				c.infobox = data['infobox']
 				c.website_url = data['website_url']
 				c.facebook_url = data['facebook_url']
+				c.goal = data['goal']
+				c.goal_start = data['goal_start']
 				data = formpart2.cleaned_data
 				c.faculty_contact = data['faculty_contact']
 				c.faculty_position = data['faculty_position']
@@ -200,7 +259,9 @@ def editchapter(request, chapterurl):
 			formpart1 = FormPartOne({
 				'infobox': c.infobox,
 				'website_url': c.website_url,
-				'facebook_url': c.facebook_url})
+				'facebook_url': c.facebook_url,
+				'goal': c.goal,
+				'goal_start': c.goal_start})
 			formpart2 = FormPartTwo({
 				'faculty_contact': c.faculty_contact,
 				'faculty_position': c.faculty_position,
