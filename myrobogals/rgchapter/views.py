@@ -105,7 +105,7 @@ class FormPartOne(forms.Form):
 	website_url = forms.CharField(max_length=128, label=_("Website URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	facebook_url = forms.CharField(max_length=128, label=_("Facebook URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	goal = forms.CharField(max_length=32, label=_("Goal"), help_text=_("Number of students"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
-	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("Goal set date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("The goal will be compared against girls taught since this date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 
 class FormPartTwo(forms.Form):
 	faculty_contact = forms.CharField(max_length=64, label=_("Person"), help_text=_("e.g. Professor John Doe"), required=False, widget=forms.TextInput(attrs={'size': '30'}))

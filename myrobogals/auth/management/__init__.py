@@ -30,19 +30,7 @@ def create_permissions(app, created_models, verbosity, **kwargs):
                 print "Adding permission '%s'" % p
 
 def create_superuser(app, created_models, verbosity, **kwargs):
-    from myrobogals.auth.models import User
-    from django.core.management import call_command
-    if User in created_models and kwargs.get('interactive', True):
-        msg = "\nYou just installed Django's auth system, which means you don't have " \
-                "any superusers defined.\nWould you like to create one now? (yes/no): "
-        confirm = raw_input(msg)
-        while 1:
-            if confirm not in ('yes', 'no'):
-                confirm = raw_input('Please enter either "yes" or "no": ')
-                continue
-            if confirm == 'yes':
-                call_command("createsuperuser", interactive=True)
-            break
+    pass
 
 signals.post_syncdb.connect(create_permissions,
     dispatch_uid = "myrobogals.auth.management.create_permissions")
