@@ -838,6 +838,7 @@ def report_standard(request):
 def report_global(request):
 	if  not request.user.is_superuser:
 		raise Http404
+	warning = ''
 	if request.method == 'POST':
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
@@ -845,6 +846,8 @@ def report_global(request):
 			chapter_totals = {}
 			region_totals = {}
 			global_totals = {}
+			if formdata['start_date'] < datetime.date(2011, 2, 11):
+				warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
 			chapters = Group.objects.all()
 			for chapter in chapters:
 				chapter_totals[chapter.short_en] = {}
@@ -900,4 +903,4 @@ def report_global(request):
 		chapter_totals = {}
 		region_totals = {}
 		global_totals = {}
-	return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals},context_instance=RequestContext(request))
+	return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
