@@ -121,6 +121,10 @@ LOCALE_PATHS = (
 	ROBOGALS_DIR + '/myrobogals/locale',
 )
 
+FIXTURE_DIRS = (
+	ROBOGALS_DIR + '/myrobogals/fixtures',
+)
+
 INSTALLED_APPS = (
 	'django_extensions',
 	'myrobogals.auth',
