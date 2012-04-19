@@ -74,6 +74,11 @@ class UserAdmin(admin.ModelAdmin):
             (r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password))
         ) + super(UserAdmin, self).get_urls()
 
+    # The admin section add user form doesn't work, so lets just redirect people to our own that does!
+    def add_view(self, request):
+        return HttpResponseRedirect('/chapters/global/edit/users/add/?return=/topsecretarea/auth/user/')
+
+    '''
     def add_view(self, request):
         # It's an error for a user to have add permission but NOT change
         # permission for users. If we allowed such users to add users, they
@@ -121,6 +126,7 @@ class UserAdmin(admin.ModelAdmin):
             'root_path': self.admin_site.root_path,
             'app_label': self.model._meta.app_label,            
         }, context_instance=template.RequestContext(request))
+    '''
 
     def user_change_password(self, request, id):
         if not self.has_change_permission(request):
