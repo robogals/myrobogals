@@ -56,8 +56,10 @@
 {% endif %}
 {% if user.bio %}
 <strong>{% trans "About me:" %}</strong><br />
-{{ user.bio }}
+{{ user.bio }}<br />
+<br />
 {% endif %}
+{% if visits %}
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "Date" %}</strong></td>
@@ -76,4 +78,5 @@
 {% endif %}
 {% endfor %}
 </table>
+{% endif %}
 {% endblock %}
