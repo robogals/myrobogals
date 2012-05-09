@@ -185,12 +185,21 @@ def listvisits(request):
 	visits = SchoolVisit.objects.filter(chapter=chapter)
 	return render_to_response('visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
+class VisitSelectorForm(forms.Form):
+	start_date = forms.DateField(label='Visit start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
+	end_date = forms.DateField(label='Visit end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
+
 @login_required
 def printlistvisits(request):
-	chapter = request.user.chapter
-	visits = SchoolVisitStats.objects.filter(visit__chapter=chapter).order_by('-visit__visit_start')
-	return render_to_response('print_visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
-
+	if request.method == 'POST':
+		theform = VisitSelectorForm(request.POST)
+		if theform.is_valid():
+			formdata = theform.cleaned_data
+			chapter = request.user.chapter
+			visits = SchoolVisit.objects.filter(chapter=chapter, visit_start__range=[formdata['start_date'],formdata['end_date']]).order_by('-visit_start')
+			return render_to_response('print_visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
+	theform = VisitSelectorForm()
+	return render_to_response('print_visit_get_range.html', {'theform': theform}, context_instance=RequestContext(request))
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):

@@ -3,30 +3,63 @@
 
 {% block title %}{% trans "Robogals Chapters" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Robogals Chapters" %}{% endblock %}
+{% block pagetitle %}{% trans "Robogals Chapters Progress" %}{% endblock %}
 
 {% block content %}
-<ul>
-{% if is_superuser %}
-    <li>
-        <a href="/chapters/global/">Global</a> {{ glob.1 }}
-        <ul>
-        {% for item in listing %}
-            <li>
-                <a href="/chapters/{{item.super.0.myrobogals_url}}/">{% if item.super.0.status == 2 %}<i>{{item.super.0.short}} (Hidden)</i>{% else %}{{item.super.0.short}}{% endif %}</a> {{ item.super.1 }}
-                <ul>
-                {% for chapter in item.chapters %}
-                    <li><a href="/chapters/{{chapter.0.myrobogals_url}}/">{% if chapter.0.status == 2 %}<i>{{chapter.0.short}} (Hidden)</i>{% else %}{{chapter.0.short}}{% endif %}</a> {{ chapter.1 }} <br><em>{{chapter.0.university}}</em></li>
-                {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
-    </li>
-{% else %}
-	<li>
-		<a href="/chapters/{{ request.user.chapter.myrobogals_url }}/">{% if request.user.chapter.status == 2 %}<i>{{ request.user.chapter.short }} (Hidden)</i>{% else %}{{ request.user.chapter.short }}{% endif %}</a> {{ glob_sum }}
-	</li>
-{% endif %}
-</ul>
+	<table>
+	{% if listing %}
+	<tr><td colspan="2"><h3>{{ root_chapter.0.short }}
+		{% if root_chapter.0.status == 2 %}(Hidden){% endif %}</h3></td></tr>
+	{% endif %}
+		<tr>
+			<td style="padding-right:20px;">{{ root_chapter.0.short }}
+			{% if root_chapter.0.status == 2 %}(Hidden){% endif %}</td>
+			<td>
+				<div style="float:left;width:{% widthratio root_chapter.1 root_chapter.0.goal bar_length_px %}px;height:20px;background-color:#1366A3;position:relative;top:11px"></div>
+				<div style="float:left;position:relative;top:9px">
+					<big>&nbsp;&nbsp;{{root_chapter.1}}/{{root_chapter.0.goal}} ({% widthratio root_chapter.1 root_chapter.0.goal 100 %}%)</big>
+					<br/>&nbsp;
+					<span style="position:relative;top:-10px;">
+						<sub>since {{root_chapter.0.goal_start|date:_("d M Y")}}</sub>
+					</span>
+				</div>
+			</td>
+		</tr>
+	{% for list in listing %}
+		{% if list.grandchildren %}
+		<tr><td colspan="2"><h3>{{ list.child.0.short }}
+		{% if list.child.0.status == 2 %}(Hidden){% endif %}</h3></td></tr>
+		{% endif %}
+			<tr>
+				<td style="padding-right:20px;">{{ list.child.0.short }}
+				{% if list.child.0.status == 2 %}(Hidden){% endif %}</td>
+				<td>
+					<div style="float:left;width:{% widthratio list.child.1 list.child.0.goal bar_length_px %}px;height:20px;background-color:#1366A3;position:relative;top:11px"></div>
+					<div style="float:left;position:relative;top:9px">
+						<big>&nbsp;&nbsp;{{list.child.1}}/{{list.child.0.goal}} ({% widthratio list.child.1 list.child.0.goal 100 %}%)</big>
+						<br/>&nbsp;
+						<span style="position:relative;top:-10px;">
+							<sub>since {{list.child.0.goal_start|date:_("d M Y")}}</sub>
+						</span>
+					</div>
+				</td>
+			</tr>
+		{% for grandchild in list.grandchildren %}
+			<tr>
+				<td style="padding-right:20px;">{{ grandchild.0.short }}
+				{% if grandchild.0.status == 2 %}(Hidden){% endif %}</td>
+				<td>
+					<div style="float:left;width:{% widthratio grandchild.1 grandchild.0.goal bar_length_px %}px;height:20px;background-color:#1366A3;position:relative;top:11px"></div>
+					<div style="float:left;position:relative;top:9px">
+						<big>&nbsp;&nbsp;{{grandchild.1}}/{{grandchild.0.goal}} ({% widthratio grandchild.1 grandchild.0.goal 100 %}%)</big>
+						<br/>&nbsp;
+						<span style="position:relative;top:-10px;">
+							<sub>since {{grandchild.0.goal_start|date:_("d M Y")}}</sub>
+						</span>
+					</div>
+				</td>
+			</tr>
+		{% endfor %}
+	{% endfor %}
+	</table>
 {% endblock %}
