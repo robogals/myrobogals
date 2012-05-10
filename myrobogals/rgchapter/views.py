@@ -168,8 +168,10 @@ def progresschapter(request):
 
 	if request.user.is_superuser:
 		c = Group.objects.get(pk=1)
-	else:
+	elif request.user.is_staff:
 		c = request.user.chapter
+	else:
+		raise Http404
 	children = Group.objects.filter(parent=c)
 	for child in children:
 		if child.status == 0 or (child.status == 2 and request.user.is_superuser):
