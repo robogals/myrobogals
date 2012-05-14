@@ -857,7 +857,7 @@ def report_global(request):
 			global_totals = {}
 			if formdata['start_date'] < datetime.date(2011, 2, 11):
 				warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
-			chapters = Group.objects.all()
+			chapters = Group.objects.filter(exclude_in_reports=False)
 			for chapter in chapters:
 				chapter_totals[chapter.short_en] = {}
 				chapter_totals[chapter.short_en]['workshops'] = 0
