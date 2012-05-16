@@ -14,7 +14,7 @@ from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 import datetime
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from myrobogals.auth.decorators import login_required
-from myrobogals.auth.models import User, Group
+from myrobogals.auth.models import User, Group, MemberStatus
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 from time import time
@@ -218,7 +218,7 @@ class InviteForm(forms.Form):
 		visit=kwargs['visit']
 		del kwargs['visit']
 		super(InviteForm, self).__init__(*args, **kwargs)
-		self.fields['memberselect'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_reminder_optin=True).order_by('last_name')
+		self.fields['memberselect'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_reminder_optin=True, pk__in=MemberStatus.objects.filter(statusType__pk=1, status_date_end__isnull=True).values_list('user_id', flat=True)).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['body'].initial = _("Hello,\n\nThere will be an upcoming Robogals school visit:<br>")
 		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
