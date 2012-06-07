@@ -221,81 +221,91 @@ class InviteForm(forms.Form):
 		self.fields['memberselect'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_reminder_optin=True, pk__in=MemberStatus.objects.filter(statusType__pk=1, status_date_end__isnull=True).values_list('user_id', flat=True)).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		self.fields['body'].initial = _("Hello,\n\nThere will be an upcoming Robogals school visit:<br>")
-		self.fields['body'].initial += "Date: " + str(visit.visit_start.date()) + ", " + str(visit.visit_start.time()) + " to " + str(visit.visit_end.time())
-		self.fields['body'].initial += _("<br>Location: ") + visit.location + "\nSchool: " + visit.school.name
-		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit") + " https://my.robogals.org/teaching/" + str(visit.pk) + "/<br><br>Thanks,<br><br>" + user.chapter.name + "<br>"
+		self.fields['body'].initial += "Date: {visit.visit_start.year}-{visit.visit_start.month}-{visit.visit_start.day}, {visit.visit_start.hour}:{visit.visit_start.minute}:{visit.visit_start.second} to {visit.visit_end.hour}:{visit.visit_end.minute}:{visit.visit_end.second}"
+		self.fields['body'].initial += _("<br>Location: ") + "{visit.location}\nSchool: {visit.school.name}"
+		self.fields['body'].initial += _("<br><br>To accept or decline this invitation, please visit") + " https://my.robogals.org/teaching/{visit.pk}/<br><br>Thanks,<br><br>{user.chapter.name}<br>"
 
 @login_required
 def invitetovisit(request, visit_id):
 	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	error = ''
 	if (v.chapter != chapter):
 		raise Http404
 	if request.method == 'POST':
 		inviteform = InviteForm(request.POST, user=request.user, visit=v)
 		if inviteform.is_valid():
 			data = inviteform.cleaned_data
-			if data['action'] == '1':
-				message = EmailMessage()
-				message.subject = data['subject']
-				message.body = data['body']
-				message.from_address = request.user.email
-				message.reply_address = request.user.email
-				message.sender = request.user
-				message.html = True
-				message.from_name = chapter.name
+			try:
+				if data['action'] == '1':
+					message = EmailMessage()
+					message.subject = data['subject']
+					try:
+						message.body = data['body'].format(
+							visit=v,
+							user=request.user
+						)
+					except Exception:
+						raise Exception(_('Email body contains invalid fields'))
+					message.from_address = request.user.email
+					message.reply_address = request.user.email
+					message.sender = request.user
+					message.html = True
+					message.from_name = chapter.name
+					
+					# Don't send it yet until the recipient list is done
+					message.status = -1
+					# Save to database so we get a value for the primary key,
+					# which we need for entering the recipient entries
+					message.save()
+	
+				if request.POST['type'] == '1':
+					users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True)
+				elif request.POST['type'] == '2':
+					users = User.objects.filter(chapter=chapter, is_active=True, is_staff=True)
+				elif request.POST['type'] == '4':
+					users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True, trained=True)
+				elif request.POST['type'] == '5':
+					ul = data['list']
+					users = ul.users.all()
+				else:
+					users = data['memberselect']
+	
+				for one_user in users:
+					if data['action'] == '1':
+						recipient = EmailRecipient()
+						recipient.message = message
+						recipient.user = one_user
+						recipient.to_name = one_user.get_full_name()
+						recipient.to_address = one_user.email
+						recipient.save()
+					EventAttendee.objects.filter(user=one_user, event=v).delete()
+					ea = EventAttendee()
+					ea.event=v
+					ea.user=one_user
+					if data['action'] == '1':
+						ea.rsvp_status=1
+					if data['action'] == '2':
+						ea.rsvp_status=2
+					ea.actual_status=0
+					ea.save()
 				
-				# Don't send it yet until the recipient list is done
-				message.status = -1
-				# Save to database so we get a value for the primary key,
-				# which we need for entering the recipient entries
-				message.save()
-
-			if request.POST['type'] == '1':
-				users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True)
-			elif request.POST['type'] == '2':
-				users = User.objects.filter(chapter=chapter, is_active=True, is_staff=True)
-			elif request.POST['type'] == '4':
-				users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True, trained=True)
-			elif request.POST['type'] == '5':
-				ul = data['list']
-				users = ul.users.all()
-			else:
-				users = data['memberselect']
-
-			for one_user in users:
 				if data['action'] == '1':
-					recipient = EmailRecipient()
-					recipient.message = message
-					recipient.user = one_user
-					recipient.to_name = one_user.get_full_name()
-					recipient.to_address = one_user.email
-					recipient.save()
-				EventAttendee.objects.filter(user=one_user, event=v).delete()
-				ea = EventAttendee()
-				ea.event=v
-				ea.user=one_user
+					# Now mark it as OK to send. The email and all recipients are now in MySQL.
+					# A background script on the server will process the queue.
+					message.status = 0
+					message.save()
+				
 				if data['action'] == '1':
-					ea.rsvp_status=1
+					request.user.message_set.create(message=unicode(_("Invitations have been sent to the selected volunteers")))
 				if data['action'] == '2':
-					ea.rsvp_status=2
-				ea.actual_status=0
-				ea.save()
-			
-			if data['action'] == '1':
-				# Now mark it as OK to send. The email and all recipients are now in MySQL.
-				# A background script on the server will process the queue.
-				message.status = 0
-				message.save()
-			
-			if data['action'] == '1':
-				request.user.message_set.create(message=unicode(_("Invitations have been sent to the selected volunteers")))
-			if data['action'] == '2':
-				request.user.message_set.create(message=unicode(_("Selected volunteers have been added as attending")))
-			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
+					request.user.message_set.create(message=unicode(_("Selected volunteers have been added as attending")))
+				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
+			except Exception as e:
+				error = e.args[0]
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)
-	return render_to_response('visit_invite.html', {'inviteform': inviteform, 'visit_id': visit_id}, context_instance=RequestContext(request))
+	return render_to_response('visit_invite.html', {'inviteform': inviteform, 'visit_id': visit_id, 'error': error}, context_instance=RequestContext(request))
 	
 class EmailAttendeesForm(forms.Form):
 	SCHEDULED_DATE_TYPES = (
@@ -673,7 +683,12 @@ def stats(request, visit_id):
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
-	if request.method == 'POST':
+	if not request.session.get('hoursPerPersonStage', False):
+		request.session['hoursPerPersonStage'] = 1
+		form = SchoolVisitStatsForm(None, visit = v)
+		return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+	if request.method == 'POST' and request.session['hoursPerPersonStage'] == 1:
+		request.session['hoursPerPersonStage'] = 2
 		form = SchoolVisitStatsForm(request.POST, visit = v)
 		if form.is_valid():
 			data = form.cleaned_data
@@ -712,13 +727,44 @@ def stats(request, visit_id):
 					person.actual_status = 2
 					person.save()
 						
-			v.status = 1
-			v.save()
-			request.user.message_set.create(message=unicode(_("Stats saved successfully, visit closed.")))
-			return HttpResponseRedirect('/teaching/')
+			defaultHours =  v.visit_end.hour - v.visit_start.hour
+			return render_to_response('visit_hoursPerPerson.html', {'attended': data['attended'], 'visit_id': visit_id, 'defaultHours': range(defaultHours)}, context_instance=RequestContext(request))
+		else:
+			request.session['hoursPerPersonStage'] = 1
+			return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+	elif request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
+		raise Http404
 	else:
+		request.session['hoursPerPersonStage'] = 1
 		form = SchoolVisitStatsForm(None, visit = v)
-	return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+		return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+
+@login_required
+def statsHoursPerPerson(request, visit_id):
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if v.school.chapter != request.user.chapter:
+		raise Http404
+	if not request.user.is_staff:
+		raise Http404
+	if not request.session.get('hoursPerPersonStage', False):
+		raise Http404
+	if request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
+		del request.session['hoursPerPersonStage']
+		for person in EventAttendee.objects.filter(event__id=v.id):
+			if str(person.user.pk) in request.POST.keys():
+				person.hours = request.POST[str(person.user.pk)]
+				person.actual_status = 1
+				person.save()
+			else:
+				person.hours = 0
+				person.actual_status = 2
+				person.save()
+		v.status = 1
+		v.save()
+		request.user.message_set.create(message=unicode(_("Stats saved successfully, visit closed.")))
+		return HttpResponseRedirect('/teaching/')
+	else:
+		raise Http404
 
 @login_required
 def statshelp(request):
