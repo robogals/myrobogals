@@ -2,10 +2,6 @@
 # Do not put a trailing slash.
 ROBOGALS_DIR = '/Users/mark/Dev/robogals'
 
-# URL that handles the media in "rgmedia"
-# Put a trailing slash if there is a path component (optional in other cases).
-MEDIA_URL = 'http://127.0.0.1/rgmedia/'
-
 #
 #
 # No need to change anything below here
@@ -51,6 +47,11 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ROBOGALS_DIR + '/rgmedia'
+
+# URL that handles the media in "rgmedia"
+# Put a trailing slash if there is a path component (optional in other cases).
+# The default '/rgmedia' will work when using the Django dev server and debug = True
+MEDIA_URL = '/rgmedia'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.

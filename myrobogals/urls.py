@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from myrobogals import admin
+from myrobogals import admin, settings
 
 admin.autodiscover()
 
@@ -95,4 +95,10 @@ urlpatterns = patterns('',
 	(r'^tinymce/', include('tinymce.urls')),
 	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
+
+if settings.DEBUG:
+	urlpatterns += patterns('',
+		(r'^rgmedia/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT,}),
+	)
+
 handler500 = 'rgmain.views.servererror'
