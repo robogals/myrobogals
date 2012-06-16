@@ -218,8 +218,14 @@ def editchapter(request, chapterurl):
 				c.infobox = data['infobox']
 				c.website_url = data['website_url']
 				c.facebook_url = data['facebook_url']
-				c.goal = data['goal']
-				c.goal_start = data['goal_start']
+				if data['goal'] != '':
+					c.goal = data['goal']
+				else:
+					c.goal = None
+				if data['goal_start'] != '':
+					c.goal_start = data['goal_start']
+				else:
+					c.goal_start = None
 				data = formpart2.cleaned_data
 				c.faculty_contact = data['faculty_contact']
 				c.faculty_position = data['faculty_position']
