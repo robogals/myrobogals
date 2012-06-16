@@ -23,6 +23,11 @@
                         </div>
                         <input type="submit" value="Fetch Report">
 </form>
+
+{% if warning %}
+    <p>{{ warning }}</p>
+{% endif %}
+
 {% if chapter_totals %}
 	<p><strong>Chapters</strong></p>			
 	<table style="text-align: center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">

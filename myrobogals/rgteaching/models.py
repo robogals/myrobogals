@@ -118,6 +118,7 @@ class EventAttendee(models.Model):
     user = models.ForeignKey(User)
     rsvp_status = models.IntegerField(choices=RSVP_STATUS_CHOICES, default=1)
     actual_status = models.IntegerField(choices=ACTUAL_STATUS_CHOICES, default=0)
+    hours = models.PositiveSmallIntegerField(default=1)
     
     def __unicode__(self):
     	return self.user.get_full_name()

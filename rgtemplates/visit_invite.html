@@ -15,6 +15,9 @@
 {% endfor %}
 </div>
 {% endif %}
+{% if error %}
+<div class="error">{{error}}</div>
+{% endif %}
 <table>
   <tr>
     <td style="vertical-align: top; width: 50px"><strong>{% trans "Action:" %}</strong></td>

@@ -1,2 +1,4 @@
 myrobogals/settings.py
+tags
+*.swp
 *.pyc

@@ -13,6 +13,7 @@ from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
 from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
 from django.db.models import Q
+import datetime
 
 def list(request):
 	listing = []
@@ -159,56 +160,48 @@ class FormPartFive(forms.Form):
 
 @login_required
 def progresschapter(request):
-	glob_sum = 0
-	supe_sum = 0
-	indv_sum = 0
-	glob = None
-	is_superuser = None
+	chapter_sum = 0
+	child_sum = 0
+	root_sum = 0
+	grandchildren_display = []
 	listing = []
+
 	if request.user.is_superuser:
-		is_superuser = True
-		superchapters = Group.objects.filter(parent=1)
-		for superchapter in superchapters:
-			chapters_all = Group.objects.filter(parent=superchapter)
-			chapters_display = []
-			for chapter in chapters_all:
-				school_visits = SchoolVisitStats.objects.filter(visit__chapter=chapter)
-				for school_visit in school_visits:
-					indv_sum = indv_sum + school_visit.num_girls()
-				chapters_display.append((chapter, indv_sum))
-				supe_sum = supe_sum + indv_sum
-				indv_sum = 0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=superchapter)
-			for school_visit in school_visits:
-				supe_sum = supe_sum + school_visit.num_girls()
-			listing.append({'super': (superchapter, supe_sum), 'chapters': chapters_display})
-			glob_sum = glob_sum + supe_sum
-			supe_sum = 0
-		glob = Group.objects.get(pk=1)
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=glob)
-		for school_visit in school_visits:
-			glob_sum = glob_sum + school_visit.num_girls()
+		c = Group.objects.get(pk=1)
 	elif request.user.is_staff:
-		is_superuser = False
 		c = request.user.chapter
-		children = Group.objects.filter(parent=c)
-		for child in children:
+	else:
+		raise Http404
+	children = Group.objects.filter(parent=c)
+	for child in children:
+		if child.status == 0 or (child.status == 2 and request.user.is_superuser):
 			grandchildren = Group.objects.filter(parent=child)
 			for grandchild in grandchildren:
-				school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild)
-				for school_visit in school_visits:
-					indv_sum = indv_sum + school_visit.num_girls()
-				supe_sum = supe_sum + indv_sum
-				indv_sum = 0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child)
+				if grandchild.status == 0 or (grandchild.status == 2 and request.user.is_superuser):
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()])
+					for school_visit in school_visits:
+						chapter_sum = chapter_sum + school_visit.num_girls()
+					grandchildren_display.append((grandchild, chapter_sum))
+					chapter_sum = 0
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()])
+					for school_visit in school_visits:
+						child_sum = child_sum + school_visit.num_girls()
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+					for school_visit in school_visits:
+						root_sum = root_sum + school_visit.num_girls()
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()])
 			for school_visit in school_visits:
-				supe_sum = supe_sum + school_visit.num_girls()
-			glob_sum = glob_sum + supe_sum
-			supe_sum = 0
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=c)
-		for school_visit in school_visits:
-			glob_sum = glob_sum + school_visit.num_girls()
-	return render_to_response('chapter_progress.html', {'glob': (glob, glob_sum), 'listing': listing, 'is_superuser': is_superuser, 'glob_sum': glob_sum}, context_instance=RequestContext(request))
+				child_sum = child_sum + school_visit.num_girls()
+			listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
+			grandchildren_display = []
+			child_sum = 0
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+			for school_visit in school_visits:
+				root_sum = root_sum + school_visit.num_girls()
+	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+	for school_visit in school_visits:
+		root_sum = root_sum + school_visit.num_girls()
+	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300}, context_instance=RequestContext(request))
 
 @login_required
 def editchapter(request, chapterurl):
