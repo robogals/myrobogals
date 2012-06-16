@@ -8,9 +8,9 @@
 {% block content %}
 <p>{% trans "This page shows progress towards the goals set at the SINE! The measure used is the number of girls to whom you've taught robotics workshops, in both metro and regional areas, counting a first visit as 1 and repeat visits as 0.5. This is the measure used to determine the &quot;Most Girls Taught&quot; award. To see current stats for other measures, please see Workshops > Reporting." %}</p>
 	<table>
+	{% if root_chapter.0.goal %}
 		<tr>
-			<td style="padding-right:20px;">{{ root_chapter.0.short }}
-			{% if root_chapter.0.status == 2 %}(Hidden){% endif %}</td>
+			<td style="padding-right:20px;">{{ root_chapter.0.short }}</td>
 			<td>
 				<div style="float:left;width:{{bar_length_px}}px;height:20px;background-color:#CCCCCC;position:relative;top:11px"><div style="float:left;width:{% widthratio root_chapter.1 root_chapter.0.goal bar_length_px %}px;height:20px;background-color:#1366A3"></div></div>
 				<div style="float:left;position:relative;top:9px">
@@ -22,6 +22,11 @@
 				</div>
 			</td>
 		</tr>
+	{% else %}
+		<tr>
+			<td style="padding-right:20px;"><strong>There are no goals set!</strong></td>
+		</tr>
+	{% endif %}
 	{% for list in listing %}
 		{% if list.child.0.status != 2 %}
 			{% if list.child.0.goal %}

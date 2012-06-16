@@ -1,4 +1,5 @@
-# The directory where you checked out the "robogals" repo.
+# The directory where you checked out the "myrobogals" repo,
+# which is one level above this directory.
 # Do not put a trailing slash.
 ROBOGALS_DIR = '/Users/mark/Dev/robogals'
 
