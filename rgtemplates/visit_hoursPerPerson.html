@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Enter hours per person" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Enter hours per person" %}{% endblock %}
+
+{% block content %}
+<form action="/teaching/{{visit_id}}/statsHoursPerPerson/" method="POST">
+	<table width="400px" style="table-layout:fixed;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="75px" />
+		<tr class="even" style="text-align: center;">
+			<td></td>
+			<td>Hours</td>
+		</tr>
+		{% for attendedUser in attended %}
+		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+			<td>{{attendedUser.last_name}}, {{ attendedUser.first_name }}</td>
+			<td>
+			<select name="{{ attendedUser.pk }}" id="{{ attendedUser.pk }}">
+			{% for i in defaultHours %}
+				<option value="{{i}}">{{i}}</option>
+			{% endfor %}
+				<option value="{{defaultHours|length}}" selected="selected">{{defaultHours|length}}</option>
+			</select>
+			</td>
+		</tr>
+		{% endfor %}
+	</table></p>
+    <p style="clear: both; font-size: 200%;"><input type="submit" value="Save Stats" /></p>
+</form>
+{% endblock %}

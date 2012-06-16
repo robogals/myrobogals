@@ -179,6 +179,7 @@ class Group(models.Model):
     name_display = models.IntegerField("Name display", choices=NAME_DISPLAYS, default=0)
     goal = models.IntegerField("Goal", default=0, blank=True, null=True)
     goal_start = models.DateField("Goal start date", default=date.today, blank=True, null=True)
+    exclude_in_reports = models.BooleanField('Exclude this chapter in global reports')
 
     class Meta:
         verbose_name = 'chapter'

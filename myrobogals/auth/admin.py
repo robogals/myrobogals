@@ -15,7 +15,7 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
     fieldsets = (
-        (None, {'fields': ('name', 'short', 'short_en', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'name_display')}),
+        (None, {'fields': ('name', 'short', 'short_en', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'exclude_in_reports', 'name_display')}),
         ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
         ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
         ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label')}),

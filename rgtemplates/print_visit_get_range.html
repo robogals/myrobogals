@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter visit list{% endblock %}
+
+{% block pagetitle %}Chapter visit list{% endblock %}
+
+{% block content %}
+<form action="/teaching/printlist/" method="post">
+                        {% if theform.errors %}
+                                <span class="alert">{{ theform.errors }}</span>
+                        {% endif %}
+                        <div>
+                                <label class="label-left" style="width:120px;" for="id_{{ theform.start_date.name }}">{{ theform.start_date.label }}</label>
+                                {{ theform.start_date }} 
+                        </div>
+                        <div>
+                                <label class="label-left" style="width:120px;" for="id_{{ theform.end_date.name }}">{{ theform.end_date.label }}</label>
+                                {{ theform.end_date }} 
+                        </div>
+                        <input type="submit" value="Get list">
+</form>
+{% endblock %}
