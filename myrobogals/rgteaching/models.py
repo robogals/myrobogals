@@ -118,15 +118,27 @@ class EventAttendee(models.Model):
     user = models.ForeignKey(User)
     rsvp_status = models.IntegerField(choices=RSVP_STATUS_CHOICES, default=1)
     actual_status = models.IntegerField(choices=ACTUAL_STATUS_CHOICES, default=0)
-    hours = models.PositiveSmallIntegerField(default=1)
+    hours = models.IntegerField(default=0)
     
     def __unicode__(self):
     	return self.user.get_full_name()
 
-VISIT_TYPES = (
-	(-1, ''),
-	(0, 'Robogals robotics workshop'),
-	(7, 'Robogals robotics workshop (RRR funded trip)'),
+VISIT_TYPES_REPORT = (
+	(-2, 'Robogals robotics workshops, sum of metro and regional'),
+	(0, 'Robogals robotics workshops, metro area'),
+	(7, 'Robogals robotics workshops, regional area'),
+	(1, 'Robogals career talks'),
+	(2, 'Robogals events'),
+	(3, 'Non-Robogals robotics workshops'),
+	(4, 'Non-Robogals career talks'),
+	(5, 'Non-Robogals events'),
+	(6, 'Other'),
+	(-1, 'Sum of all categories'),
+)
+
+VISIT_TYPES_BASE = (
+	(0, 'Robogals robotics workshop, metro area'),
+	(7, 'Robogals robotics workshop, regional area'),
 	(1, 'Robogals career talk'),
 	(2, 'Robogals event'),
 	(3, 'Non-Robogals robotics workshop'),
@@ -137,7 +149,7 @@ VISIT_TYPES = (
 
 class SchoolVisitStats(models.Model):
 	visit = models.ForeignKey(SchoolVisit, editable=False)
-	visit_type = models.IntegerField(choices=VISIT_TYPES, null=False)
+	visit_type = models.IntegerField(choices=VISIT_TYPES_BASE, null=False)
 	primary_girls_first = models.PositiveSmallIntegerField(blank=True, null=True)
 	primary_girls_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
 	primary_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -166,6 +178,22 @@ class SchoolVisitStats(models.Model):
 			sum += self.other_girls_first
 		if self.other_girls_repeat:
 			sum += self.other_girls_repeat
+		return sum
+
+	def num_girls_weighted(self):
+		sum = 0.0
+		if self.primary_girls_first:
+			sum += self.primary_girls_first
+		if self.primary_girls_repeat:
+			sum += (float(self.primary_girls_repeat) / 2)
+		if self.high_girls_first:
+			sum += self.high_girls_first
+		if self.high_girls_repeat:
+			sum += (float(self.high_girls_repeat) / 2)
+		if self.other_girls_first:
+			sum += self.other_girls_first
+		if self.other_girls_repeat:
+			sum += (float(self.other_girls_repeat) / 2)
 		return sum
 
 	def chapter(self):

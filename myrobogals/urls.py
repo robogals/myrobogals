@@ -45,7 +45,6 @@ urlpatterns = patterns('',
 	(r'^chapters/(?P<chapterurl>.+)/edit/status/$', 'rgprofile.views.editstatus'),
 	(r'^chapters/(?P<chapterurl>.+)/edit/$', 'rgchapter.views.editchapter'),
 	(r'^chapters/(?P<chapterurl>.+)/websitedetails/$', 'rgweb.views.websitedetails'),
-	(r'^chapters/progress/$', 'rgchapter.views.progresschapter'),
 	(r'^chapters/(?P<chapterurl>.+)/join/$', 'rgprofile.views.joinchapter'),
 	(r'^chapters/(?P<chapterurl>.+)/$', 'rgchapter.views.detail'),
 	(r'^teaching/$', 'rgteaching.views.teachhome'),
@@ -92,8 +91,8 @@ urlpatterns = patterns('',
 	(r'^topsecretarea/', include(admin.site.urls)),
 	(r'^reports/$', 'rgteaching.views.report_standard'),
 	(r'^globalreports/$', 'rgteaching.views.report_global'),
+	(r'^progress/$', 'rgchapter.views.progresschapter'),
 	(r'^tinymce/', include('tinymce.urls')),
-	(r'^i18n/', include('django.conf.urls.i18n')),
 	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
 handler500 = 'rgmain.views.servererror'

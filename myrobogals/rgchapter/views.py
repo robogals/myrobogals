@@ -160,9 +160,9 @@ class FormPartFive(forms.Form):
 
 @login_required
 def progresschapter(request):
-	chapter_sum = 0
-	child_sum = 0
-	root_sum = 0
+	chapter_sum = 0.0
+	child_sum = 0.0
+	root_sum = 0.0
 	grandchildren_display = []
 	listing = []
 
@@ -178,29 +178,29 @@ def progresschapter(request):
 			grandchildren = Group.objects.filter(parent=child)
 			for grandchild in grandchildren:
 				if grandchild.status == 0 or (grandchild.status == 2 and request.user.is_superuser):
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()])
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 					for school_visit in school_visits:
-						chapter_sum = chapter_sum + school_visit.num_girls()
+						chapter_sum = chapter_sum + school_visit.num_girls_weighted()
 					grandchildren_display.append((grandchild, chapter_sum))
-					chapter_sum = 0
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()])
+					chapter_sum = 0.0
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 					for school_visit in school_visits:
-						child_sum = child_sum + school_visit.num_girls()
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+						child_sum = child_sum + school_visit.num_girls_weighted()
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 					for school_visit in school_visits:
-						root_sum = root_sum + school_visit.num_girls()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()])
+						root_sum = root_sum + school_visit.num_girls_weighted()
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 			for school_visit in school_visits:
-				child_sum = child_sum + school_visit.num_girls()
+				child_sum = child_sum + school_visit.num_girls_weighted()
 			listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
 			grandchildren_display = []
 			child_sum = 0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 			for school_visit in school_visits:
-				root_sum = root_sum + school_visit.num_girls()
-	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()])
+				root_sum = root_sum + school_visit.num_girls_weighted()
+	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
 	for school_visit in school_visits:
-		root_sum = root_sum + school_visit.num_girls()
+		root_sum = root_sum + school_visit.num_girls_weighted()
 	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300}, context_instance=RequestContext(request))
 
 @login_required

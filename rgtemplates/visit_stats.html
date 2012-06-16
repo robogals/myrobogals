@@ -5,7 +5,6 @@
 {% block pagetitle %}{% trans "Enter workshop statistics" %}{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">{% trans "Return to teaching home" %}</a> | <a href="/teaching/list/">{% trans "Return to visit list" %}</a> | <a href="/teaching/{{visit_id}}/">{% trans "Return to visit" %}</a></p>
 <form action="/teaching/{{visit_id}}/stats/" method="POST">
     {% if form.errors %}
 	<div class="error">

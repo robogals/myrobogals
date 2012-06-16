@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}Global workshop reports{% endblock %}
 
@@ -25,19 +26,18 @@
 </form>
 
 {% if warning %}
-    <p>{{ warning }}</p>
+    <span class="alert">{{ warning }}</span>
 {% endif %}
 
 {% if chapter_totals %}
-	<p><strong>Chapters</strong></p>			
-	<table style="text-align: center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 		<tr class="even" style="">
-			<td>Chapter</td>
-			<td>Total Workshops</td>
-			<td>Total Unique Schools</td>
-			<td>Total Unique Girls</td>
-			<td>Total girl-workshops</td>
-			<td>Weighted girl-workshops</td>
+			<td><strong>{% trans "Chapter" %}</strong></td>
+			<td><strong>{% trans "Total Workshops" %}</strong></td>
+			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
+			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
+			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
 		</tr>
 		{% for name, chapter in chapter_totals %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -50,15 +50,14 @@
 		</tr>
 		{% endfor %}
 	</table>
-	<p><strong>Regions</strong></p>	
-	<table style="text-align: center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 		<tr class="even" style="">
-			<td>Region</td>
-			<td>Total Workshops</td>
-			<td>Total Unique Schools</td>
-			<td>Total Unique Girls</td>
-			<td>Total girl-workshops</td>
-			<td>Weighted girl-workshops</td>
+			<td><strong>{% trans "Region" %}</strong></td>
+			<td><strong>{% trans "Total Workshops" %}</strong></td>
+			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
+			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
+			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
 		</tr>
 		{% for name, region in region_totals %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">

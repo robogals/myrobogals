@@ -16,13 +16,14 @@ class GroupAdmin(admin.ModelAdmin):
     ordering = ('name',)
     fieldsets = (
         (None, {'fields': ('name', 'short', 'short_en', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'exclude_in_reports', 'name_display')}),
-        ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
-        ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
+        ('Annual goal', {'fields': ('goal', 'goal_start')}),
         ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label')}),
         ('Welcome email', {'fields': ('welcome_email_enable', 'welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
         ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
         ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
-        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'goal', 'goal_start', 'emailtext', 'smstext', 'notify_enable', 'notify_list', 'photo', 'default_email_domain', 'sms_limit', 'display_columns')}),
+        ('Address info', {'fields': ('address', 'city', 'state', 'postcode', 'country')}),
+        ('Faculty contact', {'fields': ('faculty_contact', 'faculty_position', 'faculty_department', 'faculty_email', 'faculty_phone')}),
+        ('Other', {'fields': ('infobox', 'website_url', 'facebook_url', 'emailtext', 'smstext', 'notify_enable', 'notify_list', 'photo', 'default_email_domain', 'sms_limit', 'display_columns')}),
         ('FTP details', {'fields': ('upload_exec_list', 'ftp_host', 'ftp_user', 'ftp_pass', 'ftp_path')}),
     )
 

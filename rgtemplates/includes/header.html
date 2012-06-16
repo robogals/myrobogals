@@ -80,11 +80,6 @@
                 </li>
 {% if request.user.is_staff %}
                 <li class="item147">
-                    <a class="orphan item bullet" href="/chapters/progress/">
-                        <span>{% trans "Chapter progress" %}</span>
-                    <a>
-                </li>
-                <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
                         <span>{% trans "Edit my chapter" %}</span>
                     <a>
@@ -161,7 +156,7 @@
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/list/"  >
             <span>
-                        {% trans "List school visits" %}          
+                        {% trans "Workshop list" %}          
             </span>
         </a>
 
@@ -171,7 +166,7 @@
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/printlist/"  >
             <span>
-                        {% trans "Printable list" %}          
+                        {% trans "Printable workshop list" %}          
             </span>
         </a>
 
@@ -183,7 +178,7 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/new/"  >
             <span>
-                        {% trans "Create new" %}               
+                        {% trans "Create new workshop" %}               
             </span>
 
         </a>
@@ -193,23 +188,18 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/schools/"  >
             <span>
-                        {% trans "List schools" %}              
+                        {% trans "Schools" %}              
             </span>
 
         </a>
         
         
 </li>   
-                    <li class="item71" >
-            <a class="orphan item bullet" href="/teaching/schools/new/"  >
-            <span>
-                        {% trans "Add new school" %}
-            </span>
-
-        </a>
-        
-        
-</li>   
+                <li class="item147">
+                    <a class="orphan item bullet" href="/progress/">
+                        <span>{% trans "Progress towards goals" %}</span>
+                    <a>
+                </li>
 {% if request.user.is_superuser %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/globalreports/">

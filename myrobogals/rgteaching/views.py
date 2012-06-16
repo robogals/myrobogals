@@ -21,10 +21,12 @@ from time import time
 from pytz import utc
 from myrobogals.rgmain.models import Country
 from operator import itemgetter
+from django.db.models import Q
 
 @login_required
 def teachhome(request):
-	return render_to_response('teaching.html', {}, context_instance=RequestContext(request))
+	return HttpResponseRedirect('/teaching/list/')
+	#return render_to_response('teaching.html', {}, context_instance=RequestContext(request))
 
 @login_required
 def videotute(request):
@@ -479,8 +481,39 @@ def listschools(request):
 	schools = School.objects.filter(chapter=chapter)
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
 
+# Custom field for school name
+class SchoolNameField(forms.CharField):
+	def __init__(self, *args, **kwargs):
+		self.chapter=None
+		self.school_id=None
+		super(SchoolNameField, self).__init__(*args, **kwargs)
+
+	# This function checks for the uniqueness of the school name within the chapter.
+	# School names may not necessarily be unique globally across all chapters, thus
+	# one cannot simply use the built-in Django functionality to specify this field
+	# as a unique field.
+	def clean(self, value):
+		if value == '':
+			if self.required:
+				raise forms.ValidationError(_('This field is required.'))
+			else:
+				return ''
+		if School.objects.filter(Q(chapter=self.chapter), ~Q(pk=self.school_id), Q(name=value)).count() > 0:
+			raise forms.ValidationError(_('There is already a school with that name.'))
+		else:
+			return value
+
 class SchoolFormPartOne(forms.Form):
-	name = forms.CharField(max_length=128, label=_("Name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		school_id=kwargs['school_id']
+		del kwargs['school_id']
+		super(SchoolFormPartOne, self).__init__(*args, **kwargs)
+		self.fields['name'].chapter = chapter
+		self.fields['name'].school_id = school_id
+
+	name = SchoolNameField(max_length=128, label=_("Name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	address = forms.CharField(label=_("Address"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
 class SchoolFormPartTwo(forms.Form):
@@ -506,7 +539,7 @@ def editschool(request, school_id):
 		if (s.chapter != chapter):
 			raise Http404
 		if request.method == 'POST':
-			formpart1 = SchoolFormPartOne(request.POST)
+			formpart1 = SchoolFormPartOne(request.POST, chapter=chapter, school_id=school_id)
 			formpart2 = SchoolFormPartTwo(request.POST)
 			formpart3 = SchoolFormPartThree(request.POST)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid():
@@ -528,13 +561,13 @@ def editschool(request, school_id):
 				return HttpResponseRedirect('/teaching/schools/')
 		else:
 			if school_id == 0:
-				formpart1 = SchoolFormPartOne()
+				formpart1 = SchoolFormPartOne(None, chapter=chapter, school_id=school_id)
 				formpart2 = SchoolFormPartTwo()
 				formpart3 = SchoolFormPartThree()
 			else:
 				formpart1 = SchoolFormPartOne({
 					'name': s.name,
-					'address': s.address})
+					'address': s.address}, chapter=chapter, school_id=school_id)
 				formpart2 = SchoolFormPartTwo({
 					'contact_person': s.contact_person,
 					'contact_position': s.contact_position,

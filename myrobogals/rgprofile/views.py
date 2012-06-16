@@ -304,7 +304,7 @@ def detail(request, username):
 		show_job = True
 	else:
 		show_job = False
-	visits = EventAttendee.objects.filter(user=u).order_by('-event__visit_start')
+	visits = EventAttendee.objects.filter(user=u, actual_status=1).order_by('-event__visit_start')
 	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
 
 
@@ -413,8 +413,6 @@ class MobileField(forms.CharField):
 
 # Custom student number field
 class StudentNumField(forms.CharField):
-	chapter = None
-
 	def __init__(self, *args, **kwargs):
 		self.chapter=None
 		self.user_id=None

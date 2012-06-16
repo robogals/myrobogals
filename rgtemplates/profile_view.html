@@ -60,17 +60,18 @@
 <br />
 {% endif %}
 {% if visits %}
+<strong>{% trans "Workshops and events attended:" %}</strong><br />
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "Date" %}</strong></td>
-    <td><strong>{% trans "School" %}</strong></td>
-    <td><strong>{% trans "Number of girls" %}</strong></td>
-    <td><strong>{% trans "Type of visit" %}</strong></td>
+    <td><strong>{% trans "School/Event" %}</strong></td>
+    <td><strong>{% trans "Girls" %}</strong></td>
+    <td><strong>{% trans "Type" %}</strong></td>
   </tr>
 {% for v in visits %}
 {% if v.event.schoolvisit %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td>{{v.event.visit_start|date:_("DATE_FORMAT_LONG")}}</td>
+    <td>{{v.event.visit_start|date:_("DATE_FORMAT")}}</td>
     <td>{{v.event.schoolvisit.school}}</td>
     <td>{{v.event.schoolvisit.get_num_girls_display}}</td>
     <td>{{v.event.schoolvisit.get_type}}</td>

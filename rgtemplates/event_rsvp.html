@@ -1,12 +1,12 @@
 {% extends "base_tinymce.html" %}
 {% load i18n %}
 
-{% block title %}RSVP to an event {% endblock %}
+{% block title %}{% trans "RSVP to a workshop" %}{% endblock %}
 
-{% block pagetitle %}RSVP to an event {% endblock %}
+{% block pagetitle %}{% trans "RSVP to a workshop" %}{% endblock %}
 
 {% block content %}
-<h4> {{ title_string }} </h4>
+<h4>{{ title_string }}</h4>
 <form action="/teaching/{{event_id}}/rsvp/{{user_id}}/{{ rsvp_type }}/" method="POST">
 {% if rsvpform.errors %}
 <div class="error">
@@ -17,10 +17,9 @@
 </div>
 {% endif %}
 <div id="rsvpmessage">
-	<p><label for="leave_message" class="leftlabel"><strong>{% trans "Leave a message:" %}</strong></label>{{ rsvpform.leave_message }} </p>
-	<p><label for="message"  class="leftlabel"><strong>{% trans "Message:" %}</strong></label>{{ rsvpform.message }}</p>
-	<p class="submit"><input type="submit" value="RSVP" /></p>
+	<p>{{ rsvpform.leave_message }}<label for="leave_message"><strong>{% trans "Leave a message? (optional)" %}</strong></label></p>
+	<p>{{ rsvpform.message }}</p>
+	<p><input type="submit" value="{{ title_string }}" /></p>
 </div>
-
 </form>
 {% endblock %}

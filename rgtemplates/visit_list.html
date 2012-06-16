@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% trans "School visits" %}{% endblock %}
+{% block title %}{% trans "Workshops and events" %}{% endblock %}
 
-{% block pagetitle %}{% trans "School visits" %}{% endblock %}
+{% block pagetitle %}{% trans "Workshops and events" %}{% endblock %}
 
 {% block content %}
-<p><a href="/teaching/">{% trans "Return to teaching home" %}</a>{% if request.user.is_staff %} | <a href="/teaching/new/">{% trans "Create new school visit" %}</a>{% endif %}</p>
+{% if request.user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "School" %}</strong></td>
