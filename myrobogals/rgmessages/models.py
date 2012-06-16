@@ -285,9 +285,9 @@ class SMSRecipient(models.Model):
 
 	def status_description(self):
 		if self.status == 11 or self.status == 13:
-			return self.get_status_display() + ": " + self.get_gateway_err_display()
+			return str(self.get_status_display()) + ": " + str(self.get_gateway_err_display())
 		else:
-			return self.get_status_display()
+			return str(self.get_status_display())
 	
 	def __unicode__(self):
 		return self.status_description()
