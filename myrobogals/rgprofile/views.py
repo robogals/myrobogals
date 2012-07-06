@@ -1,7 +1,7 @@
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
-from myrobogals.rgteaching.models import EventAttendee
+from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
 from myrobogals.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgprofile.models import Position, UserList
@@ -19,13 +19,14 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.db.models import Q
 from myrobogals.admin.widgets import FilteredSelectMultiple
-from myrobogals.settings import MEDIA_ROOT
+from myrobogals.settings import MEDIA_ROOT, MEDIA_URL
 from time import time
 import csv
 from django.db import connection
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage
+from myrobogals.admin.models import LogEntry
 
 '''
 def joinstart(request):
@@ -189,7 +190,66 @@ def editusers(request, chapterurl):
 					'= '+ str(c.pk) + ' ' +
 					searchsql + ' ORDER BY last_name, first_name')
 		display_columns = c.display_columns.all()
-		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'numusers': len(list(users)), 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
+		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'numusers': len(list(users)), 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING'], 'MEDIA_URL': MEDIA_URL}, context_instance=RequestContext(request))
+	else:
+		raise Http404
+
+@login_required
+def deleteuser(request, userpk):
+	userToBeDeleted = get_object_or_404(User, pk=userpk)
+	if request.user.is_superuser or (request.user.is_staff and (userToBeDeleted.chapter == request.user.chapter)):
+		msg = ''
+		old_status = userToBeDeleted.memberstatus_set.get(status_date_end__isnull=True)
+		if (not request.session.get('deleteUserPk', False)) or (request.session.get('deleteUserPk',False) and (request.method != 'POST')):
+			canNotDelete = False
+			if Position.objects.filter(user=userToBeDeleted):
+				msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has held at least one officeholder position."
+				canNotDelete = True
+			if EventAttendee.objects.filter(user=userToBeDeleted, actual_status=1):
+				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has attended at least one school visit."
+				canNotDelete = True
+			if Event.objects.filter(creator=userToBeDeleted):
+				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has created at least one school visit."
+				canNotDelete = True
+			if EmailMessage.objects.filter(sender=userToBeDeleted):
+				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has sent at least one email."
+				canNotDelete = True
+			if SMSMessage.objects.filter(sender=userToBeDeleted):
+				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has sent at least one SMS message."
+				canNotDelete = True
+			if LogEntry.objects.filter(user=userToBeDeleted):
+				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " owned at least one admin log object."
+				canNotDelete = True
+			if canNotDelete:
+				request.user.message_set.create(message=unicode(_(msg)))
+				return HttpResponseRedirect('/chapters/' + request.user.chapter.myrobogals_url + '/edit/users/?search=&status=' + str(old_status.statusType.pk))
+			request.session['deleteUserPk'] = userpk
+			return render_to_response('user_delete_confirm.html', {'userToBeDeleted': userToBeDeleted}, context_instance=RequestContext(request))
+		else:
+			if request.method == 'POST' and request.session['deleteUserPk'] == userpk:
+				del request.session['deleteUserPk']
+				if ('delete' in request.POST) and ('alumni' not in request.POST):
+					userToBeDeleted.delete()
+					msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " deleted"
+				elif ('delete' not in request.POST) and ('alumni' in request.POST):
+					if old_status.statusType == MemberStatusType.objects.get(pk=2):
+						msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " is already marked as alumni"
+					else:
+						if userToBeDeleted.membertype().description != 'Inactive':
+							old_status.status_date_end = date.today()
+							old_status.save()
+						new_status=MemberStatus()
+						new_status.user = userToBeDeleted
+						new_status.statusType = MemberStatusType.objects.get(pk=2)
+						new_status.status_date_start = date.today()
+						new_status.save()
+						msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " marked as alumni"
+				else:
+					raise Http404
+				request.user.message_set.create(message=unicode(_(msg)))
+				return HttpResponseRedirect('/chapters/' + request.user.chapter.myrobogals_url + '/edit/users/?search=&status=' + str(old_status.statusType.pk))
+			else:
+				raise Http404
 	else:
 		raise Http404
 

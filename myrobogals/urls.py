@@ -92,6 +92,7 @@ urlpatterns = patterns('',
 	(r'^reports/$', 'rgteaching.views.report_standard'),
 	(r'^globalreports/$', 'rgteaching.views.report_global'),
 	(r'^progress/$', 'rgchapter.views.progresschapter'),
+	(r'^delete/user/(?P<userpk>\d+)/$', 'rgprofile.views.deleteuser'),
 	(r'^tinymce/', include('tinymce.urls')),
 	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
