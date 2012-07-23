@@ -428,7 +428,7 @@ def cancelvisit(request, visit_id):
 			message.save()
 			
 			#Email everyone who has been invited.
-			id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
+			id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=2).values_list('user_id')
 			users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
 
 			for one_user in users:
