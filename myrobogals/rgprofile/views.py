@@ -200,40 +200,35 @@ def deleteuser(request, userpk):
 	if request.user.is_superuser or (request.user.is_staff and (userToBeDeleted.chapter == request.user.chapter)):
 		msg = ''
 		old_status = userToBeDeleted.memberstatus_set.get(status_date_end__isnull=True)
-		if (not request.session.get('deleteUserPk', False)) or (request.session.get('deleteUserPk',False) and (request.method != 'POST')):
-			canNotDelete = False
-			if Position.objects.filter(user=userToBeDeleted):
-				msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has held at least one officeholder position."
-				canNotDelete = True
-			if EventAttendee.objects.filter(user=userToBeDeleted, actual_status=1):
-				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has attended at least one school visit."
-				canNotDelete = True
-			if Event.objects.filter(creator=userToBeDeleted):
-				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has created at least one school visit."
-				canNotDelete = True
-			if EmailMessage.objects.filter(sender=userToBeDeleted):
-				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has sent at least one email."
-				canNotDelete = True
-			if SMSMessage.objects.filter(sender=userToBeDeleted):
-				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " has sent at least one SMS message."
-				canNotDelete = True
-			if LogEntry.objects.filter(user=userToBeDeleted):
-				msg += "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " owned at least one admin log object."
-				canNotDelete = True
-			if canNotDelete:
-				request.user.message_set.create(message=unicode(_(msg)))
-				return HttpResponseRedirect('/chapters/' + request.user.chapter.myrobogals_url + '/edit/users/?search=&status=' + str(old_status.statusType.pk))
-			request.session['deleteUserPk'] = userpk
-			return render_to_response('user_delete_confirm.html', {'userToBeDeleted': userToBeDeleted}, context_instance=RequestContext(request))
-		else:
-			if request.method == 'POST' and request.session['deleteUserPk'] == userpk:
-				del request.session['deleteUserPk']
+		canNotDelete = False
+		if Position.objects.filter(user=userToBeDeleted):
+			msg = _('User "%s" has held at least one officeholder position.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if EventAttendee.objects.filter(user=userToBeDeleted, actual_status=1):
+			msg += _('User "%s" has attended at least one school visit.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if Event.objects.filter(creator=userToBeDeleted):
+			msg += _('User "%s" has created at least one school visit.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if EmailMessage.objects.filter(sender=userToBeDeleted):
+			msg += _('User "%s" has sent at least one email.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if SMSMessage.objects.filter(sender=userToBeDeleted):
+			msg += _('User "%s" has sent at least one SMS message.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if LogEntry.objects.filter(user=userToBeDeleted):
+			msg += _('User "%s" owned at least one admin log object.') % userToBeDeleted.get_full_name()
+			canNotDelete = True
+		if not canNotDelete:
+			if (request.method != 'POST') or (('delete' not in request.POST) and ('alumni' not in request.POST)):
+				return render_to_response('user_delete_confirm.html', {'userToBeDeleted': userToBeDeleted, 'return': request.GET['return']}, context_instance=RequestContext(request))
+			else:
 				if ('delete' in request.POST) and ('alumni' not in request.POST):
 					userToBeDeleted.delete()
-					msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " deleted"
+					msg = _('User "%s" deleted') % userToBeDeleted.get_full_name()
 				elif ('delete' not in request.POST) and ('alumni' in request.POST):
 					if old_status.statusType == MemberStatusType.objects.get(pk=2):
-						msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " is already marked as alumni"
+						msg = _('User "%s" is already marked as alumni') % userToBeDeleted.get_full_name()
 					else:
 						if userToBeDeleted.membertype().description != 'Inactive':
 							old_status.status_date_end = date.today()
@@ -243,13 +238,14 @@ def deleteuser(request, userpk):
 						new_status.statusType = MemberStatusType.objects.get(pk=2)
 						new_status.status_date_start = date.today()
 						new_status.save()
-						msg = "User " + userToBeDeleted.first_name + " " + userToBeDeleted.last_name + " marked as alumni"
+						msg = _('User "%s" marked as alumni') % userToBeDeleted.get_full_name()
 				else:
 					raise Http404
-				request.user.message_set.create(message=unicode(_(msg)))
-				return HttpResponseRedirect('/chapters/' + request.user.chapter.myrobogals_url + '/edit/users/?search=&status=' + str(old_status.statusType.pk))
-			else:
-				raise Http404
+		request.user.message_set.create(message=unicode(_(msg)))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		else:
+			return HttpResponseRedirect('/chapters/' + request.user.chapter.myrobogals_url + '/edit/users/?search=&status=' + str(old_status.statusType.pk))
 	else:
 		raise Http404
 
