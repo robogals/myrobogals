@@ -94,6 +94,13 @@
                         <span>{% trans "Manage lists" %}</span>
                     <a>
                 </li>
+{% endif %}
+                <li class="item147">
+                    <a class="orphan item bullet" href="/forums/{{ request.user.chapter.myrobogals_url }}/">
+                        <span>{% trans "Forums" %}</span>
+                    </a>
+                </li>
+{% if request.user.is_staff %}
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/websitedetails/">
                         <span>{% trans "View website details" %}</span>

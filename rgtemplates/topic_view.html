@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% block title %}{{chapter.name}}{% endblock %}
+
+{% block pagetitle %}{{chapter.name}}{% endblock %}
+
+{% block content %}
+<p>
+	<a href="/forums/{{chapterHome.myrobogals_url}}/">{% trans "Home" %}</a>
+	&raquo;
+	<a href="/forums/{{chapterHome.myrobogals_url}}/forum/{{forum.pk}}/">{{forum.name}}</a>
+	&raquo;
+	{{topic.subject}}
+</p>
+
+{% if posts.has_previous %}
+	<a href="?page={{ posts.previous_page_number }}">{% trans "previous" %}</a> |
+{% else %}
+	{% trans "previous" %} |
+{% endif %}
+
+{% trans "Page" %} {{ posts.number }} {% trans "of" %} {{ posts.paginator.num_pages }}
+
+{% if posts.has_next %}
+	| <a href="?page={{ posts.next_page_number }}">{% trans "next" %}</a>
+{% else %}
+	| {% trans "next" %}
+{% endif %}
+
+<table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<tr style="color:white; background-color:#1366A3">
+		<td>{% trans "User" %}</td>
+		<td>{% trans "Message" %}</td>
+	</tr>
+	{% for post in posts.object_list %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td>{{ post.posted_by.get_full_name }}</td>
+		<td>{{ post.message|linebreaksbr }}</td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td></td>
+		<td><a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?postId={{post.pk}}&page={{posts.number}}">quote</a></td>
+	</tr>
+	{% endfor %}
+<form action="/forums/newpost/{{ topic.pk }}/?return={{return|urlencode}}" method="POST">
+  <tr style="border-top:solid 1px grey;">
+    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
+    <td>{{ postform.message }}</td>
+  </tr>
+  <tr><td colspan="2"><input type="submit" value="submit" /></td></tr>
+</form>
+</table>
+{% endblock %}
