@@ -77,7 +77,7 @@ def newforum(request):
 		user = request.user
 		g = get_object_or_404(Category, pk=request.GET['category'])
 		c = g.chapter
-		if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+		if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
 			if request.GET['forum'] and request.GET['description']:
 				newForum = Forum()
 				newForum.name = request.GET['forum']
@@ -119,11 +119,13 @@ def forums(request, chapterurl):
 		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
 		localExecCategories = Category.objects.filter(chapter=c, exec_only=True)
 		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
-	elif c == request.user.chapter:
+	elif request.user.is_staff:
+		globExecCategories = Category.objects.filter(chapter__isnull=True, exec_only=True)
 		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
 		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
 	else:
-		raise Http404
+		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
+		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
 	onlines = User.objects.filter(forum_last_act__gt=(datetime.datetime.now() - datetime.timedelta(hours=1)))
 	online_users = []
 	for o in onlines:
@@ -169,7 +171,7 @@ def newtopic(request, forum_id):
 	g = f.category
 	c = g.chapter
 	user = request.user
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
 		if request.method == 'POST':
 			topicform = NewTopicForm(request.POST)
 			if topicform.is_valid():
@@ -263,7 +265,7 @@ def viewforum(request, chapterurl, forum_id):
 	if c and (c != chapterHome):
 		raise Http404
 	user = request.user
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
 		topicform = NewTopicForm(None)
 		topics_list = f.topic_set.all()
 		paginator = Paginator(topics_list, 6)
@@ -326,7 +328,7 @@ def newpost(request, topic_id):
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
 		if request.method == 'POST':
 			postform = WritePostForm(request.POST)
 			if postform.is_valid():
@@ -396,7 +398,7 @@ def viewtopic(request, chapterurl, topic_id):
 	c = g.chapter
 	if c and (c != chapterHome):
 		raise Http404
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
 		editPost = ''
 		if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
 			quote = Post.objects.get(pk=request.GET['quotePostId'])
