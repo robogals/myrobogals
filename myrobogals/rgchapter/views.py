@@ -35,7 +35,7 @@ def list(request):
 					if chapter.status == 0:
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
-		specialch = Group.objects.filter(parent__myrobogals_url='special')
+		specialch = Group.objects.filter(parent__myrobogals_url='special', status=0)
 	return render_to_response('chapter_listing.html', {'listing': listing, 'specialch': specialch}, context_instance=RequestContext(request))
 
 def joinlist(request):
