@@ -14,7 +14,7 @@
 <div class="module-inner">
 <h4 class="module-title">Add new category</h4>
 <form action="/forums/newcategory/" method="GET">
-{% trans "Category name:" %} <input type="text" name="category">
+{% trans "Category name:" %} <input type="text" name="category" size="34" maxlength="80">
 {% trans "Visibility:" %}
 <select name="visibility">
 <option value="">{% trans "Global" %}</option>
@@ -28,7 +28,7 @@
 {% if return %}
 <input type="hidden" name="return" value="{{return}}" />
 {% endif %}
-<input type="submit" value="{% trans "add" %}">
+<input type="submit" value="{% trans "Add Category" %}">
 </form>
 </div></div></div></div>
 {% endif %}
@@ -38,7 +38,16 @@
 <div class="module-inner">
 <h4 class="module-title">Add new forum</h4>
 <form action="/forums/newforum/" method="GET">
-{% trans "Forum name:" %} <input type="text" name="forum">
+<table>
+	<tr>
+		<td>{% trans "Forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50"></td>
+	</tr>
+	<tr>
+		<td>{% trans "Description:" %}</td>
+		<td><input type="text" name="description" size="50"></td>
+	</tr>
+</table>
 {% trans "Category:" %}
 <select name="category">
 {% for globExecCategory in globExecCategories %}
@@ -57,11 +66,11 @@
 {% if return %}
 <input type="hidden" name="return" value="{{return}}" />
 {% endif %}
-<input type="submit" value="{% trans "add" %}">
+<input type="submit" value="{% trans "Add Forum" %}">
 </form>
 </div></div></div></div>
 
-<table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% for globExecCategory in globExecCategories %}
 	<tr style="color:white; background-color:#1366A3">
 		<td>{{ globExecCategory.get_full_name }}</td>
@@ -74,10 +83,10 @@
 	</tr>
 	{% for forum in globExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a></td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
 		<td>{{ forum.num_topics }}</td>
 		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post|linebreaksbr }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -101,10 +110,10 @@
 	</tr>
 	{% for forum in globPubCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a></td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
 		<td>{{ forum.num_topics }}</td>
 		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post|linebreaksbr }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -128,10 +137,10 @@
 	</tr>
 	{% for forum in localExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a></td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
 		<td>{{ forum.num_topics }}</td>
 		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post|linebreaksbr }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -155,10 +164,10 @@
 	</tr>
 	{% for forum in localPubCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a></td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
 		<td>{{ forum.num_topics }}</td>
 		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post|linebreaksbr }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -171,4 +180,16 @@
 	{% endif %}
 {% endfor %}
 </table>
+<p>
+	{% trans "Total number of topics:" %} <strong>{{ total_num_topics }},</strong>
+	{% trans "Total number of posts:" %} <strong>{{ total_num_posts }}</strong><br />
+	{% trans "Currently online" %} <strong> {{ num_online_users }}: </strong><br /> |
+	{% for o in online_users %}
+		{% if o.0 %}
+			<a href="/profile/{{o.1.username}}/">{{o.1.get_full_name}}</a> |
+		{% else %}
+			{{o.1.get_full_name}} |
+		{% endif %}
+	{% endfor %}
+</p>
 {% endblock %}
