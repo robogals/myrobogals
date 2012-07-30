@@ -466,12 +466,12 @@ def search(request):
 	if 'search' in request.GET:
 		search = request.GET['search']
 		if user.is_superuser:
-			forums = Forum.objects.filter(Q(name__icontains=search))
-			topics = Topic.objects.filter(Q(subject__icontains=search))
+			forums = Forum.objects.filter(Q(name__icontains=search)).order_by('category__chapter', '-category__exec_only', 'created_on')
+			topics = Topic.objects.filter(Q(subject__icontains=search)).order_by('forum__category__chapter', '-forum__category__exec_only', 'created_on')
 		elif user.is_staff:
-			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__chapter=user.chapter) | Q(category__chapter__isnull=True)))
-			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__chapter=user.chapter) | Q(forum__category__chapter__isnull=True)))
+			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__chapter=user.chapter) | Q(category__chapter__isnull=True) | Q(category__exec_only=False))).order_by('category__chapter', '-category__exec_only', 'created_on')
+			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__chapter=user.chapter) | Q(forum__category__chapter__isnull=True) | Q(forum__category__exec_only=False))).order_by('forum__category__chapter', '-forum__category__exec_only', 'created_on')
 		else:
-			forums = Forum.objects.filter(Q(name__icontains=search) & ((Q(category__chapter=user.chapter) & Q(category__exec_only=False)) | (Q(category__chapter__isnull=True) & Q(category__exec_only=False))))
-			topics = Topic.objects.filter(Q(subject__icontains=search) & ((Q(forum__category__chapter=user.chapter) & Q(forum__category__exec_only=False)) | (Q(forum__category__chapter__isnull=True) & Q(forum__category__exec_only=False))))
+			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__exec_only=False))).order_by('category__chapter', '-category__exec_only', 'created_on')
+			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__exec_only=False))).order_by('forum__category__chapter', 'created_on')
 	return render_to_response('forums_search.html', {'chapter': request.user.chapter, 'search': search, 'forums': forums, 'topics': topics}, context_instance=RequestContext(request))
