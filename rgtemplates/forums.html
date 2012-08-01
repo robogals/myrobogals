@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% block title %}{{chapter.name}}{% endblock %}
+
+{% block pagetitle %}{{chapter.name}}{% endblock %}
+
+{% block content %}
+<a href="/forums/search/">{% trans "Search" %}</a>
+
+{% if user.is_superuser %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<h4 class="module-title">Add new category</h4>
+<form action="/forums/newcategory/" method="GET">
+{% trans "Category name:" %} <input type="text" name="category" size="34" maxlength="80">
+{% trans "Visibility:" %}
+<select name="visibility">
+<option value="">{% trans "Global" %}</option>
+<option value="{{chapter.pk}}">{% trans "Local" %}</option>
+</select>
+{% trans "Available to:" %}
+<select name="availability">
+<option value="public">{% trans "Public" %}</option>
+<option value="execonly">{% trans "Exec-Only" %}</option>
+</select>
+{% if return %}
+<input type="hidden" name="return" value="{{return}}" />
+{% endif %}
+<input type="submit" value="{% trans "Add Category" %}">
+</form>
+</div></div></div></div>
+{% endif %}
+
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<h4 class="module-title">Add new forum</h4>
+<form action="/forums/newforum/" method="GET">
+<table>
+	<tr>
+		<td>{% trans "Forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50"></td>
+	</tr>
+	<tr>
+		<td>{% trans "Description:" %}</td>
+		<td><input type="text" name="description" size="50"></td>
+	</tr>
+</table>
+{% trans "Category:" %}
+<select name="category">
+{% for globExecCategory in globExecCategories %}
+<option value="{{globExecCategory.pk}}">{{globExecCategory.get_full_name}}</option>
+{% endfor %}
+{% for globPubCategory in globPubCategories %}
+<option value="{{globPubCategory.pk}}">{{globPubCategory.get_full_name}}</option>
+{% endfor %}
+{% for localExecCategory in localExecCategories %}
+<option value="{{localExecCategory.pk}}">{{localExecCategory.get_full_name}}</option>
+{% endfor %}
+{% for localPubCategory in localPubCategories %}
+<option value="{{localPubCategory.pk}}">{{localPubCategory.get_full_name}}</option>
+{% endfor %}
+</select>
+{% if return %}
+<input type="hidden" name="return" value="{{return}}" />
+{% endif %}
+<input type="submit" value="{% trans "Add Forum" %}">
+</form>
+</div></div></div></div>
+
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+{% for globExecCategory in globExecCategories %}
+	<tr style="color:white; background-color:#1366A3">
+		<td>{{ globExecCategory.get_full_name }}</td>
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Posts" %}</td>
+		<td>{% trans "Last Post" %}</td>
+		{% if user.is_superuser %}
+		<td><a style="color:white" href="/forums/category/delete/{{globExecCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
+		{% endif %}
+	</tr>
+	{% for forum in globExecCategory.forum_set.all %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
+		<td>{{ forum.num_topics }}</td>
+		<td>{{ forum.num_posts }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser %}
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	{% if user.is_superuser %}
+	<tr><td colspan="5"></td></tr>
+	{% else %}
+	<tr><td colspan="4"></td></tr>
+	{% endif %}
+{% endfor %}
+{% for globPubCategory in globPubCategories %}
+	<tr style="color:white; background-color:#1366A3">
+		<td>{{ globPubCategory.get_full_name }}</td>
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Posts" %}</td>
+		<td>{% trans "Last Post" %}</td>
+		{% if user.is_superuser %}
+		<td><a style="color:white" href="/forums/category/delete/{{globPubCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
+		{% endif %}
+	</tr>
+	{% for forum in globPubCategory.forum_set.all %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
+		<td>{{ forum.num_topics }}</td>
+		<td>{{ forum.num_posts }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser %}
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	{% if user.is_superuser %}
+	<tr><td colspan="5"></td></tr>
+	{% else %}
+	<tr><td colspan="4"></td></tr>
+	{% endif %}
+{% endfor %}
+{% for localExecCategory in localExecCategories %}
+	<tr style="color:white; background-color:#1366A3">
+		<td>{{ localExecCategory.get_full_name }}</td>
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Posts" %}</td>
+		<td>{% trans "Last Post" %}</td>
+		{% if user.is_superuser %}
+		<td><a style="color:white" href="/forums/category/delete/{{localExecCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
+		{% endif %}
+	</tr>
+	{% for forum in localExecCategory.forum_set.all %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
+		<td>{{ forum.num_topics }}</td>
+		<td>{{ forum.num_posts }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser %}
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	{% if user.is_superuser %}
+	<tr><td colspan="5"></td></tr>
+	{% else %}
+	<tr><td colspan="4"></td></tr>
+	{% endif %}
+{% endfor %}
+{% for localPubCategory in localPubCategories %}
+	<tr style="color:white; background-color:#1366A3">
+		<td>{{ localPubCategory.get_full_name }}</td>
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Posts" %}</td>
+		<td>{% trans "Last Post" %}</td>
+		{% if user.is_superuser %}
+		<td><a style="color:white" href="/forums/category/delete/{{localPubCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
+		{% endif %}
+	</tr>
+	{% for forum in localPubCategory.forum_set.all %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
+		<td>{{ forum.num_topics }}</td>
+		<td>{{ forum.num_posts }}</td>
+		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser %}
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	{% if user.is_superuser %}
+	<tr><td colspan="5"></td></tr>
+	{% else %}
+	<tr><td colspan="4"></td></tr>
+	{% endif %}
+{% endfor %}
+</table>
+<p>
+	{% trans "Total number of topics:" %} <strong>{{ total_num_topics }},</strong>
+	{% trans "Total number of posts:" %} <strong>{{ total_num_posts }}</strong><br />
+	{% trans "Currently online" %} <strong> {{ num_online_users }}: </strong><br /> |
+	{% for o in online_users %}
+		{% if o.0 %}
+			<a href="/profile/{{o.1.username}}/">{{o.1.get_full_name}}</a> |
+		{% else %}
+			{{o.1.get_full_name}} |
+		{% endif %}
+	{% endfor %}
+</p>
+{% endblock %}
