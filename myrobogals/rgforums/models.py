@@ -5,8 +5,8 @@ from myrobogals.auth.models import Group, User
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
-	chapter = models.ForeignKey(Group, null=True)
-	exec_only = models.BooleanField(default=False)
+	chapter = models.ForeignKey(Group, blank=True, null=True)
+	exec_only = models.BooleanField("For executives only", default=False)
 	created_on = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -31,13 +31,11 @@ class Category(models.Model):
 class Forum(models.Model):
 	name = models.CharField('Name', max_length=80)
 	description = models.TextField(default = '')
-	category = models.ForeignKey(Category, null=False)
+	category = models.ForeignKey(Category)
 	created_on = models.DateTimeField(auto_now_add=True)
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
-	num_topics = models.IntegerField(default = 0)
-	num_posts = models.IntegerField(default = 0)
 	last_post_time = models.DateTimeField(blank=True, null=True)
-	last_post_user = models.ForeignKey(User, null=True, related_name='forum_last_post_user')
+	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
 
 	class Meta:
 		verbose_name = "Forum"
@@ -71,16 +69,21 @@ class Forum(models.Model):
 		else:
 			return None
 
+	def number_of_topics(self):
+		return Topic.objects.filter(forum=self).count()
+
+	def number_of_posts(self):
+		return Post.objects.filter(topic__forum=self).count()
+
 class Topic(models.Model):
 	forum = models.ForeignKey(Forum)
 	posted_by = models.ForeignKey(User, related_name='topic_posted_by')
 	subject = models.CharField(max_length=80)
-	num_views = models.IntegerField(default=0)
-	num_replies = models.PositiveSmallIntegerField(default=0)
+	num_views = models.IntegerField("Number of views", default=0)
 	created_on = models.DateTimeField(auto_now_add=True)
 	last_post_time = models.DateTimeField(blank=True, null=True)
-	last_post_user = models.ForeignKey(User, null=True, related_name='topic_last_post_user')
-	sticky = models.BooleanField(default=False)
+	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
+	sticky = models.BooleanField("Set sticky", default=False)
 
 	class Meta:
 		verbose_name = "Topic"
@@ -114,13 +117,20 @@ class Topic(models.Model):
 		else:
 			return None
 
+	def number_of_replies(self):
+		num_post = Post.objects.filter(topic=self).count()
+		if num_post >= 1:
+			return num_post - 1
+		else:
+			return 0
+
 class Post(models.Model):
 	topic = models.ForeignKey(Topic)
 	posted_by = models.ForeignKey(User, related_name='post_posted_by')
 	message = models.TextField()
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(blank=True, null=True)
-	edited_by = models.ForeignKey(User, null=True, related_name='post_edited_by')
+	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
 
 	class Meta:
 		verbose_name = "Post"

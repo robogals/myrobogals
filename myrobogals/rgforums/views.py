@@ -192,8 +192,6 @@ def newtopic(request, forum_id):
 					postMessage.posted_by = user
 					postMessage.message = data['message']
 					postMessage.save()
-					f.num_topics = f.num_topics + 1
-					f.num_posts = f.num_posts + 1
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
 					f.save()
@@ -280,6 +278,32 @@ def viewforum(request, chapterurl, forum_id):
 	else:
 		raise Http404
 
+@login_required
+def deletepost(request, post_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	user = request.user
+	p = get_object_or_404(Post, pk=post_id)
+	t = p.topic
+	f = t.forum
+	g = f.category
+	c = g.chapter
+	if (user.is_superuser):
+		p.delete()
+		t.num_views = t.num_views - 1
+		t.save()
+		request.user.message_set.create(message=unicode(_('Post deleted')))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/topic/' + str(t.pk) + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/topic/' + str(t.pk) + '/')
+	else:
+		raise Http404
+
 class WritePostForm(forms.Form):
 	message = forms.CharField(widget=TinyMCE(attrs={'cols': 65}))
 
@@ -339,11 +363,9 @@ def newpost(request, topic_id):
 				postMessage.message = data['message']
 				postMessage.save()
 				t.num_views = t.num_views - 1
-				t.num_replies = t.num_replies + 1
 				t.last_post_time = datetime.datetime.now()
 				t.last_post_user = user
 				t.save()
-				f.num_posts = f.num_posts + 1
 				f.last_post_time = datetime.datetime.now()
 				f.last_post_user = user
 				f.save()
@@ -369,9 +391,6 @@ def deletetopic(request, topic_id):
 	if request.user.is_superuser:
 		t = get_object_or_404(Topic, pk=topic_id)
 		f = t.forum
-		f.num_topics = f.num_topics - 1
-		f.num_posts = f.num_posts - t.num_replies - 1
-		f.save()
 		chapter = f.category.chapter
 		request.user.message_set.create(message=unicode(_('Topic "' + t.subject + '" deleted')))
 		t.delete()
@@ -456,9 +475,10 @@ def viewtopic(request, chapterurl, topic_id):
 		raise Http404
 
 @login_required
-def search(request):
+def search(request, chapterurl):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
+	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	search = ''
 	forums = None
 	topics = None
@@ -474,4 +494,4 @@ def search(request):
 		else:
 			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__exec_only=False))).order_by('category__chapter', '-category__exec_only', 'created_on')
 			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__exec_only=False))).order_by('forum__category__chapter', 'created_on')
-	return render_to_response('forums_search.html', {'chapter': request.user.chapter, 'search': search, 'forums': forums, 'topics': topics}, context_instance=RequestContext(request))
+	return render_to_response('forums_search.html', {'chapter': c, 'search': search, 'forums': forums, 'topics': topics}, context_instance=RequestContext(request))

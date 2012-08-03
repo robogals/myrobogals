@@ -61,7 +61,7 @@
 	{% for topic in topics.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/{{ chapterHome.myrobogals_url }}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on_local|date:_("Y-m-d H:i") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}</td>
-		<td>{{ topic.num_replies }}</td>
+		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
 		<td>{{ topic.last_post_local|date:_("Y-m-d H:i") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 		{% if user.is_superuser %}
