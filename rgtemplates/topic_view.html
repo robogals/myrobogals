@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% block title %}{{chapter.name}}{% endblock %}
+
+{% block pagetitle %}{{chapter.name}}{% endblock %}
+
+{% block content %}
+<p>
+	<a href="/forums/{{chapterHome.myrobogals_url}}/">{% trans "Home" %}</a>
+	&raquo;
+	<a href="/forums/{{chapterHome.myrobogals_url}}/forum/{{forum.pk}}/">{{forum.name}}</a>
+	&raquo;
+	{{topic.subject}}
+</p>
+
+{% if posts.number == 1 %}
+	{% trans "home" %} |
+{% else %}
+	<a href="?page=1">{% trans "home" %}</a> |
+{% endif %}
+
+{% if posts.has_previous %}
+	<a href="?page={{ posts.previous_page_number }}">{% trans "previous" %}</a> |
+{% else %}
+	{% trans "previous" %} |
+{% endif %}
+
+{% trans "Page" %} {{ posts.number }} {% trans "of" %} {{ posts.paginator.num_pages }}
+
+{% if posts.has_next %}
+	| <a href="?page={{ posts.next_page_number }}">{% trans "next" %}</a>
+{% else %}
+	| {% trans "next" %}
+{% endif %}
+
+{% if posts.number == posts.paginator.num_pages %}
+	| {% trans "last" %}
+{% else %}
+	| <a href="?page={{posts.paginator.num_pages}}">{% trans "last" %}</a>
+{% endif %}
+
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<tr style="color:white; background-color:#1366A3">
+		<td>{% trans "User" %}</td>
+		<td>{% trans "Message" %}</td>
+	</tr>
+	{% for post in posts.object_list %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		{% if post.0 %}
+		<td style="border-right: solid 1px grey;" rowspan="2"><a href="/profile/{{post.1.posted_by.username}}/">{{ post.1.posted_by.get_full_name }}</a><br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
+		{% else %}
+		<td style="border-right: solid 1px grey;" rowspan="2">{{ post.1.posted_by.get_full_name }}</td>
+		{% endif %}
+		<td style="border-bottom: solid 1px grey;">{{post.1.created_on_local|date:_("Y-m-d H:i")}}{% if post.1.updated_on %} | {% trans "Last edited by" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on_local|date:_("Y-m-d H:i")}}){% endif %}</td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td>{{ post.1.message|linebreaksbr }}</td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td style="border-right: solid 1px grey; border-bottom: solid 1px grey;" align="right">{{forloop.counter}}</td>
+		<td style="border-bottom: solid 1px grey;">
+		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}">{% trans "quote" %}</a>
+		{% if post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
+		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}">{% trans "edit" %}</a>
+			{% ifequal editPost post.1.pk %}
+		</td>
+	</tr>
+			<form action="/forums/editpost/{{ post.1.pk }}/?return={{return|urlencode}}" method="POST">
+			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+				<td valign="top" style="border-right: solid 1px grey; border-top: solid 1px grey;"><strong>{% trans "Message:" %}</strong></td>
+				<td style="border-top: solid 1px grey;">{{ postform.message }}</td>
+			  </tr>
+			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}" style="border-bottom: solid 1px grey;"><td style="border-right: solid 1px grey;"><input type="submit" value="Edit Post" /></td><td></td></tr>
+			</form>
+			{% endifequal %}
+		{% endif %}
+	{% if editPost != post.1.pk %}
+		</td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+{% if not editPost %}
+<form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST">
+  <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="border-top:solid 1px grey;">
+    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
+    <td>{{ postform.message }}</td>
+  </tr>
+  <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}"><td colspan="2"><input type="submit" value="Add Post" /></td></tr>
+</form>
+{% endif %}
+</table>
+{% endblock %}
