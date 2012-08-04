@@ -13,6 +13,7 @@
 			<td></td>
 			<td>Hours</td>
 		</tr>
+		{% if attended %}
 		{% for attendedUser in attended %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 			<td>{{attendedUser.last_name}}, {{ attendedUser.first_name }}</td>
@@ -26,6 +27,9 @@
 			</td>
 		</tr>
 		{% endfor %}
+		{% else %}
+		<td colspan="2">Nobody was marked as attending, so just click "save stats" to continue</td>
+		{% endif %}
 	</table></p>
     <p style="clear: both; font-size: 200%;"><input type="submit" value="Save Stats" /></p>
 </form>

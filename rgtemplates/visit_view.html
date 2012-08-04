@@ -7,7 +7,8 @@
 {% block content %}
 <p><a href="/teaching/list/">{% trans "Return to workshop list" %}</a>
 {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit workshop" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite or add volunteers" %}</a> | <a href="/teaching/{{v.pk}}/email/">{% trans "Email volunteers" %}</a>
-| <a href="/teaching/{{v.pk}}/stats/">{% trans "Close workshop and enter stats" %}</a>  | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel workshop" %}</a>{% endifequal %}
+| <a href="/teaching/{{v.pk}}/stats/">{% trans "Close workshop and enter stats" %}</a> | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel workshop" %}</a>{% endifequal %}
+{% ifequal v.status 1 %} | <a href="/teaching/{{v.pk}}/reopen/">{% trans "Delete stats and re-open workshop" %}</a>{% endifequal %}
 {% endifequal %}{% endif %}
 </p>
 {% ifequal v.status 0 %}
@@ -131,8 +132,8 @@
     </td>
   </tr>
   {% endfor %}
-  </table?
-{% else %}
+{% endifequal %}
+</table>
 {% ifequal v.status 1 %}
 <table>
   <tr>
@@ -142,20 +143,12 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td colspan="2"><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
   </tr>
-
   {% endfor %}
-{% endifequal %}
-{% endifequal %}
-{% ifequal v.status 0%}
-  <tr></tr>
 </table>
-{% else %}
  {% if stats %}
- <tr></tr>
- </table>
- <h2> Visit Stats</h2>
- <p><strong>Visit type:</strong></label> {{ stats.get_visit_type_display }}</p>
-	<p><strong>Students taught:</strong>
+ <h2>{% trans "Workshop statistics" %}</h2>
+ <p><strong>{% trans "Workshop type:" %}</strong> {{ stats.get_visit_type_display }}</p>
+	<p><strong>{% trans "Students taught:" %}</strong>
     <table width="400px" style="table-layout:fixed;  text-align:center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 		<col width="100px" />
 		<col width="150px" />
@@ -204,7 +197,9 @@
 	{% if stats.notes %}
 	<p><strong>General Notes:</strong> <br />{{ stats.notes }}</p>
 	{% endif %}
-	{% endif %}
+  {% else %}
+  <div class="error">ERROR: This visit is closed but does not have a stats object. Please report this to my@robogals.org</div>
+  {% endif %}
 {% endifequal %}
 {% if request.user.is_staff %}
 {% if eventmessages %}

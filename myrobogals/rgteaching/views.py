@@ -353,8 +353,8 @@ def emailvisitattendees(request, visit_id):
 			message.save()
 			
 			
-			#---Start processing recieptent list ---#
-			#Insert choices for attending, not attending etc here
+			# Start processing recipient list
+			# Insert choices for attending, not attending etc here
 			if request.POST['invitee_type'] == '1':
 				id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
@@ -704,6 +704,7 @@ class SchoolVisitStatsForm(forms.Form):
 		self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in = attending)]
 		self.fields['visit_type'].initial = ''
 		self.fields['primary_girls_first'].initial = visit.numstudents
+
 @login_required
 def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
@@ -756,6 +757,8 @@ def stats(request, visit_id):
 					person.save()
 						
 			defaultHours =  v.visit_end.hour - v.visit_start.hour
+			if v.visit_end.minute > v.visit_start.minute:
+				defaultHours += 1
 			return render_to_response('visit_hoursPerPerson.html', {'attended': data['attended'], 'visit_id': visit_id, 'defaultHours': range(defaultHours)}, context_instance=RequestContext(request))
 		else:
 			request.session['hoursPerPersonStage'] = 1
@@ -766,6 +769,27 @@ def stats(request, visit_id):
 		request.session['hoursPerPersonStage'] = 1
 		form = SchoolVisitStatsForm(None, visit = v)
 		return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
+
+@login_required
+def reopenvisit(request, visit_id):
+	v = get_object_or_404(SchoolVisit, pk=visit_id)
+	if v.school.chapter != request.user.chapter:
+		raise Http404
+	if not request.user.is_staff:
+		raise Http404
+	if 'confirm' in request.GET:
+		if request.GET['confirm'] == '1':
+			stats = v.schoolvisitstats_set.all()[0]
+			stats.delete()
+			v.status = 0
+			v.save()
+			request.user.message_set.create(message=unicode(_("Stats deleted and workshop re-opened.")))
+			return HttpResponseRedirect('/teaching/' + str(visit_id) + '/')
+		else:
+			# Someone has set a random value for &confirm=
+			raise Http404
+	else:
+		return render_to_response('visit_reopen.html', {'visit_id': visit_id}, context_instance=RequestContext(request))
 
 @login_required
 def statsHoursPerPerson(request, visit_id):
