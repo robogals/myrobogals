@@ -94,13 +94,6 @@
                         <span>{% trans "Manage lists" %}</span>
                     <a>
                 </li>
-{% endif %}
-                <li class="item147">
-                    <a class="orphan item bullet" href="/forums/{{ request.user.chapter.myrobogals_url }}/">
-                        <span>{% trans "Forums" %}</span>
-                    </a>
-                </li>
-{% if request.user.is_staff %}
                 <li class="item147">
                     <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/websitedetails/">
                         <span>{% trans "View website details" %}</span>
@@ -295,6 +288,18 @@
 {% endif %}        
         
 </li>   
+<!--
+            <li class="item152 root" >
+            <a class="orphan item bullet" href="/forums/"  >
+            <span>
+
+                       {% trans "Forums" %}   
+               
+            </span>
+        </a>
+        </li>  
+-->
+<!--
             <li class="item152 root" >
             <a class="orphan item bullet" href="/wiki/"  >
             <span>
@@ -303,9 +308,8 @@
                
             </span>
         </a>
-        
-        
-</li>  
+        </li>  
+-->
     </ul>
 
                                         </div>

@@ -376,8 +376,8 @@ class User(models.Model):
     tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
     trained = models.BooleanField(default=False)
     name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
-    objects = UserManager()
     forum_last_act = models.DateTimeField('Forum last activity', default=datetime.datetime.now)
+    objects = UserManager()
 
     class Meta:
         verbose_name = 'Member'

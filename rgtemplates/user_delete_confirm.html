@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Confirm - Delete {{userToBeDeleted.first_name}} {{userToBeDeleted.last_name}}{% endblock %}
+{% block title %}Confirm deletion of {{userToBeDeleted.get_full_name}}{% endblock %}
 
-{% block pagetitle %}Confirm - Delete {{userToBeDeleted.first_name}} {{userToBeDeleted.last_name}}{% endblock %}
+{% block pagetitle %}Confirm deletion of {{userToBeDeleted.get_full_name}}{% endblock %}
 
 {% block content %}
 <form action="/delete/user/{{userToBeDeleted.pk}}/?return={{return|urlencode}}" method="post">

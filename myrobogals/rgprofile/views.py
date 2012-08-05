@@ -202,22 +202,22 @@ def deleteuser(request, userpk):
 		old_status = userToBeDeleted.memberstatus_set.get(status_date_end__isnull=True)
 		canNotDelete = False
 		if Position.objects.filter(user=userToBeDeleted):
-			msg = _('User "%s" has held at least one officeholder position.') % userToBeDeleted.get_full_name()
+			msg = _('User "%s" has held at least one officeholder position. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if EventAttendee.objects.filter(user=userToBeDeleted, actual_status=1):
-			msg += _('User "%s" has attended at least one school visit.') % userToBeDeleted.get_full_name()
+			msg += _('User "%s" has attended at least one school visit. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if Event.objects.filter(creator=userToBeDeleted):
-			msg += _('User "%s" has created at least one school visit.') % userToBeDeleted.get_full_name()
+			msg += _('User "%s" has created at least one school visit. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if EmailMessage.objects.filter(sender=userToBeDeleted):
-			msg += _('User "%s" has sent at least one email.') % userToBeDeleted.get_full_name()
+			msg += _('User "%s" has sent at least one email. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if SMSMessage.objects.filter(sender=userToBeDeleted):
-			msg += _('User "%s" has sent at least one SMS message.') % userToBeDeleted.get_full_name()
+			msg += _('User "%s" has sent at least one SMS message. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if LogEntry.objects.filter(user=userToBeDeleted):
-			msg += _('User "%s" owned at least one admin log object.') % userToBeDeleted.get_full_name()
+			msg += _('User "%s" owned at least one admin log object. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if not canNotDelete:
 			if (request.method != 'POST') or (('delete' not in request.POST) and ('alumni' not in request.POST)):
@@ -225,10 +225,10 @@ def deleteuser(request, userpk):
 			else:
 				if ('delete' in request.POST) and ('alumni' not in request.POST):
 					userToBeDeleted.delete()
-					msg = _('User "%s" deleted') % userToBeDeleted.get_full_name()
+					msg = _('Member "%s" deleted') % userToBeDeleted.get_full_name()
 				elif ('delete' not in request.POST) and ('alumni' in request.POST):
 					if old_status.statusType == MemberStatusType.objects.get(pk=2):
-						msg = _('User "%s" is already marked as alumni') % userToBeDeleted.get_full_name()
+						msg = _('Member "%s" is already marked as alumni') % userToBeDeleted.get_full_name()
 					else:
 						if userToBeDeleted.membertype().description != 'Inactive':
 							old_status.status_date_end = date.today()
@@ -238,10 +238,13 @@ def deleteuser(request, userpk):
 						new_status.statusType = MemberStatusType.objects.get(pk=2)
 						new_status.status_date_start = date.today()
 						new_status.save()
-						msg = _('User "%s" marked as alumni') % userToBeDeleted.get_full_name()
+						msg = _('Member "%s" marked as alumni') % userToBeDeleted.get_full_name()
 				else:
 					raise Http404
-		request.user.message_set.create(message=unicode(_(msg)))
+		if canNotDelete:
+			request.user.message_set.create(message=unicode(_('- Cannot delete member. Reason(s): %s Consider marking this member as alumni instead.') % msg))
+		else:
+			request.user.message_set.create(message=unicode(msg))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		else:

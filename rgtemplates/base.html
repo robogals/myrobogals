@@ -91,7 +91,11 @@
 
                     </div> <!-- article-rel-wrapper -->
         {% for message in messages %}
+        {% ifequal message.0 '-' %}
+        <div class="error">{{ message }}</div>
+        {% else %}
         <div class="message">{{ message }}</div>
+        {% endifequal %}
         {% endfor %}
         {% block content %}
         
