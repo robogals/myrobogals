@@ -91,11 +91,13 @@
 
                     </div> <!-- article-rel-wrapper -->
         {% for message in messages %}
+        {% autoescape off %}
         {% ifequal message.0 '-' %}
         <div class="error">{{ message }}</div>
         {% else %}
         <div class="message">{{ message }}</div>
         {% endifequal %}
+        {% endautoescape %}
         {% endfor %}
         {% block content %}
         

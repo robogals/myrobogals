@@ -202,22 +202,22 @@ def deleteuser(request, userpk):
 		old_status = userToBeDeleted.memberstatus_set.get(status_date_end__isnull=True)
 		canNotDelete = False
 		if Position.objects.filter(user=userToBeDeleted):
-			msg = _('User "%s" has held at least one officeholder position. ') % userToBeDeleted.get_full_name()
+			msg = _('<br>Member "%s" has held at least one officeholder position. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if EventAttendee.objects.filter(user=userToBeDeleted, actual_status=1):
-			msg += _('User "%s" has attended at least one school visit. ') % userToBeDeleted.get_full_name()
+			msg += _('<br>Member "%s" has attended at least one school visit. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if Event.objects.filter(creator=userToBeDeleted):
-			msg += _('User "%s" has created at least one school visit. ') % userToBeDeleted.get_full_name()
+			msg += _('<br>Member "%s" has created at least one school visit. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if EmailMessage.objects.filter(sender=userToBeDeleted):
-			msg += _('User "%s" has sent at least one email. ') % userToBeDeleted.get_full_name()
+			msg += _('<br>Member "%s" has sent at least one email. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if SMSMessage.objects.filter(sender=userToBeDeleted):
-			msg += _('User "%s" has sent at least one SMS message. ') % userToBeDeleted.get_full_name()
+			msg += _('<br>Member "%s" has sent at least one SMS message. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if LogEntry.objects.filter(user=userToBeDeleted):
-			msg += _('User "%s" owned at least one admin log object. ') % userToBeDeleted.get_full_name()
+			msg += _('<br>Member "%s" owned at least one admin log object. ') % userToBeDeleted.get_full_name()
 			canNotDelete = True
 		if not canNotDelete:
 			if (request.method != 'POST') or (('delete' not in request.POST) and ('alumni' not in request.POST)):
@@ -242,7 +242,7 @@ def deleteuser(request, userpk):
 				else:
 					raise Http404
 		if canNotDelete:
-			request.user.message_set.create(message=unicode(_('- Cannot delete member. Reason(s): %s Consider marking this member as alumni instead.') % msg))
+			request.user.message_set.create(message=unicode(_('- Cannot delete member. Reason(s): %s<br>Consider marking this member as alumni instead.') % msg))
 		else:
 			request.user.message_set.create(message=unicode(msg))
 		if 'return' in request.GET:
