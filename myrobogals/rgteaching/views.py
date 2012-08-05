@@ -951,8 +951,11 @@ def report_standard(request):
 
 @login_required
 def report_global(request):
-	if  not request.user.is_superuser:
-		raise Http404
+	# Allow superusers
+	if not request.user.is_superuser:
+		# Allow global exec
+		if not (request.user.chapter.pk == 1 and request.user.is_staff):
+			raise Http404
 	warning = ''
 	if request.method == 'POST':
 		theform = ReportSelectorForm(request.POST)

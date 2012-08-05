@@ -208,11 +208,19 @@
                 </li>
 {% else %}
 		{% if request.user.is_staff %}
+				{% ifequal request.user.chapter.pk 1 %}
+				<li class="item147">
+                    <a class="orphan item bullet" href="/globalreports/">
+                        <span>{% trans "Reporting" %}</span>
+                    <a>
+                </li>
+				{% else %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/reports/">
                         <span>{% trans "Reporting" %}</span>
                     <a>
                 </li>
+                {% endifequal %}
 		{% endif %}
 {% endif %}
                     <li class="item71" >
