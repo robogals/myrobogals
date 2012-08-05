@@ -929,11 +929,21 @@ def report_standard(request):
 				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
 				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr'] 
 			# attendance reporting
-			user_list = User.objects.filter(chapter=request.user.chapter).order_by('last_name')
+			user_list = User.objects.filter(chapter=request.user.chapter)
 			for volunteer in user_list:
 				attendance[volunteer.get_full_name()] = 0
 				for attended in EventAttendee.objects.filter(actual_status = 1, event__id__in = visit_ids, user__id = volunteer.id):
-					attendance[volunteer.get_full_name()] += 1
+					type_id = SchoolVisit.objects.get(pk=attended.event.pk).schoolvisitstats_set.all()[0].visit_type
+					if int(formdata['visit_type']) == -1:
+						# include all stats categories
+						attendance[volunteer.get_full_name()] += 1
+					elif int(formdata['visit_type']) == -2:
+						# include both metro and regional robotics workshops
+						if type_id == 0 or type_id == 7:
+							attendance[volunteer.get_full_name()] += 1
+					else:
+						if type_id == int(formdata['visit_type']):
+							attendance[volunteer.get_full_name()] += 1
 			for name, num_visits in attendance.iteritems():
 				if num_visits > 0:
 					attendance_filtered[name] = num_visits
