@@ -165,6 +165,8 @@ def progresschapter(request):
 	root_sum = 0.0
 	grandchildren_display = []
 	listing = []
+	displaycats = [0, 7]
+	careertalkview = False
 
 	if request.user.is_superuser:
 		c = Group.objects.get(pk=1)
@@ -172,36 +174,43 @@ def progresschapter(request):
 		c = request.user.chapter
 	else:
 		raise Http404
+	
+	# Special exception for Robogals Rural & Regional Ambassadors programme
+	# to display career talk stats in the progress bar instead of robotics workshops
+	if c.pk == 20:
+		careertalkview = True
+		displaycats = [1,]
+	
 	children = Group.objects.filter(parent=c)
 	for child in children:
 		if child.status == 0 or (child.status == 2 and request.user.is_superuser):
 			grandchildren = Group.objects.filter(parent=child)
 			for grandchild in grandchildren:
 				if grandchild.status == 0 or (grandchild.status == 2 and request.user.is_superuser):
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 					for school_visit in school_visits:
 						chapter_sum = chapter_sum + school_visit.num_girls_weighted()
 					grandchildren_display.append((grandchild, chapter_sum))
 					chapter_sum = 0.0
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 					for school_visit in school_visits:
 						child_sum = child_sum + school_visit.num_girls_weighted()
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 					for school_visit in school_visits:
 						root_sum = root_sum + school_visit.num_girls_weighted()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				child_sum = child_sum + school_visit.num_girls_weighted()
 			listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
 			grandchildren_display = []
 			child_sum = 0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				root_sum = root_sum + school_visit.num_girls_weighted()
-	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=[0,7])
+	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 	for school_visit in school_visits:
 		root_sum = root_sum + school_visit.num_girls_weighted()
-	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300}, context_instance=RequestContext(request))
+	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300, 'careertalkview': careertalkview}, context_instance=RequestContext(request))
 
 @login_required
 def editchapter(request, chapterurl):

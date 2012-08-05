@@ -6,7 +6,11 @@
 {% block pagetitle %}{% trans "Progress towards goals" %}{% endblock %}
 
 {% block content %}
+{% if not careertalkview %}
 <p>{% trans "This page shows progress towards the goals set at the SINE! The measure used is the number of girls to whom you've taught robotics workshops, in both metro and regional areas, counting a first visit as 1 and repeat visits as 0.5. This is the measure used to determine the &quot;Most Girls Taught&quot; award. To see current stats for other measures, please see Workshops > Reporting." %}</p>
+{% else %}
+<p>This page shows progress towards the goal set at the RRR Training Weekend!</p>
+{% endif %}
 	<table>
 	{% if root_chapter.0.goal %}
 		<tr>
