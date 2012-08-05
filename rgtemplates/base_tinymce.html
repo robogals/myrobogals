@@ -90,7 +90,13 @@
 
                     </div> <!-- article-rel-wrapper -->
         {% for message in messages %}
+        {% autoescape off %}
+        {% ifequal message.0 '-' %}
+        <div class="error">{{ message }}</div>
+        {% else %}
         <div class="message">{{ message }}</div>
+        {% endifequal %}
+        {% endautoescape %}
         {% endfor %}
         {% block content %}
         
@@ -117,6 +123,11 @@
                         <!--End Right Column (col3)-->
                     </div>
                 </div>
+            <div style="padding-left: 22px; padding-right: 20px">
+        {% block noboxcontent %}
+        
+        {% endblock %}
+        	</div>
             </div></div>        </div>
         <!--Begin Main Bottom-->
             

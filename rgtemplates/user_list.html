@@ -27,7 +27,8 @@
 <input type="submit" value="{% trans "Filter" %}">
 </form>
 </div></div></div></div>
-
+{% endblock %}
+{% block noboxcontent %}
 <p align="left"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
   <tr class="even">
