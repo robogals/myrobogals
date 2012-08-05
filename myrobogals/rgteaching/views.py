@@ -777,6 +777,9 @@ def reopenvisit(request, visit_id):
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
+	# Don't allow modifying of RRR stats - too many people have access
+	if v.school.chapter.pk == 20:
+		raise Http404
 	if 'confirm' in request.GET:
 		if request.GET['confirm'] == '1':
 			stats = v.schoolvisitstats_set.all()[0]
