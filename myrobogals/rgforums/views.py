@@ -77,7 +77,7 @@ def newforum(request):
 		user = request.user
 		g = get_object_or_404(Category, pk=request.GET['category'])
 		c = g.chapter
-		if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
+		if (user.is_superuser) or (user.is_staff and (c == user.chapter)):
 			if request.GET['forum'] and request.GET['description']:
 				newForum = Forum()
 				newForum.name = request.GET['forum']
@@ -106,10 +106,39 @@ def newforum(request):
 		raise Http404
 
 @login_required
+def editforum(request, forum_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	edit = get_object_or_404(Forum, pk=forum_id)
+	c = edit.category.chapter
+	if ((not edit.category.chapter) and (not request.user.is_superuser)) or (edit.category.chapter and (((not request.user.is_staff) and (not request.user.is_superuser)) or ((c != request.user.chapter) and (not request.user.is_superuser)))):
+		raise Http404
+	if (request.method == 'POST'):
+		if request.POST['forum'] and request.POST['description']:
+			edit.name = request.POST['forum']
+			edit.description = request.POST['description']
+			edit.save()
+		else:
+			msg = 'The fields "new forum name" and "new description" can not be empty'
+			request.user.message_set.create(message=unicode(_(msg)))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/')
+	else:
+		raise Http404
+	
+
+@login_required
 def forums(request, chapterurl):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	editForum = ''
 	globExecCategories = None
 	globPubCategories = None
 	localExecCategories = None
@@ -119,13 +148,16 @@ def forums(request, chapterurl):
 		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
 		localExecCategories = Category.objects.filter(chapter=c, exec_only=True)
 		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
-	elif request.user.is_staff:
-		globExecCategories = Category.objects.filter(chapter__isnull=True, exec_only=True)
+	elif c == request.user.chapter:
 		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
 		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
 	else:
-		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
-		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
+		raise Http404
+	if 'editForumId' in request.GET:
+		edit = get_object_or_404(Forum, pk=request.GET['editForumId'])
+		if ((not edit.category.chapter) and (not request.user.is_superuser)) or (edit.category.chapter and (((not request.user.is_staff) and (not request.user.is_superuser)) or ((c != request.user.chapter) and (not request.user.is_superuser)))):
+			raise Http404
+		editForum = edit.pk
 	onlines = User.objects.filter(forum_last_act__gt=(datetime.datetime.now() - datetime.timedelta(hours=1)))
 	online_users = []
 	for o in onlines:
@@ -157,7 +189,7 @@ def forums(request, chapterurl):
 	num_online_users = len(online_users)
 	total_num_topics = Topic.objects.count()
 	total_num_posts = Post.objects.count()
-	return render_to_response('forums.html', {'chapter': c, 'globExecCategories': globExecCategories, 'globPubCategories': globPubCategories, 'localExecCategories': localExecCategories, 'localPubCategories': localPubCategories, 'return': request.path + '?' + request.META['QUERY_STRING'], 'user': request.user, 'online_users': online_users, 'num_online_users': num_online_users, 'total_num_topics': total_num_topics, 'total_num_posts': total_num_posts}, context_instance=RequestContext(request))
+	return render_to_response('forums.html', {'chapter': c, 'globExecCategories': globExecCategories, 'globPubCategories': globPubCategories, 'localExecCategories': localExecCategories, 'localPubCategories': localPubCategories, 'return': request.path, 'user': request.user, 'online_users': online_users, 'num_online_users': num_online_users, 'total_num_topics': total_num_topics, 'total_num_posts': total_num_posts, 'editForum': editForum}, context_instance=RequestContext(request))
 
 class NewTopicForm(forms.Form):
 	subject = forms.CharField(label=_('New Topic:'), max_length=80, widget=forms.TextInput(attrs={'size': '60'}))
@@ -171,7 +203,7 @@ def newtopic(request, forum_id):
 	g = f.category
 	c = g.chapter
 	user = request.user
-	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 		if request.method == 'POST':
 			topicform = NewTopicForm(request.POST)
 			if topicform.is_valid():
@@ -263,7 +295,7 @@ def viewforum(request, chapterurl, forum_id):
 	if c and (c != chapterHome):
 		raise Http404
 	user = request.user
-	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 		topicform = NewTopicForm(None)
 		topics_list = f.topic_set.all()
 		paginator = Paginator(topics_list, 6)
@@ -352,7 +384,7 @@ def newpost(request, topic_id):
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 		if request.method == 'POST':
 			postform = WritePostForm(request.POST)
 			if postform.is_valid():
@@ -417,7 +449,7 @@ def viewtopic(request, chapterurl, topic_id):
 	c = g.chapter
 	if c and (c != chapterHome):
 		raise Http404
-	if (user.is_superuser) or (g.exec_only == False) or (user.is_staff and ((c == user.chapter) or (c == None))):
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 		editPost = ''
 		if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
 			quote = Post.objects.get(pk=request.GET['quotePostId'])
@@ -489,9 +521,9 @@ def search(request, chapterurl):
 			forums = Forum.objects.filter(Q(name__icontains=search)).order_by('category__chapter', '-category__exec_only', 'created_on')
 			topics = Topic.objects.filter(Q(subject__icontains=search)).order_by('forum__category__chapter', '-forum__category__exec_only', 'created_on')
 		elif user.is_staff:
-			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__chapter=user.chapter) | Q(category__chapter__isnull=True) | Q(category__exec_only=False))).order_by('category__chapter', '-category__exec_only', 'created_on')
-			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__chapter=user.chapter) | Q(forum__category__chapter__isnull=True) | Q(forum__category__exec_only=False))).order_by('forum__category__chapter', '-forum__category__exec_only', 'created_on')
+			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__chapter=user.chapter) | Q(category__chapter__isnull=True))).order_by('category__chapter', '-category__exec_only', 'created_on')
+			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__chapter=user.chapter) | Q(forum__category__chapter__isnull=True))).order_by('forum__category__chapter', '-forum__category__exec_only', 'created_on')
 		else:
-			forums = Forum.objects.filter(Q(name__icontains=search) & (Q(category__exec_only=False))).order_by('category__chapter', '-category__exec_only', 'created_on')
-			topics = Topic.objects.filter(Q(subject__icontains=search) & (Q(forum__category__exec_only=False))).order_by('forum__category__chapter', 'created_on')
+			forums = Forum.objects.filter(Q(name__icontains=search) & ((Q(category__chapter=user.chapter) & Q(category__exec_only=False)) | (Q(category__chapter__isnull=True) & Q(category__exec_only=False)))).order_by('category__chapter', '-category__exec_only', 'created_on')
+			topics = Topic.objects.filter(Q(subject__icontains=search) & ((Q(forum__category__chapter=user.chapter) & Q(forum__category__exec_only=False)) | (Q(forum__category__chapter__isnull=True) & Q(forum__category__exec_only=False)))).order_by('forum__category__chapter', 'created_on')
 	return render_to_response('forums_search.html', {'chapter': c, 'search': search, 'forums': forums, 'topics': topics}, context_instance=RequestContext(request))

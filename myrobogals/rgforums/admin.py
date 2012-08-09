@@ -9,7 +9,7 @@ class CategoryAdmin(admin.ModelAdmin):
 	)
 
 class ForumAdmin(admin.ModelAdmin):
-	list_display = ('name', 'description', 'created_on', 'created_by')
+	list_display = ('name', 'description', 'category', 'created_on', 'created_by')
 	readonly_fields = ('created_on',)
 	fieldsets = (
 		(None, {'fields': ('name', 'description', 'category')}),

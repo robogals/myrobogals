@@ -15,7 +15,7 @@ class Category(models.Model):
 		ordering = ['created_on']
 
 	def __unicode__(self):
-		return self.name
+		return self.get_full_name()
 
 	def get_full_name(self):
 		if self.chapter:
@@ -43,7 +43,7 @@ class Forum(models.Model):
 		ordering = ['created_on']
 
 	def __unicode__(self):
-		return self.name
+		return self.name + ' [' + self.category.get_full_name() + ']'
 
 	def tz_obj(self):
 		if self.category.chapter:
@@ -91,7 +91,7 @@ class Topic(models.Model):
 		ordering = ['-sticky', 'created_on']
 
 	def __unicode__(self):
-		return self.subject
+		return self.subject + ' {' + self.forum.__unicode__() + '}'
 
 	def tz_obj(self):
 		if self.forum.category.chapter:

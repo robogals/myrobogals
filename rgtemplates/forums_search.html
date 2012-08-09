@@ -9,7 +9,7 @@
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
-<h4 class="module-title">Search</h4>
+<h4 class="module-title">{% trans "Search" %}</h4>
 <form action="/forums/search/{{chapter.myrobogals_url}}/" method="GET">
 {% trans "Forum name, topic subject:" %} <input type="text" name="search" size="50" value="{{search}}">
 <input type="submit" value="{% trans "submit" %}">
@@ -27,12 +27,12 @@
 <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td><a href="/forums/{% if forum.category.chapter %}{{ forum.category.chapter.myrobogals_url }}{% else %}{{ chapter.myrobogals_url }}{% endif %}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />
 	{{ forum.description }}<br />
-	{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />
+	{% trans "Started" %} {{forum.created_on_local|date:_("DATETIME_FORMAT")}}<br />
 	{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
 	{{ forum.category.get_full_name }}</td>
 	<td>{{ forum.number_of_topics }}</td>
 	<td>{{ forum.number_of_posts }}</td>
-	<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+	<td>{{ forum.last_post_local|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 </tr>
 {% endfor %}
 <tr><td colspan="4"></td></tr>
@@ -45,13 +45,13 @@
 	{% for topic in topics %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a href="/forums/{% if topic.forum.category.chapter %}{{ topic.forum.category.chapter.myrobogals_url }}{% else %}{{ chapter.myrobogals_url }}{% endif %}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />
-		{% trans "Started" %} {{ topic.created_on_local|date:_("Y-m-d H:i") }}<br />
+		{% trans "Started" %} {{ topic.created_on_local|date:_("DATETIME_FORMAT") }}<br />
 		{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		{{topic.forum.name}}<br />
 		{{topic.forum.category.get_full_name}}</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_local|date:_("Y-m-d H:i") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_local|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 	</tr>
 	{% endfor %}
 	<tr><td colspan="4"></td></tr>

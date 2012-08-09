@@ -51,16 +51,24 @@
 	{% for post in posts.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		{% if post.0 %}
-		<td style="border-right: solid 1px grey;" rowspan="2"><a href="/profile/{{post.1.posted_by.username}}/">{{ post.1.posted_by.get_full_name }}</a><br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
+		<td valign="top" style="border-right: solid 1px grey;" rowspan="2"><a href="/profile/{{post.1.posted_by.username}}/">{{ post.1.posted_by.get_full_name }}</a>
+		{% for cur_position in post.1.posted_by.cur_positions %}
+		<br />({{cur_position.positionType}})
+		{% endfor %}
+		<br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
 		{% else %}
-		<td style="border-right: solid 1px grey;" rowspan="2">{{ post.1.posted_by.get_full_name }}</td>
+		<td valign="top" style="border-right: solid 1px grey;" rowspan="2">{{ post.1.posted_by.get_full_name }}
+		{% for cur_position in post.1.posted_by.cur_positions %}
+		<br />({{cur_position.positionType}})
+		{% endfor %}
+		</td>
 		{% endif %}
-		<td style="border-bottom: solid 1px grey;">{{post.1.created_on_local|date:_("Y-m-d H:i")}}{% if post.1.updated_on %} | {% trans "Last edited by" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on_local|date:_("Y-m-d H:i")}}){% endif %}</td>
+		<td style="border-bottom: solid 1px grey;">{{post.1.created_on_local|date:_("DATETIME_FORMAT")}}{% if post.1.updated_on %} | {% trans "Last edit:" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on_local|date:_("DATETIME_FORMAT")}}){% endif %}</td>
 		{% if user.is_superuser %}
 			{% ifequal forloop.counter 1 %}
-		<td rowspan="3" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/{{chapterHome.myrobogals_url}}/forum/{{forum.pk}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		<td rowspan="3" valign="top" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/{{chapterHome.myrobogals_url}}/forum/{{forum.pk}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 			{% else %}
-		<td rowspan="3" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/post/delete/{{post.1.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		<td rowspan="3" valign="top" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/post/delete/{{post.1.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 			{% endifequal %}
 		{% endif %}
 	</tr>
