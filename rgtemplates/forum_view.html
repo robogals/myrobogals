@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
+{% load showlocaltime %}
 {% block title %}{{chapter.name}}{% endblock %}
 
 {% block pagetitle %}{{chapter.name}}{% endblock %}
@@ -60,10 +61,10 @@
 	</tr>
 	{% for topic in topics.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/{{ chapterHome.myrobogals_url }}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on_local|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}</td>
+		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/{{ chapterHome.myrobogals_url }}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_local|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		<td><input type="checkbox" name="{{topic.pk}}" /></td>

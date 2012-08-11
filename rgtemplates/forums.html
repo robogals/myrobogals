@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
+{% load showlocaltime %}
 {% block title %}{{chapter.name}}{% endblock %}
 
 {% block pagetitle %}{{chapter.name}}{% endblock %}
@@ -21,10 +22,10 @@
 	</tr>
 	{% for forum in globExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -61,10 +62,10 @@
 	</tr>
 	{% for forum in globPubCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -101,10 +102,10 @@
 	</tr>
 	{% for forum in localExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
@@ -141,10 +142,10 @@
 	</tr>
 	{% for forum in localPubCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
+		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}">edit</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}

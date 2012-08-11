@@ -45,30 +45,6 @@ class Forum(models.Model):
 	def __unicode__(self):
 		return self.name + ' [' + self.category.get_full_name() + ']'
 
-	def tz_obj(self):
-		if self.category.chapter:
-			return self.category.chapter.timezone.tz_obj()
-		else:
-			return timezone('UTC')
-
-	def last_post_local(self):
-		if self.last_post_time:
-			if self.tz_obj() == utc:
-				return self.last_post_time
-			else:
-				return self.tz_obj().fromutc(self.last_post_time)
-		else:
-			return None
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
-
 	def number_of_topics(self):
 		return Topic.objects.filter(forum=self).count()
 
@@ -92,30 +68,6 @@ class Topic(models.Model):
 
 	def __unicode__(self):
 		return self.subject + ' {' + self.forum.__unicode__() + '}'
-
-	def tz_obj(self):
-		if self.forum.category.chapter:
-			return self.forum.category.chapter.timezone.tz_obj()
-		else:
-			return timezone('UTC')
-
-	def last_post_local(self):
-		if self.last_post_time:
-			if self.tz_obj() == utc:
-				return self.last_post_time
-			else:
-				return self.tz_obj().fromutc(self.last_post_time)
-		else:
-			return None
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
 
 	def number_of_replies(self):
 		num_post = Post.objects.filter(topic=self).count()
@@ -145,27 +97,3 @@ class Post(models.Model):
 		msg = msg.replace('\n', '\n>>')
 		msg = msg + '\n'
 		return msg
-
-	def tz_obj(self):
-		if self.topic.forum.category.chapter:
-			return self.topic.forum.category.chapter.timezone.tz_obj()
-		else:
-			return timezone('UTC')
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
-
-	def updated_on_local(self):
-		if self.updated_on:
-			if self.tz_obj() == utc:
-				return self.updated_on
-			else:
-				return self.tz_obj().fromutc(self.updated_on)
-		else:
-			return None
