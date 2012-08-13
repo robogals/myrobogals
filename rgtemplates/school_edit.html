@@ -22,7 +22,10 @@
   </tr>
   {% endif %}
   <tr>
-    <td style="vertical-align: top">{{ field.label_tag }} <span style="color: #ff0000">*</span></td>
+    <td style="vertical-align: top">{{ field.label_tag }}
+ {% if field.field.required %}
+  	<span style="color: #ff0000">*</span></td>
+	{% endif %}
     <td>{{ field }}</td>
   </tr>
 {% endfor %}

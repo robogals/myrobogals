@@ -514,8 +514,12 @@ class SchoolFormPartOne(forms.Form):
 		self.fields['name'].school_id = school_id
 
 	name = SchoolNameField(max_length=128, label=_("Name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
-	address = forms.CharField(label=_("Address"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
-
+	address_street = forms.CharField(label=_("Street"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	address_city = forms.CharField(label=_("City"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	address_state = forms.CharField(label=_("State"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	address_postcode = forms.CharField(label=_("Postcode"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	address_country = forms.ModelChoiceField(label=_("Country"), queryset=Country.objects.all(), initial='AU')
+	
 class SchoolFormPartTwo(forms.Form):
 	contact_person = forms.CharField(max_length=128, label=_("Name"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	contact_position = forms.CharField(max_length=128, label=_("Position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
@@ -548,7 +552,11 @@ def editschool(request, school_id):
 					s.creator = request.user
 				data = formpart1.cleaned_data
 				s.name = data['name']
-				s.address = data['address']
+				s.address_street = data['address_street']
+				s.address_city = data['address_city']
+				s.address_state = data['address_state']
+				s.address_postcode = data['address_postcode']
+				s.address_country = data['address_country']
 				data = formpart2.cleaned_data
 				s.contact_person = data['contact_person']
 				s.contact_position = data['contact_position']
@@ -567,7 +575,11 @@ def editschool(request, school_id):
 			else:
 				formpart1 = SchoolFormPartOne({
 					'name': s.name,
-					'address': s.address}, chapter=chapter, school_id=school_id)
+					'address_street': s.address_street,
+					'address_city': s.address_city,
+					'address_state': s.address_state,
+					'address_postcode': s.address_postcode,
+					'address_country': s.address_country.pk}, chapter=chapter, school_id=school_id)
 				formpart2 = SchoolFormPartTwo({
 					'contact_person': s.contact_person,
 					'contact_position': s.contact_position,
