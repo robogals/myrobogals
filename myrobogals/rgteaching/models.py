@@ -1,16 +1,24 @@
 from django.db import models
 from myrobogals.auth.models import Group, User
+from myrobogals.rgmain.models import Country
 from datetime import datetime
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Group)
-	address = models.TextField(blank=True)
+	address_street = models.CharField(max_length=64,blank=True)
+	address_city = models.CharField('City/Suburb',max_length=64,blank=True)
+	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'",blank=True)
+	address_postcode = models.CharField('Postcode',max_length=16,blank=True)
+	address_country = models.ForeignKey(Country, verbose_name="Country", default="AU", blank=True, null=True)
 	contact_person = models.CharField(max_length=64, blank=True)
 	contact_position = models.CharField(max_length=64, blank=True)
 	contact_email = models.CharField(max_length=64, blank=True)
 	contact_phone = models.CharField(max_length=32, blank=True)
 	notes = models.TextField(blank=True)
+
+		
+
 	
 	def __unicode__(self):
 		return self.name
