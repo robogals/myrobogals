@@ -52,7 +52,7 @@
 	{% for post in posts.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		{% if post.0 %}
-		<td valign="top" style="border-right: solid 1px grey;" rowspan="2"><a href="/profile/{{post.1.posted_by.username}}/">{{ post.1.posted_by.get_full_name }}</a>
+		<td valign="top" style="border-right: solid 1px grey;" rowspan="2"><a name="{{post.1.pk}}"></a><a href="/profile/{{post.1.posted_by.username}}/">{{ post.1.posted_by.get_full_name }}</a>
 		{% for cur_position in post.1.posted_by.cur_positions %}
 		<br />({{cur_position.positionType}})
 		{% endfor %}
@@ -79,9 +79,9 @@
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td style="border-right: solid 1px grey; border-bottom: solid 1px grey;" align="right">{{forloop.counter}}</td>
 		<td style="border-bottom: solid 1px grey;">
-		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}">{% trans "quote" %}</a>
+		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}#end">{% trans "quote" %}</a>
 		{% if post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
-		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}">{% trans "edit" %}</a>
+		<a href="/forums/{{chapterHome.myrobogals_url}}/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}#{{post.1.pk}}">{% trans "edit" %}</a>
 		{% if user.is_superuser and forloop.counter == 1 %}
 		{% trans "Deleting head post will result in the deletion of the whole topic!" %}
 		{% endif %}
@@ -113,7 +113,7 @@
 {% if not editPost %}
 <form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST">
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="border-top:solid 1px grey;">
-    <td valign="top"><strong>{% trans "Message:" %}</strong></td>
+    <td valign="top"><a name="end"></a><strong>{% trans "Message:" %}</strong></td>
     <td>{{ postform.message }}</td>
 	{% if user.is_superuser %}
 	<td></td>

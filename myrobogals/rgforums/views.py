@@ -298,7 +298,7 @@ def viewforum(request, chapterurl, forum_id):
 	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 		topicform = NewTopicForm(None)
 		topics_list = f.topic_set.all()
-		paginator = Paginator(topics_list, 6)
+		paginator = Paginator(topics_list, 10)
 		page = request.GET.get('page')
 		try:
 			topics = paginator.page(page)
@@ -492,7 +492,7 @@ def viewtopic(request, chapterurl, topic_id):
 					posts_list.append((False, post))
 				else:
 					posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-		paginator = Paginator(posts_list, 6)
+		paginator = Paginator(posts_list, 10)
 		page = request.GET.get('page')
 		try:
 			posts = paginator.page(page)
