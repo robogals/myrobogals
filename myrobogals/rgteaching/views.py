@@ -512,11 +512,16 @@ class SchoolFormPartOne(forms.Form):
 		super(SchoolFormPartOne, self).__init__(*args, **kwargs)
 		self.fields['name'].chapter = chapter
 		self.fields['name'].school_id = school_id
+		self.fields['address_state'].initial = chapter.state
+		if chapter.country:
+			self.fields['address_country'].initial = chapter.country.pk
+		else:
+			self.fields['address_country'].initial = 'AU'
 
 	name = SchoolNameField(max_length=128, label=_("Name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	address_street = forms.CharField(label=_("Street"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	address_city = forms.CharField(label=_("City"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
-	address_state = forms.CharField(label=_("State"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	address_state = forms.CharField(label=_("State"), required=True, widget=forms.TextInput(attrs={'size': '30'}),  help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
 	address_postcode = forms.CharField(label=_("Postcode"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	address_country = forms.ModelChoiceField(label=_("Country"), queryset=Country.objects.all(), initial='AU')
 	

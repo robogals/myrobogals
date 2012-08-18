@@ -7,7 +7,7 @@ class EventAttendeeAdmin(admin.TabularInline):
 	extra = 10
 
 class SchoolAdmin(admin.ModelAdmin):
-	list_display = ('name', 'chapter', 'contact_person')
+	list_display = ('name', 'chapter', 'contact_person', 'address_state', 'address_country')
 	search_fields = ('name', 'chapter', 'contact_person', 'contact_email', 'address')
 
 class SchoolVisitAdmin(admin.ModelAdmin):

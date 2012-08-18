@@ -26,7 +26,7 @@
  {% if field.field.required %}
   	<span style="color: #ff0000">*</span></td>
 	{% endif %}
-    <td>{{ field }}</td>
+    <td>{{ field }}{% if field.help_text %}<br /><span style="font-size: 8pt">{{field.help_text}}</span>{% endif %}</td>
   </tr>
 {% endfor %}
   <tr>

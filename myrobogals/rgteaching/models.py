@@ -6,9 +6,9 @@ from datetime import datetime
 class School(models.Model):
 	name = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Group)
-	address_street = models.CharField(max_length=64,blank=True)
+	address_street = models.CharField(max_length=128,blank=True)
 	address_city = models.CharField('City/Suburb',max_length=64,blank=True)
-	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'",blank=True)
+	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
 	address_postcode = models.CharField('Postcode',max_length=16,blank=True)
 	address_country = models.ForeignKey(Country, verbose_name="Country", default="AU")
 	contact_person = models.CharField(max_length=64, blank=True)
