@@ -113,7 +113,7 @@
 		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
 		<td>{{ forum.num_topics }}</td>
 		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{% showlocaltime forum.last_post_time request.user.timezone "Y-m-d H:i" %}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}

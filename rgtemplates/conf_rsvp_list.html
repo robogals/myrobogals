@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}RSVPs for {{conf.name}}{% endblock %}
+
+{% block pagetitle %}RSVPs for {{conf.name}}{% endblock %}
+
+{% block content %}
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
+    <td><strong>{% trans "Name" %}</strong></td>
+{% if request.user.is_superuser %}
+    <td><strong>{% trans "Chapter" %}</strong></td>
+{% endif %}
+    <td><strong>{% trans "Total cost" %}</strong></td>
+    <td><strong>{% trans "Balance owing" %}</strong></td>
+    <td> </td>
+    <td> </td>
+  </tr>
+{% for ca in cas %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>{{ca.first_name}} {{ca.last_name}}</td>
+{% if request.user.is_superuser %}
+    <td>{{ca.user.chapter}}</td>
+{% endif %}
+    <td>{{ca.total_cost_formatted|default_if_none:"nil"}}</td>
+    <td>{{ca.balance_owing_formatted|default_if_none:""}}</td>
+    <td><a href="/conferences/{{conf.pk}}/{{ca.user.username}}/rsvp/">{% trans "Edit RSVP" %}</a></td>
+    <td><a href="/conferences/{{conf.pk}}/{{ca.user.username}}/invoice/">{% trans "View Invoice" %}</a></td>
+  </tr>
+{% endfor %}
+</table>
+<p>
+<form action="/conferences/{{conf.pk}}/" method="GET">
+To add a new RSVP, enter that person's myRobogals username: <input type="text" name="username"> <input type="submit" value="Submit">
+</form>
+</p>
+{% endblock %}

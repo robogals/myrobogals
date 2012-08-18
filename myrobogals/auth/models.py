@@ -342,7 +342,7 @@ class User(models.Model):
     is_superuser = models.BooleanField('Superuser access', default=False, help_text="Designates that this user is able to access superuser functions on the site, and ALL functions in the Global Admin Panel.")
     last_login = models.DateTimeField('Last login', default=datetime.datetime.now)
     date_joined = models.DateTimeField('Date joined', default=datetime.datetime.now)
-    chapter = models.ForeignKey(Group, related_name='rgchapter')
+    chapter = models.ForeignKey(Group, related_name='rgchapter', default=1)
     user_permissions = models.ManyToManyField(Permission, verbose_name='Django user permissions', blank=True, help_text="Allow access to individual functions in the Global Admin Panel. The user must have exec access for this to work. Don't change this unless you really know what you're doing!")
     alt_email = models.EmailField('Alternate e-mail address', blank=True)
     dob = models.DateField(null=True, blank=True)

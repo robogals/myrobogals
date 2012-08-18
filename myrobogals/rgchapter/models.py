@@ -50,7 +50,9 @@ class Award(models.Model):
 		
 REGION_CHOICES = (
 	(0, 'Australia & New Zealand'),
-	(1, 'UK & Europe')
+	(1, 'UK & Europe'),
+	(2, 'Asia Pacific'),
+	(3, 'North America'),
 )
 
 class AwardRecipient(models.Model):

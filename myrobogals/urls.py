@@ -95,6 +95,10 @@ urlpatterns = patterns('',
 	(r'^messages/newsletters/(?P<newsletter_id>\d+)/import/$', 'rgmessages.views.importsubscribers'),
 	(r'^messages/newsletters/(?P<newsletter_id>\d+)/import/help/$', 'rgmessages.views.importsubscribershelp'),
 	(r'^messages/history/$', 'rgmessages.views.msghistory'),
+	(r'^conferences/$', 'rgconf.views.home'),
+	(r'^conferences/(?P<conf_id>\d+)/$', 'rgconf.views.rsvplist'),
+	(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/rsvp/$', 'rgconf.views.editrsvp'),
+	(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/invoice/$', 'rgconf.views.showinvoice'),
 	(r'^credits/$', 'rgmain.views.credits'),
 	(r'^support/$', 'rgmain.views.support'),
 	(r'^wiki/$', 'rgmain.views.wiki'),
@@ -108,7 +112,6 @@ urlpatterns = patterns('',
 	(r'^progress/$', 'rgchapter.views.progresschapter'),
 	(r'^delete/user/(?P<userpk>\d+)/$', 'rgprofile.views.deleteuser'),
 	(r'^tinymce/', include('tinymce.urls')),
-	#(r'^site_media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': '/myRobogals/robogals/rgmedia/'})
 )
 
 if settings.DEBUG:

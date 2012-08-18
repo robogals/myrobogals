@@ -10,16 +10,13 @@ class School(models.Model):
 	address_city = models.CharField('City/Suburb',max_length=64,blank=True)
 	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'",blank=True)
 	address_postcode = models.CharField('Postcode',max_length=16,blank=True)
-	address_country = models.ForeignKey(Country, verbose_name="Country", default="AU", blank=True, null=True)
+	address_country = models.ForeignKey(Country, verbose_name="Country", default="AU")
 	contact_person = models.CharField(max_length=64, blank=True)
 	contact_position = models.CharField(max_length=64, blank=True)
 	contact_email = models.CharField(max_length=64, blank=True)
 	contact_phone = models.CharField(max_length=32, blank=True)
 	notes = models.TextField(blank=True)
 
-		
-
-	
 	def __unicode__(self):
 		return self.name
 
@@ -90,15 +87,11 @@ class SchoolVisit(Event):
 	class Meta:
 		ordering = ['-visit_start']
 
-
 class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
 	date = models.DateTimeField()
 	message = models.TextField("RSVP Message")
-	
-	#def asdate(self):
-	#	return datetime.strptime(self.date, '%Y-%m-%d %H:%M')
 
 class TrainingSession(Event):
 	def __unicode__(self):
