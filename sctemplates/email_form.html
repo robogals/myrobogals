@@ -19,6 +19,16 @@
     <td>{{ emailform.to }}</td>
   </tr>
 
+  {% if emailform.entry_year.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in emailform.entry_year.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td valign="top" style="width: 70px"><strong>Entry year:</strong></td>
+    <td>{{ emailform.entry_year }}</td>
+  </tr>
+
   {% if emailform.from_name.errors %}
   <tr>
     <td colspan="2"><div class="error">{% for error in emailform.from_name.errors %}{{error}}{% endfor %}</div></td>

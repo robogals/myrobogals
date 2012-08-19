@@ -4,9 +4,11 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django import forms
-from reg.models import JosDonations, JosDonate
+from scichal.reg.models import JosDonations, JosDonate
+from scichal.sc.models import Entrant
 import re
 import MySQLdb
+from datetime import date
 
 @login_required
 def list(request):
@@ -14,13 +16,20 @@ def list(request):
 	return render_to_response('list.html', {'entrants': entrants}, context_instance=RequestContext(request))
 
 class WriteEmailForm(forms.Form):
-	to = forms.ChoiceField(choices=((0,"Registered but not paid"),(1,"Registered and paid, but not submitted"),(2,"Registered, paid and submitted")))
+	to = forms.ChoiceField(choices=(
+		(0,"OLD SYSTEM: Registered but not paid"),
+		(1,"OLD SYSTEM: Registered and paid, but not submitted"),
+		(2,"OLD SYSTEM: Registered, paid and submitted"),
+		(3,"NEW SYSTEM: Registered but not submitted"),
+		(4,"NEW SYSTEM: Registered and submitted"),
+	), initial=3)
 	from_name = forms.CharField(max_length=256)
 	from_address = forms.CharField(max_length=256)
 	reply_address = forms.CharField(max_length=256)
 	subject = forms.CharField(max_length=256)
 	body = forms.CharField(widget=forms.Textarea)
 	html = forms.BooleanField(required=False)
+	entry_year = forms.CharField(initial=str(date.today().year))
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -76,23 +85,26 @@ def send_email(request):
 			email_id = c.lastrowid
 			
 			# Add recipients
-			if int(data['to']) == 0:
+			action_id = int(data['to'])
+			
+			if action_id == 0:
 				entrants = JosDonations.objects.filter(xaction_result = 'PENDING')
-			elif (int(data['to']) == 1 or int(data['to']) == 2):
+			elif action_id == 1 or action_id == 2:
 				entrants = JosDonations.objects.filter(xaction_result = 'Completed ')
+			elif action_id == 3 or action_id == 4:
+				entrants = Entrant.objects.filter(entry_year=int(data['entry_year']))
 			else:
 				entrants = JosDonations.objects.none()
 			
-			if int(data['to']) == 2:
+			if action_id == 2 or action_id == 4:
 				submitted = 1    # Only take submitted
-			elif int(data['to']) == 1:
+			elif action_id == 1 or action_id == 3:
 				submitted = 0    # Only take non-submitted
 			else:
 				submitted = -1   # Don't care
 	
 			sentto = 0
 			for e in entrants:
-				print str(e)
 				if submitted == 1:
 					if not e.has_submitted():
 						continue
@@ -194,7 +206,7 @@ def mark_paid(request, entrant_id):
 	c.execute("UPDATE rgmessages_emailmessage SET `status` = 0 WHERE `id` = " + str(email_id))
 	e.xaction_result = 'Completed '
 	e.save()
-	return HttpResponseRedirect('/admin/reg/josdonations/')
+	return HttpResponseRedirect('/admin/sc/entrant/')
 
 def home(request):
-	return HttpResponseRedirect('/admin/reg/josdonations/')
+	return HttpResponseRedirect('/admin/sc/entrant/')
