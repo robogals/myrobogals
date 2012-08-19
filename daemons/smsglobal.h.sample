@@ -10,7 +10,7 @@
 /* SMSGlobal gateway details */
 #define SMSGLOBAL_SMS_URL "https://www.smsglobal.com/http-api.php"
 #define SMSGLOBAL_SMS_USER "robogals"
-#define SMSGLOBAL_SMS_PASS "f83gsr4"
+#define SMSGLOBAL_SMS_PASS "password_goes_here"
 
 /* Check SSL certificate of gateway? */
 #define SMSGLOBAL_SMS_CHECK_CERT 1
