@@ -1,5 +1,6 @@
 myrobogals/settings.py
 scichal/settings.py
+daemons/smsglobal.h
 daemons/rgsmsd
 rgmedia/unipics
 tags
