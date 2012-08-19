@@ -1,4 +1,8 @@
 myrobogals/settings.py
+scichal/settings.py
+daemons/rgsmsd
+rgmedia/unipics
 tags
 *.swp
 *.pyc
+*.o
