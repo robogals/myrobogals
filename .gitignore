@@ -1,4 +1,5 @@
 myrobogals/settings.py
+myrobogals/myrobogals
 scichal/settings.py
 daemons/smsglobal.h
 daemons/rgsmsd
