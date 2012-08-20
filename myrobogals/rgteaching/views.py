@@ -816,7 +816,8 @@ class ReportSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Report start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
 	end_date = forms.DateField(label='Report end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
 	visit_type = forms.ChoiceField(choices=VISIT_TYPES_REPORT, required=True, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % '/teaching/statshelp/')
-
+	printview = forms.BooleanField(label='Show printable version', required=False)
+	
 def xint(n):
 	if n is None:
 		return 0
@@ -942,10 +943,12 @@ def report_global(request):
 	if  not request.user.is_superuser:
 		raise Http404
 	warning = ''
+	printview = False
 	if request.method == 'POST':
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
 			formdata = theform.cleaned_data
+			printview = formdata['printview']
 			chapter_totals = {}
 			region_totals = {}
 			global_totals = {}
@@ -1013,4 +1016,7 @@ def report_global(request):
 		chapter_totals = {}
 		region_totals = {}
 		global_totals = {}
-	return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
+	if printview:
+		return render_to_response('print_report.html',{'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
+	else:
+		return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
