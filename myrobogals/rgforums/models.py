@@ -33,8 +33,8 @@ from myrobogals.auth.models import Group, User
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
-	chapter = models.ForeignKey(Group, null=True)
-	exec_only = models.BooleanField(default=False)
+	chapter = models.ForeignKey(Group, blank=True, null=True)
+	exec_only = models.BooleanField("For executives only", default=False)
 	created_on = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -43,7 +43,7 @@ class Category(models.Model):
 		ordering = ['created_on']
 
 	def __unicode__(self):
-		return self.name
+		return self.get_full_name()
 
 	def get_full_name(self):
 		if self.chapter:
@@ -59,13 +59,11 @@ class Category(models.Model):
 class Forum(models.Model):
 	name = models.CharField('Name', max_length=80)
 	description = models.TextField(default = '')
-	category = models.ForeignKey(Category, null=False)
+	category = models.ForeignKey(Category)
 	created_on = models.DateTimeField(auto_now_add=True)
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
-	num_topics = models.IntegerField(default = 0)
-	num_posts = models.IntegerField(default = 0)
 	last_post_time = models.DateTimeField(blank=True, null=True)
-	last_post_user = models.ForeignKey(User, null=True, related_name='forum_last_post_user')
+	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
 
 	class Meta:
 		verbose_name = "Forum"
@@ -73,42 +71,23 @@ class Forum(models.Model):
 		ordering = ['created_on']
 
 	def __unicode__(self):
-		return self.name
+		return self.name + ' [' + self.category.get_full_name() + ']'
 
-	def tz_obj(self):
-		if self.category.chapter:
-			return self.category.chapter.timezone.tz_obj()
-		else:
-			return timezone('UTC')
+	def number_of_topics(self):
+		return Topic.objects.filter(forum=self).count()
 
-	def last_post_local(self):
-		if self.last_post_time:
-			if self.tz_obj() == utc:
-				return self.last_post_time
-			else:
-				return self.tz_obj().fromutc(self.last_post_time)
-		else:
-			return None
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
+	def number_of_posts(self):
+		return Post.objects.filter(topic__forum=self).count()
 
 class Topic(models.Model):
 	forum = models.ForeignKey(Forum)
 	posted_by = models.ForeignKey(User, related_name='topic_posted_by')
 	subject = models.CharField(max_length=80)
-	num_views = models.IntegerField(default=0)
-	num_replies = models.PositiveSmallIntegerField(default=0)
+	num_views = models.IntegerField("Number of views", default=0)
 	created_on = models.DateTimeField(auto_now_add=True)
 	last_post_time = models.DateTimeField(blank=True, null=True)
-	last_post_user = models.ForeignKey(User, null=True, related_name='topic_last_post_user')
-	sticky = models.BooleanField(default=False)
+	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
+	sticky = models.BooleanField("Set sticky", default=False)
 
 	class Meta:
 		verbose_name = "Topic"
@@ -116,31 +95,14 @@ class Topic(models.Model):
 		ordering = ['-sticky', 'created_on']
 
 	def __unicode__(self):
-		return self.subject
+		return self.subject + ' {' + self.forum.__unicode__() + '}'
 
-	def tz_obj(self):
-		if self.forum.category.chapter:
-			return self.forum.category.chapter.timezone.tz_obj()
+	def number_of_replies(self):
+		num_post = Post.objects.filter(topic=self).count()
+		if num_post >= 1:
+			return num_post - 1
 		else:
-			return timezone('UTC')
-
-	def last_post_local(self):
-		if self.last_post_time:
-			if self.tz_obj() == utc:
-				return self.last_post_time
-			else:
-				return self.tz_obj().fromutc(self.last_post_time)
-		else:
-			return None
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
+			return 0
 
 class Post(models.Model):
 	topic = models.ForeignKey(Topic)
@@ -148,7 +110,7 @@ class Post(models.Model):
 	message = models.TextField()
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(blank=True, null=True)
-	edited_by = models.ForeignKey(User, null=True, related_name='post_edited_by')
+	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
 
 	class Meta:
 		verbose_name = "Post"
@@ -163,27 +125,3 @@ class Post(models.Model):
 		msg = msg.replace('\n', '\n>>')
 		msg = msg + '\n'
 		return msg
-
-	def tz_obj(self):
-		if self.topic.forum.category.chapter:
-			return self.topic.forum.category.chapter.timezone.tz_obj()
-		else:
-			return timezone('UTC')
-
-	def created_on_local(self):
-		if self.created_on:
-			if self.tz_obj() == utc:
-				return self.created_on
-			else:
-				return self.tz_obj().fromutc(self.created_on)
-		else:
-			return None
-
-	def updated_on_local(self):
-		if self.updated_on:
-			if self.tz_obj() == utc:
-				return self.updated_on
-			else:
-				return self.tz_obj().fromutc(self.updated_on)
-		else:
-			return None

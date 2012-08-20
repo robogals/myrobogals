@@ -12,6 +12,7 @@ from django.db.models.fields import PositiveIntegerField
 from myrobogals.rgmain.models import University, Country, MobileRegexCollection
 from myrobogals.rgprofile.files import get_profile_path
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
+from myrobogals import rgprofile
 from django.db import connection, transaction
 from pytz import timezone, utc
 
@@ -475,6 +476,9 @@ class User(models.Model):
            return True
         else:
            return False
+
+    def cur_positions(self):
+        return rgprofile.models.Position.objects.filter(user=self, position_date_end__isnull=True)
 
     def has_robogals_email(self):
         try:

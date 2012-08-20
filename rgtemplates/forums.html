@@ -1,74 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
+{% load showlocaltime %}
 {% block title %}{{chapter.name}}{% endblock %}
 
 {% block pagetitle %}{{chapter.name}}{% endblock %}
 
 {% block content %}
-<a href="/forums/search/">{% trans "Search" %}</a>
-
-{% if user.is_superuser %}
-<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
-<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
-<div class="module-inner">
-<h4 class="module-title">Add new category</h4>
-<form action="/forums/newcategory/" method="GET">
-{% trans "Category name:" %} <input type="text" name="category" size="34" maxlength="80">
-{% trans "Visibility:" %}
-<select name="visibility">
-<option value="">{% trans "Global" %}</option>
-<option value="{{chapter.pk}}">{% trans "Local" %}</option>
-</select>
-{% trans "Available to:" %}
-<select name="availability">
-<option value="public">{% trans "Public" %}</option>
-<option value="execonly">{% trans "Exec-Only" %}</option>
-</select>
-{% if return %}
-<input type="hidden" name="return" value="{{return}}" />
-{% endif %}
-<input type="submit" value="{% trans "Add Category" %}">
-</form>
-</div></div></div></div>
-{% endif %}
-
-<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
-<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
-<div class="module-inner">
-<h4 class="module-title">Add new forum</h4>
-<form action="/forums/newforum/" method="GET">
-<table>
-	<tr>
-		<td>{% trans "Forum name:" %}</td>
-		<td><input type="text" name="forum" maxlength="80" size="50"></td>
-	</tr>
-	<tr>
-		<td>{% trans "Description:" %}</td>
-		<td><input type="text" name="description" size="50"></td>
-	</tr>
-</table>
-{% trans "Category:" %}
-<select name="category">
-{% for globExecCategory in globExecCategories %}
-<option value="{{globExecCategory.pk}}">{{globExecCategory.get_full_name}}</option>
-{% endfor %}
-{% for globPubCategory in globPubCategories %}
-<option value="{{globPubCategory.pk}}">{{globPubCategory.get_full_name}}</option>
-{% endfor %}
-{% for localExecCategory in localExecCategories %}
-<option value="{{localExecCategory.pk}}">{{localExecCategory.get_full_name}}</option>
-{% endfor %}
-{% for localPubCategory in localPubCategories %}
-<option value="{{localPubCategory.pk}}">{{localPubCategory.get_full_name}}</option>
-{% endfor %}
-</select>
-{% if return %}
-<input type="hidden" name="return" value="{{return}}" />
-{% endif %}
-<input type="submit" value="{% trans "Add Forum" %}">
-</form>
-</div></div></div></div>
+<a href="/forums/search/{{chapter.myrobogals_url}}/">{% trans "Search" %}</a>
 
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% for globExecCategory in globExecCategories %}
@@ -83,14 +22,27 @@
 	</tr>
 	{% for forum in globExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
-		<td>{{ forum.num_topics }}</td>
-		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}#{{forum.pk}}">edit</a>{% endif %}</td>
+		<td>{{ forum.number_of_topics }}</td>
+		<td>{{ forum.number_of_posts }}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
+	{% ifequal editForum forum.pk %}
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	</tr>
+	</form>
+	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
 	<tr><td colspan="5"></td></tr>
@@ -118,6 +70,19 @@
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
+	{% ifequal editForum forum.pk %}
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	</tr>
+	</form>
+	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
 	<tr><td colspan="5"></td></tr>
@@ -137,14 +102,27 @@
 	</tr>
 	{% for forum in localExecCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
-		<td>{{ forum.num_topics }}</td>
-		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}#{{forum.pk}}">edit</a>{% endif %}</td>
+		<td>{{ forum.number_of_topics }}</td>
+		<td>{{ forum.number_of_posts }}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
+	{% ifequal editForum forum.pk %}
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	</tr>
+	</form>
+	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
 	<tr><td colspan="5"></td></tr>
@@ -164,14 +142,27 @@
 	</tr>
 	{% for forum in localPubCategory.forum_set.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on_local|date:_("Y-m-d H:i")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}</td>
-		<td>{{ forum.num_topics }}</td>
-		<td>{{ forum.num_posts }}</td>
-		<td>{{ forum.last_post_local|date:_("Y-m-d H:i") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}{% if user.is_superuser or user.is_staff %}<br /><a href="/forums/{{chapter.myrobogals_url}}/?editForumId={{forum.pk}}#{{forum.pk}}">edit</a>{% endif %}</td>
+		<td>{{ forum.number_of_topics }}</td>
+		<td>{{ forum.number_of_posts }}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
+	{% ifequal editForum forum.pk %}
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	</tr>
+	</form>
+	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
 	<tr><td colspan="5"></td></tr>
@@ -180,6 +171,89 @@
 	{% endif %}
 {% endfor %}
 </table>
+{% if user.is_superuser %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<h4 class="module-title">Add new category</h4>
+<form action="/forums/newcategory/" method="GET">
+<table>
+	<tr>
+		<td>{% trans "Category name:" %}</td> <td><input type="text" name="category" size="34" maxlength="80"></td>
+	</tr>
+	<tr>
+		<td>{% trans "Visibility:" %}</td>
+		<td>
+<select name="visibility">
+<option value="">{% trans "Global" %}</option>
+<option value="{{chapter.pk}}">{% trans "Local" %}</option>
+</select>
+</td>
+	</tr>
+	<tr>
+<td>{% trans "Available to:" %}</td>
+<td>
+<select name="availability">
+<option value="public">{% trans "Public" %}</option>
+<option value="execonly">{% trans "Exec-Only" %}</option>
+</select>
+</td>
+</tr>
+</table>
+{% if return %}
+<input type="hidden" name="return" value="{{return}}" />
+{% endif %}
+<input type="submit" value="{% trans "Add Category" %}">
+</form>
+</div></div></div></div>
+{% endif %}
+
+{% if user.is_superuser or user.is_staff %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<h4 class="module-title">Add new forum</h4>
+<form action="/forums/newforum/" method="GET">
+<table>
+	<tr>
+		<td>{% trans "Forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50"></td>
+	</tr>
+	<tr>
+		<td>{% trans "Description:" %}</td>
+		<td><input type="text" name="description" size="50"></td>
+	</tr>
+<tr>
+<td>{% trans "Category:" %}</td>
+<td>
+<select name="category">
+{% if user.is_superuser %}
+{% for globExecCategory in globExecCategories %}
+<option value="{{globExecCategory.pk}}">{{globExecCategory.get_full_name}}</option>
+{% endfor %}
+{% for globPubCategory in globPubCategories %}
+<option value="{{globPubCategory.pk}}">{{globPubCategory.get_full_name}}</option>
+{% endfor %}
+{% endif %}
+{% for localExecCategory in localExecCategories %}
+<option value="{{localExecCategory.pk}}">{{localExecCategory.get_full_name}}</option>
+{% endfor %}
+{% for localPubCategory in localPubCategories %}
+<option value="{{localPubCategory.pk}}">{{localPubCategory.get_full_name}}</option>
+{% endfor %}
+</select>
+</td>
+</tr>
+</table>
+{% if return %}
+<input type="hidden" name="return" value="{{return}}" />
+{% endif %}
+<input type="submit" value="{% trans "Add Forum" %}">
+</form>
+</div></div></div></div>
+{% endif %}
+
+
 <p>
 	{% trans "Total number of topics:" %} <strong>{{ total_num_topics }},</strong>
 	{% trans "Total number of posts:" %} <strong>{{ total_num_posts }}</strong><br />
