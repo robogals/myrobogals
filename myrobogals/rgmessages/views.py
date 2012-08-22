@@ -370,8 +370,29 @@ def emaildone(request):
 		raise Http404
 	return render_to_response('email_done.html', None, context_instance=RequestContext(request))
 
+@login_required
+def smsrecipients(request, sms_id):
+	sms = get_object_or_404(SMSMessage, pk=sms_id)
+	if (sms.sender != request.user):
+		raise Http404
+	recipients = SMSRecipient.objects.filter(message=sms)
+	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'sms', 'sms': sms, 'recipients': recipients}, context_instance=RequestContext(request))
+
+@login_required
+def emailrecipients(request, email_id):
+	email = get_object_or_404(EmailMessage, pk=email_id)
+	if (email.sender != request.user):
+		raise Http404
+	recipients = EmailRecipient.objects.filter(message=email)
+	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'email', 'email': email, 'recipients': recipients}, context_instance=RequestContext(request))
+
+@login_required
 def msghistory(request):
-	return HttpResponse(_("Message History"))
+	emailMsgsSent = EmailMessage.objects.filter(sender=request.user)
+	SMSMsgsSent = SMSMessage.objects.filter(sender=request.user)
+	emailMsgsReceived = EmailRecipient.objects.filter(user=request.user)
+	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user)
+	return render_to_response('message_history.html', {'chapter': request.user.chapter, 'emailMsgsSent': emailMsgsSent, 'SMSMsgsSent': SMSMsgsSent, 'emailMsgsReceived': emailMsgsReceived, 'SMSMsgsReceived': SMSMsgsReceived}, context_instance=RequestContext(request))
 
 def api(request):
 	if 'api' not in request.GET:
