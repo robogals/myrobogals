@@ -7,10 +7,13 @@
 {% block pagetitle %}{{chapter.name}}{% endblock %}
 
 {% block content %}
+<p>
+<a href="#emailSent">{% trans "Email Messages Sent" %}</a> | <a href="#SMSSent">{% trans "SMS Messages Sent" %}</a> | <a href="#emailReceived">{% trans "Email Messages Received" %}</a> | <a href="#SMSReceived">{% trans "SMS Messages Received" %}</a>
+</p>
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% if emailMsgsSent %}
 	<tr style="color:white; background-color:#1366A3">
-		<td colspan="2">{% trans "Email Messages Sent" %}</td>
+		<td colspan="2"><a name="emailSent"></a>{% trans "Email Messages Sent" %}</td>
 	</tr>
 	{% for emailMsgSent in emailMsgsSent %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -39,7 +42,7 @@
 {% endif %}
 {% if SMSMsgsSent %}
 	<tr style="color:white; background-color:#1366A3">
-		<td colspan="2">{% trans "SMS Messages Sent" %}</td>
+		<td colspan="2"><a name="SMSSent"></a>{% trans "SMS Messages Sent" %}</td>
 	</tr>
 	{% for SMSMsgSent in SMSMsgsSent %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -63,7 +66,7 @@
 {% endif %}
 {% if emailMsgsReceived %}
 	<tr style="color:white; background-color:#1366A3">
-		<td colspan="2">{% trans "Email Messages Received" %}</td>
+		<td colspan="2"><a name="emailReceived"></a>{% trans "Email Messages Received" %}</td>
 	</tr>
 	{% for emailMsgReceived in emailMsgsReceived %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -85,7 +88,7 @@
 {% endif %}
 {% if SMSMsgsReceived %}
 	<tr style="color:white; background-color:#1366A3">
-		<td colspan="2">{% trans "SMS Messages Received" %}</td>
+		<td colspan="2"><a name="SMSReceived"></a>{% trans "SMS Messages Received" %}</td>
 	</tr>
 	{% for SMSMsgReceived in SMSMsgsReceived %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
