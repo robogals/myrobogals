@@ -2,9 +2,9 @@
 {% load i18n %}
 {% load thous %}
 {% load showlocaltime %}
-{% block title %}{{chapter.name}}{% endblock %}
+{% block title %}{% trans "Message recipients" %}{% endblock %}
 
-{% block pagetitle %}{{chapter.name}}{% endblock %}
+{% block pagetitle %}{% trans "Message recipients" %}{% endblock %}
 
 {% block content %}
 {% ifequal msgtype "email" %}
@@ -16,18 +16,16 @@
 	</tr>
 	<tr class="odd">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td {% if recipients %}colspan="3"{% endif %}>{{ email.body|linebreaksbr }}</td>
+		<td {% if recipients %}colspan="3"{% endif %}><a href="/messages/showemail/{{email.pk}}/" target="_blank">{% trans "show" %}</a></td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="odd">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td {% if recipients %}colspan="3"{% endif %}>{{email.status_description}}
-	{% ifequal email.status 1 %}
-		&#40;{% trans "Time Sent" %}: {{email.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% if email.scheduled %}
+		&#40;{% trans "Scheduled date" %}: {{email.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{email.scheduled_date_type_description}}&#41;
 	{% else %}
-		{% if email.scheduled %}
-			&#40;{% trans "Scheduled date" %}: {{email.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#44; {{email.scheduled_date_type_description}}&#41;
-		{% endif %}
-	{% endifequal %}
+		&#40;{% trans "Time Sent" %}: {{email.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% endif %}
 		</td>
 	</tr>
 {% if recipients %}
@@ -57,13 +55,11 @@
 	<tr style="border-bottom: solid 1px grey;" class="odd">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td {% if recipients %}colspan="4"{% endif %}>{{sms.status_description}}
-	{% ifequal sms.status 1 %}
-		&#40;{% trans "Date Set" %}: {{sms.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% if sms.scheduled %}
+		&#40;{% trans "Scheduled date" %}: {{sms.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{sms.scheduled_date_type_description}}&#41;
 	{% else %}
-		{% if sms.scheduled %}
-			&#40;{% trans "Scheduled date" %}: {{sms.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#44; {{sms.scheduled_date_type_description}}&#41;
-		{% endif %}
-	{% endifequal %}
+		&#40;{% trans "Time Set" %}: {{sms.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% endif %}
 		</td>
 	</tr>
 {% if recipients %}

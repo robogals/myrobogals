@@ -10,6 +10,7 @@ from django.db.models import Q
 from myrobogals.auth.decorators import login_required
 from myrobogals.auth.models import Group, User
 from myrobogals.rgforums.models import Category, Forum, Topic, Post
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 
 @login_required
 def newcategory(request):
@@ -131,7 +132,50 @@ def editforum(request, forum_id):
 			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/')
 	else:
 		raise Http404
-	
+
+@login_required
+def watchforum(request, forum_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	f = get_object_or_404(Forum, pk=forum_id)
+	g = f.category
+	c = g.chapter
+	user = request.user
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+		f.watchers.add(user)
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/')
+	else:
+		raise Http404
+
+@login_required
+def unwatchforum(request, forum_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	f = get_object_or_404(Forum, pk=forum_id)
+	g = f.category
+	c = g.chapter
+	user = request.user
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+		f.watchers.remove(user)
+		for topic in f.topic_set.all():
+			topic.watchers.remove(user)
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/')
+	else:
+		raise Http404
 
 @login_required
 def forums(request, chapterurl):
@@ -227,6 +271,26 @@ def newtopic(request, forum_id):
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
 					f.save()
+					message = EmailMessage()
+					message.subject = 'New Topic: ' + newTopic.subject
+					message.body = 'New topic for forum "' + f.name + '" in category "' + g.name +'"\n\nTopic subject: ' + newTopic.subject + ' (started by ' + newTopic.posted_by.get_full_name() + ')\n\nTopic Message:\n' + postMessage.message
+					message.from_name = "myRobogals"
+					message.from_address = "my@robogals.org"
+					message.reply_address = "my@robogals.org"
+					message.sender = User.objects.get(pk=1692) #need to change
+					message.html = False
+					message.status = -1
+					message.email_type = 1
+					message.save()
+					for watcher in f.watchers.all():
+						recipient = EmailRecipient()
+						recipient.message = message
+						recipient.user = watcher
+						recipient.to_name = watcher.get_full_name()
+						recipient.to_address = watcher.email
+						recipient.save()
+					message.status = 0
+					message.save()
 			else:
 				request.user.message_set.create(message=unicode(_('The fields "New Topic" and "Message" can not be empty')))
 		else:
@@ -261,6 +325,59 @@ def stickytopic(request):
 			return HttpResponseRedirect('/forums/' + t.forum.category.chapter.myrobogals_url + '/forum/' + str(t.forum.pk) + '/')
 		else:
 			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(t.forum.pk) + '/')
+	else:
+		raise Http404
+
+@login_required
+def watchtopic(request, topic_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	t = get_object_or_404(Topic, pk=topic_id)
+	f = t.forum
+	g = f.category
+	c = g.chapter
+	user = request.user
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+		if not f.watchers.filter(pk=user.pk):
+			t.watchers.add(user)
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/forum/' + str(f.pk) + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(f.pk) + '/')
+	else:
+		raise Http404
+
+@login_required
+def unwatchtopic(request, topic_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	t = get_object_or_404(Topic, pk=topic_id)
+	f = t.forum
+	g = f.category
+	c = g.chapter
+	user = request.user
+	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+		if f.watchers.filter(pk=user.pk):
+			f.watchers.remove(user)
+			for topic in f.topic_set.all():
+				if topic != t:
+					topic.watchers.add(user)
+				else:
+					topic.watchers.remove(user)
+		else:
+			t.watchers.remove(user)
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		elif c:
+			return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/forum/' + str(f.pk) + '/')
+		else:
+			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(f.pk) + '/')
 	else:
 		raise Http404
 
@@ -401,6 +518,27 @@ def newpost(request, topic_id):
 				f.last_post_time = datetime.datetime.now()
 				f.last_post_user = user
 				f.save()
+				message = EmailMessage()
+				message.subject = 'New Post for topic "' + t.subject + '"'
+				message.body = 'New post for topic "' + t.subject + '" for forum "' + f.name + '" in category "' + g.name + '"\n\nPost message: (posted by ' + postMessage.posted_by.get_full_name() + ')\n' + postMessage.message
+				message.from_name = "myRobogals"
+				message.from_address = "my@robogals.org"
+				message.reply_address = "my@robogals.org"
+				message.sender = User.objects.get(pk=1692) #need to change
+				message.html = False
+				message.status = -1
+				message.email_type = 1
+				message.save()
+				for watcher in (f.watchers.all() | t.watchers.all()).distinct():
+					print watcher.get_full_name()
+					recipient = EmailRecipient()
+					recipient.message = message
+					recipient.user = watcher
+					recipient.to_name = watcher.get_full_name()
+					recipient.to_address = watcher.email
+					recipient.save()
+				message.status = 0
+				message.save()
 			else:
 				request.user.message_set.create(message=unicode(_('The fields "Message" can not be empty')))
 		else:

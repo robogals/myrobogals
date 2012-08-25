@@ -375,23 +375,32 @@ def smsrecipients(request, sms_id):
 	sms = get_object_or_404(SMSMessage, pk=sms_id)
 	if (sms.sender != request.user):
 		raise Http404
-	recipients = SMSRecipient.objects.filter(message=sms)
+	recipients = SMSRecipient.objects.filter(message=sms).order_by('user__chapter')
 	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'sms', 'sms': sms, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
 def emailrecipients(request, email_id):
 	email = get_object_or_404(EmailMessage, pk=email_id)
-	if (email.sender != request.user):
+	if (email.sender != request.user) or (email.email_type != 0):
 		raise Http404
-	recipients = EmailRecipient.objects.filter(message=email)
+	recipients = EmailRecipient.objects.filter(message=email).order_by('user__chapter')
 	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'email', 'email': email, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
+def showemail(request, email_id):
+	email = get_object_or_404(EmailMessage, pk=email_id)
+	if (email.sender != request.user) and (not EmailRecipient.objects.filter(user=request.user, message=email)):
+		raise Http404
+	if email.email_type != 0:
+		raise Http404
+	return render_to_response('email_show.html', {'chapter': request.user.chapter, 'email': email}, context_instance=RequestContext(request))
+
+@login_required
 def msghistory(request):
-	emailMsgsSent = EmailMessage.objects.filter(sender=request.user)
-	SMSMsgsSent = SMSMessage.objects.filter(sender=request.user)
-	emailMsgsReceived = EmailRecipient.objects.filter(user=request.user)
-	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user)
+	emailMsgsSent = EmailMessage.objects.filter(sender=request.user, email_type=0).order_by('-date')
+	SMSMsgsSent = SMSMessage.objects.filter(sender=request.user).order_by('-date')
+	emailMsgsReceived = EmailRecipient.objects.filter(user=request.user, message__email_type=0).order_by('-scheduled_date')
+	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user).order_by('-scheduled_date')
 	return render_to_response('message_history.html', {'chapter': request.user.chapter, 'emailMsgsSent': emailMsgsSent, 'SMSMsgsSent': SMSMsgsSent, 'emailMsgsReceived': emailMsgsReceived, 'SMSMsgsReceived': SMSMsgsReceived}, context_instance=RequestContext(request))
 
 def api(request):

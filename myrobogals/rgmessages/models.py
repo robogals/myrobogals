@@ -21,6 +21,11 @@ class EmailMessage(models.Model):
 		(2, 'Recipient\'s timezone'),
 	)
 
+	TYPE = (
+		(0, 'Normal'),
+		(1, 'Forum'),
+	)
+
 	subject = models.CharField("Subject", max_length=256)
 	body = models.TextField("Message Body")
 	from_name = models.CharField("From Name", max_length=64)
@@ -33,6 +38,7 @@ class EmailMessage(models.Model):
 	scheduled = models.BooleanField("Scheduled", blank=True)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
+	email_type = models.IntegerField("Email type", choices=TYPE, default=0)
 	
 	def status_description(self):
 		for status_code in self.STATUS_CODES_MSG:
