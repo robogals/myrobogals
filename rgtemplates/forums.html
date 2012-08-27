@@ -31,17 +31,25 @@
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	<table>
+	<tr>
+		<td>{% trans "new forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	<tr>
+		<td>{% trans "new description:" %}</td>
+		<td><input type="text" name="description" size="50" value="{{forum.description}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	<tr>
+		<td colspan="2"><input type="submit" value="Edit Forum" /></td>
 	</tr>
+	</table>
 	</form>
+	</td>
+	</tr>
 	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
@@ -71,17 +79,25 @@
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="5">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	<table>
+	<tr>
+		<td>{% trans "new forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	<tr>
+		<td>{% trans "new description:" %}</td>
+		<td><input type="text" name="description" size="50" value="{{forum.description}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	<tr>
+		<td colspan="2"><input type="submit" value="Edit Forum" /></td>
 	</tr>
+	</table>
 	</form>
+	</td>
+	</tr>
 	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
@@ -111,17 +127,25 @@
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="{% if user.is_superuser %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	<table>
+	<tr>
+		<td>{% trans "new forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	<tr>
+		<td>{% trans "new description:" %}</td>
+		<td><input type="text" name="description" size="50" value="{{forum.description}}" /></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	<tr>
+		<td colspan="2"><input type="submit" value="Edit Forum" /></td>
 	</tr>
+	</table>
 	</form>
+	</td>
+	</tr>
 	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}
@@ -151,17 +175,25 @@
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	<td colspan="{% if user.is_superuser %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new forum name:" %}<input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
+	<table>
+	<tr>
+		<td>{% trans "new forum name:" %}</td>
+		<td><input type="text" name="forum" maxlength="80" size="50" value="{{forum.name}}"></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="5">{% trans "new description:" %}&nbsp;<input type="text" name="description" size="50" value="{{forum.description}}"></td>
+	<tr>
+		<td>{% trans "new description:" %}</td>
+		<td><input type="text" name="description" size="50" value="{{forum.description}}"></td>
 	</tr>
-	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td colspan="5"><input type="submit" value="Edit Forum" /></td>
+	<tr>
+		<td colspan="2"><input type="submit" value="Edit Forum" /></td>
 	</tr>
+	</table>
 	</form>
+	</td>
+	</tr>
 	{% endifequal %}
 	{% endfor %}
 	{% if user.is_superuser %}

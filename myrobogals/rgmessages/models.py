@@ -35,7 +35,16 @@ class EmailMessage(models.Model):
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	
 	def status_description(self):
-		return STATUS_CODES_MSG[self.status]
+		for status_code in self.STATUS_CODES_MSG:
+			if self.status == status_code[0]:
+				return status_code[1]
+		return 'Status unknown'
+
+	def scheduled_date_type_description(self):
+		for scheduled_type in self.SCHEDULED_DATE_TYPES:
+			if self.scheduled_date_type == scheduled_type[0]:
+				return scheduled_type[1]
+		return 'Scheduled type unknown'
 	
 	def __unicode__(self):
 		return self.subject
@@ -82,7 +91,10 @@ class EmailRecipient(models.Model):
 			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
 
 	def status_description(self):
-		return STATUS_CODES_RECIPIENT[self.status]
+		for status_code in self.STATUS_CODES_RECIPIENT:
+			if self.status == status_code[0]:
+				return status_code[1]
+		return 'Status unknown'
 	
 	def __unicode__(self):
 		return self.to_address
@@ -182,8 +194,17 @@ class SMSMessage(models.Model):
 			self.split = 1
 	
 	def status_description(self):
-		return SMS_STATUS_CODES_MSG[self.status]
+		for status_code in self.SMS_STATUS_CODES_MSG:
+			if self.status == status_code[0]:
+				return status_code[1]
+		return 'Status unknown'
 		
+	def scheduled_date_type_description(self):
+		for scheduled_type in self.SCHEDULED_DATE_TYPES:
+			if self.scheduled_date_type == scheduled_type[0]:
+				return scheduled_type[1]
+		return 'Scheduled type unknown'
+	
 	def credits_used(self):
 		return self.smsrecipient_set.count() * self.split
 	
@@ -282,6 +303,12 @@ class SMSRecipient(models.Model):
 			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
 			scheduled_date_utc = scheduled_date_local.astimezone(utc)
 			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+
+	def gateway_description(self):
+		for gateway in self.SMS_GATEWAYS:
+			if self.gateway == gateway[0]:
+				return gateway[1]
+		return 'Gateway unknown'
 
 	def status_description(self):
 		if self.status == 11 or self.status == 13:
