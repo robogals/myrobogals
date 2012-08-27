@@ -366,6 +366,7 @@ def mobverify(request):
 			recipient = SMSRecipient()
 			recipient.message = message
 			recipient.user = request.user
+			request.session['mobile'] = request.user.mobile
 			recipient.to_number = request.user.mobile
 			recipient.save()
 
@@ -385,7 +386,6 @@ def mobverify(request):
 			message.status = 0
 			message.save()
 			request.session['verif_code'] = verif_code
-			request.session['mobile'] = request.user.mobile
 			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
 		else:
 			msg = 'Verification failed: no mobile number entered. (Profile -> Edit Profile)'
