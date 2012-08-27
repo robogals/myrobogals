@@ -146,6 +146,11 @@ class SMSMessage(models.Model):
 		(2, 'Recipient\'s timezone'),
 	)
 
+	TYPE = (
+		(0, 'Normal'),
+		(1, 'Mobile verification'),
+	)
+
 	body = models.TextField("Message body")
 	senderid = models.CharField("Sender ID", max_length=32)
 	sender = models.ForeignKey(User)
@@ -157,6 +162,7 @@ class SMSMessage(models.Model):
 	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
+	sms_type = models.IntegerField("SMS type", choices=TYPE, default=0)
 
 	def validate(self):
 		if validate_sms_chars(self.body):

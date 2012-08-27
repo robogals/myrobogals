@@ -74,6 +74,9 @@
 	{% else %}
 		&#40;{% trans "Time Set" %}: {{SMSMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
 	{% endif %}
+	{% if SMSMsgSent.senderid %}
+	&#40;{% trans "From" %}: {{SMSMsgSent.senderid}}&#41;
+	{% endif %}
 		<br /><a href="/messages/smsrecipients/{{SMSMsgSent.pk}}/">{% trans "Recipients" %}</a>
 		</td>
 	</tr>
@@ -114,6 +117,9 @@
 		<td valign="top"  style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{SMSMsgReceived.status_description}}
 			&#40;{% trans "Scheduled date" %}: {{SMSMsgReceived.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		{% if SMSMsgReceived.message.senderid %}
+		&#40;{% trans "From" %}: {{SMSMsgReceived.message.senderid}}&#41;
+		{% endif %}
 		</td>
 	</tr>
 	{% endfor %}

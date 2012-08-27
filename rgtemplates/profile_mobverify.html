@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% load showlocaltime %}
+
+{% block title %}Mobile Verification{% endblock %}
+
+{% block pagetitle %}Mobile Verification{% endblock %}
+
+{% block content %}
+<p>
+A verification code will be sent to your mobile number (Profile &ndash;&gt; Edit Profile). Please enter the code below:
+</p>
+<form action="/profile/mobverify/" method="POST">
+<p style="clear: both; font-size: 200%;">
+<input type="submit" value="{% trans "submit" %}">
+<input type="text" name="verif_code" size="34" maxlength="80">
+</p>
+</form>
+{% endblock %}

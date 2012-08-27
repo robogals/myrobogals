@@ -219,6 +219,11 @@ class WriteSMSForm(forms.Form):
 		else:
 			self.fields['recipients'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, mobile_marketing_optin=True).exclude(mobile='').order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
+		if user.mobile_verified:
+			self.fields['from_type'].choices = (
+				(0,"+61 429 558 100"),
+				(1, user.mobile),
+			)
 		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 
@@ -241,7 +246,10 @@ def writesms(request):
 				message.body = data['body']
 				message.sender = request.user
 				message.chapter = request.user.chapter
-				message.senderid = '61429558100'
+				if int(data['from_type']) == 0:
+					message.senderid = '61429558100'
+				elif int(data['from_type']) == 1:
+					message.senderid = str(request.user.mobile)
 				if request.POST['scheduling'] == '1':
 					message.scheduled = True
 					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
@@ -398,9 +406,9 @@ def showemail(request, email_id):
 @login_required
 def msghistory(request):
 	emailMsgsSent = EmailMessage.objects.filter(sender=request.user, email_type=0).order_by('-date')
-	SMSMsgsSent = SMSMessage.objects.filter(sender=request.user).order_by('-date')
+	SMSMsgsSent = SMSMessage.objects.filter(sender=request.user, sms_type=0).order_by('-date')
 	emailMsgsReceived = EmailRecipient.objects.filter(user=request.user, message__email_type=0).order_by('-scheduled_date')
-	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user).order_by('-scheduled_date')
+	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user, message__sms_type=0).order_by('-scheduled_date')
 	return render_to_response('message_history.html', {'chapter': request.user.chapter, 'emailMsgsSent': emailMsgsSent, 'SMSMsgsSent': SMSMsgsSent, 'emailMsgsReceived': emailMsgsReceived, 'SMSMsgsReceived': SMSMsgsReceived}, context_instance=RequestContext(request))
 
 def api(request):

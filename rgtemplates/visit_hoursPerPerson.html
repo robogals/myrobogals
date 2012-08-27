@@ -11,7 +11,7 @@
 		<col width="75px" />
 		<tr class="even" style="text-align: center;">
 			<td></td>
-			<td>Hours</td>
+			<td>{% trans "Hours" %}</td>
 		</tr>
 		{% for attendedUser in attended %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
