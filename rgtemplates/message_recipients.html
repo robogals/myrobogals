@@ -16,7 +16,13 @@
 	</tr>
 	<tr class="odd">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td {% if recipients %}colspan="3"{% endif %}>{{ email.body|linebreaksbr }}</td>
+		<td {% if recipients %}colspan="3"{% endif %}>
+		{% if email.html %}
+		Link to other page here
+		{% else %}
+		{{ email.body|linebreaksbr }}
+		{% endif %}
+		</td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="odd">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
