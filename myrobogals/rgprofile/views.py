@@ -367,7 +367,7 @@ def mobverify(request):
 			recipient.message = message
 			recipient.user = request.user
 			request.session['mobile'] = request.user.mobile
-			recipient.to_number = request.user.mobile
+			recipient.to_number = request.session['mobile']
 			recipient.save()
 
 			# Check that we haven't used too many credits
