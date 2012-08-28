@@ -372,9 +372,9 @@ def watchtopicwithmyposts(request):
 	elif 'return' in request.POST:
 		return HttpResponseRedirect(request.POST['return'])
 	elif c:
-		return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/forum/' + str(f.pk) + '/')
+		return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/')
 	else:
-		return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(f.pk) + '/')
+		return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/')
 
 
 @login_required
