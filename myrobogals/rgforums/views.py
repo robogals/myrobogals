@@ -271,26 +271,28 @@ def newtopic(request, forum_id):
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
 					f.save()
-					message = EmailMessage()
-					message.subject = 'New Topic: ' + newTopic.subject
-					message.body = 'New topic for forum "' + f.name + '" in category "' + g.name +'"\n\nTopic subject: ' + newTopic.subject + ' (started by ' + newTopic.posted_by.get_full_name() + ')\n\nTopic Message:\n' + postMessage.message
-					message.from_name = "myRobogals"
-					message.from_address = "my@robogals.org"
-					message.reply_address = "my@robogals.org"
-					message.sender = User.objects.get(username='edit')
-					message.html = False
-					message.email_type = 1
-					message.status = -1
-					message.save()
-					for watcher in f.watchers.all():
-						recipient = EmailRecipient()
-						recipient.message = message
-						recipient.user = watcher
-						recipient.to_name = watcher.get_full_name()
-						recipient.to_address = watcher.email
-						recipient.save()
-					message.status = 0
-					message.save()
+					watchers = f.watchers.all().exclude(pk=request.user.pk)
+					if watchers:
+						message = EmailMessage()
+						message.subject = 'New Topic: ' + newTopic.subject
+						message.body = 'New topic for forum "' + f.name + '" in category "' + g.name +'"\n\nTopic subject: ' + newTopic.subject + ' (started by ' + newTopic.posted_by.get_full_name() + ')\n\nTopic Message:\n' + postMessage.message
+						message.from_name = "myRobogals"
+						message.from_address = "my@robogals.org"
+						message.reply_address = "my@robogals.org"
+						message.sender = User.objects.get(username='edit')
+						message.html = False
+						message.email_type = 1
+						message.status = -1
+						message.save()
+						for watcher in watchers:
+							recipient = EmailRecipient()
+							recipient.message = message
+							recipient.user = watcher
+							recipient.to_name = watcher.get_full_name()
+							recipient.to_address = watcher.email
+							recipient.save()
+						message.status = 0
+						message.save()
 			else:
 				request.user.message_set.create(message=unicode(_('The fields "New Topic" and "Message" can not be empty')))
 		else:
@@ -350,6 +352,30 @@ def watchtopic(request, topic_id):
 			return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(f.pk) + '/')
 	else:
 		raise Http404
+
+@login_required
+def watchtopicwithmyposts(request):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	posts = Post.objects.filter(posted_by=request.user)
+	for post in posts:
+		t = post.topic
+		f = t.forum
+		g = f.category
+		c = g.chapter
+		user = request.user
+		if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
+			if not f.watchers.filter(pk=user.pk):
+				t.watchers.add(user)
+	if 'return' in request.GET:
+		return HttpResponseRedirect(request.GET['return'])
+	elif 'return' in request.POST:
+		return HttpResponseRedirect(request.POST['return'])
+	elif c:
+		return HttpResponseRedirect('/forums/' + c.myrobogals_url + '/forum/' + str(f.pk) + '/')
+	else:
+		return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/forum/' + str(f.pk) + '/')
+
 
 @login_required
 def unwatchtopic(request, topic_id):
@@ -518,26 +544,28 @@ def newpost(request, topic_id):
 				f.last_post_time = datetime.datetime.now()
 				f.last_post_user = user
 				f.save()
-				message = EmailMessage()
-				message.subject = 'New Post for topic "' + t.subject + '"'
-				message.body = 'New post for topic "' + t.subject + '" for forum "' + f.name + '" in category "' + g.name + '"\n\nPost message: (posted by ' + postMessage.posted_by.get_full_name() + ')\n' + postMessage.message
-				message.from_name = "myRobogals"
-				message.from_address = "my@robogals.org"
-				message.reply_address = "my@robogals.org"
-				message.sender = User.objects.get(pk=1692) #need to change
-				message.html = False
-				message.email_type = 1
-				message.status = -1
-				message.save()
-				for watcher in (f.watchers.all() | t.watchers.all()).distinct():
-					recipient = EmailRecipient()
-					recipient.message = message
-					recipient.user = watcher
-					recipient.to_name = watcher.get_full_name()
-					recipient.to_address = watcher.email
-					recipient.save()
-				message.status = 0
-				message.save()
+				watchers = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
+				if watchers:
+					message = EmailMessage()
+					message.subject = 'New Post for topic "' + t.subject + '"'
+					message.body = 'New post for topic "' + t.subject + '" for forum "' + f.name + '" in category "' + g.name + '"\n\nPost message: (posted by ' + postMessage.posted_by.get_full_name() + ')\n' + postMessage.message
+					message.from_name = "myRobogals"
+					message.from_address = "my@robogals.org"
+					message.reply_address = "my@robogals.org"
+					message.sender = User.objects.get(pk=1692) #need to change
+					message.html = False
+					message.email_type = 1
+					message.status = -1
+					message.save()
+					for watcher in watchers:
+						recipient = EmailRecipient()
+						recipient.message = message
+						recipient.user = watcher
+						recipient.to_name = watcher.get_full_name()
+						recipient.to_address = watcher.email
+						recipient.save()
+					message.status = 0
+					message.save()
 			else:
 				request.user.message_set.create(message=unicode(_('The fields "Message" can not be empty')))
 		else:

@@ -7,7 +7,10 @@
 {% block pagetitle %}{{chapter.name}}{% endblock %}
 
 {% block content %}
-<a href="/forums/search/{{chapter.myrobogals_url}}/">{% trans "Search" %}</a>
+<p>
+<a href="/forums/search/{{chapter.myrobogals_url}}/">{% trans "Search" %}</a> |
+<a href="/forums/watch/topic/with/myposts/?return={{return|urlencode}}">{% trans "Add topics with my posts to watch list" %}</a>
+</p>
 
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% for globExecCategory in globExecCategories %}
