@@ -60,6 +60,9 @@ class DirectorySchool(models.Model):
 	
 	def state_code(self):
 		return self.address_state.code
+	
+	class Meta:
+		ordering = ('name',)
 
 class Event(models.Model):
 	STATUS_CHOICES = (
