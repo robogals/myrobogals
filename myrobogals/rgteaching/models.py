@@ -1,6 +1,6 @@
 from django.db import models
 from myrobogals.auth.models import Group, User
-from myrobogals.rgmain.models import Country
+from myrobogals.rgmain.models import Country, Subdivision
 from datetime import datetime
 
 class School(models.Model):
@@ -19,6 +19,47 @@ class School(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+class DirectorySchool(models.Model):
+	TYPE_CHOICES = (
+		(0, 'Government'),
+		(1, 'Catholic'),
+		(2, 'Independent'),
+	)
+
+	LEVEL_CHOICES = (
+		(0, 'Combined'),
+		(1, 'Primary'),
+		(2, 'Secondary'),
+	)
+
+	GENDER_CHOICES = (
+		(0, 'Coed'),
+		(1, 'Boys'),
+		(2, 'Girls'),
+	)
+
+	name = models.CharField(max_length=64)
+	address_street = models.CharField(max_length=128, blank=True)
+	address_city = models.CharField('city', max_length=64, blank=True)
+	address_state = models.ForeignKey(Subdivision, verbose_name="state", blank=True, null=True)
+	address_postcode = models.CharField('postcode', max_length=16, blank=True)
+	address_country = models.ForeignKey(Country, verbose_name="country", default="AU")
+	email = models.CharField(max_length=64, blank=True)
+	phone = models.CharField(max_length=32, blank=True)
+	type = models.IntegerField(choices=TYPE_CHOICES, blank=True, null=True)
+	level = models.IntegerField(choices=LEVEL_CHOICES, blank=True, null=True)
+	gender = models.IntegerField(choices=GENDER_CHOICES, blank=True, null=True)
+	religion = models.CharField(max_length=32, blank=True)
+	asd_id = models.IntegerField(blank=True, null=True)
+	asd_feature = models.BooleanField()
+	notes = models.TextField(blank=True)
+
+	def __unicode__(self):
+		return self.name
+	
+	def state_code(self):
+		return self.address_state.code
 
 class Event(models.Model):
 	STATUS_CHOICES = (

@@ -12,7 +12,7 @@ class University(models.Model):
 		verbose_name_plural = "universities"
 
 class Country(models.Model):
-	code = models.CharField("ISO code", max_length=2, primary_key=True)
+	code = models.CharField("ISO 3166-1 code", max_length=2, primary_key=True)
 	country_name = models.CharField("Country", max_length=128)
 	
 	def __unicode__(self):
@@ -21,6 +21,20 @@ class Country(models.Model):
 	class Meta:
 		ordering = ('country_name', 'code')
 		verbose_name_plural = 'countries'
+
+class Subdivision(models.Model):
+	code = models.CharField("ISO 3166-2 code", max_length=3)
+	country = models.ForeignKey(Country)
+	subdivision_name = models.CharField("Name", max_length=128)
+	
+	def __unicode__(self):
+		return self.subdivision_name
+	
+	def full_iso_code(self):
+		return str(self.country.pk) + "-" + self.code
+	
+	class Meta:
+		ordering = ('subdivision_name',)
 
 class MobileRegexCollection(models.Model):
 	description = models.CharField(max_length=64)
