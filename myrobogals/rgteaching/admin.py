@@ -11,7 +11,7 @@ class SchoolAdmin(admin.ModelAdmin):
 	search_fields = ('name', 'chapter', 'contact_person', 'contact_email', 'address')
 
 class DirectorySchoolAdmin(admin.ModelAdmin):
-	list_display = ('name', 'address_city', 'state_code', 'address_postcode', 'type', 'level', 'gender')
+	list_display = ('name', 'address_city', 'state_code', 'address_postcode', 'phone', 'type', 'level', 'gender')
 	search_fields = ('name', 'address_city', 'address_postcode')
 	list_filter = ('type', 'level', 'gender', 'address_state')
 
