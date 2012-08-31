@@ -203,8 +203,9 @@ def rsvplist(request, conf_id):
 				curdate = ca.check_in
 				while curdate != ca.check_out:
 					if not curdate in accommtotals:
-						accommtotals[curdate] = [0,0,0]
+						accommtotals[curdate] = [0,0,0,0]
 					accommtotals[curdate][int(ca.gender)] += 1
+					accommtotals[curdate][3] += 1
 					curdate += one_day
 		accommtotals_sorted = sorted(accommtotals.items(), key=lambda totals: totals[0])
 	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted}, context_instance=RequestContext(request))
