@@ -123,7 +123,11 @@ Content-Transfer-Encoding: base64
 					case PEAR_MAIL_SMTP_ERROR_DATA:
 						// Failed to send message data - try again
 						$status = 0;
-						break;	
+						break;
+
+					default:
+						$status = 0;
+						break;
 				}
 					
 			} else {
