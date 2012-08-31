@@ -10,7 +10,7 @@ from myrobogals.rgconf.models import Conference, ConferenceAttendee, ConferenceP
 from django.core.urlresolvers import reverse
 from myrobogals.rgchapter.models import ShirtSize
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @login_required
 def home(request):
@@ -191,7 +191,23 @@ def rsvplist(request, conf_id):
 		if int(request.GET['accomm']) == 1:
 			if request.user.is_superuser:
 				template_file = 'conf_accomm_list.html'
-	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas}, context_instance=RequestContext(request))
+	customtotals = [0,0,0,0,0]
+	accommtotals = {}
+	if request.user.is_superuser:
+		one_day = timedelta(days=1)
+		for ca in cas:
+			for i in range(5):
+				if getattr(ca, "custom" + str(i+1)):
+					customtotals[i] += 1
+			if ca.check_in and ca.check_out:
+				curdate = ca.check_in
+				while curdate != ca.check_out:
+					if not curdate in accommtotals:
+						accommtotals[curdate] = [0,0,0]
+					accommtotals[curdate][int(ca.gender)] += 1
+					curdate += one_day
+		accommtotals_sorted = sorted(accommtotals.items(), key=lambda totals: totals[0])
+	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted}, context_instance=RequestContext(request))
 
 @login_required
 def showinvoice(request, conf_id, username):

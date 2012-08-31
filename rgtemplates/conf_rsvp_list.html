@@ -37,7 +37,46 @@
   </tr>
 {% endfor %}
 </table>
+<p align="right"><b>{% trans "Attendees in list:" %} {{ cas.count }}</b></p>
 {% if request.user.is_superuser %}
+<p>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
+    <td><strong>{% trans "Night" %}</strong></td>
+    <td><strong>{% trans "Male" %}</strong></td>
+    <td><strong>{% trans "Female" %}</strong></td>
+    <td><strong>{% trans "Unknown" %}</strong></td>
+  </tr>
+{% for night, data in accommtotals %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>{{night}}</td>
+    <td>{{data.1}}</td>
+    <td>{{data.2}}</td>
+    <td>{{data.0}}</td>
+  </tr>
+{% endfor %}
+</table>
+</p>
+<p>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
+    <td><strong>{% trans "Activity" %}</strong></td>
+    <td><strong>{% trans "People" %}</strong></td>
+  </tr>
+  <tr class="odd">
+    <td>Dreamworld</td>
+    <td>{{customtotals.1}}</td>
+  </tr>
+  <tr class="even">
+    <td>Transport to GC</td>
+    <td>{{customtotals.2}}</td>
+  </tr>
+  <tr class="odd">
+    <td>Story Bridge</td>
+    <td>{{customtotals.0}}</td>
+  </tr>
+</table>
+</p>
 <p>
 <a href="/conferences/{{conf.pk}}/?accomm=1">View accommodation list</a>
 </p>
