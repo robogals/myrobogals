@@ -10,9 +10,13 @@
     <td><strong>{% trans "Name" %}</strong></td>
 {% if request.user.is_superuser %}
     <td><strong>{% trans "Chapter" %}</strong></td>
-{% endif %}
+    <td><strong>{% trans "Balance owing" %}</strong></td>
+    <td><strong>{% trans "Check in" %}</strong></td>
+    <td><strong>{% trans "Check out" %}</strong></td>
+{% else %}
     <td><strong>{% trans "Total cost" %}</strong></td>
     <td><strong>{% trans "Balance owing" %}</strong></td>
+{% endif %}
     <td> </td>
     <td> </td>
   </tr>
@@ -21,14 +25,23 @@
     <td>{{ca.first_name}} {{ca.last_name}}</td>
 {% if request.user.is_superuser %}
     <td>{{ca.user.chapter}}</td>
-{% endif %}
+    <td>{{ca.balance_owing_formatted|default_if_none:""}}</td>
+    <td>{{ca.check_in|default_if_none:""}}</td>
+    <td>{{ca.check_out|default_if_none:""}}</td>
+{% else %}
     <td>{{ca.total_cost_formatted|default_if_none:"nil"}}</td>
     <td>{{ca.balance_owing_formatted|default_if_none:""}}</td>
+{% endif %}
     <td><a href="/conferences/{{conf.pk}}/{{ca.user.username}}/rsvp/">{% trans "Edit RSVP" %}</a></td>
     <td><a href="/conferences/{{conf.pk}}/{{ca.user.username}}/invoice/">{% trans "View Invoice" %}</a></td>
   </tr>
 {% endfor %}
 </table>
+{% if request.user.is_superuser %}
+<p>
+<a href="/conferences/{{conf.pk}}/?accomm=1">View accommodation list</a>
+</p>
+{% endif %}
 <p>
 <form action="/conferences/{{conf.pk}}/" method="GET">
 To add a new RSVP, enter that person's myRobogals username: <input type="text" name="username"> <input type="submit" value="Submit">

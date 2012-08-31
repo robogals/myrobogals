@@ -57,11 +57,17 @@ class ConferencePart(models.Model):
 
 class ConferenceAttendee(models.Model):
 	ATTENDEE_TYPE_CHOICES = (
-    	(0, '2011/2012 committee, now outgoing'),
-    	(1, '2011/2012 committee, continuing into 2012/2013 committee'),
-    	(2, 'Incoming into 2012/2013 committee'),
-    	(3, 'None of the above; ordinary volunteer'),
-    )
+		(0, '2011/2012 committee, now outgoing'),
+		(1, '2011/2012 committee, continuing into 2012/2013 committee'),
+		(2, 'Incoming into 2012/2013 committee'),
+		(3, 'None of the above; ordinary volunteer'),
+	)
+	
+	GENDERS = (
+		(0, 'Unknown'),
+		(1, 'Male'),
+		(2, 'Female'),
+	)
 
 	conference = models.ForeignKey(Conference)
 	user = models.ForeignKey(User)
@@ -82,6 +88,9 @@ class ConferenceAttendee(models.Model):
 	comments = models.CharField(max_length=128, blank=True)
 	parts_attending = models.ManyToManyField(ConferencePart)
 	rsvp_time = models.DateTimeField(default=datetime.now())
+	check_in = models.DateField(null=True, blank=True)
+	check_out = models.DateField(null=True, blank=True)
+	gender = models.IntegerField(choices=GENDERS, default=0)
 
 	def total_cost(self):
 		sum = 0.0

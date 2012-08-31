@@ -141,9 +141,19 @@
     <td>{{ form.dob }}</td>
   </tr>
 
+  {% if form.gender.errors %}
   <tr>
-    <td colspan="2">{{ form.update_account }} {{ form.update_account.label_tag }}</td>
+    <td colspan="2"><div class="error">{% for error in form.gender.errors %}{{error}}{% endfor %}</div></td>
   </tr>
+  {% endif %}
+  <tr>
+    <td style="vertical-align: top">{{ form.gender.label_tag }} <span style="color: #ff0000">*</span></td>
+    <td>{{ form.gender }}</td>
+  </tr>
+
+<!--  <tr>
+    <td colspan="2">{{ form.update_account }} {{ form.update_account.label_tag }}</td>
+  </tr> -->
 
   <tr>
     <td colspan="2"><strong>{% trans "Emergency contact person" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>

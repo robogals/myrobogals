@@ -1,0 +1,26 @@
+{% load i18n %}
+<html>
+<head>
+  <title>Robogals SINE accommodation list</title>
+</head>
+<body>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
+    <td><strong>{% trans "Name" %}</strong></td>
+    <td><strong>{% trans "Chapter" %}</strong></td>
+    <td><strong>{% trans "Gender" %}</strong></td>
+    <td><strong>{% trans "Check in" %}</strong></td>
+    <td><strong>{% trans "Check out" %}</strong></td>
+  </tr>
+{% for ca in cas %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>{{ca.first_name}} {{ca.last_name}}</td>
+    <td>{{ca.user.chapter}}</td>
+    <td>{{ca.get_gender_display|default_if_none:""}}</td>
+    <td>{{ca.check_in|default_if_none:""}}</td>
+    <td>{{ca.check_out|default_if_none:""}}</td>
+  </tr>
+{% endfor %}
+</table>
+</body>
+</html>

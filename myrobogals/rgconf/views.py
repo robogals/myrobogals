@@ -12,6 +12,7 @@ from myrobogals.rgchapter.models import ShirtSize
 import re
 from datetime import datetime
 
+@login_required
 def home(request):
 	confs = Conference.objects.all()
 	return render_to_response('conf_home.html', {'confs': confs}, context_instance=RequestContext(request))
@@ -43,10 +44,20 @@ class ConfRSVPForm(forms.Form):
 		else:
 			self.fields['mobile'].initial = user.mobile			
 		self.fields['dob'].initial = user.dob
+		if user.gender in [1, 2]:
+			self.fields['gender'].initial = user.gender
+		else:
+			self.fields['gender'].initial = 2		
+	
+	GENDERS = (
+		(1, 'Male'),
+		(2, 'Female'),
+	)
 
 	first_name = forms.CharField(label=_("First name"), help_text=_("Whatever you put here is what this person's name tag will show.<br />You can put a preferred name, e.g. 'Bec' instead of 'Rebecca' if you like."), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	last_name = forms.CharField(label=_("Last name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	attendee_type = forms.ChoiceField(label=_("This person is"), choices=((0,''),))
+	gender = forms.ChoiceField(label=_("Gender"), choices=GENDERS)
 	outgoing_position = forms.CharField(label=_("Outgoing position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	incoming_position = forms.CharField(label=_("Incoming position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	email = forms.EmailField(label=_("Email"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
@@ -65,7 +76,8 @@ class ConfRSVPForm(forms.Form):
 def editrsvp(request, conf_id, username):
 	chapter = request.user.chapter
 	if not request.user.is_staff:
-		raise Http404
+		if request.user.username != username:
+			raise Http404
 	conf = get_object_or_404(Conference, pk=conf_id)
 	u = get_object_or_404(User, username=username)
 	if u.chapter != chapter:
@@ -93,6 +105,7 @@ def editrsvp(request, conf_id, username):
 			ca.email = data['email']
 			ca.mobile = data['mobile']
 			ca.dob = data['dob']
+			ca.gender = data['gender']
 			ca.emergency_name = data['emergency_name']
 			ca.emergency_number = data['emergency_number']
 			ca.emergency_relationship = data['emergency_relationship']
@@ -118,9 +131,13 @@ def editrsvp(request, conf_id, username):
 				u.email = data['email']
 				u.dob = data['dob']
 				u.mobile = data['mobile']
+				u.gender = data['gender']
 				u.save()
 				request.user.message_set.create(message=unicode(_("Member account updated with new details")))
-			return HttpResponseRedirect('/conferences/' + str(conf_id) + '/')
+			if request.user.is_staff:
+				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/')
+			else:
+				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/' + u.username + '/invoice/')
 	else:
 		if new:
 			form = ConfRSVPForm(None, conf=conf, user=u)
@@ -134,6 +151,7 @@ def editrsvp(request, conf_id, username):
 					'email': ca.email,
 					'mobile': ca.mobile,
 					'dob': ca.dob,
+					'gender': ca.gender,
 					'emergency_name': ca.emergency_name,
 					'emergency_number': ca.emergency_number,
 					'emergency_relationship': ca.emergency_relationship,
@@ -152,7 +170,7 @@ def editrsvp(request, conf_id, username):
 @login_required
 def rsvplist(request, conf_id):
 	if not request.user.is_staff:
-		raise Http404
+		return HttpResponseRedirect('/conferences/' + str(conf_id) + '/' + request.user.username + '/rsvp/')
 	conf = get_object_or_404(Conference, pk=conf_id)
 	chapter = request.user.chapter
 	if 'username' in request.GET:
@@ -165,16 +183,22 @@ def rsvplist(request, conf_id):
 		except User.DoesNotExist:
 			request.user.message_set.create(message=unicode(_("- No such username exists in your chapter")))
 	if request.user.is_superuser:
-		cas = ConferenceAttendee.objects.filter(conference=conf)
+		cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
 	else:
 		cas = ConferenceAttendee.objects.filter(user__chapter=chapter, conference=conf)
-	return render_to_response('conf_rsvp_list.html', {'conf': conf, 'chapter': chapter, 'cas': cas}, context_instance=RequestContext(request))
+	template_file = 'conf_rsvp_list.html'
+	if 'accomm' in request.GET:
+		if int(request.GET['accomm']) == 1:
+			if request.user.is_superuser:
+				template_file = 'conf_accomm_list.html'
+	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas}, context_instance=RequestContext(request))
 
 @login_required
 def showinvoice(request, conf_id, username):
 	chapter = request.user.chapter
 	if not request.user.is_staff:
-		raise Http404
+		if request.user.username != username:
+			raise Http404
 	conf = get_object_or_404(Conference, pk=conf_id)
 	u = get_object_or_404(User, username=username)
 	if u.chapter != chapter:
