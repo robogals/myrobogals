@@ -11,6 +11,11 @@
     <td><strong>{% trans "Gender" %}</strong></td>
     <td><strong>{% trans "Check in" %}</strong></td>
     <td><strong>{% trans "Check out" %}</strong></td>
+{% if 'hideother' not in request.GET %}
+    <td><strong>{% trans "Bridge" %}</strong></td>
+    <td><strong>{% trans "Dreamworld" %}</strong></td>
+    <td><strong>{% trans "Retreat transport" %}</strong></td>
+{% endif %}
   </tr>
 {% for ca in cas %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -19,6 +24,11 @@
     <td>{{ca.get_gender_display|default_if_none:""}}</td>
     <td>{{ca.check_in|default_if_none:""}}</td>
     <td>{{ca.check_out|default_if_none:""}}</td>
+{% if 'hideother' not in request.GET %}
+    <td>{% if ca.custom1 %}Yes{% endif %}</td>
+    <td>{% if ca.custom2 %}Yes{% endif %}</td>
+    <td>{% if ca.custom3 %}Yes{% endif %}</td>
+{% endif %}
   </tr>
 {% endfor %}
 </table>

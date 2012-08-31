@@ -91,6 +91,11 @@ class ConferenceAttendee(models.Model):
 	check_in = models.DateField(null=True, blank=True)
 	check_out = models.DateField(null=True, blank=True)
 	gender = models.IntegerField(choices=GENDERS, default=0)
+	custom1 = models.BooleanField()
+	custom2 = models.BooleanField()
+	custom3 = models.BooleanField()
+	custom4 = models.BooleanField()
+	custom5 = models.BooleanField()
 
 	def total_cost(self):
 		sum = 0.0
