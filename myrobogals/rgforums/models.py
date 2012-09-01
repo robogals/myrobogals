@@ -64,6 +64,7 @@ class Forum(models.Model):
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
+	watchers = models.ManyToManyField(User, related_name='forum_watchers')
 
 	class Meta:
 		verbose_name = "Forum"
@@ -88,6 +89,7 @@ class Topic(models.Model):
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
 	sticky = models.BooleanField("Set sticky", default=False)
+	watchers = models.ManyToManyField(User, related_name='topic_watchers')
 
 	class Meta:
 		verbose_name = "Topic"

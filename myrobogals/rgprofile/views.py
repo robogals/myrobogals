@@ -27,6 +27,8 @@ from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_att
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage
 from myrobogals.admin.models import LogEntry
+import random
+from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 
 '''
 def joinstart(request):
@@ -323,6 +325,75 @@ def redirtoself(request):
 @login_required
 def redirtoeditself(request):
 	return HttpResponseRedirect("/profile/" + request.user.username + "/edit/")
+
+@login_required
+def mobverify(request):
+	if request.method == 'POST':
+		if not request.session.get('verif_code', False):
+			raise Http404
+		if not request.session.get('mobile', False):
+			del request.session['verif_code']
+			raise Http404
+		if (request.POST['verif_code'] == request.session['verif_code']) and (request.user.mobile == request.session['mobile']):
+			request.user.mobile_verified = True
+			request.user.save()
+			msg = 'Verification succeeded'
+		else:
+			msg = 'Verification failed: verification code not matched or you are being naughty'
+		del request.session['verif_code']
+		del request.session['mobile']
+		request.user.message_set.create(message=unicode(_(msg)))
+		return HttpResponseRedirect('/profile/')
+	else:
+		if request.user.mobile:
+			user_id = str(request.user.pk)
+			now = datetime.datetime.now()
+			hour = now.hour
+			minute = now.minute
+			second = now.second
+			tot_second = str(second + minute * 60 + hour * 3600).zfill(5)
+			rand = str(random.randint(10, 99))
+			verif = user_id + rand + tot_second
+			verif_code = ''
+			for c in verif:
+				verif_code += chr(int(c) + 97)
+			message = SMSMessage()
+			message.body = 'Robogals verification code: ' + verif_code
+			message.senderid = '61429558100'
+			message.sender = User.objects.get(pk=1692)
+			message.chapter = User.objects.get(pk=1692).chapter
+			message.validate()
+			message.sms_type = 1
+			message.status = -1
+			message.save()
+			recipient = SMSRecipient()
+			recipient.message = message
+			recipient.user = request.user
+			request.session['mobile'] = request.user.mobile
+			recipient.to_number = request.session['mobile']
+			recipient.save()
+
+			# Check that we haven't used too many credits
+			sms_this_month = 0
+			sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
+			for obj in sms_this_month_obj:
+				sms_this_month += obj.credits_used()
+			sms_this_month += message.credits_used()
+			if sms_this_month > User.objects.get(pk=1692).chapter.sms_limit:
+				message.status = 3
+				message.save()
+				msg = 'Verification failed: system problem please try again later'
+				request.user.message_set.create(message=unicode(_(msg)))
+				return HttpResponseRedirect('/profile/')
+
+			message.status = 0
+			message.save()
+			request.session['verif_code'] = verif_code
+			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
+		else:
+			msg = 'Verification failed: no mobile number entered. (Profile -> Edit Profile)'
+			request.user.message_set.create(message=unicode(_(msg)))
+			return HttpResponseRedirect('/profile/')
 
 def detail(request, username):
 	u = get_object_or_404(User, username__exact=username)
@@ -683,7 +754,9 @@ def edituser(request, username, chapter=None):
 					u.last_name = data['last_name']
 					u.email = data['email']
 					u.alt_email = data['alt_email']
-					u.mobile = data['mobile']
+					if u.mobile != data['mobile']:
+						u.mobile = data['mobile']
+						u.mobile_verified = False
 					u.gender = data['gender']
 					if 'student_number' in data:
 						u.student_number = data['student_number']

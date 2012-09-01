@@ -1,0 +1,16 @@
+{% if email.html %}
+{% autoescape off %}
+{{ email.body }}
+{% endautoescape %}
+{% else %}
+<html>
+<head>
+	<title>{{ email.subject }}</title>
+</head>
+<body>
+<p>
+{{ email.body|linebreaksbr }}
+</p>
+</body>
+</html>
+{% endif %}

@@ -2,13 +2,32 @@
 {% load i18n %}
 {% load thous %}
 {% load showlocaltime %}
-{% block title %}{{chapter.name}}{% endblock %}
+{% block title %}{% trans "Message history" %}{% endblock %}
 
-{% block pagetitle %}{{chapter.name}}{% endblock %}
+{% block pagetitle %}{% trans "Message history" %}{% endblock %}
 
 {% block content %}
 <p>
-<a href="#emailSent">{% trans "Email Messages Sent" %}</a> | <a href="#SMSSent">{% trans "SMS Messages Sent" %}</a> | <a href="#emailReceived">{% trans "Email Messages Received" %}</a> | <a href="#SMSReceived">{% trans "SMS Messages Received" %}</a>
+{% if emailMsgsSent %}
+<a href="#emailSent">{% trans "Email Messages Sent" %}</a> |
+{% else %}
+{% trans "Email Messages Sent" %} |
+{% endif %}
+{% if SMSMsgsSent %}
+<a href="#SMSSent">{% trans "SMS Messages Sent" %}</a> |
+{% else %}
+{% trans "SMS Messages Sent" %} |
+{% endif %}
+{% if emailMsgsReceived %}
+<a href="#emailReceived">{% trans "Email Messages Received" %}</a> |
+{% else %}
+{% trans "Email Messages Received" %} |
+{% endif %}
+{% if SMSMsgsReceived %}
+<a href="#SMSReceived">{% trans "SMS Messages Received" %}</a>
+{% else %}
+{% trans "SMS Messages Received" %}
+{% endif %}
 </p>
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% if emailMsgsSent %}
@@ -23,18 +42,16 @@
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td>{{ emailMsgSent.body|linebreaksbr }}</td>
+		<td><a href="/messages/showemail/{{emailMsgSent.pk}}/" target="_blank">{% trans "show" %}</a></td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{emailMsgSent.status_description}}
-	{% ifequal emailMsgSent.status 1 %}
-		&#40;{% trans "Time Sent" %}: {{emailMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% if emailMsgSent.scheduled %}
+		&#40;{% trans "Scheduled date" %}: {{emailMsgSent.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{emailMsgSent.scheduled_date_type_description}}&#41;
 	{% else %}
-		{% if emailMsgSent.scheduled %}
-			&#40;{% trans "Scheduled date" %}: {{emailMsgSent.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#44; {{emailMsgSent.scheduled_date_type_description}}&#41;
-		{% endif %}
-	{% endifequal %}
+		&#40;{% trans "Time Sent" %}: {{emailMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% endif %}
 		<br /><a href="/messages/emailrecipients/{{emailMsgSent.pk}}/">{% trans "Recipients" %}</a>
 		</td>
 	</tr>
@@ -52,13 +69,14 @@
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{SMSMsgSent.status_description}}
-	{% ifequal SMSMsgSent.status 1 %}
-		&#40;{% trans "Date Set" %}: {{SMSMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% if SMSMsgSent.scheduled %}
+		&#40;{% trans "Scheduled date" %}: {{SMSMsgSent.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{SMSMsgSent.scheduled_date_type_description}}&#41;
 	{% else %}
-		{% if SMSMsgSent.scheduled %}
-			&#40;{% trans "Scheduled date" %}: {{SMSMsgSent.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#44; {{SMSMsgSent.scheduled_date_type_description}}&#41;
-		{% endif %}
-	{% endifequal %}
+		&#40;{% trans "Time Set" %}: {{SMSMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+	{% endif %}
+	{% if SMSMsgSent.senderid %}
+	&#40;{% trans "From" %}: {{SMSMsgSent.senderid}}&#41;
+	{% endif %}
 		<br /><a href="/messages/smsrecipients/{{SMSMsgSent.pk}}/">{% trans "Recipients" %}</a>
 		</td>
 	</tr>
@@ -76,7 +94,7 @@
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td>{{ emailMsgReceived.message.body|linebreaksbr }}</td>
+		<td><a href="/messages/showemail/{{emailMsgReceived.message.pk}}/" target="_blank">{% trans "show" %}</a></td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
@@ -99,6 +117,9 @@
 		<td valign="top"  style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{SMSMsgReceived.status_description}}
 			&#40;{% trans "Scheduled date" %}: {{SMSMsgReceived.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		{% if SMSMsgReceived.message.senderid %}
+		&#40;{% trans "From" %}: {{SMSMsgReceived.message.senderid}}&#41;
+		{% endif %}
 		</td>
 	</tr>
 	{% endfor %}
