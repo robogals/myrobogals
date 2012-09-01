@@ -62,7 +62,7 @@ class ConfRSVPForm(forms.Form):
 	incoming_position = forms.CharField(label=_("Incoming position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	email = forms.EmailField(label=_("Email"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	mobile = forms.CharField(label=_("Mobile"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
-	dob = forms.DateField(label=_("Date of birth"), widget=SelectDateWidget(), required=True)
+	dob = forms.DateField(label=_("Date of birth"), help_text=_("If you are under 18, we will send you a form that must be signed by your parent or guardian."), widget=SelectDateWidget(), required=True)
 	update_account = forms.BooleanField(label=_("Also update this person's account in myRobogals with the email, mobile and DOB above"), required=False, initial=False)
 	emergency_name = forms.CharField(label=_("Contact name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	emergency_number = forms.CharField(label=_("Contact number"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
@@ -193,6 +193,7 @@ def rsvplist(request, conf_id):
 				template_file = 'conf_accomm_list.html'
 	customtotals = [0,0,0,0,0]
 	accommtotals = {}
+	accommtotals_sorted = []
 	if request.user.is_superuser:
 		one_day = timedelta(days=1)
 		for ca in cas:

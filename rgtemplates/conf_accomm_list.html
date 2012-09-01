@@ -18,6 +18,7 @@
 {% endif %}
   </tr>
 {% for ca in cas %}
+{% if 'hideother' not in request.GET or ca.check_in %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td>{{ca.first_name}} {{ca.last_name}}</td>
     <td>{{ca.user.chapter}}</td>
@@ -30,6 +31,7 @@
     <td>{% if ca.custom1 %}Yes{% endif %}</td>
 {% endif %}
   </tr>
+{% endif %}
 {% endfor %}
 </table>
 <p><b>{% trans "Attendees in list:" %} {{ cas.count }}</b></p>
