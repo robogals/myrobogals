@@ -351,17 +351,7 @@ def mobverify(request):
 		return HttpResponseRedirect('/profile/')
 	else:
 		if request.user.mobile:
-			user_id = str(request.user.pk)
-			now = datetime.datetime.now()
-			hour = now.hour
-			minute = now.minute
-			second = now.second
-			tot_second = str(second + minute * 60 + hour * 3600).zfill(5)
-			rand = str(random.randint(10, 99))
-			verif = user_id + rand + tot_second
-			verif_code = ''
-			for c in verif:
-				verif_code += chr(int(c) + 97)
+			verif_code = User.objects.make_random_password(6)
 			message = SMSMessage()
 			message.body = 'Robogals verification code: ' + verif_code
 			message.senderid = '61429558100'

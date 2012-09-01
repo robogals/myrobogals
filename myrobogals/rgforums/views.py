@@ -367,6 +367,7 @@ def watchtopicwithmyposts(request):
 		if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 			if not f.watchers.filter(pk=user.pk):
 				t.watchers.add(user)
+	request.user.message_set.create(message=unicode(_('Topics with your posts have been added')))
 	if 'return' in request.GET:
 		return HttpResponseRedirect(request.GET['return'])
 	elif 'return' in request.POST:

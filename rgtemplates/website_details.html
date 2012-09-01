@@ -4,10 +4,19 @@
 
 {% block pagetitle %}{% blocktrans with c.name as chapter %}Website details: {{chapter}}{% endblocktrans %}{% endblock %}
 {% block content %}
+<p>
+	{% for website in websites %}
+		{% ifequal forloop.counter 1 %}
+			<a href="#{{website.site_name}}">{{ website.site_name }}</a>
+		{% else %}
+			| <a href="#{{website.site_name}}">{{ website.site_name }}</a>
+		{% endifequal %}
+	{% endfor %}
+</p>
 {% for website in websites %}
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
 	<tr class="even">
-		<td><strong>{% trans "Site Name" %}</strong></td>
+		<td><a name="{{website.site_name}}"></a><strong>{% trans "Site Name" %}</strong></td>
 		<td>{{ website.site_name }}</td>
 	</tr>
 	<tr class="odd">
