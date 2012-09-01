@@ -9,10 +9,6 @@
 {% block pagetitle %}{% blocktrans with user.get_full_name as name %}Profile: {{name}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<p>
-<a href="/profile/mobverify/">{% trans "Verify mobile" %}</a>
-</p>
-<!-- display profile information -->
 <!--
 {% if user.photo %}
 <img src="{{user.photo.url}}" style="float: right">

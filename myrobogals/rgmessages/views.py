@@ -201,7 +201,7 @@ class WriteSMSForm(forms.Form):
 	)
 
 	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("Put your message here.  To opt-out reply 'stop'"))
-	from_type = forms.ChoiceField(choices=((0,"+61 429 558 100"),))
+	from_type = forms.ChoiceField(choices=((0,"+61429558100 (myRobogals)"),), help_text=_('You can send SMSes from your own number if you <a href="%s">verify your number</a>') % '/profile/mobverify/')
 	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
@@ -221,9 +221,11 @@ class WriteSMSForm(forms.Form):
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
 		if user.mobile_verified:
 			self.fields['from_type'].choices = (
-				(0,"+61 429 558 100"),
-				(1, user.mobile),
+				(1, "+" + user.mobile + " (you)"),
+				(0,"+61429558100 (myRobogals)"),
 			)
+			self.fields['from_type'].initial = 1
+			self.fields['from_type'].help_text = ''
 		self.fields['schedule_time'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 		self.fields['schedule_date'].initial = utc.localize(datetime.now()).astimezone(user.tz_obj())
 
@@ -237,7 +239,6 @@ def writesms(request):
 		typesel = request.POST['type']
 		schedsel = request.POST['scheduling']
 		statussel = request.POST['status']
-		
 		smsform = WriteSMSForm(request.POST, user=request.user)
 		try:
 			if smsform.is_valid():
@@ -246,10 +247,10 @@ def writesms(request):
 				message.body = data['body']
 				message.sender = request.user
 				message.chapter = request.user.chapter
-				if int(data['from_type']) == 0:
-					message.senderid = '61429558100'
-				elif int(data['from_type']) == 1:
+				if int(data['from_type']) == 1 and request.user.mobile_verified:
 					message.senderid = str(request.user.mobile)
+				else:
+					message.senderid = '61429558100'
 				if request.POST['scheduling'] == '1':
 					message.scheduled = True
 					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])

@@ -1,20 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load thous %}
 {% load showlocaltime %}
 
-{% block title %}Mobile Verification{% endblock %}
+{% block title %}{% trans "Mobile verification" %}{% endblock %}
 
-{% block pagetitle %}Mobile Verification{% endblock %}
+{% block pagetitle %}{% trans "Mobile verification" %}{% endblock %}
 
 {% block content %}
-<p>
-A verification code will be sent to your mobile number (Profile &ndash;&gt; Edit Profile). Please enter the code below:
-</p>
+<p>A verification code has been sent to your mobile number, +{{request.user.mobile}} (<a href="/profile/edit/">edit</a>)</p>
+<p>Please enter the code below when you receive it:</p>
 <form action="/profile/mobverify/" method="POST">
 <p style="clear: both; font-size: 200%;">
-<input type="submit" value="{% trans "submit" %}">
 <input type="text" name="verif_code" size="34" maxlength="80">
+<input type="submit" value="{% trans "Submit" %}">
 </p>
 </form>
 {% endblock %}

@@ -108,7 +108,7 @@
   </tr>
   <tr>
     <td valign="top"><strong>{% trans "From:" %}</strong></td>
-    <td><span id="from_normal">{{ smsform.from_type }}</span></td>
+    <td><span id="from_normal">{{ smsform.from_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{smsform.from_type.help_text}}{% endautoescape %}</span></span></td>
   </tr>
   <tr>
     <td valign="top"><strong>{% trans "Message:" %}</strong></td>

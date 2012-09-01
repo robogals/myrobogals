@@ -277,7 +277,7 @@ def newtopic(request, forum_id):
 					message.from_name = "myRobogals"
 					message.from_address = "my@robogals.org"
 					message.reply_address = "my@robogals.org"
-					message.sender = User.objects.get(pk=1692) #need to change
+					message.sender = User.objects.get(username='edit')
 					message.html = False
 					message.email_type = 1
 					message.status = -1
@@ -530,7 +530,6 @@ def newpost(request, topic_id):
 				message.status = -1
 				message.save()
 				for watcher in (f.watchers.all() | t.watchers.all()).distinct():
-					print watcher.get_full_name()
 					recipient = EmailRecipient()
 					recipient.message = message
 					recipient.user = watcher

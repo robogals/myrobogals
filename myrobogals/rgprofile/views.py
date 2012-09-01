@@ -328,6 +328,11 @@ def redirtoeditself(request):
 
 @login_required
 def mobverify(request):
+	if not request.user.is_staff:
+		raise Http404
+	if request.user.mobile_verified:
+		request.user.message_set.create(message=unicode(_('Your mobile number is already verified')))
+		return HttpResponseRedirect('/profile/')
 	if request.method == 'POST':
 		if not request.session.get('verif_code', False):
 			raise Http404
@@ -337,12 +342,12 @@ def mobverify(request):
 		if (request.POST['verif_code'] == request.session['verif_code']) and (request.user.mobile == request.session['mobile']):
 			request.user.mobile_verified = True
 			request.user.save()
-			msg = 'Verification succeeded'
+			msg = _('Verification succeeded')
 		else:
-			msg = 'Verification failed: verification code not matched or you are being naughty'
+			msg = _('- Verification failed: invalid verification code')
 		del request.session['verif_code']
 		del request.session['mobile']
-		request.user.message_set.create(message=unicode(_(msg)))
+		request.user.message_set.create(message=unicode(msg))
 		return HttpResponseRedirect('/profile/')
 	else:
 		if request.user.mobile:
@@ -360,8 +365,8 @@ def mobverify(request):
 			message = SMSMessage()
 			message.body = 'Robogals verification code: ' + verif_code
 			message.senderid = '61429558100'
-			message.sender = User.objects.get(pk=1692)
-			message.chapter = User.objects.get(pk=1692).chapter
+			message.sender = User.objects.get(username='edit')
+			message.chapter = Group.objects.get(pk=1)
 			message.validate()
 			message.sms_type = 1
 			message.status = -1
@@ -379,11 +384,11 @@ def mobverify(request):
 			for obj in sms_this_month_obj:
 				sms_this_month += obj.credits_used()
 			sms_this_month += message.credits_used()
-			if sms_this_month > User.objects.get(pk=1692).chapter.sms_limit:
+			if sms_this_month > Group.objects.get(pk=1).sms_limit:
 				message.status = 3
 				message.save()
-				msg = 'Verification failed: system problem please try again later'
-				request.user.message_set.create(message=unicode(_(msg)))
+				msg = _('- Verification failed: system problem please try again later')
+				request.user.message_set.create(message=unicode(msg))
 				return HttpResponseRedirect('/profile/')
 
 			message.status = 0
@@ -391,8 +396,8 @@ def mobverify(request):
 			request.session['verif_code'] = verif_code
 			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
 		else:
-			msg = 'Verification failed: no mobile number entered. (Profile -> Edit Profile)'
-			request.user.message_set.create(message=unicode(_(msg)))
+			msg = _('- Verification failed: no mobile number entered. (Profile -> Edit Profile)')
+			request.user.message_set.create(message=unicode(msg))
 			return HttpResponseRedirect('/profile/')
 
 def detail(request, username):

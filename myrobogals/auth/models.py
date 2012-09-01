@@ -283,8 +283,8 @@ class MemberStatusType(models.Model):
 		return self.description
 	
 	class Meta:
-		verbose_name = "Member status"
-		verbose_name_plural = "Member statuses"
+		verbose_name = "member status"
+		verbose_name_plural = "member statuses"
 
 class MemberStatus(models.Model):
 	user = models.ForeignKey('User')
@@ -381,8 +381,7 @@ class User(models.Model):
     objects = UserManager()
 
     class Meta:
-        verbose_name = 'Member'
-        verbose_name_plural = 'Members'
+        verbose_name = 'member'
         ordering = ['username']
 
     def __unicode__(self):

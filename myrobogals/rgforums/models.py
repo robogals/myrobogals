@@ -38,8 +38,8 @@ class Category(models.Model):
 	created_on = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
-		verbose_name = _('Category')
-		verbose_name_plural = _('Categories')
+		verbose_name = _('category')
+		verbose_name_plural = _('categories')
 		ordering = ['created_on']
 
 	def __unicode__(self):
@@ -67,8 +67,8 @@ class Forum(models.Model):
 	watchers = models.ManyToManyField(User, related_name='forum_watchers')
 
 	class Meta:
-		verbose_name = "Forum"
-		verbose_name_plural = "Forums"
+		verbose_name = "forum"
+		verbose_name_plural = "forums"
 		ordering = ['created_on']
 
 	def __unicode__(self):
@@ -92,8 +92,8 @@ class Topic(models.Model):
 	watchers = models.ManyToManyField(User, related_name='topic_watchers')
 
 	class Meta:
-		verbose_name = "Topic"
-		verbose_name_plural = "Topics"
+		verbose_name = "topic"
+		verbose_name_plural = "topics"
 		ordering = ['-sticky', 'created_on']
 
 	def __unicode__(self):
@@ -115,8 +115,8 @@ class Post(models.Model):
 	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
 
 	class Meta:
-		verbose_name = "Post"
-		verbose_name_plural = "Posts"
+		verbose_name = "post"
+		verbose_name_plural = "posts"
 		ordering = ['created_on']
 
 	def __unicode__(self):
