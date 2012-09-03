@@ -24,7 +24,7 @@
       <td style="background-color: #CC0000; color: #FFFFFF">No</td>
       {% else %}
         {% ifequal item|slice:"0:8" '<td>CONT' %}
-        <td style="background-color: #00CC00"><a href="http://www.sciencechallenge.com.au/vote/{{item|slice:"8:"|slice:":-5"}}.html" style="color: #000000; text-decoration: underline">View</a></td>
+        <td style="background-color: #00CC00"><a href="http://www.sciencechallenge.com.au/scichal{{item|slice:"8:"|slice:"0:4"}}/{{item|slice:"12:"|slice:":-5"}}.html" style="color: #000000; text-decoration: underline">View</a></td>
         {% else %}
         {% autoescape off %}{{ item }}{% endautoescape %}
         {% endifequal %}
