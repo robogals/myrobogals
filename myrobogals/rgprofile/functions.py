@@ -139,9 +139,11 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 	elif defaults['date_joined'] == None:
 		defaults['date_joined'] = datetime.now()
 	for row in filerows:
+	 if any(row):
 		# Get column names from first row
 		if (columns == None):
 			columns = row
+			#print columns
 			if 'first_name' not in columns:
 				raise RgImportCsvException(_('You must specify a first_name field'))
 			if 'last_name' not in columns:
@@ -155,6 +157,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 		
 		# Process row
 		i = 0;
+		flag = 0;
 		for cell in row:
 			colname = columns[i]
 			if colname == 'first_name':
@@ -166,6 +169,12 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 			elif colname == 'username':
 				data = cell.strip()
 				if data != "":
+					if not check_username(data):
+						u=User()
+						u.first_name = row(1)
+						u.last_name = row(2)
+						u.email = row(3)
+						flag=1
 					new_username = data
 				else:
 					new_username = generate_unique_username(row, columns)
@@ -251,7 +260,9 @@ def importcsv(filerows, welcomeemail, defaults, chapter):
 		newuser.is_active = True
 		newuser.is_staff = False
 		newuser.is_superuser = False
-
+		
+		if flag == 1:
+			break
 		# If we still don't have a username and/or password
 		# by this stage, let's generate one
 		if getattr(newuser, 'username', '') == '':
