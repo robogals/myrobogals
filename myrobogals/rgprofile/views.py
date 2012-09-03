@@ -1003,7 +1003,7 @@ def importusers(request, chapterurl):
 			defaultsform2 = DefaultsFormTwo(request.POST)
 			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
 				file = request.FILES['csvfile']
-				tmppath = "/tmp/" + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
+				tmppath = 'D:\dev\myrobogals\myrobogals\\' + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
 				for chunk in file.chunks():
 					destination.write(chunk)
@@ -1020,9 +1020,10 @@ def importusers(request, chapterurl):
 		elif request.POST['step'] == '2':
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
-			tmppath = request.POST['tmppath']
-			fp = open(tmppath, 'rU')
+			tmppath = request.POST['tmppath'].replace('\\\\', '\\')
+			fp = open(tmppath, 'rUb')
 			filerows = csv.reader(fp)
+			
 			welcomeemail = request.session['welcomeemail']
 			if welcomeemail['importaction'] == '2':
 				welcomeemail = None
