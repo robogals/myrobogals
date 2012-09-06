@@ -9,6 +9,7 @@
     <td><strong>{% trans "Name" %}</strong></td>
     <td><strong>{% trans "Chapter" %}</strong></td>
     <td><strong>{% trans "Gender" %}</strong></td>
+    <td><strong>{% trans "Date of birth" %}</strong></td>
     <td><strong>{% trans "Check in" %}</strong></td>
     <td><strong>{% trans "Check out" %}</strong></td>
 {% if 'hideother' not in request.GET %}
@@ -23,6 +24,7 @@
     <td>{{ca.first_name}} {{ca.last_name}}</td>
     <td>{{ca.user.chapter}}</td>
     <td>{{ca.get_gender_display|default_if_none:""}}</td>
+    <td>{{ca.dob|date:_("DATE_FORMAT_NODAY")}}</td>
     <td>{{ca.check_in|default_if_none:""}}</td>
     <td>{{ca.check_out|default_if_none:""}}</td>
 {% if 'hideother' not in request.GET %}
@@ -41,7 +43,9 @@
     <td><strong>{% trans "Night" %}</strong></td>
     <td><strong>{% trans "Male" %}</strong></td>
     <td><strong>{% trans "Female" %}</strong></td>
+{% if 'hideother' not in request.GET %}
     <td><strong>{% trans "Unknown" %}</strong></td>
+{% endif %}
     <td><strong>{% trans "Total" %}</strong></td>
   </tr>
 {% for night, data in accommtotals %}
@@ -49,7 +53,9 @@
     <td>{{night}}</td>
     <td>{{data.1}}</td>
     <td>{{data.2}}</td>
+{% if 'hideother' not in request.GET %}
     <td>{{data.0}}</td>
+{% endif %}
     <td>{{data.3}}</td>    
   </tr>
 {% endfor %}

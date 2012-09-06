@@ -74,6 +74,7 @@ class ConfRSVPForm(forms.Form):
 
 @login_required
 def editrsvp(request, conf_id, username):
+	return HttpResponse('This form is now closed. To add/modify/remove RSVPs please email mark@robogals.org')
 	chapter = request.user.chapter
 	if not request.user.is_staff:
 		if request.user.username != username:
