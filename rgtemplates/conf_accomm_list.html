@@ -36,7 +36,9 @@
 {% endif %}
 {% endfor %}
 </table>
+{% if 'hideother' not in request.GET %}
 <p><b>{% trans "Attendees in list:" %} {{ cas.count }}</b></p>
+{% endif %}
 <p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr>
