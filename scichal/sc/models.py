@@ -30,7 +30,7 @@ class Entrant(models.Model):
     def submitted(self):
     	c = JosContent.objects.filter(created_by=self.user.pk)
     	if len(c) > 0:
-    	    return "CONT" + str(c[0].pk)
+    	    return "CONT" + str(self.entry_year) + str(c[0].pk)
     	else:
     	    return "No"
     
