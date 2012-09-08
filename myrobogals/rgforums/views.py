@@ -504,6 +504,19 @@ def editpost(request, post_id):
 				p.save()
 				t.num_views = t.num_views - 1
 				t.save()
+				if 'Watch' in request.POST:
+					if not f.watchers.filter(pk=user.pk):
+						t.watchers.add(user)
+				else:
+					if f.watchers.filter(pk=user.pk):
+						f.watchers.remove(user)
+						for topic in f.topic_set.all():
+							if topic != t:
+								topic.watchers.add(user)
+							else:
+								topic.watchers.remove(user)
+					else:
+						t.watchers.remove(user)
 			else:
 				request.user.message_set.create(message=unicode(_('The fields "Message" can not be empty')))
 			if 'return' in request.GET:
@@ -545,6 +558,19 @@ def newpost(request, topic_id):
 				f.last_post_time = datetime.datetime.now()
 				f.last_post_user = user
 				f.save()
+				if 'Watch' in request.POST:
+					if not f.watchers.filter(pk=user.pk):
+						t.watchers.add(user)
+				else:
+					if f.watchers.filter(pk=user.pk):
+						f.watchers.remove(user)
+						for topic in f.topic_set.all():
+							if topic != t:
+								topic.watchers.add(user)
+							else:
+								topic.watchers.remove(user)
+					else:
+						t.watchers.remove(user)
 				watchers = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
 				if watchers:
 					message = EmailMessage()

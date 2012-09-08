@@ -49,7 +49,7 @@ class Category(models.Model):
 		if self.chapter:
 			visibility = _('%s') % (self.chapter.name)
 		else:
-			visibility = _('Global')
+			visibility = _('International')
 		if self.exec_only:
 			availability = _('Executive only')
 		else:
