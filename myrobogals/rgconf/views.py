@@ -212,7 +212,7 @@ def rsvplist(request, conf_id):
 					accommtotals[curdate][3] += 1
 					curdate += one_day
 				nights = ca.check_out - ca.check_in
-				if not nights.days in accommtotals:
+				if not nights.days in accommtotals_numnights:
 					accommtotals_numnights[nights.days] = [0,0,0,0]
 				accommtotals_numnights[nights.days][int(ca.gender)] += 1
 				accommtotals_numnights[nights.days][3] += 1
