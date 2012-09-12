@@ -65,6 +65,24 @@
 <p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr>
+    <td><strong>{% trans "No of nights" %}</strong></td>
+    <td><strong>{% trans "Male" %}</strong></td>
+    <td><strong>{% trans "Female" %}</strong></td>
+    <td><strong>{% trans "Total" %}</strong></td>
+  </tr>
+{% for night, data in accommtotals_nights %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>{{night}}</td>
+    <td>{{data.1}}</td>
+    <td>{{data.2}}</td>
+    <td>{{data.3}}</td>    
+  </tr>
+{% endfor %}
+</table>
+</p>
+<p>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
     <td><strong>{% trans "Activity" %}</strong></td>
     <td><strong>{% trans "People" %}</strong></td>
   </tr>

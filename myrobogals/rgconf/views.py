@@ -195,6 +195,8 @@ def rsvplist(request, conf_id):
 	customtotals = [0,0,0,0,0]
 	accommtotals = {}
 	accommtotals_sorted = []
+	accommtotals_numnights = {}
+	accommtotals_numnights_sorted = []
 	if request.user.is_superuser:
 		one_day = timedelta(days=1)
 		for ca in cas:
@@ -209,8 +211,14 @@ def rsvplist(request, conf_id):
 					accommtotals[curdate][int(ca.gender)] += 1
 					accommtotals[curdate][3] += 1
 					curdate += one_day
+				nights = ca.check_out - ca.check_in
+				if not nights.days in accommtotals:
+					accommtotals_numnights[nights.days] = [0,0,0,0]
+				accommtotals_numnights[nights.days][int(ca.gender)] += 1
+				accommtotals_numnights[nights.days][3] += 1
 		accommtotals_sorted = sorted(accommtotals.items(), key=lambda totals: totals[0])
-	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted}, context_instance=RequestContext(request))
+		accommtotals_numnights_sorted = sorted(accommtotals_numnights.items(), key=lambda totals: totals[0])
+	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted, 'accommtotals_nights': accommtotals_numnights_sorted}, context_instance=RequestContext(request))
 
 @login_required
 def showinvoice(request, conf_id, username):
