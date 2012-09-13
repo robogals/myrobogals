@@ -96,6 +96,12 @@
 				<td></td>
 				{% endif %}
 			  </tr>
+			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+				<td style="border-right: solid 1px grey;"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td><td></td>
+				{% if user.is_superuser %}
+				<td></td>
+				{% endif %}
+			 </tr>
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}" style="border-bottom: solid 1px grey;">
 				<td style="border-right: solid 1px grey;"><input type="submit" value="Edit Post" /></td><td></td>
 				{% if user.is_superuser %}
@@ -115,6 +121,12 @@
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="border-top:solid 1px grey;">
     <td valign="top"><a name="end"></a><strong>{% trans "Message:" %}</strong></td>
     <td>{{ postform.message }}</td>
+	{% if user.is_superuser %}
+	<td></td>
+	{% endif %}
+  </tr>
+  <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}">
+	<td colspan="2"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td>
 	{% if user.is_superuser %}
 	<td></td>
 	{% endif %}

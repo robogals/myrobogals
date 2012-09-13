@@ -7,7 +7,13 @@
 {% block pagetitle %}{{chapter.name}}{% endblock %}
 
 {% block content %}
+<p>
 <a href="/forums/search/{{chapter.myrobogals_url}}/">{% trans "Search" %}</a>
+{% comment %}
+|
+<a href="/forums/watch/topic/with/myposts/?return={{return|urlencode}}">{% trans "Add topics with my posts to watch list" %}</a>
+{% endcomment %}
+</p>
 
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 {% for globExecCategory in globExecCategories %}
@@ -241,7 +247,7 @@
 		<td>{% trans "Visibility:" %}</td>
 		<td>
 <select name="visibility">
-<option value="">{% trans "Global" %}</option>
+<option value="">{% trans "International" %}</option>
 <option value="{{chapter.pk}}">{% trans "Local" %}</option>
 </select>
 </td>
