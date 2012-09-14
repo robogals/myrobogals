@@ -367,7 +367,7 @@ def watchtopicwithmyposts(request):
 		if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 			if not f.watchers.filter(pk=user.pk):
 				t.watchers.add(user)
-	request.user.message_set.create(message=unicode(_('Topics with your posts have been added')))
+	request.user.message_set.create(message=unicode(_('Topics with your posts have been added to your watch list')))
 	if 'return' in request.GET:
 		return HttpResponseRedirect(request.GET['return'])
 	elif 'return' in request.POST:
@@ -518,7 +518,7 @@ def editpost(request, post_id):
 					else:
 						t.watchers.remove(user)
 			else:
-				request.user.message_set.create(message=unicode(_('The fields "Message" can not be empty')))
+				request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			elif 'return' in request.POST:
@@ -558,9 +558,10 @@ def newpost(request, topic_id):
 				f.last_post_time = datetime.datetime.now()
 				f.last_post_user = user
 				f.save()
-				if 'Watch' in request.POST:
-					if not f.watchers.filter(pk=user.pk):
-						t.watchers.add(user)
+				if 'watch' in request.POST:
+					if request.POST['watch'] == '1':
+						if not f.watchers.filter(pk=user.pk):
+							t.watchers.add(user)
 				else:
 					if f.watchers.filter(pk=user.pk):
 						f.watchers.remove(user)
@@ -594,7 +595,7 @@ def newpost(request, topic_id):
 					message.status = 0
 					message.save()
 			else:
-				request.user.message_set.create(message=unicode(_('The fields "Message" can not be empty')))
+				request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
 		else:
 			raise Http404
 		if 'return' in request.GET:

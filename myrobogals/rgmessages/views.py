@@ -431,7 +431,7 @@ def api(request):
 				if c != 0:
 					return HttpResponse("B")  # Already subscribed
 				if n.pk == 1:
-					users_count = User.objects.filter(email=email, email_newsletter_optin=True).count()
+					users_count = User.objects.filter(is_active=True, email=email, email_newsletter_optin=True).count()
 					if users_count > 0:
 						return HttpResponse("B")  # Already subscribed
 				try:
@@ -515,10 +515,9 @@ def api(request):
 				ns.active = False
 				ns.save()
 				if n.pk == 1:
-					for u in User.objects.filter(email=email):
-						if u.email_newsletter_optin:
-							u.email_newsletter_optin = False
-							u.save()
+					for u in User.objects.filter(is_active=True, email=email, email_newsletter_optin=True):
+						u.email_newsletter_optin = False
+						u.save()
 				return HttpResponse("A")
 			else:
 				return HttpResponse("-1")

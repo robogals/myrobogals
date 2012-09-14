@@ -72,7 +72,7 @@
 		<td>{{ topic.num_views }}</td>
 		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 		{% if user.is_superuser %}
-		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.gif" alt="Delete" /></a></td>
+		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.gif" alt="Delete" /></a></td>
 		<td><input type="checkbox" name="{{topic.pk}}" /></td>
 		{% endif %}
 	</tr>
