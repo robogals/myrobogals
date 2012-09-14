@@ -100,6 +100,10 @@ def importcsv(filerows, welcomeemail, defaults, newsletter, user):
 						raise SkipRowException
 					if NewsletterSubscriber.objects.filter(email=newsubscriber.email, newsletter=newsletter).count() > 0:
 						raise SkipRowException   # This email address is already subscribed
+					if newsletter.pk == 1:
+						users_count = User.objects.filter(is_active=True, email=newsubscriber.email, email_newsletter_optin=True).count()
+						if users_count > 0:
+							raise SkipRowException   # This email address is already subscribed by having User.email_newsletter_optin True
 				elif colname == 'first_name':
 					stringval(colname, cell, newsubscriber, defaults)
 				elif colname == 'last_name':

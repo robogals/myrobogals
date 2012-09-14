@@ -430,6 +430,10 @@ def api(request):
 				c = NewsletterSubscriber.objects.filter(email=email, newsletter=n, active=True).count()
 				if c != 0:
 					return HttpResponse("B")  # Already subscribed
+				if n.pk == 1:
+					users_count = User.objects.filter(email=email, email_newsletter_optin=True).count()
+					if users_count > 0:
+						return HttpResponse("B")  # Already subscribed
 				try:
 					# They've tried to subscribe already, so resend confirmation email
 					p = PendingNewsletterSubscriber.objects.get(email=email, newsletter=n)
@@ -510,6 +514,11 @@ def api(request):
 				ns.unsubscribed_date = datetime.now()
 				ns.active = False
 				ns.save()
+				if n.pk == 1:
+					for u in User.objects.filter(email=email):
+						if u.email_newsletter_optin:
+							u.email_newsletter_optin = False
+							u.save()
 				return HttpResponse("A")
 			else:
 				return HttpResponse("-1")
