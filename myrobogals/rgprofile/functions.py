@@ -138,11 +138,6 @@ def generate_unique_username(row, columns):
 	# Should never reach here, since the last case is pretty far-reaching
 	raise RgImportCsvException(_('Could not generate unique username'))
 
-<<<<<<< HEAD
-def importcsv(filerows, welcomeemail, defaults, chapter):
-	columns = None
-	users_imported = 0
-=======
 def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_email):
 	print chapter
 	columns = None
@@ -153,58 +148,11 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 	existing_emails=0
 	count=-1
 	msg=""
->>>>>>> Addressed Import CSV issue
 	if 'date_joined' not in defaults:
 		defaults['date_joined'] = datetime.now()
 	elif defaults['date_joined'] == None:
 		defaults['date_joined'] = datetime.now()
 	for row in filerows:
-<<<<<<< HEAD
-	 if any(row):
-		# Get column names from first row
-		if (columns == None):
-			columns = row
-			#print columns
-			if 'first_name' not in columns:
-				raise RgImportCsvException(_('You must specify a first_name field'))
-			if 'last_name' not in columns:
-				raise RgImportCsvException(_('You must specify a last_name field'))
-			if 'email' not in columns:
-				raise RgImportCsvException(_('You must specify an email field'))
-			continue
-		
-		# Create new user
-		newuser = User()
-		
-		# Process row
-		i = 0;
-		flag = 0;
-		for cell in row:
-			colname = columns[i]
-			if colname == 'first_name':
-				stringval(colname, cell, newuser, defaults)
-			elif colname == 'last_name':
-				stringval(colname, cell, newuser, defaults)
-			elif colname == 'email':
-				stringval(colname, cell, newuser, defaults)
-			elif colname == 'username':
-				data = cell.strip()
-				if data != "":
-					if not check_username(data):
-						u=User()
-						u.first_name = row(1)
-						u.last_name = row(2)
-						u.email = row(3)
-						flag=1
-					new_username = data
-				else:
-					new_username = generate_unique_username(row, columns)
-				newuser.username = new_username
-			elif colname == 'password':
-				data = cell.strip()
-				if data != "":
-					plaintext_password = data
-=======
 		if any(row):
 		# Create new user
 			count+=1
@@ -273,7 +221,6 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 					if newuser.chapter == chapter :
 						existing_users += 1
 						flag=1			
->>>>>>> Addressed Import CSV issue
 				else:
 					continue
 			# check if the email exists for any user, if yes, check if the 'ignore_email' checkbox is ticked. If it is not ticked, 
@@ -385,18 +332,6 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			newuser.is_staff = False
 			newuser.is_superuser = False
 		
-<<<<<<< HEAD
-		if flag == 1:
-			break
-		# If we still don't have a username and/or password
-		# by this stage, let's generate one
-		if getattr(newuser, 'username', '') == '':
-			new_username = generate_unique_username(row, columns)
-			newuser.username = new_username
-		if getattr(newuser, 'password', '') == '':
-			plaintext_password = User.objects.make_random_password(6)
-			newuser.set_password(plaintext_password)
-=======
 			# If we still don't have a username and/or password
 			# by this stage, let's generate one
 			if getattr(newuser, 'username', '') == '':
@@ -405,7 +340,6 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			if getattr(newuser, 'password', '') == '':
 				plaintext_password = User.objects.make_random_password(6)
 				newuser.set_password(plaintext_password)
->>>>>>> Addressed Import CSV issue
 			
 			# Apply any unapplied defaults
 			for key, value in defaults.iteritems():
