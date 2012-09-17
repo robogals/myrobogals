@@ -14,6 +14,7 @@ from myrobogals.rgmain.utils import SelectDateWidget
 import datetime
 from datetime import date
 import re
+import sys
 from django.forms.widgets import Widget, Select, TextInput
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
@@ -940,7 +941,13 @@ def process_login(request):
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()
+<<<<<<< HEAD
 
+=======
+	updateuser = forms.BooleanField(label='Update duplicate users', required=False)
+	ignore_email= forms.BooleanField(label='Ignore users with duplicate emails',initial=True, required=False)
+	
+>>>>>>> Addressed Import CSV issue
 class WelcomeEmailForm(forms.Form):
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
@@ -991,6 +998,12 @@ class DefaultsFormTwo(forms.Form):
 
 @login_required
 def importusers(request, chapterurl):
+<<<<<<< HEAD
+=======
+    # initial value to match the default value
+	updateuser=False  
+	ignore_email=True 
+>>>>>>> Addressed Import CSV issue
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
@@ -1002,6 +1015,9 @@ def importusers(request, chapterurl):
 			defaultsform1 = DefaultsFormOne(request.POST)
 			defaultsform2 = DefaultsFormTwo(request.POST)
 			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
+				#print form
+				#updateuser=form['updateuser']
+				# updateuser
 				file = request.FILES['csvfile']
 				tmppath = 'D:\dev\myrobogals\myrobogals\\' + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
@@ -1014,10 +1030,18 @@ def importusers(request, chapterurl):
 				defaults.update(defaultsform1.cleaned_data)
 				defaults.update(defaultsform2.cleaned_data)
 				welcomeemail = welcomeform.cleaned_data
+				cleanform = form.cleaned_data
+				#print request.session
 				request.session['welcomeemail'] = welcomeemail
 				request.session['defaults'] = defaults
+				request.session['updateuser'] = cleanform['updateuser']
+				request.session['ignore_email']=cleanform['ignore_email']
+				#if request.session.get(updateuser) != None :
+					#request.session['updateuser'] = updateuser
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter}, context_instance=RequestContext(request))
-		elif request.POST['step'] == '2':
+		elif request.POST['step'] == '2':			
+			#updateuser=request.POST['updateuser']
+			#print updateuser
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
 			tmppath = request.POST['tmppath'].replace('\\\\', '\\')
@@ -1028,18 +1052,45 @@ def importusers(request, chapterurl):
 			if welcomeemail['importaction'] == '2':
 				welcomeemail = None
 			defaults = request.session['defaults']
+			updateuser= request.session['updateuser']
+			ignore_email= request.session['ignore_email']
+			#print updateuser
 			try:
+<<<<<<< HEAD
 				users_imported = importcsv(filerows, welcomeemail, defaults, chapter)
+=======
+				(users_imported,users_updated, existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter,updateuser, ignore_email)
+>>>>>>> Addressed Import CSV issue
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 			if welcomeemail == None:
-				msg = _('%d users imported!') % users_imported
+				if updateuser :
+					if ignore_email :
+						msg = _('%d users imported!Duplicate usernames were found for %d rows;  their details have been updated. Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, users_updated, existing_emails, error_msg)
+					else :
+						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, users_updated, existing_emails,error_msg)
+				else : 
+					if ignore_email :
+						msg = _('%d users imported!Duplicate emails were found for %d rows')% (users_imported, existing_emails, error_msg)
+					else :
+						msg = _('%d users imported!Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, existing_emails, error_msg)
 			else:
-				msg = _('%d users imported and emailed!') % users_imported
+				if updateuser :
+					if ignore_email :
+						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, users_updated, existing_emails, error_msg)
+					else :
+						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, users_updated, existing_emails, error_msg)
+				else :
+					if ignore_email :
+						msg = _('%d users imported and emailed!Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, existing_emails, error_msg)
+					else :
+						msg = _('%d users imported and emailed!Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, existing_emails, error_msg)
 			request.user.message_set.create(message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
+			del request.session['updateuser']
+			del request.session['ignore_email']
 			return HttpResponseRedirect('/chapters/' + chapter.myrobogals_url + '/edit/users/')
 	else:
 		form = CSVUploadForm()

@@ -19,6 +19,15 @@
     <td valign="top" style="width: 70px"><strong>{% trans "CSV file:" %}</strong></td>
     <td>{{form.csvfile}}</td>
   </tr>
+<<<<<<< HEAD
+=======
+   <tr>
+    <td></td><td>{{ form.updateuser }} <label class="label-left" style="width:120px;" for="id_{{ form.updateuser.name }}">{{ form.updateuser.label }}</label></td>
+  </tr>
+  <tr>
+    <td></td><td>{{ form.ignore_email }} <label class="label-left" style="width:120px;" for="id_{{ form.ignore_email.name }}">{{ form.ignore_email.label }}</label></td>
+  </tr>
+>>>>>>> Addressed Import CSV issue
   <tr>
     <td style="vertical-align: top; width: 50px"><strong>{% trans "Action:" %}</strong></td>
     <td style="vertical-align: top">{{ welcomeform.importaction }}</td>
