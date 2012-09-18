@@ -489,3 +489,4 @@ def unsubtonews(email, chapter_id):
         	user.save()
         else:
         	raise SubToNewsException(_('That email address is not subscribed'))
+S
