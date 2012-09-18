@@ -940,9 +940,6 @@ def importusers(request, chapterurl):
 			defaultsform1 = DefaultsFormOne(request.POST)
 			defaultsform2 = DefaultsFormTwo(request.POST)
 			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
-				#print form
-				#updateuser=form['updateuser']
-				# updateuser
 				file = request.FILES['csvfile']
 				tmppath = 'D:\dev\myrobogals\myrobogals\\' + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
@@ -956,17 +953,12 @@ def importusers(request, chapterurl):
 				defaults.update(defaultsform2.cleaned_data)
 				welcomeemail = welcomeform.cleaned_data
 				cleanform = form.cleaned_data
-				#print request.session
 				request.session['welcomeemail'] = welcomeemail
 				request.session['defaults'] = defaults
 				request.session['updateuser'] = cleanform['updateuser']
 				request.session['ignore_email']=cleanform['ignore_email']
-				#if request.session.get(updateuser) != None :
-					#request.session['updateuser'] = updateuser
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter}, context_instance=RequestContext(request))
 		elif request.POST['step'] == '2':			
-			#updateuser=request.POST['updateuser']
-			#print updateuser
 			if 'tmppath' not in request.POST:
 				return HttpResponseRedirect("/chapters/" + chapterurl + "/edit/users/import/")
 			tmppath = request.POST['tmppath'].replace('\\\\', '\\')
@@ -979,7 +971,7 @@ def importusers(request, chapterurl):
 			defaults = request.session['defaults']
 			updateuser= request.session['updateuser']
 			ignore_email= request.session['ignore_email']
-			#print updateuser
+			
 			try:
 				(users_imported,users_updated, existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter,updateuser, ignore_email)
 			except RgImportCsvException as e:
