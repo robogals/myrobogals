@@ -30,12 +30,12 @@ def newcategory(request):
 				else:
 					raise Http404
 				if Category.objects.filter(name=newCategory.name, chapter=newCategory.chapter, exec_only=newCategory.exec_only):
-					msg = 'A similar category already exists'
+					msg = '- A similar category already exists'
 					request.user.message_set.create(message=unicode(_(msg)))
 				else:
 					newCategory.save()
 			else:
-				msg = 'The field "Category name" can not be empty'
+				msg = '- The field "Category name" can not be empty'
 				request.user.message_set.create(message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -86,12 +86,12 @@ def newforum(request):
 				newForum.category = g
 				newForum.created_by = user
 				if Forum.objects.filter(category=newForum.category, name=newForum.name):
-					msg = 'A similar forum already exists'
+					msg = '- A similar forum already exists'
 					request.user.message_set.create(message=unicode(_(msg)))
 				else:
 					newForum.save()
 			else:
-				msg = 'The fields "Forum name" and "Description" can not be empty'
+				msg = '- The fields "Forum name" and "Description" can not be empty'
 				request.user.message_set.create(message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -120,7 +120,7 @@ def editforum(request, forum_id):
 			edit.description = request.POST['description']
 			edit.save()
 		else:
-			msg = 'The fields "new forum name" and "new description" can not be empty'
+			msg = '- The fields "new forum name" and "new description" can not be empty'
 			request.user.message_set.create(message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -259,7 +259,7 @@ def newtopic(request, forum_id):
 				newTopic.last_post_time = datetime.datetime.now()
 				newTopic.last_post_user = user
 				if Topic.objects.filter(forum=newTopic.forum, subject=newTopic.subject):
-					msg = 'A similar topic already exists'
+					msg = '- A similar topic already exists'
 					request.user.message_set.create(message=unicode(_(msg)))
 				else:
 					newTopic.save()
@@ -294,7 +294,7 @@ def newtopic(request, forum_id):
 						message.status = 0
 						message.save()
 			else:
-				request.user.message_set.create(message=unicode(_('The fields "New Topic" and "Message" can not be empty')))
+				request.user.message_set.create(message=unicode(_('- The fields "New Topic" and "Message" can not be empty')))
 		else:
 			raise Http404
 		if 'return' in request.GET:
