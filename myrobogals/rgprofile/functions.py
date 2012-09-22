@@ -141,7 +141,7 @@ def generate_unique_username(row, columns):
 	raise RgImportCsvException(_('Could not generate unique username'))
 
 def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_email):
-	#print chapter
+	
 	columns = None
 	users_imported = 0
 	username_pos= 0	
@@ -227,7 +227,6 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 				user_already_exists_flag = True
 				if updateuser :
 					newuser = User.objects.get(username=uname_data)
-					#print newuser.chapter
 					if newuser.chapter == chapter :
 						existing_users += 1
 						flag=1			
@@ -241,15 +240,11 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			# then get the row with the matching username (and, as we will see, replace its contents). Otherwise, ignore.		
 			# Also, they must be from the same chapter
 			elif not (check_email(email_data)):
-				print check_email(email_data)
 				if newuser.chapter == chapter:
 					existing_emails+=1
 					if ignore_email:
 						msg += ("<br> Row %d has a duplicate email - row ignored") % count
 						continue
-					#else :
-						#newuser = User.objects.get(email=email_data)
-						#flag=1
 				
 			for cell in row:
 				colname = columns[i]
@@ -366,15 +361,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			newuser.chapter = chapter
 			newuser.save()
 			new_vals = newuser.__dict__.values()
-		
-			#j=0
-			#for val in new_vals :
-				#if old_vals[j] !=  new_vals[j] :
-					#flag2=1
-					#users_existed+=1
-					#break
-				#j+=1	
-				
+
 			# flag is set to 1 if either a duplicate username or email is being imported. In which case, we 
 			# will not add the users to our list, instead we'll simply update their values.
 			if flag == 1:

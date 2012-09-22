@@ -977,6 +977,8 @@ def importusers(request, chapterurl):
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
+
+			
 			if welcomeemail == None:				
 				if updateuser:
 						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
@@ -984,6 +986,7 @@ def importusers(request, chapterurl):
 						msg = _('%d users imported!<br>Duplicate usernames have been ignored. <br>%s') % (users_imported, error_msg)
 				else :
 						msg = _('%d users imported!<br>Duplicate emails were found for %d rows. They have been added. <br>%s') % (users_imported, existing_emails, error_msg)
+
 			else:
 				if updateuser:
 						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
@@ -1190,7 +1193,7 @@ def newsletterunsub(request, chapterurl):
 		else:
 			newsletterunform = NewsletterUnForm()
 	return render_to_response('newsletterunsub.html', {'newsletterunform': newsletterunform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
+e 
 def newsletterunsubdone(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	return render_to_response('newsletterunsubdone.html', {'c': chapter}, context_instance=RequestContext(request))
