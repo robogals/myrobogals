@@ -973,32 +973,24 @@ def importusers(request, chapterurl):
 			ignore_email= request.session['ignore_email']
 			
 			try:
-				(users_imported,users_updated, existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter,updateuser, ignore_email)
+				(users_imported,users_updated,existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter,updateuser, ignore_email)
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-			if welcomeemail == None:
-				if updateuser :
-					if ignore_email :
-						msg = _('%d users imported!Duplicate usernames were found for %d rows;  their details have been updated. Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, users_updated, existing_emails, error_msg)
-					else :
-						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, users_updated, existing_emails,error_msg)
-				else : 
-					if ignore_email :
-						msg = _('%d users imported!Duplicate emails were found for %d rows')% (users_imported, existing_emails, error_msg)
-					else :
-						msg = _('%d users imported!Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, existing_emails, error_msg)
-			else:
-				if updateuser :
-					if ignore_email :
-						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, users_updated, existing_emails, error_msg)
-					else :
-						msg = _('%d users imported!Duplicate usernames were found for %d rows; their details have been updated. Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, users_updated, existing_emails, error_msg)
+			if welcomeemail == None:				
+				if updateuser:
+						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
+				elif ignore_email:
+						msg = _('%d users imported!<br>Duplicate usernames have been ignored. <br>%s') % (users_imported, error_msg)
 				else :
-					if ignore_email :
-						msg = _('%d users imported and emailed!Duplicate emails were found for %d rows. They have been ignored. %s') % (users_imported, existing_emails, error_msg)
-					else :
-						msg = _('%d users imported and emailed!Duplicate emails were found for %d rows. They have been updated. %s') % (users_imported, existing_emails, error_msg)
+						msg = _('%d users imported!<br>Duplicate emails were found for %d rows. They have been added. <br>%s') % (users_imported, existing_emails, error_msg)
+			else:
+				if updateuser:
+						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
+				elif ignore_email:
+						msg = _('%d users imported!<br>Duplicate usernames have been ignored. <br>%s') % (users_imported, error_msg)
+				else :
+						msg = _('%d users imported!<br>Duplicate emails were found for %d rows. They have been added. <br>%s') % (users_imported, existing_emails, error_msg)
 			request.user.message_set.create(message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']

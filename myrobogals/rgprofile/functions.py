@@ -81,7 +81,9 @@ def check_email(email):
 		User.objects.get(email=email)
 	except User.DoesNotExist:
 		return True
-	return False	
+	except User.MultipleObjectsReturned:
+		return False
+	return False		
 
 def generate_unique_username(row, columns):
 	first_name = row[columns.index('first_name')]
@@ -139,7 +141,7 @@ def generate_unique_username(row, columns):
 	raise RgImportCsvException(_('Could not generate unique username'))
 
 def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_email):
-	print chapter
+	#print chapter
 	columns = None
 	users_imported = 0
 	username_pos= 0	
@@ -147,6 +149,8 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 	existing_users= 0
 	existing_emails=0
 	count=-1
+	username_field_exists_flag=1
+	user_already_exists= False
 	msg=""
 	if 'date_joined' not in defaults:
 		defaults['date_joined'] = datetime.now()
@@ -155,8 +159,10 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 	for row in filerows:
 		if any(row):
 		# Create new user
-			count+=1
 			newuser = User()
+			
+			count+=1
+			user_already_exists_flag= False
 		# Get column names from first row, also get the positions of the fields so that we can extract their values 
 		# using their positions later.
 			if (columns == None):
@@ -178,8 +184,9 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 					
 				if 'username' in columns:
 					username_pos=columns.index('username')
+					username_field_exists_flag=1
 					
-				if 'mobile' in columns	:
+				if 'mobile' in columns:
 					mobile_pos=columns.index('mobile')
 				continue		
 		
@@ -188,7 +195,10 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			flag = 0;
 				
 			# extracting the values of the username, email, first_name and last_name fields for each row.
-			uname=row[username_pos]
+			if username_field_exists_flag == 1:
+				uname=row[username_pos]
+			else :
+				uname = ''
 			email=row[email_pos]
 			first_name= row[first_name_pos]
 			last_name = row[last_name_pos]		
@@ -201,39 +211,45 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			
 			# check if any of the values is None or empty for a row. If yes, form an error message and ignore that row.
 			if first_name_data == None or first_name_data == '':
-				msg += ("First name not provided for row %d - row ignored.") % count
+				msg += ("<br>First name not provided for row %d - row ignored.") % count
 				continue
 			if last_name_data == None or last_name_data == '' :
-				msg += ("Last name not provided for row %d - row ignored.") % count
+				msg += ("<br>Last name not provided for row %d - row ignored.") % count
 				continue
 			if email_data == None or email_data == '' :
-				msg += ("Email not provided for row %d - row ignored.") % count 	
+				msg += ("<br>Email not provided for row %d - row ignored.") % count 	
 				continue
 		
 			# check if the username exists, if yes, check if the 'updateuser' checkbox is ticked. If it is ticked, 
 			# then get the row with the matching username (and, as we will see, replace its contents). Otherwise, ignore.
 			# Also, they must be from the same chapter
-			if not check_username(uname_data):
-			
+			if not check_username(uname_data):	
+				user_already_exists_flag = True
 				if updateuser :
 					newuser = User.objects.get(username=uname_data)
-					print newuser.chapter
+					#print newuser.chapter
 					if newuser.chapter == chapter :
 						existing_users += 1
 						flag=1			
+						
+					else :
+						msg += ("<br>Row %d has a duplicate user from another chapter - row ignored") % count
 				else:
+					msg += ("<br> Row %d has a duplicate user - row ignored") % count
 					continue
 			# check if the email exists for any user, if yes, check if the 'ignore_email' checkbox is ticked. If it is not ticked, 
 			# then get the row with the matching username (and, as we will see, replace its contents). Otherwise, ignore.		
 			# Also, they must be from the same chapter
-			elif not check_email(email_data):
+			elif not (check_email(email_data)):
+				print check_email(email_data)
 				if newuser.chapter == chapter:
 					existing_emails+=1
 					if ignore_email:
+						msg += ("<br> Row %d has a duplicate email - row ignored") % count
 						continue
-					else :
-						newuser = User.objects.get(email=email_data)
-						flag=1
+					#else :
+						#newuser = User.objects.get(email=email_data)
+						#flag=1
 				
 			for cell in row:
 				colname = columns[i]
