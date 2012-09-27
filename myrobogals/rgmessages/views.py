@@ -78,47 +78,60 @@ def writeemail(request):
 		schedsel = request.POST['scheduling']
 		statussel = request.POST['status']
 		
-		emailform = WriteEmailForm(request.POST, user=request.user)
+		if 'step' in request.POST:
+			if request.POST['step'] == '1':
+				emailform = WriteEmailForm(request.POST, user=request.user)
+				request.session['emailform'] = emailform
+			elif request.POST['step'] == '2':
+				if 'emailform' not in request.session:
+					raise Http404
+				emailform = request.session['emailform']
+				del request.session['emailform']
+			else:
+				raise Http404
+		else:
+			raise Http404
 		if emailform.is_valid():
 			data = emailform.cleaned_data
-			message = EmailMessage()
-			message.subject = data['subject']
-			message.body = data['body']
-			message.from_address = request.user.email
-			message.reply_address = request.user.email
-			message.sender = request.user
-			message.html = True
+			if request.POST['step'] == '2':
+				message = EmailMessage()
+				message.subject = data['subject']
+				message.body = data['body']
+				message.from_address = request.user.email
+				message.reply_address = request.user.email
+				message.sender = request.user
+				message.html = True
 
-			if request.POST['scheduling'] == '1':
-				message.scheduled = True
-				message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
-				try:
-					message.scheduled_date_type = int(data['schedule_zone'])
-				except Exception:
-					message.scheduled_date_type = 1
-			else:
-				message.scheduled = False
-
-			if request.POST['type'] == '4':
-				n = data['newsletters']
-				message.from_name = n.from_name
-				message.from_address = n.from_email
-				message.reply_address = n.from_email
-				message.sender = n.from_user
-			else:
-				message.content_subtype = "html"
-				if int(data['from_type']) == 0:
-					message.from_name = "Robogals"
-				elif int(data['from_type']) == 1:
-					message.from_name = request.user.chapter.name
+				if request.POST['scheduling'] == '1':
+					message.scheduled = True
+					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+					try:
+						message.scheduled_date_type = int(data['schedule_zone'])
+					except Exception:
+						message.scheduled_date_type = 1
 				else:
-					message.from_name = request.user.get_full_name()
-				
-			# Don't send it yet until the recipient list is done
-			message.status = -1
-			# Save to database so we get a value for the primary key,
-			# which we need for entering the recipient entries
-			message.save()
+					message.scheduled = False
+
+				if request.POST['type'] == '4':
+					n = data['newsletters']
+					message.from_name = n.from_name
+					message.from_address = n.from_email
+					message.reply_address = n.from_email
+					message.sender = n.from_user
+				else:
+					message.content_subtype = "html"
+					if int(data['from_type']) == 0:
+						message.from_name = "Robogals"
+					elif int(data['from_type']) == 1:
+						message.from_name = request.user.chapter.name
+					else:
+						message.from_name = request.user.get_full_name()
+					
+				# Don't send it yet until the recipient list is done
+				message.status = -1
+				# Save to database so we get a value for the primary key,
+				# which we need for entering the recipient entries
+				message.save()
 
 			if request.POST['type'] == '1':
 				if request.user.is_superuser:
@@ -147,39 +160,57 @@ def writeemail(request):
 			else:
 				users = data['recipients']
 
+			usersfiltered = []
 			if statussel != '0' and request.POST['type'] != '4':
 				for one_user in users:
 					if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk=(int(statussel)))):
-						recipient = EmailRecipient()
-						recipient.message = message
-						recipient.user = one_user
-						recipient.to_name = one_user.get_full_name()
-						recipient.to_address = one_user.email
-						recipient.save()
+						if request.POST['step'] == '1':
+							usersfiltered.append(one_user)
+						else:
+							if str(one_user.pk) in request.POST.keys():
+								recipient = EmailRecipient()
+								recipient.message = message
+								recipient.user = one_user
+								recipient.to_name = one_user.get_full_name()
+								recipient.to_address = one_user.email
+								recipient.save()
 			else:
 				for one_user in users:
-					recipient = EmailRecipient()
-					recipient.message = message
-					recipient.user = one_user
-					recipient.to_name = one_user.get_full_name()
-					recipient.to_address = one_user.email
-					recipient.save()
+					if request.POST['step'] == '1':
+						usersfiltered.append(one_user)
+					else:
+						if str(one_user.pk) in request.POST.keys():
+							recipient = EmailRecipient()
+							recipient.message = message
+							recipient.user = one_user
+							recipient.to_name = one_user.get_full_name()
+							recipient.to_address = one_user.email
+							recipient.save()
 			
+			subscribers = []
 			if request.POST['type'] == '4' and request.user.is_superuser:
 				for one_subscriber in NewsletterSubscriber.objects.filter(newsletter=data['newsletters'], active=True):
-					recipient = EmailRecipient()
-					recipient.message = message
-					recipient.user = None
-					recipient.to_name = one_subscriber.first_name + " " + one_subscriber.last_name
-					recipient.to_address = one_subscriber.email
-					recipient.save()
+					if request.POST['step'] == '1':
+						subscribers.append(one_subscriber)
+					else:
+						if ('sub' + str(one_subscriber.pk)) in request.POST.keys():
+							recipient = EmailRecipient()
+							recipient.message = message
+							recipient.user = None
+							recipient.to_name = one_subscriber.first_name + " " + one_subscriber.last_name
+							recipient.to_address = one_subscriber.email
+							recipient.save()
 			
-			# Now mark it as OK to send. The email and all recipients are now in MySQL.
-			# A background script on the server will process the queue.
-			message.status = 0
-			message.save()
+			if request.POST['step'] == '2':
+				# Now mark it as OK to send. The email and all recipients are now in MySQL.
+				# A background script on the server will process the queue.
+				message.status = 0
+				message.save()
 			
-			return HttpResponseRedirect('/messages/email/done/')
+			if request.POST['step'] == '1':
+				return render_to_response('email_users_confirm.html', {'usersfiltered': usersfiltered, 'subscribers': subscribers, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status']}, context_instance=RequestContext(request))
+			else:
+				return HttpResponseRedirect('/messages/email/done/')
 	else:
 		if request.user.is_superuser:
 			typesel = '2'
