@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Confirm Email Recipients" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Confirm Email Recipients" %}{% endblock %}
+
+{% block content %}
+{% comment %}
+<p>
+	{% if type == "4" and user.is_superuser and subscribers %}
+	<a href="#recipients">Recipients</a> | <a href="#subscribers">Subscribers</a>
+	{% endif %}
+</p>
+{% endcomment %}
+<form action="/messages/email/write/" method="POST">
+	<a name="recipients"></a>
+	<table width="400px" style="table-layout:fixed;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="75px" />
+		<tr class="even" style="text-align: center;">
+			<td>{% trans "Recipient" %}</td>
+			<td>{% trans "Send Status" %}</td>
+		</tr>
+		{% if usersfiltered %}
+		{% for recipient in usersfiltered %}
+		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+			<td>{{ recipient.get_full_name }}</td>
+			<td style="text-align: center;">
+			<input type="checkbox" name="{{ recipient.pk }}" value="1" checked="checked" />
+			</td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<td colspan="2">No recipients selected</td>
+		{% endif %}
+	</table></p>
+		{% if type == "4" and user.is_superuser %}
+		<a name="subscribers"></a>
+		<table style="table-layout:fixed;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+			<col width="100px" />
+			<col width="75px" />
+			<tr class="even" style="text-align: center;">
+				<td>{% trans "Subscriber" %}</td>
+				<td>{% trans "Email Address" %}</td>
+				<td>{% trans "Send Status" %}</td>
+			</tr>
+			{% if subscribers %}
+			{% for sub in subscribers %}
+			<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+				<td>
+				{% if sub.last_name or sub.first_name %}
+					{{ sub.first_name }}, {{ sub.last_name }}
+				{% else %}
+					{% trans "None" %}
+				{% endif %}
+				</td>
+				<td>{{ sub.email }}</td>
+				<td>
+				<input type="checkbox" name="sub{{ sub.pk }}" value="1" checked="checked" />
+				</td>
+			</tr>
+			{% endfor %}
+			{% else %}
+			<td colspan="3">No subscribers selected</td>
+			{% endif %}
+		{% endif %}
+	</table></p>
+	<input type="hidden" name="step" value="2" />
+	<input type="hidden" name="type" value="{{type}}" />
+	<input type="hidden" name="scheduling" value="{{scheduling}}" />
+	<input type="hidden" name="status" value="{{status}}" />
+    <p style="clear: both; font-size: 200%;"><input type="submit" value="Send Email!" /></p>
+</form>
+{% endblock %}
