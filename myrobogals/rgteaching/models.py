@@ -103,7 +103,7 @@ class SchoolVisit(Event):
 	closing_comments = models.TextField("Closing comments", blank=True)
 
 	def __unicode__(self):
-		return str(self.school) + " on " + str(self.visit_start.date())
+		return unicode(self.school) + " on " + str(self.visit_start.date())
 		
 	def get_absolute_url(self):
 		return "/teaching/%d/" % self.pk
