@@ -1,52 +1,31 @@
-from django.template import RequestContext, Context, loader
-from django.shortcuts import render_to_response, get_object_or_404
-from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
-from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
-from myrobogals.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgmain.models import University, MobileRegex
-from myrobogals.auth import authenticate, login
-from django.core.validators import email_re
 from django import forms
-from django.utils.translation import ugettext_lazy as _
-from myrobogals.rgmain.utils import SelectDateWidget
-import datetime
-from datetime import date
-import re
-import sys
+from django.core.validators import email_re
+from django.db import connection
+from django.db.models import Q
 from django.forms.widgets import Widget, Select, TextInput
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext, Context, loader
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
-from django.db.models import Q
-from myrobogals.admin.widgets import FilteredSelectMultiple
-from myrobogals.settings import MEDIA_ROOT, MEDIA_URL
-from time import time
-import csv
-from django.db import connection
-from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
-from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
-from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage
+from django.utils.translation import ugettext_lazy as _
 from myrobogals.admin.models import LogEntry
-
-'''
-def joinstart(request):
-	if request.user.is_authenticated():
-		return render_to_response('join_already_logged_in.html', {}, context_instance=RequestContext(request))
-	else:
-		secondlevel = []
-		# Get chapters whose parent = 1 (Robogals Global)
-		superchapters = Group.objects.filter(parent_id=1)
-		for superchapter in superchapters:
-			chapters = Group.objects.filter(parent=superchapter)
-			t = loader.get_template('chapter_listing_sub.html')
-			c = Context({
-				'superchapter': superchapter,
-				'chapters': chapters,
-			})
-			secondlevel.append(t.render(c))
-		return render_to_response('join_select_chapter.html', {'secondlevels': secondlevel}, context_instance=RequestContext(request))
-'''
+from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.auth import authenticate, login
+from myrobogals.auth.decorators import login_required
+from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
+from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
+from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
+from myrobogals.rgprofile.models import Position, UserList
+from myrobogals.rgmain.models import University, MobileRegex
+from myrobogals.rgmain.utils import SelectDateWidget
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
+from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
+from myrobogals.settings import MEDIA_ROOT, MEDIA_URL
+import datetime
+from time import time
+import re
+import csv
 
 def joinchapter(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
@@ -232,12 +211,12 @@ def deleteuser(request, userpk):
 						msg = _('Member "%s" is already marked as alumni') % userToBeDeleted.get_full_name()
 					else:
 						if userToBeDeleted.membertype().description != 'Inactive':
-							old_status.status_date_end = date.today()
+							old_status.status_date_end = datetime.date.today()
 							old_status.save()
 						new_status=MemberStatus()
 						new_status.user = userToBeDeleted
 						new_status.statusType = MemberStatusType.objects.get(pk=2)
-						new_status.status_date_start = date.today()
+						new_status.status_date_start = datetime.date.today()
 						new_status.save()
 						msg = _('Member "%s" marked as alumni') % userToBeDeleted.get_full_name()
 				else:
@@ -292,12 +271,12 @@ def editstatus(request, chapterurl):
 							users_already = u.username
 					else:
 						if user.membertype().description != 'Inactive':
-							old_status.status_date_end = date.today()
+							old_status.status_date_end = datetime.date.today()
 							old_status.save()
 						new_status=MemberStatus()
 						new_status.user = u
 						new_status.statusType = MemberStatusType.objects.get(pk=int(status))
-						new_status.status_date_start = date.today()
+						new_status.status_date_start = datetime.date.today()
 						new_status.save()
 						if(users_changed):						
 							users_changed = users_changed + ", " + u.username
@@ -320,6 +299,70 @@ def adduser(request, chapterurl):
 @login_required
 def redirtoself(request):
 	return HttpResponseRedirect("/profile/" + request.user.username + "/")
+
+@login_required
+def mobverify(request):
+	if not request.user.is_staff:
+		raise Http404
+	if request.user.mobile_verified:
+		request.user.message_set.create(message=unicode(_('Your mobile number is already verified')))
+		return HttpResponseRedirect('/profile/')
+	if request.method == 'POST':
+		if not request.session.get('verif_code', False):
+			raise Http404
+		if not request.session.get('mobile', False):
+			del request.session['verif_code']
+			raise Http404
+		if (request.POST['verif_code'] == request.session['verif_code']) and (request.user.mobile == request.session['mobile']):
+			request.user.mobile_verified = True
+			request.user.save()
+			msg = _('Verification succeeded')
+		else:
+			msg = _('- Verification failed: invalid verification code')
+		del request.session['verif_code']
+		del request.session['mobile']
+		request.user.message_set.create(message=unicode(msg))
+		return HttpResponseRedirect('/messages/sms/write/')
+	else:
+		if request.user.mobile:
+			verif_code = User.objects.make_random_password(6)
+			message = SMSMessage()
+			message.body = 'Robogals verification code: ' + verif_code
+			message.senderid = '61429558100'
+			message.sender = User.objects.get(username='edit')
+			message.chapter = Group.objects.get(pk=1)
+			message.validate()
+			message.sms_type = 1
+			message.status = -1
+			message.save()
+			recipient = SMSRecipient()
+			recipient.message = message
+			recipient.user = request.user
+			request.session['mobile'] = request.user.mobile
+			recipient.to_number = request.session['mobile']
+			recipient.save()
+
+			# Check that we haven't used too many credits
+			sms_this_month = 0
+			sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
+			for obj in sms_this_month_obj:
+				sms_this_month += obj.credits_used()
+			sms_this_month += message.credits_used()
+			if sms_this_month > Group.objects.get(pk=1).sms_limit:
+				message.status = 3
+				message.save()
+				msg = _('- Verification failed: system problem please try again later')
+				request.user.message_set.create(message=unicode(msg))
+				return HttpResponseRedirect('/profile/')
+
+			message.status = 0
+			message.save()
+			request.session['verif_code'] = verif_code
+			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
+		else:
+			msg = _('- Verification failed: no mobile number entered. (Profile -> Edit Profile)')
+			request.user.message_set.create(message=unicode(msg))
+			return HttpResponseRedirect('/messages/sms/write/')
 
 @login_required
 def redirtoeditself(request):
@@ -684,7 +727,9 @@ def edituser(request, username, chapter=None):
 					u.last_name = data['last_name']
 					u.email = data['email']
 					u.alt_email = data['alt_email']
-					u.mobile = data['mobile']
+					if u.mobile != data['mobile']:
+						u.mobile = data['mobile']
+						u.mobile_verified = False
 					u.gender = data['gender']
 					if 'student_number' in data:
 						u.student_number = data['student_number']
@@ -873,8 +918,8 @@ def process_login(request):
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()
-	updateuser = forms.BooleanField(label='Update duplicate users', required=False)
-	ignore_email= forms.BooleanField(label='Ignore users with duplicate emails',initial=True, required=False)
+	updateuser = forms.BooleanField(label=_('Update (instead of create) members if the username already exists'), required=False)
+	ignore_email= forms.BooleanField(label=_('Ignore rows that have the same email address as an existing member'),initial=True, required=False)
 	
 class WelcomeEmailForm(forms.Form):
 	def __init__(self, *args, **kwargs):
@@ -941,7 +986,7 @@ def importusers(request, chapterurl):
 			defaultsform2 = DefaultsFormTwo(request.POST)
 			if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
 				file = request.FILES['csvfile']
-				tmppath = 'D:\dev\myrobogals\myrobogals\\' + request.user.chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
+				tmppath = '/tmp/' + chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
 				destination = open(tmppath, 'w')
 				for chunk in file.chunks():
 					destination.write(chunk)
@@ -969,31 +1014,29 @@ def importusers(request, chapterurl):
 			if welcomeemail['importaction'] == '2':
 				welcomeemail = None
 			defaults = request.session['defaults']
-			updateuser= request.session['updateuser']
-			ignore_email= request.session['ignore_email']
+			updateuser = request.session['updateuser']
+			ignore_email = request.session['ignore_email']
 			
 			try:
-				(users_imported,users_updated,existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter,updateuser, ignore_email)
+				(users_imported, users_updated, existing_emails, error_msg) = importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_email)
 			except RgImportCsvException as e:
 				errmsg = e.errmsg
 				return render_to_response('import_users_2.html', {'tmppath': tmppath, 'filerows': filerows, 'chapter': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
 			
-			if welcomeemail == None:				
+			if welcomeemail == None:
 				if updateuser:
-						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
+						msg = _('%d users imported.<br>Existing usernames were found for %d rows; their details have been updated.<br>%s') % (users_imported, users_updated, error_msg)
 				elif ignore_email:
-						msg = _('%d users imported!<br>Duplicate usernames have been ignored. <br>%s') % (users_imported, error_msg)
+						msg = _('%d users imported.<br>%d rows were ignored due to members with those email addresses already existing.<br>%s') % (users_imported, existing_emails, error_msg)
 				else :
-						msg = _('%d users imported!<br>Duplicate emails were found for %d rows. They have been added. <br>%s') % (users_imported, existing_emails, error_msg)
-
+						msg = _('%d users imported.<br>%s') % (users_imported, error_msg)
 			else:
 				if updateuser:
-						msg = _('%d users imported!<br>Duplicate usernames were found for %d rows; their details have been updated. <br>%s') % (users_imported, users_updated, error_msg)
+						msg = _('%d users imported and emailed.<br>Existing usernames were found for %d rows; their details have been updated.<br>%s') % (users_imported, users_updated, error_msg)
 				elif ignore_email:
-						msg = _('%d users imported!<br>Duplicate usernames have been ignored. <br>%s') % (users_imported, error_msg)
+						msg = _('%d users imported and emailed.<br>%d rows were ignored due to members with those email addresses already existing.<br>%s') % (users_imported, existing_emails, error_msg)
 				else :
-						msg = _('%d users imported!<br>Duplicate emails were found for %d rows. They have been added. <br>%s') % (users_imported, existing_emails, error_msg)
+						msg = _('%d users imported and emailed.<br>%s') % (users_imported, error_msg)
 			request.user.message_set.create(message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
@@ -1029,7 +1072,7 @@ def exportusers(request, chapterurl):
 			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number', 'user__alt_email', 'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end', 'user__course_type', 'user__student_type').distinct()
 
 		response = HttpResponse(mimetype='text/csv')
-		filename = 'robogals-' + c.myrobogals_url + '-' + str(date.today()) + '.csv'
+		filename = 'robogals-' + c.myrobogals_url + '-' + str(datetime.date.today()) + '.csv'
 		response['Content-Disposition'] = 'attachment; filename=' + filename
 		writer = csv.writer(response)
 		writer.writerow(['username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'])
@@ -1193,7 +1236,7 @@ def newsletterunsub(request, chapterurl):
 		else:
 			newsletterunform = NewsletterUnForm()
 	return render_to_response('newsletterunsub.html', {'newsletterunform': newsletterunform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-e 
+
 def newsletterunsubdone(request, chapterurl):
 	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	return render_to_response('newsletterunsubdone.html', {'c': chapter}, context_instance=RequestContext(request))

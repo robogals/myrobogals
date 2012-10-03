@@ -8,19 +8,19 @@
 {% if errmsg %}{{errmsg}}<br> <br>{% endif %}
 {% trans 'The first row of your CSV file must specify the field names for the data contained in the file. A full list of possible field names is available <a href="help/">here</a>. ' %}<br>
 <br>
-{% trans "The compulsory fields of first_name, last_name and email must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't." %}<br>
+{% trans "<strong>The compulsory fields of first_name, last_name and email must always be included. All other fields are optional.</strong> Fields with an unrecognised name will be ignored." %}<br>
 <br>
 <form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data">
 {% if form.csvfile.errors %}
 <div class="error">{% for error in form.csvfile.errors %}{% blocktrans with error as error%}{{error}} {% endblocktrans %}{% endfor %}</div>
 {% endif %}
-<table>
+<table width="100%">
   <tr>
     <td valign="top" style="width: 70px"><strong>{% trans "CSV file:" %}</strong></td>
     <td>{{form.csvfile}}</td>
   </tr>
    <tr>
-    <td></td><td>{{ form.updateuser }} <label class="label-left" style="width:120px;" for="id_{{ form.updateuser.name }}">{{ form.updateuser.label }}</label></td>
+    <td><strong>{% trans "Options:" %}</strong></td><td>{{ form.updateuser }} <label class="label-left" style="width:120px;" for="id_{{ form.updateuser.name }}">{{ form.updateuser.label }}</label></td>
   </tr>
   <tr>
     <td></td><td>{{ form.ignore_email }} <label class="label-left" style="width:120px;" for="id_{{ form.ignore_email.name }}">{{ form.ignore_email.label }}</label></td>

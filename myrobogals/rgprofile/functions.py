@@ -70,6 +70,10 @@ def boolval(colname, cell, newuser, defaults):
 			setattr(newuser, colname, defaults[colname])
 
 def check_username(username):
+	if username == None:
+		return True
+	if username == '':
+		return True
 	try:
 		User.objects.get(username=username)
 	except User.DoesNotExist:
@@ -83,7 +87,16 @@ def check_email(email):
 		return True
 	except User.MultipleObjectsReturned:
 		return False
-	return False		
+	return False
+
+def check_email_and_chapter(email, chapter):
+	try:
+		User.objects.get(email=email, chapter=chapter)
+	except User.DoesNotExist:
+		return True
+	except User.MultipleObjectsReturned:
+		return False
+	return False
 
 def generate_unique_username(row, columns):
 	first_name = row[columns.index('first_name')]
@@ -141,16 +154,15 @@ def generate_unique_username(row, columns):
 	raise RgImportCsvException(_('Could not generate unique username'))
 
 def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_email):
-	
-	columns = None
-	users_imported = 0
-	username_pos= 0	
-	users_updated = 0
-	existing_users= 0
+	columns=None
+	users_imported=0
+	username_pos=0	
+	users_updated=0
+	existing_users=0
 	existing_emails=0
 	count=-1
-	username_field_exists_flag=1
-	user_already_exists= False
+	username_field_exists_flag=False
+	user_already_exists=False
 	msg=""
 	if 'date_joined' not in defaults:
 		defaults['date_joined'] = datetime.now()
@@ -158,56 +170,55 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 		defaults['date_joined'] = datetime.now()
 	for row in filerows:
 		if any(row):
-		# Create new user
+			# Create new user
 			newuser = User()
-			
 			count+=1
-			user_already_exists_flag= False
-		# Get column names from first row, also get the positions of the fields so that we can extract their values 
-		# using their positions later.
+			user_already_exists_flag=False
+			# Get column names from first row, also get the positions of the fields so that we can extract their values 
+			# using their positions later.
 			if (columns == None):
 				columns = row
 				if 'first_name' not in columns:
 					raise RgImportCsvException(_('You must specify a first_name field'))
-				else :
-					first_name_pos=columns.index('first_name')	
+				else:
+					first_name_pos=columns.index('first_name')
 					
 				if 'last_name' not in columns:
 					raise RgImportCsvException(_('You must specify a last_name field'))
-				else :
-					last_name_pos=columns.index('last_name')	
+				else:
+					last_name_pos=columns.index('last_name')
 				
 				if 'email' not in columns:
 					raise RgImportCsvException(_('You must specify an email field'))
-				else : 
-					email_pos = columns.index('email')	
+				else:
+					email_pos = columns.index('email')
 					
 				if 'username' in columns:
 					username_pos=columns.index('username')
-					username_field_exists_flag=1
+					username_field_exists_flag=True
 					
 				if 'mobile' in columns:
 					mobile_pos=columns.index('mobile')
-				continue		
+
+				continue
 		
 			# Process row
 			i = 0;
-			flag = 0;
 				
 			# extracting the values of the username, email, first_name and last_name fields for each row.
-			if username_field_exists_flag == 1:
+			if username_field_exists_flag:
 				uname=row[username_pos]
-			else :
+			else:
 				uname = ''
 			email=row[email_pos]
-			first_name= row[first_name_pos]
-			last_name = row[last_name_pos]		
+			first_name=row[first_name_pos]
+			last_name=row[last_name_pos]		
 			
 			# now remove all the whitespaces from the extracted values.
 			uname_data=uname.strip()
 			email_data=email.strip()
-			first_name_data= first_name.strip()
-			last_name_data = last_name.strip()
+			first_name_data=first_name.strip()
+			last_name_data=last_name.strip()
 			
 			# check if any of the values is None or empty for a row. If yes, form an error message and ignore that row.
 			if first_name_data == None or first_name_data == '':
@@ -223,28 +234,27 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			# check if the username exists, if yes, check if the 'updateuser' checkbox is ticked. If it is ticked, 
 			# then get the row with the matching username (and, as we will see, replace its contents). Otherwise, ignore.
 			# Also, they must be from the same chapter
-			if not check_username(uname_data):	
+			if not check_username(uname_data):
 				user_already_exists_flag = True
-				if updateuser :
+				if updateuser:
 					newuser = User.objects.get(username=uname_data)
-					if newuser.chapter == chapter :
+					if newuser.chapter == chapter:
 						existing_users += 1
-						flag=1			
-						
-					else :
-						msg += ("<br>Row %d has a duplicate user from another chapter - row ignored") % count
+					else:
+						msg += ("<br>Row %d has a username clash (%s) with another chapter - row ignored") % (count, uname_data)
+						continue
 				else:
-					msg += ("<br> Row %d has a duplicate user - row ignored") % count
+					msg += ("<br>Row %d has a username clash (%s) - row ignored") % (count, uname_data)
 					continue
+
 			# check if the email exists for any user, if yes, check if the 'ignore_email' checkbox is ticked. If it is not ticked, 
 			# then get the row with the matching username (and, as we will see, replace its contents). Otherwise, ignore.		
 			# Also, they must be from the same chapter
-			elif not (check_email(email_data)):
-				if newuser.chapter == chapter:
-					existing_emails+=1
-					if ignore_email:
-						msg += ("<br> Row %d has a duplicate email - row ignored") % count
-						continue
+			elif not check_email_and_chapter(email_data, chapter):
+				existing_emails+=1
+				if ignore_email:
+					msg += ("<br>Row %d's email address (%s) matches an existing user - row ignored") % (count, email_data)
+					continue
 				
 			for cell in row:
 				colname = columns[i]
@@ -362,17 +372,17 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 			newuser.save()
 			new_vals = newuser.__dict__.values()
 
-			# flag is set to 1 if either a duplicate username or email is being imported. In which case, we 
-			# will not add the users to our list, instead we'll simply update their values.
-			if flag == 1:
+			# If updating an existing user, we don't need to set their member status or
+			# send them a welcome email
+			if user_already_exists_flag:
 				continue
 
-		# Must be called after save() because the primary key
-		# is required for these
-			mt = MemberStatus(user_id=newuser.pk, statusType_id=1)
+			# Must be called after newuser.save() because the primary key
+			# is required for these
+			mt = MemberStatus(user_id=newuser.pk, statusType_id=1, status_date_start=newuser.date_joined.date())
 			mt.save()
 
-		# Send welcome email
+			# Send welcome email
 			if welcomeemail:
 				message = EmailMessage()
 				try:
@@ -409,7 +419,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 
 			users_imported += 1
 			
-	return (users_imported,existing_users, existing_emails, msg)
+	return (users_imported, existing_users, existing_emails, msg)
 
 def genandsendpw(user, welcomeemail, chapter):
 	plaintext_password = User.objects.make_random_password(6)
