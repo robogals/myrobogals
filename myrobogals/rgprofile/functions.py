@@ -346,12 +346,6 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 					pass   # Unknown column, ignore
 				# Increment column and do the loop again
 				i += 1
-
-			# Should be the default at the model-level,
-			# but just to be sure...
-			newuser.is_active = True
-			newuser.is_staff = False
-			newuser.is_superuser = False
 		
 			# If we still don't have a username and/or password
 			# by this stage, let's generate one
@@ -362,20 +356,26 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 				plaintext_password = User.objects.make_random_password(6)
 				newuser.set_password(plaintext_password)
 			
+			# And finally...
+			newuser.chapter = chapter
+			newuser.save()
+
+			# If updating an existing user, we don't need to do the rest
+			if user_already_exists_flag:
+				continue
+
+			# Should be the default at the model-level,
+			# but just to be sure...
+			newuser.is_active = True
+			newuser.is_staff = False
+			newuser.is_superuser = False
+
 			# Apply any unapplied defaults
 			for key, value in defaults.iteritems():
 				if key not in columns:
 					setattr(newuser, key, value)
-
-			# And finally...
-			newuser.chapter = chapter
+			
 			newuser.save()
-			new_vals = newuser.__dict__.values()
-
-			# If updating an existing user, we don't need to set their member status or
-			# send them a welcome email
-			if user_already_exists_flag:
-				continue
 
 			# Must be called after newuser.save() because the primary key
 			# is required for these
