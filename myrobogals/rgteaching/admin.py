@@ -8,7 +8,7 @@ class EventAttendeeAdmin(admin.TabularInline):
 
 class SchoolAdmin(admin.ModelAdmin):
 	list_display = ('name', 'chapter', 'contact_person', 'address_state', 'address_country')
-	search_fields = ('name', 'chapter', 'contact_person', 'contact_email', 'address')
+	search_fields = ('name', 'contact_person', 'contact_email', 'address_city', 'address_postcode', 'address_street')
 
 class DirectorySchoolAdmin(admin.ModelAdmin):
 	list_display = ('name', 'address_city', 'state_code', 'address_postcode', 'phone', 'type', 'level', 'gender')

@@ -135,7 +135,7 @@ class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
 	date = models.DateTimeField()
-	message = models.TextField("RSVP Message")
+	message = models.TextField("RSVP message")
 
 class TrainingSession(Event):
 	def __unicode__(self):
@@ -189,7 +189,7 @@ VISIT_TYPES_BASE = (
 	(3, 'Non-Robogals robotics workshop'),
 	(4, 'Non-Robogals career talk'),
 	(5, 'Non-Robogals event'),
-	(6, 'Other (specify in notes below)'),
+	(6, 'Other'),
 )
 
 class SchoolVisitStats(models.Model):
