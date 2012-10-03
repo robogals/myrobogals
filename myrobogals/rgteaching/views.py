@@ -857,6 +857,24 @@ def xint(n):
 
 @login_required
 def report_standard(request):
+	# Allow superusers
+	if request.user.is_superuser:
+		return HttpResponseRedirect('/globalreports/')
+	else:
+		# Redirect global and regional exec to global reports
+		if not request.user.is_staff:
+			raise Http404  # Don't allow ordinary users to see any reports
+		else:
+			if request.user.chapter.pk == 1:
+				return HttpResponseRedirect('/globalreports/')
+			elif request.user.chapter.parent:
+				if request.user.chapter.parent.pk == 1:
+					return HttpResponseRedirect('/globalreports/')
+				else:
+					pass
+			else:
+				pass
+
 	if request.method == 'POST':
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
@@ -984,9 +1002,20 @@ def report_standard(request):
 def report_global(request):
 	# Allow superusers
 	if not request.user.is_superuser:
-		# Allow global exec
-		if not (request.user.chapter.pk == 1 and request.user.is_staff):
+		# Allow global and regional exec to see these reports
+		if not request.user.is_staff:
 			raise Http404
+		else:
+			if request.user.chapter.pk == 1:
+				pass
+			elif request.user.chapter.parent:
+				if request.user.chapter.parent.pk == 1:
+					pass
+				else:
+					raise Http404
+			else:
+				raise Http404
+
 	warning = ''
 	printview = False
 	if request.method == 'POST':
