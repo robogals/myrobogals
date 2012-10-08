@@ -190,32 +190,30 @@ def progresschapter(request):
 		careertalkview = True
 		displaycats = [1,]
 	
-	children = Group.objects.filter(parent=c)
+	children = Group.objects.filter(parent=c).filter(goal__gt=0)
 	for child in children:
-		if child.status == 0 or (child.status == 2 and request.user.is_superuser):
-			grandchildren = Group.objects.filter(parent=child)
-			for grandchild in grandchildren:
-				if grandchild.status == 0 or (grandchild.status == 2 and request.user.is_superuser):
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
-					for school_visit in school_visits:
-						chapter_sum = chapter_sum + school_visit.num_girls_weighted()
-					grandchildren_display.append((grandchild, chapter_sum))
-					chapter_sum = 0.0
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
-					for school_visit in school_visits:
-						child_sum = child_sum + school_visit.num_girls_weighted()
-					school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
-					for school_visit in school_visits:
-						root_sum = root_sum + school_visit.num_girls_weighted()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		grandchildren = Group.objects.filter(parent=child).filter(goal__gt=0)
+		for grandchild in grandchildren:
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			for school_visit in school_visits:
+				chapter_sum = chapter_sum + school_visit.num_girls_weighted()
+			grandchildren_display.append((grandchild, chapter_sum))
+			chapter_sum = 0.0
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				child_sum = child_sum + school_visit.num_girls_weighted()
-			listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
-			grandchildren_display = []
-			child_sum = 0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				root_sum = root_sum + school_visit.num_girls_weighted()
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		for school_visit in school_visits:
+			child_sum = child_sum + school_visit.num_girls_weighted()
+		listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
+		grandchildren_display = []
+		child_sum = 0
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		for school_visit in school_visits:
+			root_sum = root_sum + school_visit.num_girls_weighted()
 	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
 	for school_visit in school_visits:
 		root_sum = root_sum + school_visit.num_girls_weighted()

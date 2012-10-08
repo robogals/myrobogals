@@ -32,44 +32,40 @@
 		</tr>
 	{% endif %}
 	{% for list in listing %}
-		{% if list.child.0.status != 2 %}
-			{% if list.child.0.goal %}
-				{% if list.grandchildren %}
-				<tr><td colspan="2"><h3>{{ list.child.0.short }}</h3></td></tr>
-				{% endif %}
-					<tr>
-						<td style="padding-right:20px;">{{ list.child.0.short }}</td>
-						<td>
-							<div style="float:left;width:{{bar_length_px}}px;height:20px;background-color:#CCCCCC;position:relative;top:11px"><div style="float:left;width:{% widthratio list.child.1 list.child.0.goal bar_length_px %}px;height:20px;background-color:#1366A3"></div></div>
-							<div style="float:left;position:relative;top:9px">
-								<big>&nbsp;&nbsp;{% intthous list.child.1 %} / {% thous list.child.0.goal %} ({% widthratio list.child.1 list.child.0.goal 100 %}%)</big>
-								<br/>&nbsp;
-								<span style="position:relative;top:-10px;">
-									<sub>since {{list.child.0.goal_start|date:_("d M Y")}}</sub>
-								</span>
-							</div>
-						</td>
-					</tr>
-				{% for grandchild in list.grandchildren %}
-					{% if grandchild.0.status != 2 %}
-						{% if grandchild.0.goal %}
-						<tr>
-							<td style="padding-right:20px;">{{ grandchild.0.short }}</td>
-							<td>
-								<div style="float:left;width:{{bar_length_px}}px;height:20px;background-color:#CCCCCC;position:relative;top:11px"><div style="float:left;width:{% widthratio grandchild.1 grandchild.0.goal bar_length_px %}px;height:20px;background-color:#1366A3"></div></div>
-								<div style="float:left;position:relative;top:9px">
-									<big>&nbsp;&nbsp;{% intthous grandchild.1 %} / {% thous grandchild.0.goal %} ({% widthratio grandchild.1 grandchild.0.goal 100 %}%)</big>
-									<br/>&nbsp;
-									<span style="position:relative;top:-10px;">
-										<sub>since {{grandchild.0.goal_start|date:_("d M Y")}}</sub>
-									</span>
-								</div>
-							</td>
-						</tr>
-						{% endif %}
-					{% endif %}
-				{% endfor %}
+		{% if list.child.0.goal %}
+			{% if list.grandchildren %}
+			<tr><td colspan="2"><h3>{{ list.child.0.short }}</h3></td></tr>
 			{% endif %}
+				<tr>
+					<td style="padding-right:20px;">{{ list.child.0.short }}</td>
+					<td>
+						<div style="float:left;width:{{bar_length_px}}px;height:20px;background-color:#CCCCCC;position:relative;top:11px"><div style="float:left;width:{% widthratio list.child.1 list.child.0.goal bar_length_px %}px;height:20px;background-color:#1366A3"></div></div>
+						<div style="float:left;position:relative;top:9px">
+							<big>&nbsp;&nbsp;{% intthous list.child.1 %} / {% thous list.child.0.goal %} ({% widthratio list.child.1 list.child.0.goal 100 %}%)</big>
+							<br/>&nbsp;
+							<span style="position:relative;top:-10px;">
+								<sub>since {{list.child.0.goal_start|date:_("d M Y")}}</sub>
+							</span>
+						</div>
+					</td>
+				</tr>
+			{% for grandchild in list.grandchildren %}
+				{% if grandchild.0.goal %}
+				<tr>
+					<td style="padding-right:20px;">{{ grandchild.0.short }}</td>
+					<td>
+						<div style="float:left;width:{{bar_length_px}}px;height:20px;background-color:#CCCCCC;position:relative;top:11px"><div style="float:left;width:{% widthratio grandchild.1 grandchild.0.goal bar_length_px %}px;height:20px;background-color:#1366A3"></div></div>
+						<div style="float:left;position:relative;top:9px">
+							<big>&nbsp;&nbsp;{% intthous grandchild.1 %} / {% thous grandchild.0.goal %} ({% widthratio grandchild.1 grandchild.0.goal 100 %}%)</big>
+							<br/>&nbsp;
+							<span style="position:relative;top:-10px;">
+								<sub>since {{grandchild.0.goal_start|date:_("d M Y")}}</sub>
+							</span>
+						</div>
+					</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
 		{% endif %}
 	{% endfor %}
 	</table>
