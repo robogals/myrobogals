@@ -6,10 +6,10 @@
 
 {% block content %}
 <p><a href="/teaching/list/">{% trans "Return to workshop list" %}</a>
-{% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit workshop" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite or add volunteers" %}</a> | <a href="/teaching/{{v.pk}}/email/">{% trans "Email volunteers" %}</a>
+{% if request.user.is_staff %}{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit workshop" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite or add volunteers" %}</a> | <a href="/teaching/{{v.pk}}/email/">{% trans "Email volunteers" %}</a>
 | <a href="/teaching/{{v.pk}}/stats/">{% trans "Close workshop and enter stats" %}</a> | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel workshop" %}</a>{% endifequal %}
 {% ifequal v.status 1 %} | <a href="/teaching/{{v.pk}}/reopen/">{% trans "Delete stats and re-open workshop" %}</a>{% endifequal %}
-{% endifequal %}{% endif %}
+{% endif %}
 </p>
 {% ifequal v.status 0 %}
 {% ifequal user_rsvp_status 0 %}
@@ -52,6 +52,12 @@
     <td style="vertical-align: top; width: 150px">{% trans "School" %}</td>
     <td>{{v.school}}</td>
   </tr>
+{% if request.user.is_superuser %}
+  <tr>
+    <td style="vertical-align: top; width: 150px">{% trans "Chapter" %}</td>
+    <td>{{v.chapter}}</td>
+  </tr>
+{% endif %}
   <tr>
     <td style="vertical-align: top">{% trans "Date" %}</td>
     <td>{{v.visit_start|date:_("DATE_FORMAT_LONG")}}</td>
@@ -99,9 +105,9 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
-    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    {% if request.user.is_staff %}
     <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">{% trans "change RSVP to not attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
-    {% endifequal %}{% endif %}
+    {% endif %}
     </td>
   </tr>
   {% endfor %}
@@ -112,9 +118,9 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
-    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    {% if request.user.is_staff %}
     <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">{% trans "change RSVP to attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
-    {% endifequal %}{% endif %}
+    {% endif %}
     </td>
   </tr>
   {% endfor %}
@@ -125,10 +131,10 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="/profile/{{user.user.username}}/">{{user.user.get_full_name}}</a></td>
     <td>
-    {% if request.user.is_staff %}{% ifequal request.user.chapter v.chapter %}
+    {% if request.user.is_staff %}
     <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/yes/">{% trans "change RSVP to attending" %}</a>
     | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/no/">{% trans "change RSVP to not attending" %}</a> | <a href="/teaching/{{v.pk}}/rsvp/{{user.user.pk}}/remove/">{% trans "remove" %}</a>
-    {% endifequal %}{% endif %}
+    {% endif %}
     </td>
   </tr>
   {% endfor %}

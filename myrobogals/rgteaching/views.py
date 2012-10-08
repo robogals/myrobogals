@@ -52,7 +52,10 @@ class SchoolVisitFormOne(forms.Form):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
 		super(SchoolVisitFormOne, self).__init__(*args, **kwargs)
-		self.fields["school"].queryset = School.objects.filter(chapter=chapter)
+		if chapter == None:
+			self.fields["school"].queryset = School.objects.all()
+		else:
+			self.fields["school"].queryset = School.objects.filter(chapter=chapter)
 
 class SchoolVisitFormTwo(forms.Form):
 	meeting_location = forms.CharField(label=_("Meeting location"), help_text=_("Where people will meet at university to go as a group to the school, if applicable"), initial=_("N/A"), required=False)
@@ -82,10 +85,13 @@ def editvisit(request, visit_id):
 		else:
 			v = get_object_or_404(SchoolVisit, pk=visit_id)
 			new = False
-		if (v.chapter != chapter):
+		if (v.chapter != chapter) and not request.user.is_superuser:
 			raise Http404
 		if request.method == 'POST':
-			formpart1 = SchoolVisitFormOne(request.POST, chapter=chapter)
+			if request.user.is_superuser:
+				formpart1 = SchoolVisitFormOne(request.POST, chapter=None)
+			else:
+				formpart1 = SchoolVisitFormOne(request.POST, chapter=chapter)				
 			formpart2 = SchoolVisitFormTwo(request.POST)
 			formpart3 = SchoolVisitFormThree(request.POST)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid():
@@ -121,8 +127,12 @@ def editvisit(request, visit_id):
 				request.user.message_set.create(message=unicode(_("School visit info updated")))
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 		else:
+			if request.user.is_superuser:
+				formchapter = None
+			else:
+				formchapter = chapter
 			if visit_id == 0:
-				formpart1 = SchoolVisitFormOne(None, chapter=chapter)
+				formpart1 = SchoolVisitFormOne(None, chapter=formchapter)
 				formpart2 = SchoolVisitFormTwo()
 				formpart3 = SchoolVisitFormThree()
 			else:
@@ -133,7 +143,7 @@ def editvisit(request, visit_id):
 					'end_time': v.visit_end.time(),
 					'location': v.location,
 					'school': v.school_id,
-					'allow_rsvp': v.allow_rsvp}, chapter=chapter)
+					'allow_rsvp': v.allow_rsvp}, chapter=formchapter)
 				formpart2 = SchoolVisitFormTwo({
 					'meeting_location': v.meeting_location,
 					'meeting_time': v.meeting_time,
@@ -162,7 +172,7 @@ def newvisit(request):
 def viewvisit(request, visit_id):
 	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if (v.chapter != chapter):
+	if (v.chapter != chapter) and not request.user.is_superuser:
 		raise Http404
 	attended = EventAttendee.objects.filter(event=v, actual_status=1)
 	attending = EventAttendee.objects.filter(event=v, rsvp_status=2)
@@ -185,8 +195,13 @@ def viewvisit(request, visit_id):
 @login_required
 def listvisits(request):
 	chapter = request.user.chapter
-	visits = SchoolVisit.objects.filter(chapter=chapter)
-	return render_to_response('visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
+	if request.user.is_superuser:
+		visits = SchoolVisit.objects.all()
+		showall = True
+	else:
+		visits = SchoolVisit.objects.filter(chapter=chapter)
+		showall = False
+	return render_to_response('visit_list.html', {'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
 class VisitSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Visit start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
@@ -194,13 +209,19 @@ class VisitSelectorForm(forms.Form):
 
 @login_required
 def printlistvisits(request):
+	if not request.user.is_staff:
+		raise Http404
 	if request.method == 'POST':
 		theform = VisitSelectorForm(request.POST)
 		if theform.is_valid():
 			formdata = theform.cleaned_data
 			chapter = request.user.chapter
-			visits = SchoolVisit.objects.filter(chapter=chapter, visit_start__range=[formdata['start_date'],formdata['end_date']]).order_by('-visit_start')
-			return render_to_response('print_visit_list.html', {'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
+			visits = SchoolVisit.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']]).order_by('-visit_start')
+			showall = True
+			if not request.user.is_superuser:
+				visits = visits.filter(chapter=chapter)
+				showall = False
+			return render_to_response('print_visit_list.html', {'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 	theform = VisitSelectorForm()
 	return render_to_response('print_visit_get_range.html', {'theform': theform}, context_instance=RequestContext(request))
 
@@ -226,10 +247,12 @@ class InviteForm(forms.Form):
 
 @login_required
 def invitetovisit(request, visit_id):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
 	error = ''
-	if (v.chapter != chapter):
+	if (v.chapter != chapter) and not request.user.is_superuser:
 		raise Http404
 	if request.method == 'POST':
 		inviteform = InviteForm(request.POST, user=request.user, visit=v)
@@ -327,9 +350,11 @@ class EmailAttendeesForm(forms.Form):
 		
 @login_required
 def emailvisitattendees(request, visit_id):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if (v.chapter != chapter):
+	if (v.chapter != chapter) and not request.user.is_superuser:
 		raise Http404
 	if request.method == 'POST':
 		emailform = EmailAttendeesForm(request.POST, user=request.user, visit=v)
@@ -403,9 +428,11 @@ class CancelForm(forms.Form):
 		
 @login_required
 def cancelvisit(request, visit_id):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if (v.chapter != chapter):
+	if (v.chapter != chapter) and not request.user.is_superuser:
 		raise Http404
 	if request.method == 'POST':
 		cancelform = CancelForm(request.POST, user=request.user, visit=v)
@@ -458,6 +485,8 @@ class DeleteForm(forms.Form):
 			
 @login_required
 def deleteschool(request, school_id):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	s = get_object_or_404(School, pk=school_id)
 	if (s.chapter != chapter):
@@ -477,6 +506,8 @@ def deleteschool(request, school_id):
 	
 @login_required
 def listschools(request):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	schools = School.objects.filter(chapter=chapter)
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
@@ -651,7 +682,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 		rsvp_id = 0
 	else:
 		raise Http404
-	if e.chapter != chapter:
+	if e.chapter != chapter and not request.user.is_superuser:
 		raise Http404
 	if request.method == 'POST':
 		rsvpform = RSVPForm(request.POST, user=request.user, event=e)
@@ -667,7 +698,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage.date = user_dt.replace(tzinfo=None)
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
-			request.user.message_set.create(message= unicode((rsvp_string)))
+			request.user.message_set.create(message=unicode(rsvp_string))
 			return dorsvp(request, event_id, user_id, rsvp_id)
 	else:
 		rsvpform = RSVPForm(None, user=request.user, event=e)
@@ -675,10 +706,12 @@ def rsvp(request, event_id, user_id, rsvp_type):
 
 @login_required
 def deletemessage(request, visit_id, message_id):
+	if not request.user.is_staff:
+		raise Http404
 	chapter = request.user.chapter
 	v = get_object_or_404(Event, pk=visit_id)
 	m = get_object_or_404(EventMessage, pk=message_id)
-	if (v.chapter != chapter):
+	if (v.chapter != chapter) and not request.user.is_superuser:
 		raise Http404
 	if request.user.is_staff:	
 		m.delete()
@@ -725,7 +758,7 @@ class SchoolVisitStatsForm(forms.Form):
 @login_required
 def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if v.school.chapter != request.user.chapter:
+	if v.school.chapter != request.user.chapter and not request.user.is_superuser:
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
@@ -790,7 +823,7 @@ def stats(request, visit_id):
 @login_required
 def reopenvisit(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if v.school.chapter != request.user.chapter:
+	if v.school.chapter != request.user.chapter and not request.user.is_superuser:
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
@@ -799,8 +832,9 @@ def reopenvisit(request, visit_id):
 		raise Http404
 	if 'confirm' in request.GET:
 		if request.GET['confirm'] == '1':
-			stats = v.schoolvisitstats_set.all()[0]
-			stats.delete()
+			statses = v.schoolvisitstats_set.all()
+			for stats in statses:
+				stats.delete()
 			v.status = 0
 			v.save()
 			request.user.message_set.create(message=unicode(_("Stats deleted and workshop re-opened.")))
@@ -814,7 +848,7 @@ def reopenvisit(request, visit_id):
 @login_required
 def statsHoursPerPerson(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
-	if v.school.chapter != request.user.chapter:
+	if v.school.chapter != request.user.chapter and not request.user.is_superuser:
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
@@ -857,7 +891,7 @@ def xint(n):
 
 @login_required
 def report_standard(request):
-	# Allow superusers
+	# Redirect superusers to global reports
 	if request.user.is_superuser:
 		return HttpResponseRedirect('/globalreports/')
 	else:
@@ -875,6 +909,7 @@ def report_standard(request):
 			else:
 				pass
 
+	# If we reached here, we must be a chapter exec
 	if request.method == 'POST':
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
@@ -1000,7 +1035,7 @@ def report_standard(request):
 
 @login_required
 def report_global(request):
-	# Allow superusers
+	# Allow superusers to see these reports
 	if not request.user.is_superuser:
 		# Allow global and regional exec to see these reports
 		if not request.user.is_staff:

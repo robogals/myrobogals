@@ -164,10 +164,9 @@
                         {% trans "Workshop list" %}          
             </span>
         </a>
-
-        
-        
 </li>   
+
+{% if request.user.is_staff %}
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/printlist/"  >
             <span>
@@ -179,7 +178,6 @@
         
 </li>   
                             
-{% if request.user.is_staff %}
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/new/"  >
             <span>
