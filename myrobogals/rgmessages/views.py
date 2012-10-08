@@ -270,37 +270,51 @@ def writesms(request):
 		typesel = request.POST['type']
 		schedsel = request.POST['scheduling']
 		statussel = request.POST['status']
-		smsform = WriteSMSForm(request.POST, user=request.user)
+
+		if 'step' in request.POST:
+			if request.POST['step'] == '1':
+				smsform = WriteSMSForm(request.POST, user=request.user)
+				request.session['smsform'] = smsform
+			elif request.POST['step'] == '2':
+				if 'smsform' not in request.session:
+					raise Http404
+				smsform = request.session['smsform']
+				del request.session['smsform']
+			else:
+				raise Http404
+		else:
+			raise Http404
 		try:
 			if smsform.is_valid():
 				data = smsform.cleaned_data
-				message = SMSMessage()
-				message.body = data['body']
-				message.sender = request.user
-				message.chapter = request.user.chapter
-				if int(data['from_type']) == 1 and request.user.mobile_verified:
-					message.senderid = str(request.user.mobile)
-				else:
-					message.senderid = '61429558100'
-				if request.POST['scheduling'] == '1':
-					message.scheduled = True
-					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
-					try:
-						message.scheduled_date_type = int(data['schedule_zone'])
-					except Exception:
-						message.scheduled_date_type = 1
-				else:
-					message.scheduled = False
-			
-				# Validate, and calculate the values for unicode and split.
-				# If the message is too long, the exception will be caught below.
-				message.validate()
-			
-				# Don't send it yet until the recipient list is done
-				message.status = -1
-				# Save to database so we get a value for the primary key,
-				# which we need for entering the recipient entries
-				message.save()
+				if request.POST['step'] == '2':
+					message = SMSMessage()
+					message.body = data['body']
+					message.sender = request.user
+					message.chapter = request.user.chapter
+					if int(data['from_type']) == 1 and request.user.mobile_verified:
+						message.senderid = str(request.user.mobile)
+					else:
+						message.senderid = '61429558100'
+					if request.POST['scheduling'] == '1':
+						message.scheduled = True
+						message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+						try:
+							message.scheduled_date_type = int(data['schedule_zone'])
+						except Exception:
+							message.scheduled_date_type = 1
+					else:
+						message.scheduled = False
+				
+					# Validate, and calculate the values for unicode and split.
+					# If the message is too long, the exception will be caught below.
+					message.validate()
+				
+					# Don't send it yet until the recipient list is done
+					message.status = -1
+					# Save to database so we get a value for the primary key,
+					# which we need for entering the recipient entries
+					message.save()
 
 				if request.POST['type'] == '1':
 					if request.user.is_superuser:
@@ -324,39 +338,52 @@ def writesms(request):
 					# those users with a blank mobile number
 					users = data['recipients']
 
+				usersfiltered = []
 				if statussel != '0':
 					for one_user in users:
 						if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk=(int(statussel)))):
-							recipient = SMSRecipient()
-							recipient.message = message
-							recipient.user = one_user
-							recipient.to_number = one_user.mobile
-							recipient.save()
+							if request.POST['step'] == '1':
+								usersfiltered.append(one_user)
+							else:
+								if str(one_user.pk) in request.POST.keys():
+									recipient = SMSRecipient()
+									recipient.message = message
+									recipient.user = one_user
+									recipient.to_number = one_user.mobile
+									recipient.save()
 				else:
 					for one_user in users:
-						recipient = SMSRecipient()
-						recipient.message = message
-						recipient.user = one_user
-						recipient.to_number = one_user.mobile
-						recipient.save()
-			
+						if request.POST['step'] == '1':
+							usersfiltered.append(one_user)
+						else:
+							if str(one_user.pk) in request.POST.keys():
+								recipient = SMSRecipient()
+								recipient.message = message
+								recipient.user = one_user
+								recipient.to_number = one_user.mobile
+								recipient.save()
+
 				# Check that we haven't used too many credits
-				sms_this_month = 0
-				sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime(datetime.now().year, datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
-				for obj in sms_this_month_obj:
-					sms_this_month += obj.credits_used()
-				sms_this_month += message.credits_used()
-				if sms_this_month > request.user.chapter.sms_limit:
-					message.status = 3
+				if request.POST['step'] == '2':
+					sms_this_month = 0
+					sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime(datetime.now().year, datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
+					for obj in sms_this_month_obj:
+						sms_this_month += obj.credits_used()
+					sms_this_month += message.credits_used()
+					if sms_this_month > request.user.chapter.sms_limit:
+						message.status = 3
+						message.save()
+						return HttpResponseRedirect('/messages/sms/overlimit/')
+			
+					# Now mark it as OK to send. The email and all recipients are now in MySQL.
+					# A background script on the server will process the queue.
+					message.status = 0
 					message.save()
-					return HttpResponseRedirect('/messages/sms/overlimit/')
 			
-				# Now mark it as OK to send. The email and all recipients are now in MySQL.
-				# A background script on the server will process the queue.
-				message.status = 0
-				message.save()
-			
-				return HttpResponseRedirect('/messages/sms/done/')
+				if request.POST['step'] == '1':
+					return render_to_response('sms_users_confirm.html', {'usersfiltered': usersfiltered, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status']}, context_instance=RequestContext(request))
+				else:
+					return HttpResponseRedirect('/messages/sms/done/')
 		except SMSLengthException as e:
 			smserror = e.errmsg
 	else:
