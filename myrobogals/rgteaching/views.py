@@ -192,16 +192,25 @@ def viewvisit(request, visit_id):
 		user_rsvp_status = 0
 	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
+class ChapterSelector(forms.Form):
+	chapter = forms.ModelChoiceField(queryset=Group.objects.filter(status__in=[0,2]), required=False)
+
 @login_required
 def listvisits(request):
 	chapter = request.user.chapter
 	if request.user.is_superuser:
 		visits = SchoolVisit.objects.all()
 		showall = True
+		chapterform = ChapterSelector(request.GET)
+		if chapterform.is_valid():
+			chapter_filter = chapterform.cleaned_data['chapter']
+			if chapter_filter:
+				visits = visits.filter(chapter=chapter_filter)
 	else:
 		visits = SchoolVisit.objects.filter(chapter=chapter)
 		showall = False
-	return render_to_response('visit_list.html', {'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
+		chapterform = None
+	return render_to_response('visit_list.html', {'chapterform': chapterform, 'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
 class VisitSelectorForm(forms.Form):
 	start_date = forms.DateField(label='Visit start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())

@@ -302,11 +302,6 @@ class MemberStatus(models.Model):
 		ordering = ('-status_date_end', '-status_date_start')
 
 class User(models.Model):
-    """Users within the Django authentication system are represented by this model.
-
-    Username and password are required. Other fields are optional.
-    """
-    
     GENDERS = (
     	(0, 'No answer'),
     	(1, 'Male'),

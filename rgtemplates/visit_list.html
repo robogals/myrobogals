@@ -5,6 +5,12 @@
 {% block pagetitle %}{% trans "Workshops and events" %}{% endblock %}
 
 {% block content %}
+{% if showall %}
+<form action="/teaching/list/" method="GET">
+{% trans "Filter by chapter:" %} {{chapterform.chapter}}
+<input type="submit" value="{% trans "Go" %}">
+</form>
+{% endif %}
 {% if request.user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
