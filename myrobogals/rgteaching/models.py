@@ -68,7 +68,6 @@ class Event(models.Model):
 	STATUS_CHOICES = (
 		(0, 'Open'),
 		(1, 'Closed'),
-		(2, 'Cancelled'),
 	)
 	
 	ALLOW_RSVP_CHOICES = (

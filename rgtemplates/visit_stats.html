@@ -7,15 +7,7 @@
 {% block content %}
 <form action="/teaching/{{visit_id}}/stats/" method="POST">
     {% if form.errors %}
-	<div class="error">
-	{% trans "Please correct the following field(s)" %}:<br>
-	{% for error in form.field_errors %}
-	- {{error}}<br>
-	{% endfor %}
-	{% for error in form.non_field_errors %}
-	- {{error}}<br>
-	{% endfor %}
-	</div>
+	<div class="error">{% trans "Please correct your entries in the form" %}</div>
 	{% endif %}
 	<p><label for="id_visit_type">Visit type:</label> {{ form.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{form.visit_type.help_text}}{% endautoescape %}</span></p>
 	<p> Students taught:

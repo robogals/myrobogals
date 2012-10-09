@@ -771,6 +771,9 @@ def stats(request, visit_id):
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
+	if v.status != 0:
+		request.user.message_set.create(message=unicode(_("- This workshop is already closed")))
+		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if not request.session.get('hoursPerPersonStage', False):
 		request.session['hoursPerPersonStage'] = 1
 		form = SchoolVisitStatsForm(None, visit = v)
@@ -780,6 +783,11 @@ def stats(request, visit_id):
 		form = SchoolVisitStatsForm(request.POST, visit = v)
 		if form.is_valid():
 			data = form.cleaned_data
+			# Delete any existing stats that may exist for this visit.
+			# This can happen if the user clicks back after entering stats
+			# to change their stats
+			v.schoolvisitstats_set.all().delete()
+			# and add the new stats just entered
 			stats = SchoolVisitStats()
 			stats.visit = v
 			stats.visit_type = data['visit_type']
@@ -797,6 +805,7 @@ def stats(request, visit_id):
 			stats.other_boys_repeat = data['other_boys_repeat']
 			stats.notes = data['notes']
 			stats.save()
+
 			for attendee in data['attended']:
 				list = EventAttendee.objects.filter(event__id=v.id).values_list('user_id', flat=True)
 				if attendee.id not in list:
@@ -806,7 +815,6 @@ def stats(request, visit_id):
 					newinvite.actual_status = 1
 					newinvite.rsvp_status = 0
 					newinvite.save()
-			
 			for person in EventAttendee.objects.filter(event__id=v.id):
 				if person.user in data['attended']:
 					person.actual_status = 1
@@ -836,14 +844,15 @@ def reopenvisit(request, visit_id):
 		raise Http404
 	if not request.user.is_staff:
 		raise Http404
+	if v.status != 1:
+		request.user.message_set.create(message=unicode(_("- This workshop is already open!")))
+		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of RRR stats - too many people have access
 	if v.school.chapter.pk == 20:
 		raise Http404
 	if 'confirm' in request.GET:
 		if request.GET['confirm'] == '1':
-			statses = v.schoolvisitstats_set.all()
-			for stats in statses:
-				stats.delete()
+			v.schoolvisitstats_set.all().delete()
 			v.status = 0
 			v.save()
 			request.user.message_set.create(message=unicode(_("Stats deleted and workshop re-opened.")))
@@ -877,7 +886,7 @@ def statsHoursPerPerson(request, visit_id):
 		v.status = 1
 		v.save()
 		request.user.message_set.create(message=unicode(_("Stats saved successfully, visit closed.")))
-		return HttpResponseRedirect('/teaching/')
+		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		raise Http404
 
