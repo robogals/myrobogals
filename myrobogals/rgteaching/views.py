@@ -7,7 +7,7 @@ from django.db import connection
 connection.queries
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.rgteaching.models import School, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats, VISIT_TYPES_BASE, VISIT_TYPES_REPORT
+from myrobogals.rgteaching.models import School, DirectorySchool, StarSchoolDirectory, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats, VISIT_TYPES_BASE, VISIT_TYPES_REPORT
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 #from myrobogals.auth.models import Group
@@ -22,6 +22,7 @@ from pytz import utc
 from myrobogals.rgmain.models import Country
 from operator import itemgetter
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required
 def teachhome(request):
@@ -480,6 +481,132 @@ def listschools(request):
 	chapter = request.user.chapter
 	schools = School.objects.filter(chapter=chapter)
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
+
+@login_required
+def schoolsdirectory(request, chapterurl):
+	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
+		raise Http404
+	schools_list = DirectorySchool.objects.all()
+	name = ''
+	suburb = ''
+	school_type = '-1'
+	school_level = '-1'
+	school_gender = '-1'
+	starstatus = '-1'
+	if ('name' in request.GET) and (request.GET['name'] != ''):
+		name = request.GET['name']
+		schools_list = schools_list.filter(name__icontains=request.GET['name'])
+	if ('suburb' in request.GET) and (request.GET['suburb'] != ''):
+		suburb = request.GET['suburb']
+		schools_list = schools_list.filter(address_city__icontains=request.GET['suburb'])
+	if ('type' in request.GET) and (request.GET['type'] != '-1'):
+		school_type = request.GET['type']
+		schools_list = schools_list.filter(type=school_type)
+	if ('level' in request.GET) and (request.GET['level'] != '-1'):
+		school_level = request.GET['level']
+		schools_list = schools_list.filter(level=school_level)
+	if ('gender' in request.GET) and (request.GET['gender'] != '-1'):
+		school_gender = request.GET['gender']
+		schools_list = schools_list.filter(gender=school_gender)
+	star_schools = StarSchoolDirectory.objects.filter(chapter=c).values_list('school_id', flat=True)
+	if ('starstatus' in request.GET) and (request.GET['starstatus'] != '-1'):
+		starstatus = request.GET['starstatus']
+		if starstatus == '1':
+			schools_list = schools_list.filter(id__in=star_schools)
+		else:
+			schools_list = schools_list.exclude(id__in=star_schools)
+	paginator = Paginator(schools_list, 50)
+	page = request.GET.get('page')
+	try:
+		schools = paginator.page(page)
+	except EmptyPage:
+		schools = paginator.page(paginator.num_pages)
+	except:
+		schools = paginator.page(1)
+	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
+	return render_to_response('schools_directory.html', {'schools': schools, 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools}, context_instance=RequestContext(request))
+
+@login_required
+def starschool(request):
+	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
+		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
+		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
+			raise Http404
+		if StarSchoolDirectory.objects.filter(school=s, chapter=c):
+			msg = '- The school "' + s.name + '" has been starred'
+		else:
+			starSchool = StarSchoolDirectory()
+			starSchool.school = s
+			starSchool.chapter = c
+			starSchool.save()
+			msg = 'The school "' + s.name + '" is starred'
+		request.user.message_set.create(message=unicode(_(msg)))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		else:
+			return HttpResponseRedirect('/teaching/schoolsdirectory/' + c.myrobogals_url)
+	else:
+		raise Http404
+
+@login_required
+def unstarschool(request):
+	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
+		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
+		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
+			raise Http404
+		starschools = StarSchoolDirectory.objects.filter(school=s, chapter=c)
+		if starschools:
+			for starschool in starschools:
+				starschool.delete()
+			msg = 'The school "' + s.name + '" is unstarred'
+		else:
+			msg = '- The school "' + s.name + '" is not starred'
+		request.user.message_set.create(message=unicode(_(msg)))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		else:
+			return HttpResponseRedirect('/teaching/schoolsdirectory/' + c.myrobogals_url)
+	else:
+		raise Http404
+
+@login_required
+def copyschool(request):
+	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
+		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
+		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
+			raise Http404
+		if School.objects.filter(chapter=c, name=s.name).count() > 0:
+			msg = '- The school "' + s.name + '" is already copied'
+		else:
+			school = School()
+			school.name = s.name
+			school.chapter = c
+			school.address_street = s.address_street
+			school.address_city = s.address_city
+			school.address_state = s.address_state.code
+			school.address_postcode = s.address_postcode
+			school.address_country = s.address_country
+			school.contact_email = s.email
+			school.contact_phone = s.phone
+			school.save()
+			msg = 'The school "' + s.name + '" is copied'
+		request.user.message_set.create(message=unicode(_(msg)))
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		else:
+			return HttpResponseRedirect('/teaching/schoolsdirectory/' + c.myrobogals_url)
+	else:
+		raise Http404
 
 # Custom field for school name
 class SchoolNameField(forms.CharField):
