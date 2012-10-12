@@ -66,6 +66,7 @@
     <td><strong>{% trans "School/Event" %}</strong></td>
     <td><strong>{% trans "Girls" %}</strong></td>
     <td><strong>{% trans "Type" %}</strong></td>
+	<td><strong>{% trans "No. of hours volunteered" %}</strong></td>
   </tr>
 {% for v in visits %}
 {% if v.event.schoolvisit %}
@@ -74,6 +75,7 @@
     <td>{{v.event.schoolvisit.school}}</td>
     <td>{{v.event.schoolvisit.get_num_girls_display}}</td>
     <td>{{v.event.schoolvisit.get_type}}</td>
+	<td>{{v.hours}}</td>
   </tr>
 {% endif %}
 {% endfor %}
