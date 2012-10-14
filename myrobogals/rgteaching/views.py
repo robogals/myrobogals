@@ -540,7 +540,7 @@ def schoolsdirectory(request, chapterurl):
 		url_values = urllib.urlencode(data)
 		url = 'http://maps.googleapis.com/maps/api/distancematrix/json'
 		full_url = url + '?' + url_values
-		data = urllib2.urlopen(full_url)
+		data = urllib2.urlopen(full_url, timeout = 1)
 		result = json.loads(data.read())
 		if result['status'] == 'OK':
 			dis_meter = distance * 1000
