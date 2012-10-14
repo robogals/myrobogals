@@ -23,6 +23,8 @@ from myrobogals.rgmain.models import Country
 from operator import itemgetter
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from myrobogals.rgmain.models import Subdivision
+import json, urllib, urllib2
 
 @login_required
 def teachhome(request):
@@ -494,6 +496,9 @@ def schoolsdirectory(request, chapterurl):
 	school_level = '-1'
 	school_gender = '-1'
 	starstatus = '-1'
+	distance = ''
+	origin = ''
+	state = '1'
 	if ('name' in request.GET) and (request.GET['name'] != ''):
 		name = request.GET['name']
 		schools_list = schools_list.filter(name__icontains=request.GET['name'])
@@ -516,6 +521,45 @@ def schoolsdirectory(request, chapterurl):
 			schools_list = schools_list.filter(id__in=star_schools)
 		else:
 			schools_list = schools_list.exclude(id__in=star_schools)
+	schools_distance = {}
+	if ('distance' in request.GET) and (request.GET['distance'] != '') and ('origin' in request.GET) and (request.GET['origin'] != '') and ('state' in request.GET):
+		distance = float(request.GET['distance'])
+		origin = request.GET['origin']
+		state = request.GET['state']
+		subdiv = get_object_or_404(Subdivision, pk=state)
+		schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+		mode = 'driving'
+		sensor = 'false'
+		data = {}
+		data['origins'] = origin + ' ' + subdiv.code
+		data['destinations'] = ''
+		for s in schools_list:
+			data['destinations'] += s.address_street + ' ' + s.address_city + ' ' + s.state_code() + ' ' + s.address_country_id + '|'
+		data['mode'] = mode
+		data['sensor'] = sensor
+		url_values = urllib.urlencode(data)
+		url = 'http://maps.googleapis.com/maps/api/distancematrix/json'
+		full_url = url + '?' + url_values
+		data = urllib2.urlopen(full_url)
+		result = json.loads(data.read())
+		if result['status'] == 'OK':
+			dis_meter = distance * 1000
+			sch_list = []
+			index = 0
+			for s in schools_list:
+				if (result['rows'][0]['elements'][index]['status'] == 'OK'):
+					if (result['rows'][0]['elements'][index]['distance']['value'] <= dis_meter):
+						sch_list.append(s.pk)
+						schools_distance[s.pk] = result['rows'][0]['elements'][index]['distance']['text']
+				else:
+					sch_list.append(s.pk)
+					schools_distance[s.pk] = 'Unknown'
+				index += 1
+			schools_list = schools_list.filter(id__in=sch_list)
+		else:
+			schools_list = []
+			msg = '- Sorry query failed!'
+			request.user.message_set.create(message=unicode(_(msg)))
 	paginator = Paginator(schools_list, 50)
 	page = request.GET.get('page')
 	try:
@@ -525,7 +569,7 @@ def schoolsdirectory(request, chapterurl):
 	except:
 		schools = paginator.page(1)
 	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
-	return render_to_response('schools_directory.html', {'schools': schools, 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools}, context_instance=RequestContext(request))
+	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'schools_distance': schools_distance}, context_instance=RequestContext(request))
 
 @login_required
 def starschool(request):

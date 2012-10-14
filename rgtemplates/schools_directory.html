@@ -13,15 +13,15 @@
 <table>
 	<tr>
 		<td>{% trans "School name:" %}</td>
-		<td><input type="text" name="name" maxlength="80" size="50" value="{{name}}"></td>
+		<td colspan="5"><input type="text" name="name" maxlength="80" size="50" value="{{name}}"></td>
 	</tr>
 	<tr>
 		<td>{% trans "Suburb:" %}</td>
-		<td><input type="text" name="suburb" size="50" value="{{suburb}}"></td>
+		<td colspan="5"><input type="text" name="suburb" size="50" value="{{suburb}}"></td>
 	</tr>
 <tr>
 	<td>{% trans "Type:" %}</td>
-	<td>
+	<td colspan="5">
 	<select name="type">
 		<option value="-1" {% ifequal school_type -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
 	{% for type_choice in DirectorySchool.TYPE_CHOICES %}
@@ -32,7 +32,7 @@
 </tr>
 <tr>
 	<td>{% trans "Level" %}</td>
-	<td>
+	<td colspan="5">
 	<select name="level">
 		<option value="-1" {% ifequal school_level -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
 	{% for level_choice in DirectorySchool.LEVEL_CHOICES %}
@@ -43,7 +43,7 @@
 </tr>
 <tr>
 	<td>{% trans "Gender" %}</td>
-	<td>
+	<td colspan="5">
 	<select name="gender">
 		<option value="-1" {% ifequal school_gender -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
 	{% for gender_choice in DirectorySchool.GENDER_CHOICES %}
@@ -54,11 +54,25 @@
 </tr>
 <tr>
 	<td>{% trans "Star status" %}</td>
-	<td>
+	<td colspan="5">
 	<select name="starstatus">
 		<option value="-1" {% ifequal starstatus -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
 		<option value="1" {% ifequal starstatus 1 %}selected="selected"{% endifequal %}>{% trans "Starred" %}</option>
 		<option value="0" {% ifequal starstatus 0 %}selected="selected"{% endifequal %}>{% trans "Unstarred" %}</option>
+	</select>
+	</td>
+</tr>
+<tr>
+	<td>{% trans "Within" %}</td>
+	<td><input type="text" name="distance" size="8" value="{{distance}}"> {% trans "km" %}</td>
+	<td>{% trans "of suburb" %}</td>
+	<td><input type="text" name="origin" size="25" value="{{origin}}"></td>
+	<td>{% trans "state" %}</td>
+	<td>
+	<select name="state">
+		{% for s in subdivision %}
+		<option value="{{s.id}}" {% ifequal state s.id %}selected="selected"{% endifequal %}>{{ s.full_iso_code }}</option>
+		{% endfor %}
 	</select>
 	</td>
 </tr>
@@ -103,6 +117,7 @@
     <td><strong>{% trans "Type" %}</strong></td>
 	<td><strong>{% trans "Level" %}</strong></td>
 	<td><strong>{% trans "Gender" %}</strong></td>
+	<td><strong>{% trans "Distance" %}</strong></td>
 	<td></td>
   </tr>
 {% for s in schools.object_list %}
@@ -120,6 +135,15 @@
 	<td>{{s.get_type_display}}</td>
 	<td>{{s.get_level_display}}</td>
 	<td>{{s.get_gender_display}}</td>
+	{% if s.pk in schools_distance.keys %}
+	{% for key, value in schools_distance.items %}
+		{% ifequal key s.pk %}
+			<td>{{value}}</td>
+		{% endifequal %}
+	{% endfor %}
+	{% else %}
+		<td></td>
+	{% endif %}
 	{% if s.name in copied_schools %}
 	<td></td>
 	{% else %}
