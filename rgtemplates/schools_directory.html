@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}Schools Directory{% endblock %}
+
+{% block pagetitle %}Schools Directory{% endblock %}
+
+{% block content %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<h4 class="module-title">Search schools</h4>
+<form action="/teaching/schoolsdirectory/{{chapterurl}}/" method="GET">
+<table>
+	<tr>
+		<td>{% trans "School name:" %}</td>
+		<td colspan="5"><input type="text" name="name" maxlength="80" size="50" value="{{name}}"></td>
+	</tr>
+	<tr>
+		<td>{% trans "Suburb:" %}</td>
+		<td colspan="5"><input type="text" name="suburb" size="50" value="{{suburb}}"></td>
+	</tr>
+<tr>
+	<td>{% trans "Type:" %}</td>
+	<td colspan="5">
+	<select name="type">
+		<option value="-1" {% ifequal school_type -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
+	{% for type_choice in DirectorySchool.TYPE_CHOICES %}
+		<option value="{{type_choice.0}}" {% ifequal school_type type_choice.0 %}selected="selected"{% endifequal %}>{{type_choice.1}}</option>
+	{% endfor %}
+	</select>
+	</td>
+</tr>
+<tr>
+	<td>{% trans "Level" %}</td>
+	<td colspan="5">
+	<select name="level">
+		<option value="-1" {% ifequal school_level -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
+	{% for level_choice in DirectorySchool.LEVEL_CHOICES %}
+		<option value="{{level_choice.0}}" {% ifequal school_level level_choice.0 %}selected="selected"{% endifequal %}>{{level_choice.1}}</option>
+	{% endfor %}
+	</select>
+	</td>
+</tr>
+<tr>
+	<td>{% trans "Gender" %}</td>
+	<td colspan="5">
+	<select name="gender">
+		<option value="-1" {% ifequal school_gender -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
+	{% for gender_choice in DirectorySchool.GENDER_CHOICES %}
+		<option value="{{gender_choice.0}}" {% ifequal school_gender gender_choice.0 %}selected="selected"{% endifequal %}>{{gender_choice.1}}</option>
+	{% endfor %}
+	</select>
+	</td>
+</tr>
+<tr>
+	<td>{% trans "Star status" %}</td>
+	<td colspan="5">
+	<select name="starstatus">
+		<option value="-1" {% ifequal starstatus -1 %}selected="selected"{% endifequal %}>{% trans "All" %}</option>
+		<option value="1" {% ifequal starstatus 1 %}selected="selected"{% endifequal %}>{% trans "Starred" %}</option>
+		<option value="0" {% ifequal starstatus 0 %}selected="selected"{% endifequal %}>{% trans "Unstarred" %}</option>
+	</select>
+	</td>
+</tr>
+<tr>
+	<td>{% trans "Within" %}</td>
+	<td><input type="text" name="distance" size="8" value="{{distance}}"> {% trans "km" %}</td>
+	<td>{% trans "of suburb" %}</td>
+	<td><input type="text" name="origin" size="25" value="{{origin}}"></td>
+	<td>{% trans "state" %}</td>
+	<td>
+	<select name="state">
+		{% for s in subdivision %}
+		<option value="{{s.id}}" {% ifequal state s.id %}selected="selected"{% endifequal %}>{{ s.full_iso_code }}</option>
+		{% endfor %}
+	</select>
+	</td>
+</tr>
+</table>
+<input type="submit" value="{% trans "Search" %}">
+</form>
+</div></div></div></div>
+{% if schools.number == 1 %}
+	{% trans "home" %} |
+{% else %}
+	<a href="?page=1&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "home" %}</a> |
+{% endif %}
+
+{% if schools.has_previous %}
+	<a href="?page={{schools.previous_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "previous" %}</a> |
+{% else %}
+	{% trans "previous" %} |
+{% endif %}
+
+{% trans "Page" %} {{schools.number}} {% trans "of" %} {{schools.paginator.num_pages}}
+
+{% if schools.has_next %}
+	| <a href="?page={{schools.next_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "next" %}</a>
+{% else %}
+	| {% trans "next" %}
+{% endif %}
+
+{% if schools.number == schools.paginator.num_pages %}
+	| {% trans "last" %}
+{% else %}
+	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "last" %}</a>
+{% endif %}
+
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+  <tr>
+	<td></td>
+    <td><strong>{% trans "Name" %}</strong></td>
+    <td><strong>{% trans "City" %}</strong></td>
+    <td><strong>{% trans "State code" %}</strong></td>
+    <td><strong>{% trans "Postcode" %}</strong></td>
+    <td><strong>{% trans "Phone" %}</strong></td>
+    <td><strong>{% trans "Type" %}</strong></td>
+	<td><strong>{% trans "Level" %}</strong></td>
+	<td><strong>{% trans "Gender" %}</strong></td>
+	<td><strong>{% trans "Distance" %}</strong></td>
+	<td></td>
+  </tr>
+{% for s in schools.object_list %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+	{% if s.id in star_schools %}
+	<td><a href="/teaching/unstarschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/gold_star.png" alt="Star" height="18" width="18"/></a></td>
+	{% else %}
+	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
+	{% endif %}
+    <td>{{s.name}}</td>
+    <td>{{s.address_city}}</td>
+    <td>{{s.state_code}}</td>
+    <td>{{s.address_postcode}}</td>
+	<td>{{s.phone}}</td>
+	<td>{{s.get_type_display}}</td>
+	<td>{{s.get_level_display}}</td>
+	<td>{{s.get_gender_display}}</td>
+	{% if s.pk in schools_distance.keys %}
+	{% for key, value in schools_distance.items %}
+		{% ifequal key s.pk %}
+			<td>{{value}}</td>
+		{% endifequal %}
+	{% endfor %}
+	{% else %}
+		<td></td>
+	{% endif %}
+	{% if s.name in copied_schools %}
+	<td></td>
+	{% else %}
+	<td><a href="/teaching/copyschooldir/?return={{return|urlencode}}&school_id={{s.id}}&chapterurl={{chapterurl}}">{% trans "Copy" %}</a></td>
+	{% endif %}
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}
