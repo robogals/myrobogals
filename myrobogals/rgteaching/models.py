@@ -64,6 +64,10 @@ class DirectorySchool(models.Model):
 	class Meta:
 		ordering = ('name',)
 
+class StarSchoolDirectory(models.Model):
+	school = models.ForeignKey(DirectorySchool)
+	chapter = models.ForeignKey(Group)
+
 class Event(models.Model):
 	STATUS_CHOICES = (
 		(0, 'Open'),
