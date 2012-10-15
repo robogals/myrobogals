@@ -1202,15 +1202,19 @@ def report_standard(request):
 					if int(formdata['visit_type']) == -1:
 						# include all stats categories
 						attendance[volunteer.get_full_name()][0] += 1
+						volunteer_hours = attended.hours
+						attendance[volunteer.get_full_name()][1] += int(volunteer_hours)
 					elif int(formdata['visit_type']) == -2:
 						# include both metro and regional robotics workshops
 						if type_id == 0 or type_id == 7:
 							attendance[volunteer.get_full_name()][0] += 1
+							volunteer_hours = attended.hours
+							attendance[volunteer.get_full_name()][1] += int(volunteer_hours)
 					else:
 						if type_id == int(formdata['visit_type']):
 							attendance[volunteer.get_full_name()][0] += 1
-					volunteer_hours = attended.hours	
-					attendance[volunteer.get_full_name()][1] = int(volunteer_hours)
+							volunteer_hours = attended.hours
+							attendance[volunteer.get_full_name()][1] += int(volunteer_hours)
 								
 			for name, num_visits in attendance.iteritems():
 				if num_visits > 0:
