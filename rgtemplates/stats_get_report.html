@@ -122,11 +122,13 @@
 	<tr style="font-weight: bold;">
 		<td> Name</td>
 		<td> Visits Attended </td>
+		<td> No. of hours volunteered </td>
 	</tr>
 	{% for key,value in attendance %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td> {{ key }} </td>
-		<td style="text-align: center;"> {{ value }} </td>
+		<td style="text-align: center;"> {{ value.0 }} </td>
+		<td style="text-align: center;"> {{ value.1 }} </td>
 	</tr>
 	{% endfor %}
 </table>
