@@ -24,7 +24,7 @@ from operator import itemgetter
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from myrobogals.rgmain.models import Subdivision
-import json, urllib, urllib2
+import json, urllib, urllib2, math
 
 @login_required
 def teachhome(request):
@@ -485,6 +485,22 @@ def listschools(request):
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
 
 @login_required
+def filllatlngschdir(request):
+	if request.user.is_superuser:
+		schools = DirectorySchool.objects.all()
+		for school in schools:
+			if (not school.latitude) or (not school.longitude):
+				print 'saving: ' + str(school.pk) + ' ' + school.name + ' ' + str(school.latitude) + str(school.longitude)
+				school.save()
+			else:
+				print str(school.pk) + ' ' + school.name + ' ' + str(school.latitude) + str(school.longitude)
+		msg = 'Operation successful!'
+	else:
+		msg = '- You can not do this!'
+	request.user.message_set.create(message=unicode(_(msg)))
+	return render_to_response('response.html', {}, context_instance=RequestContext(request))
+
+@login_required
 def schoolsdirectory(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
@@ -522,26 +538,68 @@ def schoolsdirectory(request, chapterurl):
 		else:
 			schools_list = schools_list.exclude(id__in=star_schools)
 	schools_distance = {}
+	sch_ordering = {}
 	if ('distance' in request.GET) and (request.GET['distance'] != '') and ('origin' in request.GET) and (request.GET['origin'] != '') and ('state' in request.GET):
 		distance = float(request.GET['distance'])
 		origin = request.GET['origin']
 		state = request.GET['state']
 		subdiv = get_object_or_404(Subdivision, pk=state)
-		schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+		try:
+			data = {}
+			data['address'] = origin + ' ' + subdiv.code
+			data['sensor'] = 'false'
+			url_values = urllib.urlencode(data)
+			url = 'http://maps.googleapis.com/maps/api/geocode/json'
+			full_url = url + '?' + url_values
+			data = urllib2.urlopen(full_url, timeout=1)
+			result = json.loads(data.read())
+			if result['status'] == 'OK':
+				L1 = float(result['results'][0]['geometry']['location']['lat'])
+				G1 = float(result['results'][0]['geometry']['location']['lng'])
+
+				schools_list = schools_list.filter(address_state=subdiv)
+				sch_list = {}
+				for school in schools_list:
+					if (school.latitude != None) and (school.longitude != None):
+						L2 = school.latitude
+						G2 = school.longitude
+						DG = G2 - G1
+						DL = L2 - L1
+						TERM1 = 111.08956 * (DL + 0.000001)
+						TERM2 = math.cos(math.radians(L1 + (DL/2)))
+						TERM3 = (DG + 0.000001) / (DL + 0.000001)
+						D = math.fabs(TERM1 / math.cos(math.atan(TERM2 * TERM3)))
+						if D <= distance:
+							sch_list[school.id] = D
+				sch_list = sorted(sch_list, key=sch_list.get)[0:50]
+				schools_list = schools_list.filter(id__in=sch_list)
+			else:
+				schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+		except:
+				schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+
 		mode = 'driving'
 		sensor = 'false'
-		data = {}
-		data['origins'] = origin + ' ' + subdiv.code
-		data['destinations'] = ''
-		for s in schools_list:
-			data['destinations'] += s.address_street + ' ' + s.address_city + ' ' + s.state_code() + ' ' + s.address_country_id + '|'
-		data['mode'] = mode
-		data['sensor'] = sensor
-		url_values = urllib.urlencode(data)
-		url = 'http://maps.googleapis.com/maps/api/distancematrix/json'
-		full_url = url + '?' + url_values
-		data = urllib2.urlopen(full_url, timeout = 1)
-		result = json.loads(data.read())
+		result = {'status': 'Not available'}
+		for i in range(5):
+			if not schools_list[i*10:i*10+10]:
+				break
+			data = {}
+			data['origins'] = origin + ' ' + subdiv.code
+			data['destinations'] = ''
+			for s in schools_list[i*10:i*10+10]:
+				data['destinations'] += s.address_street + ' ' + s.address_city + ' ' + s.state_code() + ' ' + s.address_country_id + '|'
+			data['mode'] = mode
+			data['sensor'] = sensor
+			url_values = urllib.urlencode(data)
+			url = 'http://maps.googleapis.com/maps/api/distancematrix/json'
+			full_url = url + '?' + url_values
+			data = urllib2.urlopen(full_url, timeout = 1)
+			res = json.loads(data.read())
+			if i == 0:
+				result = res
+			else:
+				result['rows'][0]['elements'] += res['rows'][0]['elements']
 		if result['status'] == 'OK':
 			dis_meter = distance * 1000
 			sch_list = []
@@ -550,12 +608,18 @@ def schoolsdirectory(request, chapterurl):
 				if (result['rows'][0]['elements'][index]['status'] == 'OK'):
 					if (result['rows'][0]['elements'][index]['distance']['value'] <= dis_meter):
 						sch_list.append(s.pk)
+						sch_ordering[s.pk] = result['rows'][0]['elements'][index]['distance']['value']
 						schools_distance[s.pk] = result['rows'][0]['elements'][index]['distance']['text']
 				else:
 					sch_list.append(s.pk)
+					sch_ordering[s.pk] = float('inf')
 					schools_distance[s.pk] = 'Unknown'
 				index += 1
 			schools_list = schools_list.filter(id__in=sch_list)
+			l = []
+			for key in sorted(sch_ordering, key=sch_ordering.get):
+				l.append(schools_list.get(pk=key))
+			schools_list = l
 		else:
 			schools_list = []
 			msg = '- Sorry query failed!'

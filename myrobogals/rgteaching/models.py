@@ -2,6 +2,7 @@ from django.db import models
 from myrobogals.auth.models import Group, User
 from myrobogals.rgmain.models import Country, Subdivision
 from datetime import datetime
+import json, urllib, urllib2
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
@@ -54,6 +55,8 @@ class DirectorySchool(models.Model):
 	asd_id = models.IntegerField(blank=True, null=True)
 	asd_feature = models.BooleanField()
 	notes = models.TextField(blank=True)
+	latitude = models.FloatField(blank=True, null=True)
+	longitude = models.FloatField(blank=True, null=True)
 
 	def __unicode__(self):
 		return self.name
@@ -63,6 +66,23 @@ class DirectorySchool(models.Model):
 	
 	class Meta:
 		ordering = ('name',)
+
+	def save(self, *args, **kwargs):
+		try:
+			data = {}
+			data['address'] = self.address_street + ' ' + self.address_city + ' ' + self.state_code() + ' ' + self.address_country_id
+			data['sensor'] = 'false'
+			url_values = urllib.urlencode(data)
+			url = 'http://maps.googleapis.com/maps/api/geocode/json'
+			full_url = url + '?' + url_values
+			data = urllib2.urlopen(full_url, timeout=1)
+			result = json.loads(data.read())
+			if result['status'] == 'OK':
+				self.latitude = result['results'][0]['geometry']['location']['lat']
+				self.longitude = result['results'][0]['geometry']['location']['lng']
+		except:
+			pass
+		super(DirectorySchool, self).save(*args, **kwargs)
 
 class StarSchoolDirectory(models.Model):
 	school = models.ForeignKey(DirectorySchool)
