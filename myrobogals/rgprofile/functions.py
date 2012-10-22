@@ -379,7 +379,7 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 
 			# Must be called after newuser.save() because the primary key
 			# is required for these
-			mt = MemberStatus(user_id=newuser.pk, statusType_id=1, status_date_start=newuser.date_joined.date())
+			mt = MemberStatus(user_id=newuser.pk, statusType_id=1, status_date_start=newuser.date_joined)
 			mt.save()
 
 			# Send welcome email
