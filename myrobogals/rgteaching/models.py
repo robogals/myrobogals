@@ -68,20 +68,23 @@ class DirectorySchool(models.Model):
 		ordering = ('name',)
 
 	def save(self, *args, **kwargs):
-		try:
-			data = {}
-			data['address'] = self.address_street + ' ' + self.address_city + ' ' + self.state_code() + ' ' + self.address_country_id
-			data['sensor'] = 'false'
-			url_values = urllib.urlencode(data)
-			url = 'http://maps.googleapis.com/maps/api/geocode/json'
-			full_url = url + '?' + url_values
-			data = urllib2.urlopen(full_url, timeout=1)
-			result = json.loads(data.read())
-			if result['status'] == 'OK':
-				self.latitude = result['results'][0]['geometry']['location']['lat']
-				self.longitude = result['results'][0]['geometry']['location']['lng']
-		except:
-			pass
+		if (self.latitude == None) or (self.longitude == None):
+			try:
+				data = {}
+				data['address'] = self.address_street
+				data['components'] = '|locality:' + self.address_city + '|administrative_area:' + self.state_code() + '|country:' + self.address_country_id + '|postal_code:' + self.address_postcode
+				data['sensor'] = 'false'
+				url_values = urllib.urlencode(data)
+				url = 'http://maps.googleapis.com/maps/api/geocode/json'
+				full_url = url + '?' + url_values
+				print full_url
+				data = urllib2.urlopen(full_url, timeout=2)
+				result = json.loads(data.read())
+				if result['status'] == 'OK':
+					self.latitude = result['results'][0]['geometry']['location']['lat']
+					self.longitude = result['results'][0]['geometry']['location']['lng']
+			except:
+				pass
 		super(DirectorySchool, self).save(*args, **kwargs)
 
 class StarSchoolDirectory(models.Model):

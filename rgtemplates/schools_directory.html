@@ -83,11 +83,11 @@
 {% if schools.number == 1 %}
 	{% trans "home" %} |
 {% else %}
-	<a href="?page=1&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "home" %}</a> |
+	<a href="?page=1&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "home" %}</a> |
 {% endif %}
 
 {% if schools.has_previous %}
-	<a href="?page={{schools.previous_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "previous" %}</a> |
+	<a href="?page={{schools.previous_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "previous" %}</a> |
 {% else %}
 	{% trans "previous" %} |
 {% endif %}
@@ -95,7 +95,7 @@
 {% trans "Page" %} {{schools.number}} {% trans "of" %} {{schools.paginator.num_pages}}
 
 {% if schools.has_next %}
-	| <a href="?page={{schools.next_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "next" %}</a>
+	| <a href="?page={{schools.next_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "next" %}</a>
 {% else %}
 	| {% trans "next" %}
 {% endif %}
@@ -103,7 +103,7 @@
 {% if schools.number == schools.paginator.num_pages %}
 	| {% trans "last" %}
 {% else %}
-	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "last" %}</a>
+	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "last" %}</a>
 {% endif %}
 
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
@@ -117,7 +117,9 @@
     <td><strong>{% trans "Type" %}</strong></td>
 	<td><strong>{% trans "Level" %}</strong></td>
 	<td><strong>{% trans "Gender" %}</strong></td>
+	{% if sch_list %}
 	<td><strong>{% trans "Distance" %}</strong></td>
+	{% endif %}
 	<td></td>
   </tr>
 {% for s in schools.object_list %}
@@ -135,14 +137,16 @@
 	<td>{{s.get_type_display}}</td>
 	<td>{{s.get_level_display}}</td>
 	<td>{{s.get_gender_display}}</td>
-	{% if s.pk in schools_distance.keys %}
-	{% for key, value in schools_distance.items %}
-		{% ifequal key s.pk %}
-			<td>{{value}}</td>
-		{% endifequal %}
-	{% endfor %}
-	{% else %}
-		<td></td>
+	{% if sch_list %}
+		{% if s.pk in sch_list.keys %}
+			{% for key, value in sch_list.items %}
+				{% ifequal key s.pk %}
+					<td>{{value|floatformat:-2}} {% trans 'km' %}</td>
+				{% endifequal %}
+			{% endfor %}
+		{% else %}
+			<td></td>
+		{% endif %}
 	{% endif %}
 	{% if s.name in copied_schools %}
 	<td></td>
