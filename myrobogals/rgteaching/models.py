@@ -77,7 +77,6 @@ class DirectorySchool(models.Model):
 				url_values = urllib.urlencode(data)
 				url = 'http://maps.googleapis.com/maps/api/geocode/json'
 				full_url = url + '?' + url_values
-				print full_url
 				data = urllib2.urlopen(full_url, timeout=2)
 				result = json.loads(data.read())
 				if result['status'] == 'OK':

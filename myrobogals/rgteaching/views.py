@@ -17,7 +17,7 @@ from myrobogals.auth.decorators import login_required
 from myrobogals.auth.models import User, Group, MemberStatus
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
-from time import time
+from time import time, sleep
 from pytz import utc
 from myrobogals.rgmain.models import Country
 from operator import itemgetter
@@ -490,6 +490,7 @@ def filllatlngschdir(request):
 		schools = DirectorySchool.objects.all()
 		over_query_limit = False
 		for school in schools:
+			sleep(0.1)
 			if (school.latitude == None) or (school.longitude == None):
 				data = {}
 				data['address'] = school.address_street
@@ -563,6 +564,8 @@ def schoolsdirectory(request, chapterurl):
 		else:
 			schools_list = schools_list.exclude(id__in=star_schools)
 	sch_list = {}
+	L1 = None
+	G1 = None
 	if ('distance' in request.GET) and (request.GET['distance'] != '') and ('origin' in request.GET) and (request.GET['origin'] != '') and ('state' in request.GET):
 		distance = float(request.GET['distance'])
 		origin = request.GET['origin']
@@ -612,7 +615,7 @@ def schoolsdirectory(request, chapterurl):
 	except:
 		schools = paginator.page(1)
 	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
-	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'sch_list': sch_list}, context_instance=RequestContext(request))
+	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'sch_list': sch_list, 'L1': L1, 'G1': G1}, context_instance=RequestContext(request))
 
 @login_required
 def starschool(request):

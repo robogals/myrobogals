@@ -80,6 +80,7 @@
 <input type="submit" value="{% trans "Search" %}">
 </form>
 </div></div></div></div>
+
 {% if schools.number == 1 %}
 	{% trans "home" %} |
 {% else %}
@@ -156,4 +157,13 @@
   </tr>
 {% endfor %}
 </table>
+{% endblock %}
+{% block noboxcontent %}
+{% if sch_list %}
+<div class="round5" style="position: absolute; top: 200px;"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<img src="http://maps.googleapis.com/maps/api/staticmap?center={{L1}},{{G1}}&zoom=15&size=200x200&sensor=false&markers=color:red%7Clabel:A%7C{{L1}},{{G1}}">
+</div></div></div></div>
+{% endif %}
 {% endblock %}
