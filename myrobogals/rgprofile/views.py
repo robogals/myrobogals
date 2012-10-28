@@ -577,6 +577,7 @@ class FormPartOne(forms.Form):
 
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
+	username = forms.CharField(label=_('Username'), max_length=30,required = False)
 	email = forms.EmailField(label=_('Email'), max_length=64)
 	student_number = StudentNumField(max_length=32)
 	union_member = forms.BooleanField()
@@ -725,6 +726,8 @@ def edituser(request, username, chapter=None):
 					data = formpart1.cleaned_data
 					u.first_name = data['first_name']
 					u.last_name = data['last_name']
+					u.username = data['username']
+					username = data['username']
 					u.email = data['email']
 					u.alt_email = data['alt_email']
 					if u.mobile != data['mobile']:
@@ -819,6 +822,7 @@ def edituser(request, username, chapter=None):
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
 					'last_name': u.last_name,
+					'username' : u.username,
 					'email': u.email,
 					'alt_email': u.alt_email,
 					'mobile': u.mobile,
