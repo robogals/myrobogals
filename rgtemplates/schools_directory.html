@@ -124,7 +124,9 @@
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
   <tr>
 	<td></td>
+	{% if sch_list %}
 	<td><strong>{% trans "Map Ref" %}</strong></td>
+	{% endif %}
     <td><strong>{% trans "Name" %}</strong></td>
     <td><strong>{% trans "City" %}</strong></td>
     <td><strong>{% trans "State Code" %}</strong></td>
@@ -145,7 +147,9 @@
 	{% else %}
 	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% endif %}
+	{% if sch_list %}
 	<td>{{forloop.counter|chr}}</td>
+	{% endif %}
     <td>{{s.name}}</td>
     <td>{{s.address_city}}</td>
     <td>{{s.state_code}}</td>
