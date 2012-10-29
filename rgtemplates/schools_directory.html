@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load chr %}
 {% block title %}Schools Directory{% endblock %}
 
 {% block pagetitle %}Schools Directory{% endblock %}
@@ -80,7 +81,21 @@
 <input type="submit" value="{% trans "Search" %}">
 </form>
 </div></div></div></div>
+{% if sch_list %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<img src="http://maps.googleapis.com/maps/api/staticmap?size=620x620&sensor=false&markers=color:green%7Clabel:A%7C{{L1}},{{G1}}
+{% for s in schools.object_list %}
+&markers=label:{{forloop.counter|chr}}%7C{{s.latitude}},{{s.longitude}}
+{% endfor %}
+">
+</div></div></div></div>
+{% endif %}
+{% endblock %}
 
+{% block noboxcontent %}
+<p><b>
 {% if schools.number == 1 %}
 	{% trans "home" %} |
 {% else %}
@@ -105,14 +120,14 @@
 	| {% trans "last" %}
 {% else %}
 	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "last" %}</a>
-{% endif %}
-
-<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+{% endif %}</b></p>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
   <tr>
 	<td></td>
+	<td><strong>{% trans "Map Ref" %}</strong></td>
     <td><strong>{% trans "Name" %}</strong></td>
     <td><strong>{% trans "City" %}</strong></td>
-    <td><strong>{% trans "State code" %}</strong></td>
+    <td><strong>{% trans "State Code" %}</strong></td>
     <td><strong>{% trans "Postcode" %}</strong></td>
     <td><strong>{% trans "Phone" %}</strong></td>
     <td><strong>{% trans "Type" %}</strong></td>
@@ -130,6 +145,7 @@
 	{% else %}
 	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% endif %}
+	<td>{{forloop.counter|chr}}</td>
     <td>{{s.name}}</td>
     <td>{{s.address_city}}</td>
     <td>{{s.state_code}}</td>
@@ -157,13 +173,4 @@
   </tr>
 {% endfor %}
 </table>
-{% endblock %}
-{% block noboxcontent %}
-{% if sch_list %}
-<div class="round5" style="position: absolute; top: 200px;"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
-<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
-<div class="module-inner">
-<img src="http://maps.googleapis.com/maps/api/staticmap?center={{L1}},{{G1}}&zoom=15&size=200x200&sensor=false&markers=color:red%7Clabel:A%7C{{L1}},{{G1}}">
-</div></div></div></div>
-{% endif %}
 {% endblock %}

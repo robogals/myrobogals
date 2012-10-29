@@ -96,7 +96,7 @@ def unsubscribe(request, uidb36, token, step):
 
 		user.email_chapter_optin = False
 		user.save()
-		return render_to_response('response.html', {'msg': 'Unsubscribe succeed!'}, context_instance=RequestContext(request))
+		return render_to_response('response.html', {'msg': 'Unsubscribe succeeded!'}, context_instance=RequestContext(request))
 	else:
 		return render_to_response('response.html', {'msg': 'The link is invalid!'}, context_instance=RequestContext(request))
 

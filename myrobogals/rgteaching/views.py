@@ -606,7 +606,7 @@ def schoolsdirectory(request, chapterurl):
 			msg = '- Sorry, suburb coordinate can not be retrieved! Instead, schools within the same suburb is displayed!'
 			request.user.message_set.create(message=unicode(_(msg)))
 
-	paginator = Paginator(schools_list, 50)
+	paginator = Paginator(schools_list, 25)
 	page = request.GET.get('page')
 	try:
 		schools = paginator.page(page)
