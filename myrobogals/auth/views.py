@@ -13,6 +13,7 @@ from django.utils.http import urlquote, base36_to_int
 from django.utils.translation import ugettext as _
 from myrobogals.auth.models import User
 from django.views.decorators.cache import never_cache
+from datetime import date
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
@@ -70,6 +71,34 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
     if not login_url:
         login_url = settings.LOGIN_URL
     return HttpResponseRedirect('%s?%s=%s' % (login_url, urlquote(redirect_field_name), urlquote(next)))
+
+def unsubscribe(request, uidb36, token, step):
+	if step == '1':
+		return render_to_response('response.html', {'next_url': '/unsubscribe/' + uidb36 + '/' + token + '/2/', 'msg': 'Are you sure you want to unsubscribe?'}, context_instance=RequestContext(request))
+	elif step == '2':
+		try:
+			uid_int = base36_to_int(uidb36)
+		except ValueError:
+			raise Http404
+
+		user = get_object_or_404(User, id=uid_int)
+		try:
+			ts_b36, hash = token.split("-")
+			ts = base36_to_int(ts_b36)
+		except ValueError:
+			return render_to_response('response.html', {'msg': 'The link is invalid!'}, context_instance=RequestContext(request))
+
+		from django.utils.hashcompat import sha_constructor
+		hash2 = sha_constructor(unicode(user.id) + unicode(ts)).hexdigest()[::2]
+
+		if (hash2 != hash) or (((date.today() - date(2001,1,1)).days - ts) > settings.PASSWORD_RESET_TIMEOUT_DAYS):
+			return render_to_response('response.html', {'msg': 'The link is invalid!'}, context_instance=RequestContext(request))
+
+		user.email_chapter_optin = False
+		user.save()
+		return render_to_response('response.html', {'msg': 'Unsubscribe succeed!'}, context_instance=RequestContext(request))
+	else:
+		return render_to_response('response.html', {'msg': 'The link is invalid!'}, context_instance=RequestContext(request))
 
 # 4 views for password reset:
 # - password_reset sends the mail

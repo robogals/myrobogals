@@ -39,7 +39,7 @@ class WriteEmailForm(forms.Form):
 	)
 
 	subject = forms.CharField(max_length=256)
-	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), initial=_("This email has been sent to you by Robogals Adelaide ({{unsubscribe}})"))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
