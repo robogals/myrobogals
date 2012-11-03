@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from myrobogals.filters.templatetags.hide_email import hide_email_filter
 
 def chr_(value):
-	return chr(value + 65)
+	return chr(value + 64)
 
 register = template.Library()
 register.filter('chr', chr_)

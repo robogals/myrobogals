@@ -82,6 +82,81 @@
 </form>
 </div></div></div></div>
 {% if sch_list %}
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCvoGYCX4PLPnWNXbmwNEbAxB6V80st1_4&amp;sensor=false">
+</script>
+<script type="text/javascript">
+var map;
+var bound;
+function initialize() {
+	var mapOptions = {
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+	var marker = new google.maps.Marker({
+		position: new google.maps.LatLng({{L1}},{{G1}}),
+		map: map,
+		title: "{{origin}}",
+		icon: "{{MEDIA_URL}}/images/greenMarkerDot.png",
+		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+											new google.maps.Size(37, 34),
+											new google.maps.Point(0, 0),
+											new google.maps.Point(10, 34))
+	});
+	{% for sub in subdivision %}
+		{% ifequal sub.id state %}
+			origState = "{{sub.full_iso_code}}";
+		{% endifequal %}
+	{% endfor %}
+	var infowindow = new google.maps.InfoWindow({
+		content: "{{origin}} " + origState,
+		size: new google.maps.Size(50,50)
+	});
+	google.maps.event.addListener(marker, 'click', function() {
+		infowindow.open(map, marker);
+	});
+	bound = new google.maps.LatLngBounds();
+	bound.extend(marker.getPosition());
+{% for s in schools.object_list %}
+	{% if s.pk in sch_list.keys %}
+		{% for key, value in sch_list.items %}
+			{% ifequal key s.pk %}
+				var distance_{{s.pk}} = "{{value|floatformat:-2}} {% trans 'km' %}"
+			{% endifequal %}
+		{% endfor %}
+	{% else %}
+		var distance_{{s.pk}} = "Unknown"
+	{% endif %}
+	var marker{{s.pk}} = new google.maps.Marker({
+		position: new google.maps.LatLng({{s.latitude}},{{s.longitude}}),
+		map: map,
+		title: distance_{{s.pk}},
+		icon: "{{MEDIA_URL}}/images/redMarker{{forloop.counter|chr}}.png",
+		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+											new google.maps.Size(37, 34),
+											new google.maps.Point(0, 0),
+											new google.maps.Point(10, 34))
+	});
+	var infowindow{{s.pk}} = new google.maps.InfoWindow({
+		content: "{{s.name}}<br />Distance: " +  distance_{{s.pk}} + "<br />Type: {{s.get_type_display}}<br />Level: {{s.get_level_display}}<br />Gender: {{s.get_gender_display}}",
+		size: new google.maps.Size(50,50)
+	});
+	google.maps.event.addListener(marker{{s.pk}}, 'click', function() {
+		infowindow{{s.pk}}.open(map, marker{{s.pk}});
+	});
+	bound.extend(marker{{s.pk}}.getPosition());
+{% endfor %}
+	map.fitBounds(bound);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<div id="map_canvas" style="width:620px; height:620px;"></div>
+</div></div></div></div>
+{% comment %}
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
@@ -91,6 +166,7 @@
 {% endfor %}
 ">
 </div></div></div></div>
+{% endcomment %}
 {% endif %}
 {% endblock %}
 
