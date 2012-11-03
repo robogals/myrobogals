@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load chr %}
 {% block title %}Schools Directory{% endblock %}
 
 {% block pagetitle %}Schools Directory{% endblock %}
@@ -80,14 +81,105 @@
 <input type="submit" value="{% trans "Search" %}">
 </form>
 </div></div></div></div>
+{% if sch_list %}
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCvoGYCX4PLPnWNXbmwNEbAxB6V80st1_4&amp;sensor=false">
+</script>
+<script type="text/javascript">
+var map;
+var bound;
+function initialize() {
+	var mapOptions = {
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+	var marker = new google.maps.Marker({
+		position: new google.maps.LatLng({{L1}},{{G1}}),
+		map: map,
+		title: "{{origin}}",
+		icon: "{{MEDIA_URL}}/images/greenMarkerDot.png",
+		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+											new google.maps.Size(37, 34),
+											new google.maps.Point(0, 0),
+											new google.maps.Point(10, 34))
+	});
+	{% for sub in subdivision %}
+		{% ifequal sub.id state %}
+			origState = "{{sub.full_iso_code}}";
+		{% endifequal %}
+	{% endfor %}
+	var infowindow = new google.maps.InfoWindow({
+		content: "{{origin}} " + origState,
+		size: new google.maps.Size(50,50)
+	});
+	google.maps.event.addListener(marker, 'click', function() {
+		infowindow.open(map, marker);
+	});
+	bound = new google.maps.LatLngBounds();
+	bound.extend(marker.getPosition());
+{% for s in schools.object_list %}
+	{% if s.pk in sch_list.keys %}
+		{% for key, value in sch_list.items %}
+			{% ifequal key s.pk %}
+				var distance_{{s.pk}} = "{{value|floatformat:-2}} {% trans 'km' %}"
+			{% endifequal %}
+		{% endfor %}
+	{% else %}
+		var distance_{{s.pk}} = "Unknown"
+	{% endif %}
+	var marker{{s.pk}} = new google.maps.Marker({
+		position: new google.maps.LatLng({{s.latitude}},{{s.longitude}}),
+		map: map,
+		title: distance_{{s.pk}},
+		icon: "{{MEDIA_URL}}/images/redMarker{{forloop.counter|chr}}.png",
+		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+											new google.maps.Size(37, 34),
+											new google.maps.Point(0, 0),
+											new google.maps.Point(10, 34))
+	});
+	var infowindow{{s.pk}} = new google.maps.InfoWindow({
+		content: "{{s.name}}<br />Distance: " +  distance_{{s.pk}} + "<br />Type: {{s.get_type_display}}<br />Level: {{s.get_level_display}}<br />Gender: {{s.get_gender_display}}",
+		size: new google.maps.Size(50,50)
+	});
+	google.maps.event.addListener(marker{{s.pk}}, 'click', function() {
+		infowindow{{s.pk}}.open(map, marker{{s.pk}});
+	});
+	bound.extend(marker{{s.pk}}.getPosition());
+{% endfor %}
+	map.fitBounds(bound);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<div id="map_canvas" style="width:620px; height:620px;"></div>
+</div></div></div></div>
+{% comment %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<img src="http://maps.googleapis.com/maps/api/staticmap?size=620x620&sensor=false&markers=color:green%7Clabel:A%7C{{L1}},{{G1}}
+{% for s in schools.object_list %}
+&markers=label:{{forloop.counter|chr}}%7C{{s.latitude}},{{s.longitude}}
+{% endfor %}
+">
+</div></div></div></div>
+{% endcomment %}
+{% endif %}
+{% endblock %}
+
+{% block noboxcontent %}
+<p><b>
 {% if schools.number == 1 %}
 	{% trans "home" %} |
 {% else %}
-	<a href="?page=1&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "home" %}</a> |
+	<a href="?page=1&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "home" %}</a> |
 {% endif %}
 
 {% if schools.has_previous %}
-	<a href="?page={{schools.previous_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "previous" %}</a> |
+	<a href="?page={{schools.previous_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "previous" %}</a> |
 {% else %}
 	{% trans "previous" %} |
 {% endif %}
@@ -95,7 +187,7 @@
 {% trans "Page" %} {{schools.number}} {% trans "of" %} {{schools.paginator.num_pages}}
 
 {% if schools.has_next %}
-	| <a href="?page={{schools.next_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "next" %}</a>
+	| <a href="?page={{schools.next_page_number}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "next" %}</a>
 {% else %}
 	| {% trans "next" %}
 {% endif %}
@@ -103,21 +195,25 @@
 {% if schools.number == schools.paginator.num_pages %}
 	| {% trans "last" %}
 {% else %}
-	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}">{% trans "last" %}</a>
-{% endif %}
-
-<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
+	| <a href="?page={{schools.paginator.num_pages}}&name={{name}}&suburb={{suburb}}&type={{school_type}}&level={{school_level}}&gender={{school_gender}}&starstatus={{starstatus}}&distance={{distance}}&origin={{origin}}&state={{state}}">{% trans "last" %}</a>
+{% endif %}</b></p>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
   <tr>
 	<td></td>
+	{% if sch_list %}
+	<td><strong>{% trans "Map Ref" %}</strong></td>
+	{% endif %}
     <td><strong>{% trans "Name" %}</strong></td>
     <td><strong>{% trans "City" %}</strong></td>
-    <td><strong>{% trans "State code" %}</strong></td>
+    <td><strong>{% trans "State Code" %}</strong></td>
     <td><strong>{% trans "Postcode" %}</strong></td>
     <td><strong>{% trans "Phone" %}</strong></td>
     <td><strong>{% trans "Type" %}</strong></td>
 	<td><strong>{% trans "Level" %}</strong></td>
 	<td><strong>{% trans "Gender" %}</strong></td>
+	{% if sch_list %}
 	<td><strong>{% trans "Distance" %}</strong></td>
+	{% endif %}
 	<td></td>
   </tr>
 {% for s in schools.object_list %}
@@ -127,6 +223,9 @@
 	{% else %}
 	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% endif %}
+	{% if sch_list %}
+	<td>{{forloop.counter|chr}}</td>
+	{% endif %}
     <td>{{s.name}}</td>
     <td>{{s.address_city}}</td>
     <td>{{s.state_code}}</td>
@@ -135,14 +234,16 @@
 	<td>{{s.get_type_display}}</td>
 	<td>{{s.get_level_display}}</td>
 	<td>{{s.get_gender_display}}</td>
-	{% if s.pk in schools_distance.keys %}
-	{% for key, value in schools_distance.items %}
-		{% ifequal key s.pk %}
-			<td>{{value}}</td>
-		{% endifequal %}
-	{% endfor %}
-	{% else %}
-		<td></td>
+	{% if sch_list %}
+		{% if s.pk in sch_list.keys %}
+			{% for key, value in sch_list.items %}
+				{% ifequal key s.pk %}
+					<td>{{value|floatformat:-2}} {% trans 'km' %}</td>
+				{% endifequal %}
+			{% endfor %}
+		{% else %}
+			<td></td>
+		{% endif %}
 	{% endif %}
 	{% if s.name in copied_schools %}
 	<td></td>

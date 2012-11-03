@@ -17,14 +17,14 @@ from myrobogals.auth.decorators import login_required
 from myrobogals.auth.models import User, Group, MemberStatus
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
-from time import time
+from time import time, sleep
 from pytz import utc
 from myrobogals.rgmain.models import Country
 from operator import itemgetter
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from myrobogals.rgmain.models import Subdivision
-import json, urllib, urllib2
+import json, urllib, urllib2, math
 
 @login_required
 def teachhome(request):
@@ -525,6 +525,48 @@ def listschools(request):
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
 
 @login_required
+def filllatlngschdir(request):
+	if request.user.is_superuser:
+		schools = DirectorySchool.objects.all()
+		over_query_limit = False
+		for school in schools:
+			sleep(0.1)
+			if (school.latitude == None) or (school.longitude == None):
+				data = {}
+				data['address'] = school.address_street
+				data['components'] = '|locality:' + school.address_city + '|administrative_area:' + school.state_code() + '|country:' + school.address_country_id + '|postal_code:' + school.address_postcode
+				data['sensor'] = 'false'
+				url_values = urllib.urlencode(data)
+				url = 'http://maps.googleapis.com/maps/api/geocode/json'
+				full_url = url + '?' + url_values
+				data = urllib2.urlopen(full_url, timeout=2)
+				result = json.loads(data.read())
+				if result['status'] == 'OK':
+					school.latitude = result['results'][0]['geometry']['location']['lat']
+					school.longitude = result['results'][0]['geometry']['location']['lng']
+					school.save()
+				elif result['status'] == 'ZERO_RESULTS':
+					pass
+				elif result['status'] == 'OVER_QUERY_LIMIT':
+					msg = '- You have reached one day quota!'
+					over_query_limit = True
+					break
+				elif result['status'] == 'REQUEST_DENIED':
+					pass
+				elif result['status'] == 'INVALID_REQUEST':
+					pass
+				else:
+					pass
+			else:
+				pass
+		if not over_query_limit:
+			msg = 'Operation successful!'
+	else:
+		msg = '- You can not do this!'
+	request.user.message_set.create(message=unicode(_(msg)))
+	return render_to_response('response.html', {}, context_instance=RequestContext(request))
+
+@login_required
 def schoolsdirectory(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
@@ -561,46 +603,50 @@ def schoolsdirectory(request, chapterurl):
 			schools_list = schools_list.filter(id__in=star_schools)
 		else:
 			schools_list = schools_list.exclude(id__in=star_schools)
-	schools_distance = {}
+	sch_list = {}
+	L1 = None
+	G1 = None
 	if ('distance' in request.GET) and (request.GET['distance'] != '') and ('origin' in request.GET) and (request.GET['origin'] != '') and ('state' in request.GET):
 		distance = float(request.GET['distance'])
 		origin = request.GET['origin']
 		state = request.GET['state']
 		subdiv = get_object_or_404(Subdivision, pk=state)
-		schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
-		mode = 'driving'
-		sensor = 'false'
-		data = {}
-		data['origins'] = origin + ' ' + subdiv.code
-		data['destinations'] = ''
-		for s in schools_list:
-			data['destinations'] += s.address_street + ' ' + s.address_city + ' ' + s.state_code() + ' ' + s.address_country_id + '|'
-		data['mode'] = mode
-		data['sensor'] = sensor
-		url_values = urllib.urlencode(data)
-		url = 'http://maps.googleapis.com/maps/api/distancematrix/json'
-		full_url = url + '?' + url_values
-		data = urllib2.urlopen(full_url, timeout = 1)
-		result = json.loads(data.read())
-		if result['status'] == 'OK':
-			dis_meter = distance * 1000
-			sch_list = []
-			index = 0
-			for s in schools_list:
-				if (result['rows'][0]['elements'][index]['status'] == 'OK'):
-					if (result['rows'][0]['elements'][index]['distance']['value'] <= dis_meter):
-						sch_list.append(s.pk)
-						schools_distance[s.pk] = result['rows'][0]['elements'][index]['distance']['text']
-				else:
-					sch_list.append(s.pk)
-					schools_distance[s.pk] = 'Unknown'
-				index += 1
-			schools_list = schools_list.filter(id__in=sch_list)
-		else:
-			schools_list = []
-			msg = '- Sorry query failed!'
+		try:
+			data = {}
+			data['components'] = 'locality:' + origin + '|administrative_area:' + subdiv.code + '|country:' + subdiv.country.pk
+			data['sensor'] = 'false'
+			url_values = urllib.urlencode(data)
+			url = 'http://maps.googleapis.com/maps/api/geocode/json'
+			full_url = url + '?' + url_values
+			data = urllib2.urlopen(full_url, timeout=2)
+			result = json.loads(data.read())
+			if result['status'] == 'OK':
+				L1 = float(result['results'][0]['geometry']['location']['lat'])
+				G1 = float(result['results'][0]['geometry']['location']['lng'])
+				for school in schools_list:
+					if (school.latitude != None) and (school.longitude != None):
+						L2 = school.latitude
+						G2 = school.longitude
+						DG = G2 - G1
+						PI = 3.141592654
+						D = 1.852 * 60.0 * (180.0 / PI) * math.acos(math.sin(math.radians(L1)) * math.sin(math.radians(L2)) + math.cos(math.radians(L1)) * math.cos(math.radians(L2)) * math.cos(math.radians(DG)))
+						if D <= distance:
+							sch_list[school.id] = D
+				sch_list_sorted_keys = sorted(sch_list, key=sch_list.get)
+				l = []
+				for key in sch_list_sorted_keys:
+					l.append(schools_list.get(pk=key))
+				schools_list = l
+			else:
+				schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+				msg = '- Sorry, suburb coordinate can not be retrieved! Instead, schools within the same suburb is displayed!'
+				request.user.message_set.create(message=unicode(_(msg)))
+		except:
+			schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
+			msg = '- Sorry, suburb coordinate can not be retrieved! Instead, schools within the same suburb is displayed!'
 			request.user.message_set.create(message=unicode(_(msg)))
-	paginator = Paginator(schools_list, 50)
+
+	paginator = Paginator(schools_list, 26)
 	page = request.GET.get('page')
 	try:
 		schools = paginator.page(page)
@@ -609,7 +655,7 @@ def schoolsdirectory(request, chapterurl):
 	except:
 		schools = paginator.page(1)
 	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
-	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'schools_distance': schools_distance}, context_instance=RequestContext(request))
+	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'sch_list': sch_list, 'L1': L1, 'G1': G1}, context_instance=RequestContext(request))
 
 @login_required
 def starschool(request):
