@@ -1019,8 +1019,13 @@ def reopenvisit(request, visit_id):
 		request.user.message_set.create(message=unicode(_("- This workshop is already open!")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of RRR stats - too many people have access
-	if v.school.chapter.pk == 20:
-		raise Http404
+	if v.school.chapter.pk == 20 and not request.user.is_superuser:
+		request.user.message_set.create(message=unicode(_("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
+		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
+	# Don't allow modifying of stats more than 6 months old - too risky
+	if (datetime.datetime.now() - v.visit_start) > datetime.timedelta(days=180):
+		request.user.message_set.create(message=unicode(_("- To protect against accidental deletion of old stats, workshops more than six months old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
+		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if 'confirm' in request.GET:
 		if request.GET['confirm'] == '1':
 			v.schoolvisitstats_set.all().delete()
@@ -1189,9 +1194,9 @@ def report_standard(request):
 				if visited_schools[school.name]['visits'] == 0:
 					del visited_schools[school.name]
 				totals['gf'] = totals['pgf'] + totals['hgf'] + totals['ogf']
-				totals['gr'] = totals['pgr'] + totals['hgr'] + totals['ogr'] 
+				totals['gr'] = totals['pgr'] + totals['hgr'] + totals['ogr']
 				totals['bf'] = totals['pbf'] + totals['hbf'] + totals['obf']
-				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr'] 
+				totals['br'] = totals['pbr'] + totals['hbr'] + totals['obr']
 			# attendance reporting
 			user_list = User.objects.filter(chapter=request.user.chapter)
 						
