@@ -39,7 +39,7 @@ class WriteEmailForm(forms.Form):
 	)
 
 	subject = forms.CharField(max_length=256)
-	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), initial=_("This email has been sent to you by Robogals Adelaide ({{unsubscribe}})"))
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
@@ -59,6 +59,7 @@ class WriteEmailForm(forms.Form):
 		else:
 			self.fields['recipients'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
+		self.fields['body'].initial = _("<br><br>--<br>This email has been sent to you by " + user.chapter.name + " ({{unsubscribe}})")
 		self.fields['from_type'].choices = (
 			(0, "Robogals <" + user.email + ">"),
 			(1, user.chapter.name + " <" + user.email + ">"),

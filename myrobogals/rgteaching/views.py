@@ -563,7 +563,7 @@ def filllatlngschdir(request):
 			msg = 'Operation successful!'
 	else:
 		msg = '- You can not do this!'
-	request.user.message_set.create(message=unicode(_(msg)))
+	request.user.message_set.create(message=unicode(msg))
 	return render_to_response('response.html', {}, context_instance=RequestContext(request))
 
 @login_required
@@ -629,6 +629,7 @@ def schoolsdirectory(request, chapterurl):
 						G2 = school.longitude
 						DG = G2 - G1
 						PI = 3.141592654
+						# Great-circle distance
 						D = 1.852 * 60.0 * (180.0 / PI) * math.acos(math.sin(math.radians(L1)) * math.sin(math.radians(L2)) + math.cos(math.radians(L1)) * math.cos(math.radians(L2)) * math.cos(math.radians(DG)))
 						if D <= distance:
 							sch_list[school.id] = D
@@ -639,12 +640,10 @@ def schoolsdirectory(request, chapterurl):
 				schools_list = l
 			else:
 				schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
-				msg = '- Sorry, suburb coordinate can not be retrieved! Instead, schools within the same suburb is displayed!'
-				request.user.message_set.create(message=unicode(_(msg)))
+				request.user.message_set.create(message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed.')))
 		except:
 			schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
-			msg = '- Sorry, suburb coordinate can not be retrieved! Instead, schools within the same suburb is displayed!'
-			request.user.message_set.create(message=unicode(_(msg)))
+			request.user.message_set.create(message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed')))
 
 	paginator = Paginator(schools_list, 26)
 	page = request.GET.get('page')
@@ -714,7 +713,7 @@ def copyschool(request):
 		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
 			raise Http404
 		if School.objects.filter(chapter=c, name=s.name).count() > 0:
-			msg = '- The school "' + s.name + '" is already copied'
+			msg = '- The school "' + s.name + '" is already already in your schools list'
 		else:
 			school = School()
 			school.name = s.name
@@ -727,7 +726,7 @@ def copyschool(request):
 			school.contact_email = s.email
 			school.contact_phone = s.phone
 			school.save()
-			msg = 'The school "' + s.name + '" is copied'
+			msg = 'The school "' + s.name + '" has been added to your schools list. You can now create a workshop at this school.'
 		request.user.message_set.create(message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
