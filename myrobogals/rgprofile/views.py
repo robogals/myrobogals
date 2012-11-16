@@ -1074,10 +1074,14 @@ def exportusers(request, chapterurl):
 		response = HttpResponse(mimetype='text/csv')
 		filename = 'robogals-' + c.myrobogals_url + '-' + str(datetime.date.today()) + '.csv'
 		response['Content-Disposition'] = 'attachment; filename=' + filename
-		writer = csv.writer(response)
-		writer.writerow(['username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'])
+		csv_data = (('username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'),)
 		for user in users:
-			writer.writerow([user['user__username'], user['user__first_name'], user['user__last_name'], user['user__email'], user['user__mobile'], user['user__course'], user['user__university__name'], user['user__student_number'], user['user__alt_email'], user['user__date_joined'], user['user__dob'], user['user__gender'], user['user__uni_start'], user['user__uni_end'], user['user__course_type'], user['user__student_type']])
+			csv_data = csv_data + ((user['user__username'], user['user__first_name'], user['user__last_name'], user['user__email'], user['user__mobile'], user['user__course'], user['user__university__name'], user['user__student_number'], user['user__alt_email'], user['user__date_joined'], user['user__dob'], user['user__gender'], user['user__uni_start'], user['user__uni_end'], user['user__course_type'], user['user__student_type']),)
+		t = loader.get_template('csv_temp.txt')
+		c = Context({
+			'data': csv_data,
+		})
+		response.write(t.render(c))
 		return response
 	else:
 		raise Http404
