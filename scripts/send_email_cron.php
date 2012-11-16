@@ -9,6 +9,7 @@
 */
 
 set_time_limit(0);
+date_default_timezone_set('UTC');
 
 // kill script if alredy running
 if ($fp = @fopen("/tmp/robogals-cron-email-lock", 'r')) die();
@@ -79,7 +80,6 @@ Content-Type: text/html; charset=\"utf-8\"
 Content-Transfer-Encoding: base64
 
 ";
-				date_default_timezone_set('UTC');
 				$now = time();
 				$beg = strtotime("2001-01-01");
 				$datediff = $now - $beg;
@@ -89,7 +89,7 @@ Content-Transfer-Encoding: base64
 				for ($i = 0; $i < strlen($unicd); $i = $i + 2) {
 					$unicode = $unicode.$unicd[$i];
 				}
-				$uniqurl = sprintf('<a href="http://10.0.2.7:8000/unsubscribe/%s/%s-%s/1/">unsubscribe<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
+				$uniqurl = sprintf('<a href="https://my.robogals.org/unsubscribe/%s/%s-%s/1/">unsubscribe<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
 				$body .= chunk_split(base64_encode(str_replace('{{to_name}}', $recipient['to_name'], str_replace('{{email_id}}', $recipient['id'], str_replace('{{unsubscribe}}', $uniqurl, $msg['body'])))));
 				$body .= "
 

@@ -83,7 +83,7 @@
 </div></div></div></div>
 {% if sch_list %}
 <script type="text/javascript"
-	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCvoGYCX4PLPnWNXbmwNEbAxB6V80st1_4&amp;sensor=false">
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvoGYCX4PLPnWNXbmwNEbAxB6V80st1_4&amp;sensor=false">
 </script>
 <script type="text/javascript">
 var map;
@@ -160,7 +160,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
-<img src="http://maps.googleapis.com/maps/api/staticmap?size=620x620&sensor=false&markers=color:green%7Clabel:A%7C{{L1}},{{G1}}
+<img src="https://maps.googleapis.com/maps/api/staticmap?size=620x620&sensor=false&markers=color:green%7Clabel:A%7C{{L1}},{{G1}}
 {% for s in schools.object_list %}
 &markers=label:{{forloop.counter|chr}}%7C{{s.latitude}},{{s.longitude}}
 {% endfor %}
