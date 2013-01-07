@@ -410,6 +410,17 @@ def detail(request, username):
 	visits = EventAttendee.objects.filter(user=u, actual_status=1).order_by('-event__visit_start')
 	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
 
+def contactdirectory(request):
+	if not request.user.is_staff:
+		raise Http404
+	results = []
+	name = ''
+	if ('name' in request.GET) and (request.GET['name'] != ''):
+		name = request.GET['name']
+		for u in User.objects.filter(Q(first_name__icontains=request.GET['name']) | Q(last_name__icontains=request.GET['name'])):
+			if u.has_cur_pos():
+				results.append(u)
+	return render_to_response('contact_directory.html', {'results': results, 'name': name}, context_instance=RequestContext(request))
 
 # Widget that shows a month and year field only
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
