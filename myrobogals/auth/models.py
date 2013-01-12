@@ -385,37 +385,51 @@ class User(models.Model):
     def age(self):
     	return int((date.today() - self.dob).days / 365.25)
     
-    def membertype(self):
-        m = list(MemberStatus.objects.filter(user=self, status_date_end__isnull=True))
-        if len(m) > 0:
-        	return m[0].statusType
-        else:
-        	return MemberStatusType(description='Inactive')
-    '''
-    	cursor = connection.cursor()
-    	cursor.execute('SELECT * FROM `rgprofile_memberstatus` WHERE user_id = ' + str(self.pk) + ' LIMIT 1')
-    	ms = cursor.fetchone()
-    	if ms:
-	    	if ms[4]:
-    			if ms[2] == 1:
-    				return 'Alumni'  # ex-student member
-    			else:
-    				return 'Inactive'  # ex other kind of member
-    		else:
-    			cursor.execute('SELECT description FROM `rgprofile_memberstatustype` WHERE id = ' + str(ms[2]) + ' LIMIT 1')
-    			mt = cursor.fetchone()
-    			return mt[0]
+    # This fixes members whose MemberStatus is broken.
+    # It returns the new value.
+    def fixmembertype(self):
+    	# Get all types ever assigned to this member
+    	ms_list = MemberStatus.objects.filter(user=self).order_by('status_date_end',)
+    	n_total = len(ms_list)
+    	if n_total == 0:
+    		# This member never had a type
+    		# Create the type "Student" effective from join date
+    		student = MemberStatusType.objects.get(pk=1)
+    		ms = MemberStatus(user=self, status_date_start=self.date_joined.date(), status_date_end=None, statusType=student)
+    		ms.save()
+    		return student
     	else:
-    		return 'Inactive'  # never had any member status
-    '''
+    		# Get all types currently active on this member (should not be more than one)
+    		ms_active_list = MemberStatus.objects.filter(user=self, status_date_end__isnull=True).order_by('status_date_start',)
+    		n_active = len(ms_active_list)
+    		if n_active > 1:
+	    		# This member has more than one active type
+    			# Deactivate all but the last type
+    			for i in range(n_active-1):
+    				ms = ms_active_list[i]
+    				ms.status_date_end = datetime.datetime.now().date()
+    				ms.save()
+    			# Return the active status (i.e. last in the list)
+    			return ms_active_list[n_active-1].statusType
+    		elif n_active < 1:
+    			# This member has old types but no current types
+    			# Make the most recently ended type the current type
+    			ms = ms_list[n_total-1]
+    			ms.status_date_end = None
+    			ms.save()
+    			return ms.statusType
+    		else:
+    			# This user is not actually broken
+    			# Return the actual current type
+    			return ms_active_list[0].statusType
 
-    '''
-    def getchapter(self):
-        try:
-            return Group.objects.get(user=self)
-        except Group.DoesNotExist:
-            return Group.objects.get(pk=1)
-    '''
+	# Return current member type
+    def membertype(self):
+    	try:
+    		return MemberStatus.objects.get(user=self, status_date_end__isnull=True).statusType
+    	except (MemberStatus.DoesNotExist, MemberStatus.MultipleObjectsReturned):
+        	# The member type is broken, fix it and return the fixed value
+    		return self.fixmembertype()
 
     # If they have set a timezone override, use that
     # otherwise use their chapter's timezone
