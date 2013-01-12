@@ -146,20 +146,19 @@
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{% trans "at" %} {{ emailform.schedule_time }} {% trans "on" %} {{ emailform.schedule_date }}{% if request.user.is_superuser %}<br>{%trans "in" %} {{ emailform.schedule_zone }}{% endif %}</td>
+          <td style="vertical-align: top">{% trans "at" %} {{ emailform.schedule_time }} {% trans "on" %} {{ emailform.schedule_date }}{% if request.user.is_superuser %}<br>{%trans "in" %} {{ emailform.schedule_zone }}{% endif %}<br>If using recipients' timezones for newsletter subscribers who do not have a timezone specified, Melbourne time will be used for them.</td>
         </tr>
       </table>
     </td>
   <tr>
 </table>
+{# Translation not required for this warning as only Global will see it #}
 <div id="newsletter_warning" style="padding: 7px; margin: 7px; background-color: #CC0000; color: #FFFFFF; display: none">
-<strong>{% trans "This newsletter will be sent to hundreds of people. If this message is showing, then the option you have selected is the real thing and NOT a test. Please ensure:" %}</strong>
+<strong>This newsletter will be sent to hundreds of people. If this message is showing, then the option you have selected is the real thing and NOT a test. Please ensure:</strong>
 <ul>
-{% blocktrans %}
   <li>All relevant procedures for this newsletter have been complied with</li>
   <li>An up-to-date web version has been uploaded for people who click "view it online"</li>
-  {% endblocktrans %}
-  <li>{% trans "{{email_id}}" %}{% trans ' has been inserted into the email here, but not the "view it online" version' %}</li>
+  <li>{{email_id}} has been inserted into the email here, but not the "view it online" version</li>
 </ul>
 </div>
 <input type="hidden" name="step" value="1" />
