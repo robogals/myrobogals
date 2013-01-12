@@ -164,7 +164,7 @@ def writeemail(request):
 			usersfiltered = []
 			if statussel != '0' and request.POST['type'] != '4':
 				for one_user in users:
-					if((one_user.memberstatus_set.get(status_date_end__isnull=True)).statusType == MemberStatusType.objects.get(pk=(int(statussel)))):
+					if one_user.membertype().statusType.pk == int(statussel):
 						if request.POST['step'] == '1':
 							usersfiltered.append(one_user)
 						else:
