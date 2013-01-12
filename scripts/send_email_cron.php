@@ -8,6 +8,8 @@
 	It should be running on a cron job in the background on the server.
 */
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 set_time_limit(0);
 date_default_timezone_set('UTC');
 
