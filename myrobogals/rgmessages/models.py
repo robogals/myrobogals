@@ -311,9 +311,13 @@ class SMSRecipient(models.Model):
 				if self.user:
 					local_tz = self.user.tz_obj()
 				else:
-					local_tz = utc
+					# Use Robogals Global's timezone as default
+					local_tz = Group.objects.get(pk=1).tz_obj()
+			# Interpret the user-entered time as being in local time
 			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
+			# Convert this time into UTC
 			scheduled_date_utc = scheduled_date_local.astimezone(utc)
+			# Convert to a naive datetime to keep MySQL happy
 			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
 
 	def gateway_description(self):
