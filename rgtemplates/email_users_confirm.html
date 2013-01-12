@@ -40,7 +40,7 @@
 			<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 				<td>
 				{% if sub.last_name or sub.first_name %}
-					{{ sub.first_name }}, {{ sub.last_name }}
+					{{ sub.first_name }} {{ sub.last_name }}
 				{% else %}
 					{% trans "None" %}
 				{% endif %}
