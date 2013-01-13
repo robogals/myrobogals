@@ -1,21 +1,90 @@
 from django.db import models
 from datetime import datetime
-from myrobogals.auth.models import User
+from myrobogals.auth.models import User, Group, Timezone
 from myrobogals.rgchapter.models import ShirtSize
+from pytz import utc
 
 class Conference(models.Model):
+	POLICY_CHOICES = (
+		(0, 'Registration to auto-close at RSVP deadline'),
+		(1, 'Registration to auto-close at late RSVP deadline'),
+		(2, 'Registraion open indefinitely'),
+		(3, 'Registration closed'),
+		(4, 'Conference closed and hidden from list'),
+	)
+	
+	CUSTOM_CHECKBOX_SETTINGS = (
+		(0, 'Disabled'),
+		(1, 'Enabled, for use by organisers'),
+		(2, 'Enabled, user-settable (not implemented)'),
+	)
+
 	name = models.CharField(max_length=64)
 	start_date = models.DateField()
 	end_date = models.DateField()
-	early_rsvp_close = models.DateField()
-	rsvp_close = models.DateField()
-	late_rsvp_close = models.DateField()
 	details = models.TextField(blank=True)
-	url = models.CharField(max_length=128)
+	url = models.CharField(max_length=128, help_text="URL to page with information")
+	host = models.ForeignKey(Group, blank=True, null=True)
 	committee_year = models.IntegerField(default=0, help_text="The committee year for the purposes of the relevant question in the RSVP form. Put 0 to remove this question from the form.")
+	early_rsvp_close = models.DateTimeField(help_text="Time in conference timezone when benefits for registering early should close (not implemented)")
+	rsvp_close = models.DateTimeField(help_text="Time in conference timezone when registration will close; set policy below. Publicly viewable.")
+	late_rsvp_close = models.DateTimeField(help_text="Time in conference timezone when late registration will close; set policy below. Not publicly viewable, so can be used to silently allow late RSVPs.")
+	timezone = models.ForeignKey(Timezone, help_text="Timezone of the place where the conference is taking place. Used for RSVP deadlines")
+	timezone_desc = models.CharField(max_length=128, help_text="Description of timezone, e.g. 'Melbourne time' or 'Pacific Time'")
+	policy = models.IntegerField(choices=POLICY_CHOICES, default=1)
+	closed_msg = models.CharField(max_length=128, blank=True, help_text="Message to be shown when registration is closed", default="This form is now closed. To add/modify/remove RSVPs please email ______________")
+	enable_invoicing = models.BooleanField()
+	custom1_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
+	custom1_label = models.CharField(max_length=32, blank=True)
+	custom2_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
+	custom2_label = models.CharField(max_length=32, blank=True)
+	custom3_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
+	custom3_label = models.CharField(max_length=32, blank=True)
+	custom4_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
+	custom4_label = models.CharField(max_length=32, blank=True)
+	custom5_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
+	custom5_label = models.CharField(max_length=32, blank=True)
 
 	def __unicode__(self):
 		return self.name
+	
+	def rsvp_close_utc(self):
+		return self.timezone.tz_obj().localize(self.rsvp_close).astimezone(utc).replace(tzinfo=None)
+
+	def late_rsvp_close_utc(self):
+		return self.timezone.tz_obj().localize(self.late_rsvp_close).astimezone(utc).replace(tzinfo=None)
+
+	def is_open(self):
+		if self.policy == 3:
+			# Always closed
+			return False
+		elif self.policy == 4:
+			# Closed and hidden
+			return False
+		elif self.policy == 2:
+			# Always open
+			return True
+		elif self.policy == 0:
+			# Closed after deadline
+			if datetime.utcnow() > self.rsvp_close_utc():
+				return False
+			else:
+				return True
+		elif self.policy == 1:
+			# Closed after late deadline
+			if datetime.utcnow() > self.late_rsvp_close_utc():
+				return False
+			else:
+				return True
+		else:
+			# Invalid policy type
+			return False
+	
+	def is_hidden(self):
+		if self.policy == 4:
+			return True
+		else:
+			return False
 
 	class Meta:
 		ordering = ('-start_date',)
@@ -57,9 +126,9 @@ class ConferencePart(models.Model):
 
 class ConferenceAttendee(models.Model):
 	ATTENDEE_TYPE_CHOICES = (
-		(0, '2011/2012 committee, now outgoing'),
-		(1, '2011/2012 committee, continuing into 2012/2013 committee'),
-		(2, 'Incoming into 2012/2013 committee'),
+		(0, 'Outgoing from committee'),
+		(1, 'Continuing in commmitee'),
+		(2, 'Incoming into committee'),
 		(3, 'None of the above; ordinary volunteer'),
 	)
 	
@@ -67,8 +136,8 @@ class ConferenceAttendee(models.Model):
 		(0, 'Unknown'),
 		(1, 'Male'),
 		(2, 'Female'),
-	)
-
+	)			
+	
 	conference = models.ForeignKey(Conference)
 	user = models.ForeignKey(User)
 	first_name = models.CharField(max_length=64)
@@ -86,8 +155,8 @@ class ConferenceAttendee(models.Model):
 	arrival_time = models.CharField(max_length=64, blank=True)
 	dietary_reqs = models.CharField(max_length=64, blank=True)
 	comments = models.CharField(max_length=128, blank=True)
-	parts_attending = models.ManyToManyField(ConferencePart)
-	rsvp_time = models.DateTimeField(default=datetime.now())
+	parts_attending = models.ManyToManyField(ConferencePart, blank=True, null=True)
+	rsvp_time = models.DateTimeField(default=datetime.now(), help_text="Time in conference timezone when this person registered (does not change if RSVP edited)")
 	check_in = models.DateField(null=True, blank=True)
 	check_out = models.DateField(null=True, blank=True)
 	gender = models.IntegerField(choices=GENDERS, default=0)
@@ -96,6 +165,20 @@ class ConferenceAttendee(models.Model):
 	custom3 = models.BooleanField()
 	custom4 = models.BooleanField()
 	custom5 = models.BooleanField()
+
+	def get_position(self):
+		if self.attendee_type == 0:
+			if self.outgoing_position:
+				return "Outgoing " + self.outgoing_position
+			else:
+				return ""
+		elif self.attendee_type == 1 or self.attendee_type == 2:
+			if self.incoming_position:
+				return self.incoming_position
+			else:
+				return ""
+		else:
+			return ""
 
 	def total_cost(self):
 		sum = 0.0

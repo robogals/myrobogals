@@ -9,13 +9,28 @@
     <td><strong>{% trans "Name" %}</strong></td>
     <td><strong>{% trans "Chapter" %}</strong></td>
     <td><strong>{% trans "Gender" %}</strong></td>
+    <td><strong>{% trans "Mobile" %}</strong></td>
     <td><strong>{% trans "Date of birth" %}</strong></td>
     <td><strong>{% trans "Check in" %}</strong></td>
     <td><strong>{% trans "Check out" %}</strong></td>
+    <td><strong>{% trans "Dietary reqs" %}</strong></td>
+    <td><strong>{% trans "Emergency contact" %}</strong></td>
 {% if 'hideother' not in request.GET %}
-    <td><strong>{% trans "Dreamworld" %}</strong></td>
-    <td><strong>{% trans "Transport to GC" %}</strong></td>
-    <td><strong>{% trans "Story Bridge" %}</strong></td>
+{% ifnotequal conf.custom1_setting 0 %}
+    <td><strong>{{conf.custom1_label}}</strong></td>
+{% endifnotequal %}
+{% ifnotequal conf.custom2_setting 0 %}
+    <td><strong>{{conf.custom2_label}}</strong></td>
+{% endifnotequal %}
+{% ifnotequal conf.custom3_setting 0 %}
+    <td><strong>{{conf.custom3_label}}</strong></td>
+{% endifnotequal %}
+{% ifnotequal conf.custom4_setting 0 %}
+    <td><strong>{{conf.custom4_label}}</strong></td>
+{% endifnotequal %}
+{% ifnotequal conf.custom5_setting 0 %}
+    <td><strong>{{conf.custom5_label}}</strong></td>
+{% endifnotequal %}
 {% endif %}
   </tr>
 {% for ca in cas %}
@@ -24,13 +39,28 @@
     <td>{{ca.first_name}} {{ca.last_name}}</td>
     <td>{{ca.user.chapter}}</td>
     <td>{{ca.get_gender_display|default_if_none:""}}</td>
+    <td>{{ca.mobile}}</td>
     <td>{{ca.dob|date:_("DATE_FORMAT_NODAY")}}</td>
     <td>{{ca.check_in|default_if_none:""}}</td>
     <td>{{ca.check_out|default_if_none:""}}</td>
+    <td>{{ca.dietary_reqs}}</td>
+    <td>{{ca.emergency_name}}, {{ca.emergency_number}}, {{ca.emergency_relationship}}</td>
 {% if 'hideother' not in request.GET %}
-    <td>{% if ca.custom2 %}Yes{% endif %}</td>
-    <td>{% if ca.custom3 %}Yes{% endif %}</td>
+{% ifnotequal conf.custom1_setting 0 %}
     <td>{% if ca.custom1 %}Yes{% endif %}</td>
+{% endifnotequal %}
+{% ifnotequal conf.custom2_setting 0 %}
+    <td>{% if ca.custom2 %}Yes{% endif %}</td>
+{% endifnotequal %}
+{% ifnotequal conf.custom3_setting 0 %}
+    <td>{% if ca.custom3 %}Yes{% endif %}</td>
+{% endifnotequal %}
+{% ifnotequal conf.custom4_setting 0 %}
+    <td>{% if ca.custom4 %}Yes{% endif %}</td>
+{% endifnotequal %}
+{% ifnotequal conf.custom5_setting 0 %}
+    <td>{% if ca.custom5 %}Yes{% endif %}</td>
+{% endifnotequal %}
 {% endif %}
   </tr>
 {% endif %}
@@ -76,26 +106,46 @@
 </table>
 </p>
 {% if 'hideother' not in request.GET %}
+{% if not hide_all_custom %}
 <p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0">
   <tr>
     <td><strong>{% trans "Activity" %}</strong></td>
     <td><strong>{% trans "People" %}</strong></td>
   </tr>
+{% ifnotequal conf.custom1_setting 0 %}
   <tr class="odd">
-    <td>Dreamworld</td>
-    <td>{{customtotals.1}}</td>
-  </tr>
-  <tr class="even">
-    <td>Transport to GC</td>
-    <td>{{customtotals.2}}</td>
-  </tr>
-  <tr class="odd">
-    <td>Story Bridge</td>
+    <td>{{conf.custom1_label}}</td>
     <td>{{customtotals.0}}</td>
   </tr>
+{% endifnotequal %}
+{% ifnotequal conf.custom2_setting 0 %}
+  <tr class="even">
+    <td>{{conf.custom2_label}}</td>
+    <td>{{customtotals.1}}</td>
+  </tr>
+{% endifnotequal %}
+{% ifnotequal conf.custom3_setting 0 %}
+  <tr class="odd">
+    <td>{{conf.custom3_label}}</td>
+    <td>{{customtotals.2}}</td>
+  </tr>
+{% endifnotequal %}
+{% ifnotequal conf.custom4_setting 0 %}
+  <tr class="even">
+    <td>{{conf.custom4_label}}</td>
+    <td>{{customtotals.3}}</td>
+  </tr>
+{% endifnotequal %}
+{% ifnotequal conf.custom5_setting 0 %}
+  <tr class="odd">
+    <td>{{conf.custom5_label}}</td>
+    <td>{{customtotals.4}}</td>
+  </tr>
+{% endifnotequal %}
 </table>
 </p>
+{% endif %}
 {% endif %}
 </body>
 </html>

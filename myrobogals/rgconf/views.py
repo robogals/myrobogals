@@ -1,7 +1,7 @@
-from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from myrobogals.auth.models import User
 from myrobogals.auth.decorators import login_required
+from django.template import RequestContext, Context, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -42,48 +42,70 @@ class ConfRSVPForm(forms.Form):
 		elif user.mobile[0] != '0':
 			self.fields['mobile'].initial = '+' + user.mobile
 		else:
-			self.fields['mobile'].initial = user.mobile			
+			self.fields['mobile'].initial = user.mobile
 		self.fields['dob'].initial = user.dob
 		if user.gender in [1, 2]:
 			self.fields['gender'].initial = user.gender
 		else:
-			self.fields['gender'].initial = 2		
-	
+			self.fields['gender'].initial = 2
+
+	def clean(self):
+		cleaned_data = self.cleaned_data
+		attendee_type = int(cleaned_data.get('attendee_type'))
+		outgoing_position = cleaned_data.get('outgoing_position')
+		incoming_position = cleaned_data.get('incoming_position')
+		print attendee_type
+		print outgoing_position
+		print incoming_position
+		if attendee_type == 0:
+			if not outgoing_position:
+				raise forms.ValidationError(_('You have indicated that you are outgoing from your chapter committee, but did not specify your outgoing position. Please state the position from which you are outgoing, e.g. "Schools Manager". If your chapter does not assign specific roles, you can simply put "General Committee"'))
+		elif attendee_type == 1:
+			if not incoming_position:
+				raise forms.ValidationError(_('You have indicated that you are continuing in your chapter committee, but did not specify your position. Please state the position in which you are continuing, e.g. "Schools Manager". If your chapter does not assign specific roles, you can simply put "General Committee"'))
+		elif attendee_type == 2:
+			if not incoming_position:
+				raise forms.ValidationError(_('You have indicated that you are incoming into your chapter committee, but did not specify your incoming position. Please state the position into which you are incoming, e.g. "Schools Manager". If your chapter does not assign specific roles, you can simply put "General Committee"'))
+		return cleaned_data
+
 	GENDERS = (
 		(1, 'Male'),
 		(2, 'Female'),
 	)
 
-	first_name = forms.CharField(label=_("First name"), help_text=_("Whatever you put here is what this person's name tag will show.<br />You can put a preferred name, e.g. 'Bec' instead of 'Rebecca' if you like."), required=True, widget=forms.TextInput(attrs={'size': '30'}))
+	first_name = forms.CharField(label=_("First name"), help_text=_("Whatever you put here is what the name tag will show.<br />You can put a preferred name, e.g. 'Bec' instead of 'Rebecca' if you like."), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	last_name = forms.CharField(label=_("Last name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	attendee_type = forms.ChoiceField(label=_("This person is"), choices=((0,''),))
 	gender = forms.ChoiceField(label=_("Gender"), choices=GENDERS)
 	outgoing_position = forms.CharField(label=_("Outgoing position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	incoming_position = forms.CharField(label=_("Incoming position"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	email = forms.EmailField(label=_("Email"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
-	mobile = forms.CharField(label=_("Mobile"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
+	mobile = forms.CharField(label=_("Mobile/cell phone"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	dob = forms.DateField(label=_("Date of birth"), help_text=_("If you are under 18, we will send you a form that must be signed by your parent or guardian."), widget=SelectDateWidget(), required=True)
 	update_account = forms.BooleanField(label=_("Also update this person's account in myRobogals with the email, mobile and DOB above"), required=False, initial=False)
 	emergency_name = forms.CharField(label=_("Contact name"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	emergency_number = forms.CharField(label=_("Contact number"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	emergency_relationship = forms.CharField(label=_("Relationship to you"), required=True, widget=forms.TextInput(attrs={'size': '30'}))
 	tshirt = forms.ModelChoiceField(label=_("T-shirt size"), queryset=ShirtSize.objects.filter(chapter__id=1), required=True)
-	arrival_time = forms.CharField(label=_("Flight arrival time, if known"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	arrival_time = forms.CharField(label=_("Arrival time, if known"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	dietary_reqs = forms.CharField(label=_("Dietary requirements"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	comments = forms.CharField(label=_("Comments or special requests"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 
 @login_required
 def editrsvp(request, conf_id, username):
-	return HttpResponse('This form is now closed. To add/modify/remove RSVPs please email mark@robogals.org')
 	chapter = request.user.chapter
 	if not request.user.is_staff:
 		if request.user.username != username:
 			raise Http404
-	conf = get_object_or_404(Conference, pk=conf_id)
 	u = get_object_or_404(User, username=username)
 	if u.chapter != chapter:
 		if not request.user.is_superuser:
 			raise Http404
+	conf = get_object_or_404(Conference, pk=conf_id)
+	if conf.is_hidden():
+		raise Http404
+	if not conf.is_open():
+		return render_to_response('response.html', {'msg': conf.closed_msg, 'msgtitle': _('Registration is closed')}, context_instance=RequestContext(request))
 	try:
 		ca = ConferenceAttendee.objects.get(conference=conf, user=u)
 		new = False
@@ -137,8 +159,12 @@ def editrsvp(request, conf_id, username):
 				request.user.message_set.create(message=unicode(_("Member account updated with new details")))
 			if request.user.is_staff:
 				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/')
-			else:
+			elif ca.balance_owing()[1] == None:
+				return HttpResponseRedirect('/profile/' + u.username + '/')
+			elif ca.balance_owing()[0] > 0.0:
 				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/' + u.username + '/invoice/')
+			else:
+				return HttpResponseRedirect('/profile/' + u.username + '/')
 	else:
 		if new:
 			form = ConfRSVPForm(None, conf=conf, user=u)
@@ -218,7 +244,11 @@ def rsvplist(request, conf_id):
 				accommtotals_numnights[nights.days][3] += 1
 		accommtotals_sorted = sorted(accommtotals.items(), key=lambda totals: totals[0])
 		accommtotals_numnights_sorted = sorted(accommtotals_numnights.items(), key=lambda totals: totals[0])
-	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted, 'accommtotals_nights': accommtotals_numnights_sorted}, context_instance=RequestContext(request))
+	if (not conf.custom1_setting) and (not conf.custom2_setting) and (not conf.custom3_setting) and (not conf.custom4_setting) and (not conf.custom5_setting):
+		hide_all_custom = True
+	else:
+		hide_all_custom = False
+	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted, 'accommtotals_nights': accommtotals_numnights_sorted, 'hide_all_custom': hide_all_custom}, context_instance=RequestContext(request))
 
 @login_required
 def showinvoice(request, conf_id, username):
@@ -227,6 +257,8 @@ def showinvoice(request, conf_id, username):
 		if request.user.username != username:
 			raise Http404
 	conf = get_object_or_404(Conference, pk=conf_id)
+	if not conf.enable_invoicing:
+		raise Http404
 	u = get_object_or_404(User, username=username)
 	if u.chapter != chapter:
 		if not request.user.is_superuser:
@@ -236,3 +268,17 @@ def showinvoice(request, conf_id, username):
 	except ConferenceAttendee.DoesNotExist:
 		raise Http404
 	return render_to_response('conf_invoice.html', {'conf': conf, 'chapter': chapter, 'ca': ca, 'user': u}, context_instance=RequestContext(request))
+
+@login_required
+def nametagscsv(request, conf_id):
+	if not request.user.is_superuser:
+		raise Http404
+	conf = get_object_or_404(Conference, pk=conf_id)
+	cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
+	response = HttpResponse(mimetype='text/csv')
+	filename = 'robogals-sine-nametags-' + str(datetime.now().date()) + '.csv'
+	response['Content-Disposition'] = 'attachment; filename=' + filename
+	t = loader.get_template('conf_nametags_csv.txt')
+	c = Context({'cas': cas})
+	response.write(t.render(c))
+	return response

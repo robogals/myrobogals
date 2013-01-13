@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Response{% endblock %}
+{% block title %}{% if msgtitle %}{{msgtitle}}{% else %}Response{% endif %}{% endblock %}
 
-{% block pagetitle %}Response{% endblock %}
+{% block pagetitle %}{% if msgtitle %}{{msgtitle}}{% else %}Response{% endif %}{% endblock %}
 
 {% block content %}
 <p>{{msg}}</p>

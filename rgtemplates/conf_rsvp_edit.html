@@ -11,7 +11,6 @@
   <tr>
     <td colspan="2"><strong>{% trans "Conference attendance info" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
   </tr>
-
   <tr>
     <td style="vertical-align: top">{% trans "myRobogals account" %} <span style="color: #ff0000">*</span></td>
     <td>{{u.get_full_name}} ({{username}})</td>
@@ -36,6 +35,12 @@
     <td style="vertical-align: top">{{ form.last_name.label_tag }} <span style="color: #ff0000">*</span></td>
     <td>{{ form.last_name }}</td>
   </tr>
+
+  {% if form.non_field_errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in form.non_field_errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
 
   {% if form.attendee_type.errors %}
   <tr>
@@ -189,6 +194,7 @@
     <td>{{ form.emergency_relationship }}</td>
   </tr>
 </table>
+{% if all_parts %}
 <p>&nbsp;</p>
 <table border="1" rules="NONE" width="90%" frame="BOX" cellpadding="10" cellspacing="0">
   <tr>
@@ -209,6 +215,7 @@
 {% endfor %}
 </table>
 <p>&nbsp;</p>
+{% endif %}
 <input type="submit" value="Submit" />
 </form>
 {% endblock %}
