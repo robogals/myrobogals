@@ -73,9 +73,9 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td>{{v.event.visit_start|date:_("DATE_FORMAT")}}</td>
     <td>{{v.event.schoolvisit.school}}</td>
-    <td>{{v.event.schoolvisit.get_num_girls_display}}</td>
+    <td>{% if v.event.schoolvisit.get_num_girls_display %}{{v.event.schoolvisit.get_num_girls_display}}{% endif %}</td>
     <td>{{v.event.schoolvisit.get_type}}</td>
-	<td>{{v.hours}}</td>
+	<td>{% if v.hours %}{{v.hours}}{% endif %}</td>
   </tr>
 {% endif %}
 {% endfor %}
