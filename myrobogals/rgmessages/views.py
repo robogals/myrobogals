@@ -59,7 +59,8 @@ class WriteEmailForm(forms.Form):
 		else:
 			self.fields['recipients'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_chapter_optin=True).exclude(email='').order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
-		self.fields['body'].initial = _("<br><br>--<br>This email has been sent to you by " + user.chapter.name + " ({{unsubscribe}})")
+		if not user.is_superuser:
+			self.fields['body'].initial = _("<br><br>--<br>This email has been sent to you by " + user.chapter.name + " ({{unsubscribe}})")
 		self.fields['from_type'].choices = (
 			(0, "Robogals <" + user.email + ">"),
 			(1, user.chapter.name + " <" + user.email + ">"),
