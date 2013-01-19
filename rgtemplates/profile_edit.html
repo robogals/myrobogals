@@ -36,6 +36,12 @@
     <td width="150">New username <span style="color: #ff0000">*</span></td>
     <td><input type="text" name="username"{% if new_username %} value="{{new_username}}"{% endif %}></td>
   </tr>
+{% else %}
+  {% if usererr %}
+  <tr>
+    <td colspan="2"><div class="error">{{ usererr }}</div></td>
+  </tr>
+  {% endif %}  
 {% endif %}
 {% if chpass %}
   {% if pwerr %}
