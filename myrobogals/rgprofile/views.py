@@ -680,7 +680,7 @@ def edituser(request, username, chapter=None):
 		chapter = u.chapter
 	if join or request.user.is_superuser or request.user.id == u.id or (request.user.is_staff and request.user.chapter == u.chapter):
 		if request.method == 'POST':
-			if join or not (request.POST['username'] == ''):
+			if join or not (request.POST['username'].strip() == ''):
 				new_username = request.POST['username'].strip()
 				change_username_flag = 1
 			formpart1 = FormPartOne(request.POST, chapter=chapter, user_id=u.id)
