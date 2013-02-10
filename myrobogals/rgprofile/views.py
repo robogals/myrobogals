@@ -577,6 +577,7 @@ class FormPartOne(forms.Form):
 
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
+	username = forms.CharField(label=_('Username'), max_length=30,required = False)
 	email = forms.EmailField(label=_('Email'), max_length=64)
 	student_number = StudentNumField(max_length=32)
 	union_member = forms.BooleanField()
@@ -662,6 +663,7 @@ def edituser(request, username, chapter=None):
 	pwerr = ''
 	usererr = ''
 	new_username = ''
+	change_username_flag = 0
 	if username == '':
 		join = True
 		u = User()
@@ -678,15 +680,16 @@ def edituser(request, username, chapter=None):
 		chapter = u.chapter
 	if join or request.user.is_superuser or request.user.id == u.id or (request.user.is_staff and request.user.chapter == u.chapter):
 		if request.method == 'POST':
-			if join:
+			if join or not (request.POST['username'].strip() == ''):
 				new_username = request.POST['username'].strip()
+				change_username_flag = 1
 			formpart1 = FormPartOne(request.POST, chapter=chapter, user_id=u.id)
 			formpart2 = FormPartTwo(request.POST, chapter=chapter)
 			formpart3 = FormPartThree(request.POST, chapter=chapter)
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			formpart5 = FormPartFive(request.POST, chapter=chapter)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
-				if join:
+				if join or not (new_username == ''):
 					username_len = len(new_username)
 					if username_len < 3:
 						usererr = _('Your username must be 3 or more characters')
@@ -699,7 +702,7 @@ def edituser(request, username, chapter=None):
 						try:
 							usercheck = User.objects.get(username=new_username)
 						except User.DoesNotExist:
-							if request.POST['password1'] == request.POST['password2']:
+							if change_username_flag == 0 and request.POST['password1'] == request.POST['password2']:
 								if len(request.POST['password1']) < 5:
 									pwerr = _('Your password must be at least 5 characters long')
 								else:
@@ -711,10 +714,13 @@ def edituser(request, username, chapter=None):
 									u.is_staff = False
 									u.is_superuser = False
 									u.save()
-							else:
+							elif change_username_flag == 1:
+								pwerr = ''								
+							else:								
 								pwerr = _('The password and repeated password did not match. Please try again')
 						else:
 							usererr = _('That username is already taken')
+							
 				if request.user.is_staff and request.user != u:
 					if len(request.POST['password1']) > 0:
 						if request.POST['password1'] == request.POST['password2']:
@@ -725,6 +731,8 @@ def edituser(request, username, chapter=None):
 					data = formpart1.cleaned_data
 					u.first_name = data['first_name']
 					u.last_name = data['last_name']
+					u.username = data['username']
+					username = data['username']
 					u.email = data['email']
 					u.alt_email = data['alt_email']
 					if u.mobile != data['mobile']:
@@ -819,6 +827,7 @@ def edituser(request, username, chapter=None):
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
 					'last_name': u.last_name,
+					'username' : u.username,
 					'email': u.email,
 					'alt_email': u.alt_email,
 					'mobile': u.mobile,
