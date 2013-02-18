@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% load showlocaltime %}
+{% load showstarrating %}
+
+{% block title %}Confirm deletion of topic{% endblock %}
+
+{% block pagetitle %}Confirm deletion of topic{% endblock %}
+
+{% block content %}
+<form action="/forums/topic/delete/{{topic.pk}}/?return={{return}}" method="post">
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<tr style="color:white; background-color:#1366A3">
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Replies" %}</td>
+		<td>{% trans "Views" %}</td>
+		<td>{% trans "Last Post" %}</td>
+	</tr>
+	<tr class="odd">
+		<td>{{ topic.subject }}<br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
+		</td>
+		<td>{{ topic.number_of_replies }}</td>
+		<td>{{ topic.num_views }}</td>
+		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+	</tr>
+</table>
+<p style="clear: both; font-size: 200%;">
+<input type="submit" id="deltopic" name="deltopic" value="Delete topic">
+</p>
+</form>
+{% endblock %}

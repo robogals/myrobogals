@@ -90,7 +90,8 @@ Content-Transfer-Encoding: base64
 					$unicode = $unicode.$unicd[$i];
 				}
 				$uniqurl = sprintf('<a href="https://my.robogals.org/unsubscribe/%s/%s-%s/1/">unsubscribe<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
-				$body .= chunk_split(base64_encode(str_replace('{{to_name}}', $recipient['to_name'], str_replace('{{email_id}}', $recipient['id'], str_replace('{{unsubscribe}}', $uniqurl, $msg['body'])))));
+				$uniqurlunwatchall = sprintf('<a href="https://my.robogals.org/forums/unwatchall/%s/%s-%s/1/">Empty watch list<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
+				$body .= chunk_split(base64_encode(str_replace('{{to_name}}', $recipient['to_name'], str_replace('{{email_id}}', $recipient['id'], str_replace('{{unsubscribe}}', $uniqurl, str_replace('{{unwatchall}}', $uniqurlunwatchall, $msg['body']))))));
 				$body .= "
 
 --robogals{$uniqid}--

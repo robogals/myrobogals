@@ -54,7 +54,7 @@
 		<td>{% trans "Replies" %}</td>
 		<td>{% trans "Views" %}</td>
 		<td>{% trans "Last Post" %}</td>
-		{% if user.is_superuser %}
+		{% if canDelete %}
 		<td>{% trans "Delete" %}</td>
 		<td><input type="submit" value="Sticky Toggle" /></td>
 		{% endif %}
@@ -71,24 +71,29 @@
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
 		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
-		{% if user.is_superuser %}
-		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.gif" alt="Delete" /></a></td>
+		{% if canDelete %}
+		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		<td><input type="checkbox" name="{{topic.pk}}" /></td>
 		{% endif %}
 	</tr>
 	{% endfor %}
 </form>
-<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnLastPage|urlencode}}" method="POST">
+<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnLastPage|urlencode}}" method="POST" enctype="multipart/form-data">
   <tr style="border-top:solid 1px grey;">
     <td valign="top"><strong>{{topicform.subject.label_tag}}</strong></td>
-    <td {% if user.is_superuser %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.subject }}</td>
+    <td {% if canDelete %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.subject }}</td>
   </tr>
   <tr style="border-top:solid 1px grey;">
     <td valign="top"><strong>{{topicform.message.label_tag}}</strong></td>
-	<td {% if user.is_superuser %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.message }}</td>
+	<td {% if canDelete %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.message }}</td>
+  </tr>
+  <tr><td colspan="4">{{topicform.upload_file}}</td>
+  {% if canDelete %}
+  <td colspan="2"></td>
+  {% endif %}
   </tr>
   <tr><td colspan="4"><input type="submit" value="Add Topic" /></td>
-  {% if user.is_superuser %}
+  {% if canDelete %}
   <td colspan="2"></td>
   {% endif %}
   </tr>

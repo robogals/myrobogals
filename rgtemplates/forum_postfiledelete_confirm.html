@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% load showlocaltime %}
+{% load showstarrating %}
+
+{% block title %}Confirm deletion of post file{% endblock %}
+
+{% block pagetitle %}Confirm deletion of post file{% endblock %}
+
+{% block content %}
+<form action="/forums/deletefile/{{post.pk}}/?return={{return|urlencode}}" method="post">
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<tr style="color:white; background-color:#1366A3">
+		<td>{% trans "User" %}</td>
+		<td>{% trans "Message" %}</td>
+	</tr>
+	<tr class="odd">
+		<td valign="top" style="border-right: solid 1px grey;" rowspan="4">{{ post.posted_by.get_full_name }}
+		{% for cur_position in post.posted_by.cur_positions %}
+		<br />({{cur_position.positionType}})
+		{% endfor %}
+		</td>
+		<td style="border-bottom: solid 1px grey;">{{post.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.updated_on %} | {% trans "Last edit:" %} {{ post.edited_by.get_full_name }} ({{ post.updated_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
+	</tr>
+	<tr class="odd">
+		<td>{{ post.message|linebreaksbr }}</td>
+	</tr>
+	<tr class="odd">
+		<td>{% if post.upload_file %}<a href="/forums/downloadpostfile/{{post.pk}}/">{% trans "file: " %}{{post.uploadfilename}} ({% trans "size" %}: {{post.upload_file.size|filesizeformat}})</a> <input type="submit" id="delpostfile" name="delpostfile" value="Delete file"><br/>{% trans "Rating: " %}{{post|showstarrating|safe}} {{post.vote_average}} ({{post.vote_count}} {% trans "voted" %}){% endif %}</td>
+	</tr>
+	<tr class="odd">
+	<td></td>
+	</tr>
+</table>
+</form>
+{% endblock %}

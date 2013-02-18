@@ -30,6 +30,9 @@ from pytz import timezone, utc
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from myrobogals.auth.models import Group, User
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+from django.db.models import Avg
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
@@ -65,6 +68,7 @@ class Forum(models.Model):
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
 	watchers = models.ManyToManyField(User, related_name='forum_watchers')
+	blacklist = models.ManyToManyField(User, related_name='forum_blacklist')
 
 	class Meta:
 		verbose_name = "forum"
@@ -113,6 +117,7 @@ class Post(models.Model):
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(blank=True, null=True)
 	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
+	upload_file = models.FileField(upload_to='forumFileUpload', blank=True)
 
 	class Meta:
 		verbose_name = "post"
@@ -127,3 +132,59 @@ class Post(models.Model):
 		msg = msg.replace('\n', '\n>>')
 		msg = msg + '\n'
 		return msg
+
+	def uploadfilename(self):
+		return self.upload_file.name.split('/')[-1]
+
+	def vote_average(self):
+		votes = Vote.objects.filter(post=self, status=True)
+		return (votes.aggregate(Avg('score'))['score__avg'] if votes else 0)
+
+	def vote_count(self):
+		votes = Vote.objects.filter(post=self, status=True)
+		return (votes.count() if votes else 0)
+
+#	def delete(self, *args, **kwargs):
+#		try:
+#			if self.upload_file:
+#				self.upload_file.delete()
+#		except:
+#			pass
+#		super(Post, self).delete(*args, **kwargs)
+
+@receiver(pre_delete, sender=Post)
+def Post_delete(sender, instance, **kwargs):
+	try:
+		if instance.upload_file:
+			instance.upload_file.delete()
+	except:
+		pass
+
+class Vote(models.Model):
+	post = models.ForeignKey(Post)
+	voter = models.ForeignKey(User, related_name='vote')
+	score = models.IntegerField()
+	status = models.BooleanField(default=True)
+
+class Offense(models.Model):
+	forum = models.ForeignKey(Forum)
+	officer = models.ForeignKey(User, related_name="offense_officer")
+	perpetrator = models.ForeignKey(User, related_name='offense_user')
+	notes = models.TextField()
+
+	class Meta:
+		verbose_name = "Offense"
+		verbose_name_plural = "offenses"
+		ordering = ['perpetrator']
+
+class Forumsettings(models.Model):
+	key = models.CharField('key', unique=True, max_length=255)
+	value = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return self.key + self.value
+
+	class Meta:
+		verbose_name = "setting"
+		verbose_name_plural = "settings"
+		ordering = ['key']

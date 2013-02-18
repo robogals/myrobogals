@@ -15,6 +15,7 @@ from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals import rgprofile
 from django.db import connection, transaction
 from pytz import timezone, utc
+import json, urllib, urllib2
 
 UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
@@ -181,6 +182,8 @@ class Group(models.Model):
     goal = models.IntegerField("Goal", default=0, blank=True, null=True)
     goal_start = models.DateField("Goal start date", default=date.today, blank=True, null=True)
     exclude_in_reports = models.BooleanField('Exclude this chapter in global reports')
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'chapter'
@@ -229,6 +232,30 @@ class Group(models.Model):
     
     def get_absolute_url(self):
     	return "/chapters/%s/" % self.myrobogals_url
+
+    def save(self, *args, **kwargs):
+        if (self.status == 0) and (self.university != None) and ((self.latitude == None) or (self.longitude == None)):
+            try:
+                data = {}
+                data['address'] = self.university.name + ', ' + self.location
+                data['sensor'] = 'false'
+                url_values = urllib.urlencode(data)
+                url = 'http://maps.googleapis.com/maps/api/geocode/json'
+                full_url = url + '?' + url_values
+                data = urllib2.urlopen(full_url, timeout=2)
+                result = json.loads(data.read())
+                if result['status'] == 'OK':
+                    self.latitude = result['results'][0]['geometry']['location']['lat']
+                    self.longitude = result['results'][0]['geometry']['location']['lng']
+            except:
+				if self.pk == 26:
+					full_url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=Tokyo+Institute+of+Technology%2C+Tokyo%2C+Japan'
+					data = urllib2.urlopen(full_url, timeout=2)
+					result = json.loads(data.read())
+					if result['status'] == 'OK':
+						self.latitude = result['results'][0]['geometry']['location']['lat']
+						self.longitude = result['results'][0]['geometry']['location']['lng']
+        super(Group, self).save(*args, **kwargs)
 
 class UserManager(models.Manager):
     def create_user(self, username, email, password=None):
