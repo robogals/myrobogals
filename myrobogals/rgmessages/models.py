@@ -9,6 +9,9 @@ import datetime
 from pytz import utc
 import re
 
+class EmailFile(models.Model):
+	emailfile = models.FileField(upload_to='emailFileUpload')
+
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (
 		(-1, 'Wait'),
@@ -39,6 +42,7 @@ class EmailMessage(models.Model):
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	email_type = models.IntegerField("Email type", choices=TYPE, default=0)
+	upload_files = models.ManyToManyField(EmailFile, related_name='emailmessage_upload_files')
 	
 	def status_description(self):
 		for status_code in self.STATUS_CODES_MSG:

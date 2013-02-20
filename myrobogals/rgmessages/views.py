@@ -6,7 +6,7 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import User, Group, MemberStatusType
-from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
+from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -203,6 +203,10 @@ def writeemail(request):
 							recipient.save()
 			
 			if request.POST['step'] == '2':
+				for f in request.FILES.getlist('upload_files'):
+					ef = EmailFile(emailfile=f)
+					ef.save()
+					message.upload_files.add(ef)
 				# Now mark it as OK to send. The email and all recipients are now in MySQL.
 				# A background script on the server will process the queue.
 				message.status = 0

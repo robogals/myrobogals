@@ -319,10 +319,15 @@ def newtopic(request, forum_id):
 					if maxfilesetting:
 						maxfilesize = int(maxfilesetting[0].value)
 					if ('upload_file' in request.FILES):
-						if (request.FILES['upload_file'].size <= maxfilesize * 1024*1024):
+						if (request.FILES['upload_file'].size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70):
 							postMessage.upload_file=request.FILES['upload_file']
 						else:
-							request.user.message_set.create(message=unicode(_('- file size exceeds ' + str(maxfilesize) + ' MB, and not uploaded!')))
+							msg = '- File is not uploaded due to:'
+							if (request.FILES['upload_file'].size > maxfilesize * 1024*1024):
+								msg = msg + ' file size exceeds ' + str(maxfilesize) + ' MB '
+							if (request.FILES['upload_file'].name.__len__() > 70):
+								msg = msg + ' file name exceeds 70 characters'
+							request.user.message_set.create(message=unicode(_(msg)))
 					postMessage.save()
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
@@ -711,7 +716,7 @@ def editpost(request, post_id):
 			maxfilesetting = Forumsettings.objects.filter(key='maxuploadfilesize')
 			if maxfilesetting:
 				maxfilesize = int(maxfilesetting[0].value)
-			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024):
+			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or ((postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70))):
 				data = postform.cleaned_data
 				p.message = data['message']
 				p.updated_on = datetime.datetime.now()
@@ -741,7 +746,10 @@ def editpost(request, post_id):
 					request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
 					warning = True
 				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._size > maxfilesize * 1024*1024):
-					request.user.message_set.create(message=unicode(_('- file size exceeds ' + str(maxfilesize) + ' MB')))
+					request.user.message_set.create(message=unicode(_('- File size exceeds ' + str(maxfilesize) + ' MB')))
+					warning = True
+				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._name.__len__() > 70):
+					request.user.message_set.create(message=unicode(_('- File name exceeds 70 characters')))
 					warning = True
 			if 'return' in request.GET:
 				if warning:
@@ -926,7 +934,7 @@ def newpost(request, topic_id):
 			maxfilesetting = Forumsettings.objects.filter(key='maxuploadfilesize')
 			if maxfilesetting:
 				maxfilesize = int(maxfilesetting[0].value)
-			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024):
+			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or ((postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70))):
 				data = postform.cleaned_data
 				postMessage = Post()
 				postMessage.topic = t
@@ -982,7 +990,9 @@ def newpost(request, topic_id):
 				if not postform.is_valid():
 					request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
 				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._size > maxfilesize * 1024*1024):
-					request.user.message_set.create(message=unicode(_('- file size exceeds ' + str(maxfilesize) + ' MB')))
+					request.user.message_set.create(message=unicode(_('- File size exceeds ' + str(maxfilesize) + ' MB ')))
+				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._name.__len__() > 70):
+					request.user.message_set.create(message=unicode(_('- File name exceeds 70 characters')))
 		else:
 			raise Http404
 		if 'return' in request.GET:

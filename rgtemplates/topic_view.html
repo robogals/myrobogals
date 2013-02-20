@@ -108,7 +108,7 @@
 		{% if post.1.upload_file %}
 		<a href="/forums/deletefile/{{post.1.pk}}/?return={{return|urlencode}}%23{{post.1.pk}}">({% trans "delete file" %})</a>
 		{% endif %}
-		{% if canDelete and forloop.counter == 1 and posts.number == 1%}
+		{% if canDelete and forloop.counter == 1 and posts.number == 1 %}
 		<br/>{% trans "Deleting head post will result in the deletion of the whole topic!" %}
 		{% else %}
 			{% if canFileOffenses %}
@@ -127,7 +127,7 @@
 				{% endif %}
 			  </tr>
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-				<td style="border-right: solid 1px grey;"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td><td>{# {{postform.upload_file}} #}</td>
+				<td style="border-right: solid 1px grey;"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td><td>{% if posts.number == 1 and forloop.counter == 1 %} {{postform.upload_file}} {% endif %} </td>
 				{% if canDelete %}
 				<td></td>
 				{% endif %}
