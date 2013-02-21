@@ -11,6 +11,18 @@ import re
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 
+class MessagesSettings(models.Model):
+	key = models.CharField('key', unique=True, max_length=255)
+	value = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return self.key + ': ' + self.value
+
+	class Meta:
+		verbose_name = "setting"
+		verbose_name_plural = "settings"
+		ordering = ['key']
+
 class EmailFile(models.Model):
 	emailfile = models.FileField(upload_to='emailFileUpload')
 

@@ -182,7 +182,7 @@ class Forumsettings(models.Model):
 	value = models.CharField(max_length=255)
 
 	def __unicode__(self):
-		return self.key + self.value
+		return self.key + ': ' + self.value
 
 	class Meta:
 		verbose_name = "setting"

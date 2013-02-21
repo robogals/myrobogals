@@ -6,7 +6,7 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import User, Group, MemberStatusType
-from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
+from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -26,6 +26,31 @@ from pytz import utc
 from decimal import *
 from operator import itemgetter
 
+@login_required
+def setmaxuploadfilesize(request):
+	max_size_setting = None
+	max_size = ''
+	if request.user.is_superuser:
+		max_size_setting = MessagesSettings.objects.filter(key='maxuploadfilesize')
+		if max_size_setting:
+			max_size = max_size_setting[0].value
+		if (request.method == 'POST') and ('maxfilesize' in request.POST):
+			try:
+				if max_size_setting:
+					max_size_setting[0].value = str(int(request.POST['maxfilesize']))
+					max_size_setting[0].save()
+				else:
+					max_file_size = MessagesSettings()
+					max_file_size.key = 'maxuploadfilesize'
+					max_file_size.value = str(int(request.POST['maxfilesize']))
+					max_file_size.save()
+				return HttpResponseRedirect('/messages/email/write/')
+			except:
+				msg = '- Maximum file size must be an integer'
+				request.user.message_set.create(message=unicode(_(msg)))
+		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': '', 'apps': 'messages'}, context_instance=RequestContext(request))
+	else:
+		raise Http404
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -88,12 +113,16 @@ def writeemail(request):
 					raise Http404
 				warning = False
 				msg = ''
+				maxfilesize = 10
+				maxfilesetting = MessagesSettings.objects.filter(key='maxuploadfilesize')
+				if maxfilesetting:
+					maxfilesize = int(maxfilesetting[0].value)
 				for f in request.FILES.getlist('upload_files'):
 					if (f.name.__len__() > 70):
 						msg += '<br>File name: "' + f.name + '" is longer than 70 characters'
 						warning = True
-					if (f.size > 10 * 1024*1024):
-						msg += '<br>File: "' + f.name + '" is larger than ' + str(10) + ' MB'
+					if (f.size > maxfilesize * 1024*1024):
+						msg += '<br>File: "' + f.name + '" is larger than ' + str(maxfilesize) + ' MB'
 						warning = True
 				if warning:
 					del request.session['emailform']

@@ -43,7 +43,7 @@ def setmaxuploadfilesize(request):
 			except:
 				msg = '- Maximum file size must be an integer'
 				request.user.message_set.create(message=unicode(_(msg)))
-		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': request.GET['return']}, context_instance=RequestContext(request))
+		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': request.GET['return'], 'apps': 'forums'}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 

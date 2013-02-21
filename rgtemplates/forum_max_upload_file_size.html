@@ -9,7 +9,7 @@
 {% block pagetitle %}Set maximum upload file size{% endblock %}
 
 {% block content %}
-<form action="/forums/setmaxuploadfilesize/?return={{return|urlencode}}" method="post">
+<form action="/{{apps}}/setmaxuploadfilesize/?return={{return|urlencode}}" method="post">
 <table width="100%" cellpadding="5" cellspacing="0">
 	<tr>
 		<td>{% trans "Maximum file size:" %}</td>
