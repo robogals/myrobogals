@@ -8,9 +8,14 @@ from django.db.models.fields import PositiveIntegerField
 import datetime
 from pytz import utc
 import re
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 class EmailFile(models.Model):
 	emailfile = models.FileField(upload_to='emailFileUpload')
+
+	def __unicode__(self):
+		return self.emailfile.name
 
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (
@@ -63,6 +68,15 @@ class EmailMessage(models.Model):
 		if self.date == None:
 			self.date = datetime.datetime.now()
 		super(EmailMessage, self).save(*args, **kwargs)
+
+@receiver(pre_delete, sender=EmailMessage)
+def EmailMessage_delete(sender, instance, **kwargs):
+	try:
+		for f in instance.upload_files.all():
+			f.emailfile.delete()
+			f.delete()
+	except:
+		pass
 
 class EmailRecipient(models.Model):
 	STATUS_CODES_RECIPIENT = (

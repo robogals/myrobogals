@@ -86,6 +86,19 @@ def writeemail(request):
 			elif request.POST['step'] == '2':
 				if 'emailform' not in request.session:
 					raise Http404
+				warning = False
+				msg = ''
+				for f in request.FILES.getlist('upload_files'):
+					if (f.name.__len__() > 70):
+						msg += '<br>File name: "' + f.name + '" is longer than 70 characters'
+						warning = True
+					if (f.size > 10 * 1024*1024):
+						msg += '<br>File: "' + f.name + '" is larger than ' + str(10) + ' MB'
+						warning = True
+				if warning:
+					del request.session['emailform']
+					request.user.message_set.create(message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
+					return HttpResponseRedirect('/messages/email/write/')
 				emailform = request.session['emailform']
 				del request.session['emailform']
 			else:

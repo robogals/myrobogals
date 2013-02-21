@@ -63,7 +63,8 @@ mysql_select_db('myrobogals');
 		
 		if ($msg['html'] == 1) {
 			$uniqid = uniqid();
-			$headers['Content-Type'] = "multipart/alternative; boundary=robogals{$uniqid}";
+			$headers['MIME-Version'] = "1.0";
+			$headers['Content-Type'] = "multipart/mixed; boundary=robogals{$uniqid}";
 		}
 
 		$sql = sprintf("SELECT * FROM rgmessages_emailrecipient WHERE `message_id` = %d AND `status` = 0 AND `scheduled_date` < NOW()", $msg['id']);
@@ -92,6 +93,23 @@ Content-Transfer-Encoding: base64
 				$uniqurl = sprintf('<a href="https://my.robogals.org/unsubscribe/%s/%s-%s/1/">unsubscribe<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
 				$uniqurlunwatchall = sprintf('<a href="https://my.robogals.org/forums/unwatchall/%s/%s-%s/1/">Empty watch list<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
 				$body .= chunk_split(base64_encode(str_replace('{{to_name}}', $recipient['to_name'], str_replace('{{email_id}}', $recipient['id'], str_replace('{{unsubscribe}}', $uniqurl, str_replace('{{unwatchall}}', $uniqurlunwatchall, $msg['body']))))));
+				$filesql = sprintf("SELECT `rgmessages_emailfile`.`emailfile` FROM `rgmessages_emailmessage`, `rgmessages_emailmessage_upload_files`, `rgmessages_emailfile` WHERE `rgmessages_emailmessage`.`id` = %d AND `rgmessages_emailmessage`.`id` = `rgmessages_emailmessage_upload_files`.`emailmessage_id` AND `rgmessages_emailmessage_upload_files`.`emailfile_id` = `rgmessages_emailfile`.`id`", $msg['id']);
+				$result3 = mysql_query($filesql);
+				while ($emailfile = mysql_fetch_assoc($result3)) {
+					$emailfile = "../rgmedia/" . $emailfile['emailfile'];
+					$body .= "
+--robogals{$uniqid}
+Content-Type: application/octet-stream; name=\"" . basename($emailfile) . "\"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=\"" . basename($emailfile) . "\"
+
+";
+					$fp = @fopen($emailfile, "rb");
+					$file = @fread($fp, filesize($emailfile));
+					@fclose($fp);
+					$data = chunk_split(base64_encode($file));
+					$body .= $data;
+				}
 				$body .= "
 
 --robogals{$uniqid}--
