@@ -78,7 +78,7 @@
 		<td>{{ post.1.message|linebreaksbr }}</td>
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td>{% if post.1.upload_file %}<a href="/forums/downloadpostfile/{{post.1.pk}}/">{% trans "file: " %}{{post.1.uploadfilename}} ({% trans "size" %}: {{post.1.upload_file.size|filesizeformat}})</a><br/>{% trans "Rating: " %}{{post.1|showstarrating|safe}} {{post.1.vote_average}} ({{post.1.vote_count}} {% trans "voted" %}){% endif %}</td>
+		<td>{% if post.1.upload_file %}<a href="/forums/downloadpostfile/{{post.1.pk}}/?return={{return|urlencode}}">{% trans "file: " %}{{post.1.uploadfilename}} ({% trans "size" %}: {{post.1.uploadfilesize|filesizeformat}})</a><br/>{% trans "Rating: " %}{{post.1|showstarrating|safe}} {{post.1.vote_average}} ({{post.1.vote_count}} {% trans "voted" %}){% endif %}</td>
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		{% if post.1.upload_file %}

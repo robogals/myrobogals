@@ -10,6 +10,7 @@ from pytz import utc
 import re
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
+import os.path
 
 class MessagesSettings(models.Model):
 	key = models.CharField('key', unique=True, max_length=255)
@@ -28,6 +29,16 @@ class EmailFile(models.Model):
 
 	def __unicode__(self):
 		return self.emailfile.name
+
+	def filename(self):
+		return os.path.basename(self.emailfile.name)
+
+	def filesize(self):
+		try:
+			size = self.emailfile.size
+		except:
+			size = -1
+		return size
 
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (

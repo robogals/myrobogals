@@ -27,7 +27,7 @@
 		<td>{{ post.message|linebreaksbr }}</td>
 	</tr>
 	<tr class="odd">
-		<td>{% if post.upload_file %}<a href="/forums/downloadpostfile/{{post.pk}}/">{% trans "file: " %}{{post.uploadfilename}} ({% trans "size" %}: {{post.upload_file.size|filesizeformat}})</a> <input type="submit" id="delpostfile" name="delpostfile" value="Delete file"><br/>{% trans "Rating: " %}{{post|showstarrating|safe}} {{post.vote_average}} ({{post.vote_count}} {% trans "voted" %}){% endif %}</td>
+		<td>{% if post.upload_file %}<a href="/forums/downloadpostfile/{{post.pk}}/">{% trans "file: " %}{{post.uploadfilename}} ({% trans "size" %}: {{post.uploadfilesize|filesizeformat}})</a> <input type="submit" id="delpostfile" name="delpostfile" value="Delete file"><br/>{% trans "Rating: " %}{{post|showstarrating|safe}} {{post.vote_average}} ({{post.vote_count}} {% trans "voted" %}){% endif %}</td>
 	</tr>
 	<tr class="odd">
 	<td></td>

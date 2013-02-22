@@ -501,6 +501,26 @@ def emailrecipients(request, email_id):
 	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'email', 'email': email, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
+def downloademailfile(request, email_id, file_name):
+	email = get_object_or_404(EmailMessage, pk=email_id)
+	if (email.sender != request.user) and (not EmailRecipient.objects.filter(user=request.user, message=email)):
+		raise Http404
+	f = email.upload_files.filter(emailfile__icontains=file_name)
+	if f:
+		try:
+			response = HttpResponse(f[0].emailfile.read(), content_type='application/octet-stream')
+			response['Content-Disposition'] = 'attachment; filename="%s"' % f[0].filename()
+			response['Content-Length'] = f[0].filesize()
+			return response
+		except:
+			request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % f[0].filename())))
+			return HttpResponseRedirect('/messages/history/')
+	else:
+		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
+		return HttpResponseRedirect('/messages/history/')
+	
+
+@login_required
 def showemail(request, email_id):
 	email = get_object_or_404(EmailMessage, pk=email_id)
 	if (email.sender != request.user) and (not EmailRecipient.objects.filter(user=request.user, message=email)):

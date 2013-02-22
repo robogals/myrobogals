@@ -381,10 +381,17 @@ def downloadpostfile(request, post_id):
 	c = g.chapter
 	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or (user not in f.blacklist.filter(pk=user.pk) and (((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
 		if post.upload_file:
-			response = HttpResponse(post.upload_file, content_type='application/octet-stream')
-			response['Content-Disposition'] = 'attachment; filename="%s"' % post.uploadfilename()
-			response['Content-Length'] = post.upload_file.size
-			return response
+			try:
+				response = HttpResponse(post.upload_file.read(), content_type='application/octet-stream')
+				response['Content-Disposition'] = 'attachment; filename="%s"' % post.uploadfilename()
+				response['Content-Length'] = post.uploadfilesize()
+				return response
+			except:
+				request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % post.uploadfilename())))
+				if 'return' in request.GET:
+					return HttpResponseRedirect(request.GET['return'])
+				else:
+					return HttpResponseRedirect('/forums/' + request.user.chapter.myrobogals_url + '/topic/' + str(t.pk) + '/')
 		else:
 			Http404
 	else:

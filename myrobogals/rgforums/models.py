@@ -33,6 +33,7 @@ from myrobogals.auth.models import Group, User
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 from django.db.models import Avg
+import os.path
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
@@ -134,7 +135,14 @@ class Post(models.Model):
 		return msg
 
 	def uploadfilename(self):
-		return self.upload_file.name.split('/')[-1]
+		return os.path.basename(self.upload_file.name)
+
+	def uploadfilesize(self):
+		try:
+			size = self.upload_file.size
+		except:
+			size = -1
+		return size
 
 	def vote_average(self):
 		votes = Vote.objects.filter(post=self, status=True)

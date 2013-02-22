@@ -42,7 +42,7 @@
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td><a href="/messages/showemail/{{emailMsgSent.pk}}/" target="_blank">{% trans "show" %}</a></td>
+		<td><a href="/messages/showemail/{{emailMsgSent.pk}}/" target="_blank">{% trans "show" %}</a><br>{% for f in emailMsgSent.upload_files.all %} <a href="/messages/downloademailfile/{{emailMsgSent.pk}}/{{f.filename}}/">{{f.filename}}({{f.filesize|filesizeformat}})</a>{% endfor %}</td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
@@ -94,7 +94,7 @@
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey; border-bottom: solid 1px grey;">{% trans "Message" %}</td>
-		<td><a href="/messages/showemail/{{emailMsgReceived.message.pk}}/" target="_blank">{% trans "show" %}</a></td>
+		<td><a href="/messages/showemail/{{emailMsgReceived.message.pk}}/" target="_blank">{% trans "show" %}</a><br>{% for f in emailMsgReceived.message.upload_files.all %} <a href="/messages/downloademailfile/{{emailMsgReceived.message.pk}}/{{f.filename}}/">{{f.filename}}({{f.filesize|filesizeformat}})</a>{% endfor %}</td>
 	</tr>
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
