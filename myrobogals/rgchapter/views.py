@@ -14,6 +14,7 @@ from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
 from django.db.models import Q
 import datetime
+import StringIO
 
 def list(request):
 	listing = []
@@ -306,3 +307,47 @@ def editchapter(request, chapterurl):
 		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'c': c}, context_instance=RequestContext(request))
 	else:
 		raise Http404
+
+def chaptermap(request):
+	chaptmap = StringIO.StringIO()
+	chaptmap.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+	chaptmap.write('<kml xmlns="http://earth.google.com/kml/2.2">\n')
+	chaptmap.write('<Document>\n')
+	chaptmap.write('  <name>Robogals chapters</name>\n')
+	chaptmap.write('  <description><![CDATA[]]></description>\n')
+	chaptmap.write('  <Style id="stylemelbourne">\n')
+	chaptmap.write('    <IconStyle>\n')
+	chaptmap.write('      <Icon>\n')
+	chaptmap.write('        <href>http://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png</href>\n')
+	chaptmap.write('      </Icon>\n')
+	chaptmap.write('    </IconStyle>\n')
+	chaptmap.write('  </Style>\n')
+	chaptmap.write('  <Placemark>\n')
+	chaptmap.write('    <name>Robogals Global Headquarters</name>\n')
+	chaptmap.write('    <description><![CDATA[<div dir="ltr">Level 4<br>Walter Boas Building<br>University of Melbourne<br>Parkville VIC 3052<br>Australia<br>http://www.robogals.org<br>&nbsp;<br><strong>Robogals Melbourne</strong><br>http://melbourne.robogals.org.au</div>]]></description>\n')
+	chaptmap.write('    <styleUrl>#stylemelbourne</styleUrl>\n')
+	chaptmap.write('    <Point>\n')
+	chaptmap.write('      <coordinates>144.961807,-37.798481,0.000000</coordinates>\n')
+	chaptmap.write('    </Point>\n')
+	chaptmap.write('  </Placemark>\n')
+	for g in Group.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).exclude(pk=3):
+		chaptmap.write('  <Style id="style' + g.myrobogals_url + '">\n')
+		chaptmap.write('    <IconStyle>\n')
+		chaptmap.write('      <Icon>\n')
+		chaptmap.write('        <href>http://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png</href>\n')
+		chaptmap.write('      </Icon>\n')
+		chaptmap.write('    </IconStyle>\n')
+		chaptmap.write('  </Style>\n')
+		chaptmap.write('  <Placemark>\n')
+		chaptmap.write('    <name>' + g.name + '</name>\n')
+		chaptmap.write('    <description><![CDATA[<div dir="ltr">' + g.university.name + ', ' + g.location + '<br>' + g.website_url + '</div>]]></description>\n')
+		chaptmap.write('    <styleUrl>#style' + g.myrobogals_url + '</styleUrl>\n')
+		chaptmap.write('    <Point>\n')
+		chaptmap.write('      <coordinates>' + str(g.longitude) + ',' + str(g.latitude) + ',0</coordinates>\n')
+		chaptmap.write('    </Point>\n')
+		chaptmap.write('  </Placemark>\n')
+	chaptmap.write('</Document>\n')
+	chaptmap.write('</kml>')
+	response = HttpResponse(chaptmap.getvalue(), content_type='application/octet-stream')
+	response['Content-Disposition'] = 'attachment; filename="robogals-chapter-map.kml"'
+	return response
