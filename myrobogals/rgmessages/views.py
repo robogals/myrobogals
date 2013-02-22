@@ -559,10 +559,11 @@ def api(request):
 					users_count = User.objects.filter(is_active=True, email=email, email_newsletter_optin=True).count()
 					if users_count > 0:
 						return HttpResponse("B")  # Already subscribed
-				try:
-					# They've tried to subscribe already, so resend confirmation email
-					p = PendingNewsletterSubscriber.objects.get(email=email, newsletter=n)
-				except PendingNewsletterSubscriber.DoesNotExist:
+				# They've tried to subscribe already, so resend confirmation email
+				p = PendingNewsletterSubscriber.objects.filter(email=email, newsletter=n)
+				if p:
+					p = p[0]
+				else:
 					p = PendingNewsletterSubscriber()
 					p.email = email
 					p.uniqid = md5(SECRET_KEY + email + n.name).hexdigest()
@@ -616,7 +617,7 @@ def api(request):
 					ns.active = True
 					ns.details_verified = False
 					ns.save()
-				p.delete()
+				PendingNewsletterSubscriber.objects.filter(email=p.email, newsletter=n).delete()
 				return HttpResponse("A")
 			elif request.GET['action'] == 'unsubscribe':
 				email = unquote_plus(request.GET['email']).strip()
