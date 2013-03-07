@@ -178,29 +178,36 @@ def unwatchforum(request, forum_id):
 		raise Http404
 
 @login_required
-def forums(request, chapterurl):
+def forums(request):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	editForum = ''
 	globExecCategories = None
 	globPubCategories = None
 	localExecCategories = None
 	localPubCategories = None
-	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
-		globExecCategories = Category.objects.filter(chapter__isnull=True, exec_only=True)
-		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
-		localExecCategories = Category.objects.filter(chapter=c, exec_only=True)
-		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
-	elif c == request.user.chapter:
-		globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
-		localPubCategories = Category.objects.filter(chapter=c, exec_only=False)
+
+	# Get local categories (for superusers, show all local categories)
+	if request.user.is_superuser:
+		localPubCategories = Category.objects.filter(chapter__isnull=False, exec_only=False)
+		localExecCategories = Category.objects.filter(chapter__isnull=False, exec_only=True)
 	else:
-		raise Http404
+		localPubCategories = Category.objects.filter(chapter=request.user.chapter, exec_only=False)
+		if request.user.is_staff:
+			localExecCategories = Category.objects.filter(chapter=request.user.chapter, exec_only=True)
+
+	# Get global categories	
+	if request.user.is_staff:
+		globExecCategories = Category.objects.filter(chapter__isnull=True, exec_only=True)
+	globPubCategories = Category.objects.filter(chapter__isnull=True, exec_only=False)
+
 	if 'editForumId' in request.GET:
 		edit = get_object_or_404(Forum, pk=request.GET['editForumId'])
-		if ((not edit.category.chapter) and (not request.user.is_superuser)) or (edit.category.chapter and (((not request.user.is_staff) and (not request.user.is_superuser)) or ((c != request.user.chapter) and (not request.user.is_superuser)))):
+		if not request.user.is_staff:
 			raise Http404
+		if edit.category.chapter != request.user.chapter:
+			if not request.user.is_superuser:
+				raise Http404
 		editForum = edit.pk
 	onlines = User.objects.filter(forum_last_act__gt=(datetime.datetime.now() - datetime.timedelta(hours=1)))
 	online_users = []
@@ -233,7 +240,7 @@ def forums(request, chapterurl):
 	num_online_users = len(online_users)
 	total_num_topics = Topic.objects.count()
 	total_num_posts = Post.objects.count()
-	return render_to_response('forums.html', {'chapter': c, 'globExecCategories': globExecCategories, 'globPubCategories': globPubCategories, 'localExecCategories': localExecCategories, 'localPubCategories': localPubCategories, 'return': request.path, 'user': request.user, 'online_users': online_users, 'num_online_users': num_online_users, 'total_num_topics': total_num_topics, 'total_num_posts': total_num_posts, 'editForum': editForum}, context_instance=RequestContext(request))
+	return render_to_response('forums.html', {'globExecCategories': globExecCategories, 'globPubCategories': globPubCategories, 'localExecCategories': localExecCategories, 'localPubCategories': localPubCategories, 'return': request.path, 'online_users': online_users, 'num_online_users': num_online_users, 'total_num_topics': total_num_topics, 'total_num_posts': total_num_posts, 'editForum': editForum}, context_instance=RequestContext(request))
 
 class NewTopicForm(forms.Form):
 	subject = forms.CharField(label=_('New Topic:'), max_length=80, widget=forms.TextInput(attrs={'size': '60'}))
@@ -429,30 +436,29 @@ def deleteforum(request, forum_id):
 		raise Http404
 
 @login_required
-def viewforum(request, chapterurl, forum_id):
+def viewforum(request, forum_id):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
-	chapterHome = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	f = get_object_or_404(Forum, pk=forum_id)
 	g = f.category
 	c = g.chapter
-	if c and (c != chapterHome):
+	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
+	if c and c != request.user.chapter and not request.user.is_superuser:
 		raise Http404
-	user = request.user
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
-		topicform = NewTopicForm(None)
-		topics_list = f.topic_set.all()
-		paginator = Paginator(topics_list, 10)
-		page = request.GET.get('page')
-		try:
-			topics = paginator.page(page)
-		except EmptyPage:
-			topics = paginator.page(paginator.num_pages)
-		except:
-			topics = paginator.page(1)
-		return render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'chapterHome': chapterHome, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
-	else:
+	# If the forum is for exec only, check that they are exec
+	if g.exec_only and not request.user.is_staff:
 		raise Http404
+	topicform = NewTopicForm()
+	topics_list = f.topic_set.all()
+	paginator = Paginator(topics_list, 25)
+	page = request.GET.get('page')
+	try:
+		topics = paginator.page(page)
+	except EmptyPage:
+		topics = paginator.page(paginator.num_pages)
+	except:
+		topics = paginator.page(1)
+	return render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + request.META['QUERY_STRING']}, context_instance=RequestContext(request))
 
 @login_required
 def deletepost(request, post_id):
@@ -481,7 +487,7 @@ def deletepost(request, post_id):
 		raise Http404
 
 class WritePostForm(forms.Form):
-	message = forms.CharField(widget=TinyMCE(attrs={'cols': 65}))
+	message = forms.CharField(widget=TinyMCE(attrs={'cols': 57}))
 
 @login_required
 def editpost(request, post_id):
@@ -631,73 +637,72 @@ def deletetopic(request, topic_id):
 		raise Http404
 
 @login_required
-def viewtopic(request, chapterurl, topic_id):
+def viewtopic(request, topic_id):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
-	chapterHome = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
-	user = request.user
 	t = get_object_or_404(Topic, pk=topic_id)
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	if c and (c != chapterHome):
+	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
+	if c and c != request.user.chapter and not request.user.is_superuser:
 		raise Http404
-	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
-		editPost = ''
-		if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
-			quote = Post.objects.get(pk=request.GET['quotePostId'])
-			postform = WritePostForm({'message': quote.get_quote()})
-		elif ('editPostId' in request.GET) and ('quotePostId' not in request.GET):
-			edit = Post.objects.get(pk=request.GET['editPostId'])
-			if (not request.user.is_superuser) and (edit.posted_by != request.user):
-				raise Http404
-			postform = WritePostForm({'message': edit.message})
-			editPost = edit.pk
-		else:
-			postform = WritePostForm(None)
-			t.num_views = t.num_views + 1
-			t.save()
-		posts_ls = t.post_set.all()
-		posts_list = []
-		for post in posts_ls:
-			if request.user.is_superuser:
-				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-			elif post.posted_by.privacy >= 20:
-				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-			elif post.posted_by.privacy >= 10:
-				if not request.user.is_authenticated():
-					posts_list.append((False, post))
-				else:
-					posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-			elif post.posted_by.privacy >= 5:
-				if not request.user.is_authenticated():
-					posts_list.append((False, post))
-				elif not (request.user.chapter == post.posted_by.chapter):
-					posts_list.append((False, post))
-				else:
-					posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-			else:
-				if not request.user.is_authenticated():
-					posts_list.append((False, post))
-				elif not (request.user.chapter == post.posted_by.chapter):
-					posts_list.append((False, post))
-				elif not request.user.is_staff:
-					posts_list.append((False, post))
-				else:
-					posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-		paginator = Paginator(posts_list, 10)
-		page = request.GET.get('page')
-		try:
-			posts = paginator.page(page)
-		except EmptyPage:
-			posts = paginator.page(paginator.num_pages)
-			page = paginator.num_pages
-		except:
-			posts = paginator.page(1)
-			page = 1
-		return render_to_response('topic_view.html', {'chapter': c, 'posts': posts, 'postform': postform, 'topic': t, 'chapterHome': chapterHome, 'forum': f, 'editPost': editPost, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + 'page=' + str(page)}, context_instance=RequestContext(request))
+	# If the forum is for exec only, check that they are exec
+	if g.exec_only and not request.user.is_staff:
+		raise Http404
+	editPost = ''
+	if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
+		quote = Post.objects.get(pk=request.GET['quotePostId'])
+		postform = WritePostForm({'message': quote.get_quote()})
+	elif ('editPostId' in request.GET) and ('quotePostId' not in request.GET):
+		edit = Post.objects.get(pk=request.GET['editPostId'])
+		if not request.user.is_superuser and edit.posted_by != request.user:
+			raise Http404
+		postform = WritePostForm({'message': edit.message})
+		editPost = edit.pk
 	else:
-		raise Http404
+		postform = WritePostForm(None)
+		t.num_views = t.num_views + 1
+		t.save()
+	posts_ls = t.post_set.all()
+	posts_list = []
+	for post in posts_ls:
+		if request.user.is_superuser:
+			posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+		elif post.posted_by.privacy >= 20:
+			posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+		elif post.posted_by.privacy >= 10:
+			if not request.user.is_authenticated():
+				posts_list.append((False, post))
+			else:
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+		elif post.posted_by.privacy >= 5:
+			if not request.user.is_authenticated():
+				posts_list.append((False, post))
+			elif not (request.user.chapter == post.posted_by.chapter):
+				posts_list.append((False, post))
+			else:
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+		else:
+			if not request.user.is_authenticated():
+				posts_list.append((False, post))
+			elif not (request.user.chapter == post.posted_by.chapter):
+				posts_list.append((False, post))
+			elif not request.user.is_staff:
+				posts_list.append((False, post))
+			else:
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+	paginator = Paginator(posts_list, 10)
+	page = request.GET.get('page')
+	try:
+		posts = paginator.page(page)
+	except EmptyPage:
+		posts = paginator.page(paginator.num_pages)
+		page = paginator.num_pages
+	except:
+		posts = paginator.page(1)
+		page = 1
+	return render_to_response('topic_view.html', {'chapter': c, 'posts': posts, 'postform': postform, 'topic': t, 'forum': f, 'editPost': editPost, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + 'page=' + str(page)}, context_instance=RequestContext(request))
 
 @login_required
 def search(request, chapterurl):

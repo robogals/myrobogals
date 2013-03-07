@@ -2,9 +2,9 @@
 {% load i18n %}
 {% load thous %}
 {% load showlocaltime %}
-{% block title %}{{chapter.name}}{% endblock %}
+{% block title %}{{forum.name}}{% endblock %}
 
-{% block pagetitle %}{{chapter.name}}{% endblock %}
+{% block pagetitle %}{{forum.name}}{% endblock %}
 
 {% block content %}
 {% if topicform.errors %}
@@ -16,7 +16,7 @@
 </div>
 {% endif %}
 <p>
-	<a href="/forums/{{ chapterHome.myrobogals_url }}/">{% trans "Home" %}</a>
+	<a href="/forums/">{% trans "Home" %}</a>
 	&raquo;
 	{{forum.name}}
 </p>
@@ -61,7 +61,7 @@
 	</tr>
 	{% for topic in topics.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/{{ chapterHome.myrobogals_url }}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
+		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		{% if request.user in topic.forum.watchers.all or request.user in topic.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchtopic/{{topic.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
