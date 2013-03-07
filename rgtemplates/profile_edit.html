@@ -32,10 +32,12 @@
     <td colspan="2"><div class="error">{{ usererr }}</div></td>
   </tr>
   {% endif %}
+  <!--
   <tr>
     <td width="150">New username <span style="color: #ff0000">*</span></td>
     <td><input type="text" name="username"{% if new_username %} value="{{new_username}}"{% endif %}></td>
   </tr>
+  -->
 {% else %}
   {% if usererr %}
   <tr>
@@ -43,6 +45,17 @@
   </tr>
   {% endif %}  
 {% endif %}
+{% for field in formpart1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td width="150">{{ field.label_tag }}{% if field.field.required %} <span style="color: #ff0000">*</span>{% endif %}</td>
+    <td>{{ field }}</td>
+  </tr>
+{% endfor %}
 {% if chpass %}
   {% if pwerr %}
   <tr>
@@ -64,17 +77,6 @@
   </tr>
 {% endif %}
 {% endif %}
-{% for field in formpart1 %}
-  {% if field.errors %}
-  <tr>
-    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
-  </tr>
-  {% endif %}
-  <tr>
-    <td width="150">{{ field.label_tag }}{% if field.field.required %} <span style="color: #ff0000">*</span>{% endif %}</td>
-    <td>{{ field }}</td>
-  </tr>
-{% endfor %}
   <tr>
     <td style="vertical-align: top">{% trans "Chapter" %} <span style="color: #ff0000">*</span></td>
     <td style="vertical-align: top">{{ chapter }}{% if not join %}<br /><span style="font-size: 9pt">{% trans "To move to another chapter, please contact support@robogals.org" %}</span>{% endif %}</td>

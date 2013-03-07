@@ -172,7 +172,7 @@ def newvisit(request):
 	return editvisit(request, 0)
 	
 @login_required
-def newvisit_with_school_selected(request, school_id):
+def newvisitwithschool(request, school_id):
 	v = SchoolVisit()
 	school = get_object_or_404(School, pk=school_id)
 	v.chapter = request.user.chapter
@@ -182,8 +182,7 @@ def newvisit_with_school_selected(request, school_id):
 	v.school = school
 	v.location = "Enter location"
 	v.save()
-	return editvisit(request, v.id)	
-	
+	return editvisit(request, v.id)
 
 @login_required
 def viewvisit(request, visit_id):
