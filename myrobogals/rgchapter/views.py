@@ -330,7 +330,7 @@ def chaptermap(request):
 	chaptmap.write('      <coordinates>144.961807,-37.798481,0.000000</coordinates>\n')
 	chaptmap.write('    </Point>\n')
 	chaptmap.write('  </Placemark>\n')
-	for g in Group.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).exclude(pk=3):
+	for g in Group.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).exclude(pk=3).filter(status=0):
 		chaptmap.write('  <Style id="style' + g.myrobogals_url + '">\n')
 		chaptmap.write('    <IconStyle>\n')
 		chaptmap.write('      <Icon>\n')

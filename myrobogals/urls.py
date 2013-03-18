@@ -160,7 +160,7 @@ urlpatterns = patterns('',
 	# SMSGlobal delivery receipts API
 	(r'^api/dlr/$', 'rgmessages.views.dlrapi'),
 	# Google Maps KML API
-	(r'^api/robogals-chapter-map.kml', 'rgchapter.views.chaptermap'),
+	(r'^api/chapter-map.kml', 'rgchapter.views.chaptermap'),
 	# Delete user API
 	(r'^delete/user/(?P<userpk>\d+)/$', 'rgprofile.views.deleteuser'),
 
