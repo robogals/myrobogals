@@ -25,7 +25,7 @@ class MessagesSettings(models.Model):
 		ordering = ['key']
 
 class EmailFile(models.Model):
-	emailfile = models.FileField(upload_to='emailFileUpload')
+	emailfile = models.FileField(upload_to='email_uploads')
 
 	def __unicode__(self):
 		return self.emailfile.name
