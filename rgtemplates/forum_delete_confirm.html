@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load thous %}
+{% load showlocaltime %}
+{% load showstarrating %}
+
+{% block title %}Confirm deletion of forum{% endblock %}
+
+{% block pagetitle %}Confirm deletion of forum{% endblock %}
+
+{% block content %}
+<form action="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}" method="post">
+<table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+	<tr style="color:white; background-color:#1366A3">
+		<td>{{ forum.category.get_full_name }}</td>
+		<td>{% trans "Topics" %}</td>
+		<td>{% trans "Posts" %}</td>
+		<td>{% trans "Last Post" %}</td>
+	</tr>
+	<tr class="odd">
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
+		{% if request.user in forum.watchers.all %}
+		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
+		{% else %}
+		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
+		{% endif %}
+		</td>
+		<td>{{ forum.number_of_topics }}</td>
+		<td>{{ forum.number_of_posts }}</td>
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+	</tr>
+</table>
+<p style="clear: both; font-size: 200%;">
+<input type="submit" id="delforum" name="delforum" value="Delete forum">
+</p>
+</form>
+{% endblock %}

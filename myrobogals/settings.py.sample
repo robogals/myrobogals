@@ -141,6 +141,7 @@ INSTALLED_APPS = (
 	'myrobogals.rgweb',
 	'myrobogals.filters',
 	'myrobogals.rgforums',
+	'myrobogals.rgconf',
 )
 
 API_SECRET = 'k290gj2apoz0'

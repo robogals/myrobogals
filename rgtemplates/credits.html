@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load hide_email %}
 {% block title %}{% trans "Credits" %}{% endblock %}
 
 {% block pagetitle %}{% trans "Credits" %}{% endblock %}
 
 {% block content %}
 <img src="{{MEDIA_URL}}/images/myrobogals-credits.jpg"><br>
-<strong>Version 1.2<br>
-&copy; 2010-2012 Robogals Global</strong><br>
+<strong>&copy; 2010-2013 Robogals Global</strong><br>
 <br>
 {% trans "Contributors:" %}<br>
 <a href="/profile/mark/">Mark Parncutt</a><br>
@@ -16,6 +16,21 @@
 <a href="/profile/qc/">Quynh-Chi Nguyen</a><br>
 <a href="/profile/makiko/">Makiko Nagasawa</a><br>
 <a href="/profile/paul/">Paul Madsen</a><br>
+
+
+#############
+
+<a href="/profile/paul/">Junee Singh</a><br>
+<a href="/profile/paul/">James Li</a><br>
+
+
+#############
+
+{% blocktrans with "James Li" as name and "james@robogals.org" as email %}Are you a coder who would like to contribute to building myRobogals? Contact {{name}} on {{email}} to join our software engineering team!{% endblocktrans %}
+
+
+
+
 <br>
 <br>
 <a href="http://www.djangoproject.com/"><img src="{{MEDIA_URL}}/djangopowered.gif" border="0"></a>

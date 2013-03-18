@@ -50,6 +50,20 @@
         
         
 </li>   
+{% if request.user.is_authenticated %}
+{% if request.user.is_staff %}
+                    <li class="item146" >
+            <a class="orphan item bullet" href="/profile/contactdirectory/"  >
+            <span>
+
+                        {% trans "Contact Directory" %}               
+            </span>
+        </a>
+        
+        
+</li>   
+{% endif %}
+{% endif %}
                             
                             </ul>
         </div>

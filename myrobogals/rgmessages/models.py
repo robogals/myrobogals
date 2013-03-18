@@ -8,6 +8,37 @@ from django.db.models.fields import PositiveIntegerField
 import datetime
 from pytz import utc
 import re
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
+import os.path
+
+class MessagesSettings(models.Model):
+	key = models.CharField('key', unique=True, max_length=255)
+	value = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return self.key + ': ' + self.value
+
+	class Meta:
+		verbose_name = "setting"
+		verbose_name_plural = "settings"
+		ordering = ['key']
+
+class EmailFile(models.Model):
+	emailfile = models.FileField(upload_to='emailFileUpload')
+
+	def __unicode__(self):
+		return self.emailfile.name
+
+	def filename(self):
+		return os.path.basename(self.emailfile.name)
+
+	def filesize(self):
+		try:
+			size = self.emailfile.size
+		except:
+			size = -1
+		return size
 
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (
@@ -39,6 +70,7 @@ class EmailMessage(models.Model):
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	email_type = models.IntegerField("Email type", choices=TYPE, default=0)
+	upload_files = models.ManyToManyField(EmailFile, related_name='emailmessage_upload_files')
 	
 	def status_description(self):
 		for status_code in self.STATUS_CODES_MSG:
@@ -59,6 +91,15 @@ class EmailMessage(models.Model):
 		if self.date == None:
 			self.date = datetime.datetime.now()
 		super(EmailMessage, self).save(*args, **kwargs)
+
+@receiver(pre_delete, sender=EmailMessage)
+def EmailMessage_delete(sender, instance, **kwargs):
+	try:
+		for f in instance.upload_files.all():
+			f.emailfile.delete()
+			f.delete()
+	except:
+		pass
 
 class EmailRecipient(models.Model):
 	STATUS_CODES_RECIPIENT = (

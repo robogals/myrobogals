@@ -6,7 +6,7 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import User, Group, MemberStatusType
-from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
+from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -26,6 +26,31 @@ from pytz import utc
 from decimal import *
 from operator import itemgetter
 
+@login_required
+def setmaxuploadfilesize(request):
+	max_size_setting = None
+	max_size = ''
+	if request.user.is_superuser:
+		max_size_setting = MessagesSettings.objects.filter(key='maxuploadfilesize')
+		if max_size_setting:
+			max_size = max_size_setting[0].value
+		if (request.method == 'POST') and ('maxfilesize' in request.POST):
+			try:
+				if max_size_setting:
+					max_size_setting[0].value = str(int(request.POST['maxfilesize']))
+					max_size_setting[0].save()
+				else:
+					max_file_size = MessagesSettings()
+					max_file_size.key = 'maxuploadfilesize'
+					max_file_size.value = str(int(request.POST['maxfilesize']))
+					max_file_size.save()
+				return HttpResponseRedirect('/messages/email/write/')
+			except:
+				msg = '- Maximum file size must be an integer'
+				request.user.message_set.create(message=unicode(_(msg)))
+		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': '', 'apps': 'messages'}, context_instance=RequestContext(request))
+	else:
+		raise Http404
 
 class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
@@ -87,6 +112,23 @@ def writeemail(request):
 			elif request.POST['step'] == '2':
 				if 'emailform' not in request.session:
 					raise Http404
+				warning = False
+				msg = ''
+				maxfilesize = 10
+				maxfilesetting = MessagesSettings.objects.filter(key='maxuploadfilesize')
+				if maxfilesetting:
+					maxfilesize = int(maxfilesetting[0].value)
+				for f in request.FILES.getlist('upload_files'):
+					if (f.name.__len__() > 70):
+						msg += '<br>File name: "' + f.name + '" is longer than 70 characters'
+						warning = True
+					if (f.size > maxfilesize * 1024*1024):
+						msg += '<br>File: "' + f.name + '" is larger than ' + str(maxfilesize) + ' MB'
+						warning = True
+				if warning:
+					del request.session['emailform']
+					request.user.message_set.create(message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
+					return HttpResponseRedirect('/messages/email/write/')
 				emailform = request.session['emailform']
 				del request.session['emailform']
 			else:
@@ -204,6 +246,10 @@ def writeemail(request):
 							recipient.save()
 			
 			if request.POST['step'] == '2':
+				for f in request.FILES.getlist('upload_files'):
+					ef = EmailFile(emailfile=f)
+					ef.save()
+					message.upload_files.add(ef)
 				# Now mark it as OK to send. The email and all recipients are now in MySQL.
 				# A background script on the server will process the queue.
 				message.status = 0
@@ -456,6 +502,26 @@ def emailrecipients(request, email_id):
 	return render_to_response('message_recipients.html', {'chapter': request.user.chapter, 'msgtype': 'email', 'email': email, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
+def downloademailfile(request, email_id, file_name):
+	email = get_object_or_404(EmailMessage, pk=email_id)
+	if (email.sender != request.user) and (not EmailRecipient.objects.filter(user=request.user, message=email)):
+		raise Http404
+	f = email.upload_files.filter(emailfile__icontains=file_name)
+	if f:
+		try:
+			response = HttpResponse(f[0].emailfile.read(), content_type='application/octet-stream')
+			response['Content-Disposition'] = 'attachment; filename="%s"' % f[0].filename()
+			response['Content-Length'] = f[0].filesize()
+			return response
+		except:
+			request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % f[0].filename())))
+			return HttpResponseRedirect('/messages/history/')
+	else:
+		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
+		return HttpResponseRedirect('/messages/history/')
+	
+
+@login_required
 def showemail(request, email_id):
 	email = get_object_or_404(EmailMessage, pk=email_id)
 	if (email.sender != request.user) and (not EmailRecipient.objects.filter(user=request.user, message=email)):
@@ -494,10 +560,11 @@ def api(request):
 					users_count = User.objects.filter(is_active=True, email=email, email_newsletter_optin=True).count()
 					if users_count > 0:
 						return HttpResponse("B")  # Already subscribed
-				try:
-					# They've tried to subscribe already, so resend confirmation email
-					p = PendingNewsletterSubscriber.objects.get(email=email, newsletter=n)
-				except PendingNewsletterSubscriber.DoesNotExist:
+				# They've tried to subscribe already, so resend confirmation email
+				p = PendingNewsletterSubscriber.objects.filter(email=email, newsletter=n)
+				if p:
+					p = p[0]
+				else:
 					p = PendingNewsletterSubscriber()
 					p.email = email
 					p.uniqid = md5(SECRET_KEY + email + n.name).hexdigest()
@@ -551,7 +618,7 @@ def api(request):
 					ns.active = True
 					ns.details_verified = False
 					ns.save()
-				p.delete()
+				PendingNewsletterSubscriber.objects.filter(email=p.email, newsletter=n).delete()
 				return HttpResponse("A")
 			elif request.GET['action'] == 'unsubscribe':
 				email = unquote_plus(request.GET['email']).strip()

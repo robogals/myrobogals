@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load hide_email %}
+{% load chr %}
+{% block title %}Global internal contact directory{% endblock %}
+
+{% block pagetitle %}Global internal contact directory{% endblock %}
+
+{% block content %}
+<div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
+<div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
+<div class="module-inner">
+<form action="/profile/contactdirectory/" method="GET">
+<table>
+	<tr>
+		<td>{% trans "Name:" %}</td>
+		<td colspan="5"><input type="text" name="name" maxlength="80" size="50" value="{{name}}"><input type="submit" value="{% trans "Search" %}"></td>
+	</tr>
+</table>
+</form>
+</div></div></div></div>
+<table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
+  <tr>
+    <td><strong>{% trans "Name" %}</strong></td>
+    <td><strong>{% trans "Position" %}</strong></td>
+    <td><strong>{% trans "Email" %}</strong></td>
+    <td><strong>{% trans "Mobile Phone" %}</strong></td>
+  </tr>
+{% for u in results %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>{{u.get_full_name}}</td>
+    <td>
+		{% for cur_position in u.cur_positions %}
+		{{cur_position}}<br />
+		{% endfor %}
+	</td>
+    <td>{% hide_email u.email %}</td>
+	<td>{% if u.mobile %}+{% endif %}{{u.mobile}}</td>
+  </tr>
+{% endfor %}
+</table>
+<p>{% trans "Access to this directory is restricted to Robogals chapter executive committee members only" %}<p>
+{% endblock %}

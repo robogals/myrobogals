@@ -2,8 +2,8 @@
 {% load i18n %}
 {% load thous %}
 {% load showlocaltime %}
+{% load showstarrating %}
 {% block title %}{{topic.subject}}{% endblock %}
-
 {% block pagetitle %}{{topic.subject}}{% endblock %}
 
 {% block content %}
@@ -45,62 +45,77 @@
 	<tr style="color:white; background-color:#1366A3">
 		<td width="140">{% trans "Poster" %}</td>
 		<td>{% trans "Message" %}</td>
-		{% if user.is_superuser %}
-		<td>{% trans "Delete" %}</td>
-		{% endif %}
 	</tr>
 	{% for post in posts.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td valign="top" style="border-right: solid 1px grey;" rowspan="2"><a name="{{post.1.pk}}"></a>{% if post.0 %}<a href="/profile/{{post.1.posted_by.username}}/">{% endif %}<strong>{{ post.1.posted_by.get_full_name }}</strong>{% if post.0 %}</a>{% endif %}
+		<td valign="top" style="border-right: solid 1px grey;" rowspan="4"><a name="{{post.1.pk}}"></a>{% if post.0 %}<a href="/profile/{{post.1.posted_by.username}}/">{% endif %}<strong>{{ post.1.posted_by.get_full_name }}</strong>{% if post.0 %}</a>{% endif %}
 		{% for cur_position in post.1.posted_by.cur_positions %}
 		<br /><span style="font-size: 9pt"><em>{{cur_position.positionType}}<br />{{cur_position.positionChapter}}</em></span>
 		{% empty %}
-		<em>{{request.user.chapter}}</em>
+		<br /><em>{{request.user.chapter}}</em>
 		{% endfor %}
 		<br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
 		<td style="border-bottom: solid 1px grey;">{{post.1.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.1.updated_on %} | {% trans "Last edit:" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
-		{% if user.is_superuser %}
-			{% ifequal forloop.counter 1 %}
-		<td rowspan="3" valign="top" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/forum/{{forum.pk}}"><img src="{{ MEDIA_URL }}/images/delete.gif" alt="Delete" /></a></td>
-			{% else %}
-		<td rowspan="3" valign="top" style="border-bottom: solid 1px grey; border-left: solid 1px grey;"><a href="/forums/post/delete/{{post.1.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.gif" alt="Delete" /></a></td>
-			{% endifequal %}
-		{% endif %}
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td>{{ post.1.message|linebreaksbr }}</td>
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td style="border-right: solid 1px grey; border-bottom: solid 1px grey;" align="right">{{forloop.counter}}</td>
+		<td>{% if post.1.upload_file %}<a href="/forums/downloadpostfile/{{post.1.pk}}/?return={{return|urlencode}}">{% trans "file: " %}{{post.1.uploadfilename}} ({% trans "size" %}: {{post.1.uploadfilesize|filesizeformat}})</a><br/>{% trans "Rating: " %}{{post.1|showstarrating|safe}} {{post.1.vote_average}} ({{post.1.vote_count}} {% trans "voted" %}){% endif %}</td>
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		{% if post.1.upload_file %}
+		<td>{% trans "Your Vote:" %}
+			<a href="/forums/filevote/{{post.1.pk}}/0/?return={{return|urlencode}}%23{{post.1.pk}}">0</a>
+			<a href="/forums/filevote/{{post.1.pk}}/1/?return={{return|urlencode}}%23{{post.1.pk}}">1</a>
+			<a href="/forums/filevote/{{post.1.pk}}/2/?return={{return|urlencode}}%23{{post.1.pk}}">2</a>
+			<a href="/forums/filevote/{{post.1.pk}}/3/?return={{return|urlencode}}%23{{post.1.pk}}">3</a>
+			<a href="/forums/filevote/{{post.1.pk}}/4/?return={{return|urlencode}}%23{{post.1.pk}}">4</a>
+			<a href="/forums/filevote/{{post.1.pk}}/5/?return={{return|urlencode}}%23{{post.1.pk}}">5</a>
+			<a href="/forums/filevote/{{post.1.pk}}/6/?return={{return|urlencode}}%23{{post.1.pk}}">6</a>
+			<a href="/forums/filevote/{{post.1.pk}}/7/?return={{return|urlencode}}%23{{post.1.pk}}">7</a>
+			<a href="/forums/filevote/{{post.1.pk}}/8/?return={{return|urlencode}}%23{{post.1.pk}}">8</a>
+			<a href="/forums/filevote/{{post.1.pk}}/9/?return={{return|urlencode}}%23{{post.1.pk}}">9</a>
+			<a href="/forums/filevote/{{post.1.pk}}/10/?return={{return|urlencode}}%23{{post.1.pk}}">10</a>
+		</td>
+		{% else %}
+		<td></td>
+		{% endif %}
+	</tr>
+	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+		<td style="border-right: solid 1px grey; border-bottom: solid 1px grey;" align="right">{{ posts.start_index|add:forloop.counter|add:-1 }}</td>
 		<td style="border-bottom: solid 1px grey;">
-		<a href="/forums/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}#end">{% trans "quote" %}</a>
-		{% if post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
-		<a href="/forums/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}#{{post.1.pk}}">{% trans "edit" %}</a>
-		{% if user.is_superuser and forloop.counter == 1 %}
-		{% trans "Deleting head post will result in the deletion of the whole topic!" %}
+		<a href="/forums/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}#end">{% trans "quote" %}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% if post.1.posted_by.pk == request.user.pk or request.user.is_superuser or canEdit %}
+		<a href="/forums/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}#{{post.1.pk}}">{% trans "edit" %}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% if post.1.upload_file %}
+		<a href="/forums/deletefile/{{post.1.pk}}/?return={{return|urlencode}}%23{{post.1.pk}}">{% trans "delete file" %}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+		{% endif %}
+		{% if canDelete %}
+			{% if forloop.counter == 1 and posts.number == 1 %}
+		<a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/forum/{{forum.pk}}">delete topic</a>
+			{% else %}
+		<a href="/forums/post/delete/{{post.1.pk}}/?return={{return|urlencode}}">delete post</a>
+			{% endif %}
+		{% endif %}
+		{% if not canDelete %}
+			{% if canFileOffenses %}
+				<br/><a href="/forums/post/fileoffenses/{{post.1.pk}}/?return={{return|urlencode}}%23{{post.1.pk}}">{% trans "Report as offensive" %}</a>
+			{% endif %}
 		{% endif %}
 			{% ifequal editPost post.1.pk %}
 		</td>
 	</tr>
-			<form action="/forums/editpost/{{ post.1.pk }}/?return={{return|urlencode}}" method="POST">
+			<form action="/forums/editpost/{{ post.1.pk }}/?return={{return|urlencode}}%23{{post.1.pk}}" method="POST" enctype="multipart/form-data">
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 				<td valign="top" style="border-right: solid 1px grey; border-top: solid 1px grey;"><strong>{% trans "Message:" %}</strong></td>
 				<td style="border-top: solid 1px grey;">{{ postform.message }}</td>
-				{% if user.is_superuser %}
-				<td></td>
-				{% endif %}
 			  </tr>
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-				<td style="border-right: solid 1px grey;"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td><td></td>
-				{% if user.is_superuser %}
-				<td></td>
-				{% endif %}
+				<td style="border-right: solid 1px grey;"><input type="checkbox" name="Watch" checked="checked"/> {% trans "Watch" %}</td><td>{% if posts.number == 1 and forloop.counter == 1 %} {{postform.upload_file}} {% endif %} </td>
 			 </tr>
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}" style="border-bottom: solid 1px grey;">
 				<td style="border-right: solid 1px grey;"><input type="submit" value="Edit Post" /></td><td></td>
-				{% if user.is_superuser %}
-				<td></td>
-				{% endif %}
 			 </tr>
 			</form>
 			{% endifequal %}
@@ -111,25 +126,19 @@
 	{% endif %}
 	{% endfor %}
 {% if not editPost %}
-<form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST">
+<form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST" enctype="multipart/form-data">
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="border-top:solid 1px grey;">
     <td valign="top"><a name="end"></a><strong>{% trans "Message:" %}</strong></td>
     <td>{{ postform.message }}</td>
-	{% if user.is_superuser %}
-	<td></td>
-	{% endif %}
   </tr>
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}">
 	<td colspan="2"><input type="checkbox" name="watch" value="1" checked="checked"/> {% trans "Email me when someone posts in this topic" %}</td>
-	{% if user.is_superuser %}
-	<td></td>
-	{% endif %}
+  </tr>
+  <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}">
+	<td colspan="2">{# {{postform.upload_file}} #}</td>
   </tr>
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}">
 	<td colspan="2"><input type="submit" value="Add Post" /></td>
-	{% if user.is_superuser %}
-	<td></td>
-	{% endif %}
   </tr>
 </form>
 {% endif %}
