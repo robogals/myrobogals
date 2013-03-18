@@ -56,6 +56,7 @@ urlpatterns = patterns('',
 	(r'^conferences/$', 'rgconf.views.home'),
 	(r'^conferences/(?P<conf_id>\d+)/$', 'rgconf.views.rsvplist'),
 	(r'^conferences/(?P<conf_id>\d+)/nametags\.csv$', 'rgconf.views.nametagscsv'),
+	(r'^conferences/(?P<conf_id>\d+)/email/$', 'rgconf.views.rsvpemail'),
 	(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/rsvp/$', 'rgconf.views.editrsvp'),
 	(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/invoice/$', 'rgconf.views.showinvoice'),
 

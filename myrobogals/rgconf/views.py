@@ -9,6 +9,10 @@ from myrobogals.rgmain.utils import SelectDateWidget
 from myrobogals.rgconf.models import Conference, ConferenceAttendee, ConferencePart
 from django.core.urlresolvers import reverse
 from myrobogals.rgchapter.models import ShirtSize
+from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
+from myrobogals.rgteaching.views import EmailModelMultipleChoiceField
+from myrobogals.admin.widgets import FilteredSelectMultiple
+from tinymce.widgets import TinyMCE
 import re
 from datetime import datetime, timedelta
 
@@ -249,6 +253,98 @@ def rsvplist(request, conf_id):
 	else:
 		hide_all_custom = False
 	return render_to_response(template_file, {'conf': conf, 'chapter': chapter, 'cas': cas, 'customtotals': customtotals, 'accommtotals': accommtotals_sorted, 'accommtotals_nights': accommtotals_numnights_sorted, 'hide_all_custom': hide_all_custom}, context_instance=RequestContext(request))
+
+class EmailAttendeesForm(forms.Form):
+	# Set up form
+	subject = forms.CharField(max_length=256, required=False)
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
+	memberselect = EmailModelMultipleChoiceField(queryset=ConferenceAttendee.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
+
+	def __init__(self, *args, **kwargs):
+		# Grab params, clear scope
+		conf=kwargs['conference']
+		del kwargs['conference']
+		
+		super(EmailAttendeesForm, self).__init__(*args, **kwargs)
+		# Using `ConferenceAttendee`
+		self.fields['memberselect'].queryset = ConferenceAttendee.objects.filter(conference=conf.id).order_by('last_name')
+		
+		# Using `User`
+		# id_list = ConferenceAttendee.objects.filter(conference=conf.id).values_list('user_id')
+		# self.fields['memberselect'].queryset = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True).order_by('last_name')
+	
+@login_required
+def rsvpemail(request, conf_id):
+	# Superuser check
+	if not request.user.is_superuser:
+		raise Http404
+    
+	conf = get_object_or_404(Conference, pk=conf_id)
+	chapter = request.user.chapter
+	
+	# Determine if form has been POSTed back
+	if request.method == 'POST':
+		# Validate email form data
+		emailform = EmailAttendeesForm(request.POST, conference=conf)
+		if emailform.is_valid():
+			data = emailform.cleaned_data
+			
+			message = EmailMessage()
+			message.subject = data['subject']
+			message.body = data['body']
+			message.from_address = request.user.email
+			message.reply_address = request.user.email
+			message.sender = request.user
+			message.html = True
+			message.from_name = chapter.name
+			message.scheduled = False
+				
+			# Don't send it yet until the recipient list is done
+			message.status = -1
+			# Save to database so we get a value for the primary key,
+			# which we need for entering the recipient entries
+			message.save()
+			
+			
+			# Start processing recipient list
+			# Insert choices for attending, not attending etc here
+			if request.POST['invitee_type'] == '1':	# All
+				# Using `ConferenceAttendee`
+				users = ConferenceAttendee.objects.filter(conference=conf.id)
+		
+				# Using `User`
+				# id_list = ConferenceAttendee.objects.filter(conference=conf.id).values_list('user_id')
+				# users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True).order_by('last_name')
+			elif request.POST['invitee_type'] == '2': # Selected
+				users = data['memberselect']
+
+			for one_user in users:
+				recipient = EmailRecipient()
+				recipient.message = message
+				recipient.to_address = one_user.email
+				
+				# Using `ConferenceAttendee`
+				recipient.user = one_user.user
+				recipient.to_name = one_user.full_name()
+				
+				# Using `User`
+				# recipient.user = one_user
+				# recipient.to_name = one_user.get_full_name()
+
+				recipient.save()
+			
+			# Send message
+			message.status = 0
+			message.save()
+			
+			request.user.message_set.create(message=unicode(_("Email sent successfully")))
+			return HttpResponseRedirect('/conferences/' + str(conf.pk) + '/')
+	else:
+		emailform = EmailAttendeesForm(None, conference=conf)
+	
+	
+	# Display email form
+	return render_to_response('conf_rsvp_email.html', {'conf': conf, 'emailform': emailform}, context_instance=RequestContext(request))
 
 @login_required
 def showinvoice(request, conf_id, username):
