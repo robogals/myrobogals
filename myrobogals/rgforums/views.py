@@ -606,7 +606,7 @@ def deletepost(request, post_id):
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None):
+	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None) or (user == p.posted_by):
 		if (request.method != 'POST') or ('delpost' not in request.POST):
 			return render_to_response('forum_postdelete_confirm.html', {'post': p, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
@@ -1000,7 +1000,7 @@ def deletetopic(request, topic_id):
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None):
+	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None) or (user == t.posted_by):
 		if (request.method != 'POST') or ('deltopic' not in request.POST):
 			return render_to_response('forum_topicdelete_confirm.html', {'topic': t, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:

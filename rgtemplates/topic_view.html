@@ -91,7 +91,7 @@
 		{% if post.1.upload_file %}
 		<a href="/forums/deletefile/{{post.1.pk}}/?return={{return|urlencode}}%23{{post.1.pk}}">{% trans "delete file" %}</a>&nbsp;&nbsp;&nbsp;&nbsp;
 		{% endif %}
-		{% if canDelete %}
+		{% if canDelete or post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
 			{% if forloop.counter == 1 and posts.number == 1 %}
 		<a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/forum/{{forum.pk}}">delete topic</a>
 			{% else %}
