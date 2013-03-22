@@ -108,9 +108,16 @@ def writeemail(request):
 		if 'step' in request.POST:
 			if request.POST['step'] == '1':
 				emailform = WriteEmailForm(request.POST, user=request.user)
+				request.session['emailid'] = datetime.utcnow().strftime('%y%m%d%H%M%S')
 				request.session['emailform'] = emailform
 			elif request.POST['step'] == '2':
-				if 'emailform' not in request.session:
+				if ('emailform' not in request.session) or ('emailid' not in request.session):
+					if 'emailform' in request.session:
+						del request.session['emailform']
+					if 'emailid' in request.session:
+						del request.session['emailid']
+					raise Http404
+				if request.session['emailid'] != request.POST['emailid']:
 					raise Http404
 				warning = False
 				msg = ''
@@ -127,10 +134,12 @@ def writeemail(request):
 						warning = True
 				if warning:
 					del request.session['emailform']
+					del request.session['emailid']
 					request.user.message_set.create(message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
 					return HttpResponseRedirect('/messages/email/write/')
 				emailform = request.session['emailform']
 				del request.session['emailform']
+				del request.session['emailid']
 			else:
 				raise Http404
 		else:
@@ -256,7 +265,7 @@ def writeemail(request):
 				message.save()
 			
 			if request.POST['step'] == '1':
-				return render_to_response('email_users_confirm.html', {'usersfiltered': usersfiltered, 'subscribers': subscribers, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status']}, context_instance=RequestContext(request))
+				return render_to_response('email_users_confirm.html', {'usersfiltered': usersfiltered, 'subscribers': subscribers, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status'], 'emailid': request.session['emailid']}, context_instance=RequestContext(request))
 			else:
 				return HttpResponseRedirect('/messages/email/done/')
 	else:
@@ -322,12 +331,20 @@ def writesms(request):
 		if 'step' in request.POST:
 			if request.POST['step'] == '1':
 				smsform = WriteSMSForm(request.POST, user=request.user)
+				request.session['smsid'] = datetime.utcnow().strftime('%y%m%d%H%M%S')
 				request.session['smsform'] = smsform
 			elif request.POST['step'] == '2':
-				if 'smsform' not in request.session:
+				if ('smsform' not in request.session) or ('smsid' not in request.session):
+					if 'smsform' in request.session:
+						del request.session['smsform']
+					if 'smsid' in request.session:
+						del request.session['smsid']
+					raise Http404
+				if request.session['smsid'] != request.POST['smsid']:
 					raise Http404
 				smsform = request.session['smsform']
 				del request.session['smsform']
+				del request.session['smsid']
 			else:
 				raise Http404
 		else:
@@ -429,7 +446,7 @@ def writesms(request):
 					message.save()
 			
 				if request.POST['step'] == '1':
-					return render_to_response('sms_users_confirm.html', {'usersfiltered': usersfiltered, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status']}, context_instance=RequestContext(request))
+					return render_to_response('sms_users_confirm.html', {'usersfiltered': usersfiltered, 'type': request.POST['type'], 'scheduling': request.POST['scheduling'], 'status': request.POST['status'], 'smsid': request.session['smsid']}, context_instance=RequestContext(request))
 				else:
 					return HttpResponseRedirect('/messages/sms/done/')
 		except SMSLengthException as e:

@@ -99,7 +99,7 @@ class Topic(models.Model):
 	class Meta:
 		verbose_name = "topic"
 		verbose_name_plural = "topics"
-		ordering = ['-sticky', 'created_on']
+		ordering = ['-sticky', '-last_post_time']
 
 	def __unicode__(self):
 		return self.subject + ' {' + self.forum.__unicode__() + '}'

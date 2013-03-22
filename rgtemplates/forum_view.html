@@ -87,6 +87,11 @@
     <td valign="top"><strong>{{topicform.message.label_tag}}</strong></td>
 	<td {% if can_delete %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.message }}</td>
   </tr>
+  <tr><td colspan="4"><input type="checkbox" name="watch" value="1" checked="checked"/> {% trans "Email me when someone posts in this topic" %}</td>
+  {% if can_delete %}
+  <td colspan="2"></td>
+  {% endif %}
+  </tr>
   <tr><td colspan="4">{{topicform.upload_file}}</td>
   {% if can_delete %}
   <td colspan="2"></td>
