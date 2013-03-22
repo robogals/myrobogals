@@ -13,6 +13,7 @@ from myrobogals.auth.models import Group, User
 from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offense, ForumSettings
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from django.utils.http import urlquote, base36_to_int
+from django.db.models import Avg, Max, Min, Count
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -335,6 +336,20 @@ def newtopic(request, forum_id):
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
 					f.save()
+					if 'watch' in request.POST:
+						if request.POST['watch'] == '1':
+							if not f.watchers.filter(pk=user.pk):
+								newTopic.watchers.add(user)
+					else:
+						if f.watchers.filter(pk=user.pk):
+							f.watchers.remove(user)
+							for topic in f.topic_set.all():
+								if topic != newTopic:
+									topic.watchers.add(user)
+								else:
+									topic.watchers.remove(user)
+						else:
+							newTopic.watchers.remove(user)
 					watchers = f.watchers.all().exclude(pk=request.user.pk)
 					if watchers:
 						message = EmailMessage()
@@ -611,8 +626,15 @@ def deletepost(request, post_id):
 			return render_to_response('forum_postdelete_confirm.html', {'post': p, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			p.delete()
+			last_post_topic = Post.objects.filter(topic=t).latest('created_on')
+			t.last_post_time = last_post_topic.created_on
+			t.last_post_user = last_post_topic.posted_by
 			t.num_views = t.num_views - 1
 			t.save()
+			last_post_forum = Post.objects.filter(topic__forum=f).latest('created_on')
+			f.last_post_time = last_post_forum.created_on
+			f.last_post_user = last_post_forum.posted_by
+			f.save()
 			request.user.message_set.create(message=unicode(_('Post deleted')))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -1007,6 +1029,10 @@ def deletetopic(request, topic_id):
 			chapter = f.category.chapter
 			request.user.message_set.create(message=unicode(_('Topic "%s" deleted') % t.subject))
 			t.delete()
+			last_post_forum = Post.objects.filter(topic__forum=f).latest('created_on')
+			f.last_post_time = last_post_forum.created_on
+			f.last_post_user = last_post_forum.posted_by
+			f.save()
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			elif 'return' in request.POST:
