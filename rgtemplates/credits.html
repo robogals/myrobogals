@@ -16,22 +16,10 @@
 <a href="/profile/qc/">Quynh-Chi Nguyen</a><br>
 <a href="/profile/makiko/">Makiko Nagasawa</a><br>
 <a href="/profile/paul/">Paul Madsen</a><br>
-
-
-#############
-
-<a href="/profile/paul/">Junee Singh</a><br>
-<a href="/profile/paul/">James Li</a><br>
-
-
-#############
-
-{% blocktrans with "James Li" as name and "james@robogals.org" as email %}Are you a coder who would like to contribute to building myRobogals? Contact {{name}} on {{email}} to join our software engineering team!{% endblocktrans %}
-
-
-
-
+<a href="/profile/junee/">Junee Singh</a><br>
+<a href="/profile/spock/">James Li</a><br>
 <br>
+{% blocktrans with "James Li" as name and "james@robogals.org"|hide_email as email %}Are you a coder who would like to contribute to building myRobogals? Contact <b>{{name}}</b> on {{email}} to join our software engineering team!{% endblocktrans %}<br>
 <br>
 <a href="http://www.djangoproject.com/"><img src="{{MEDIA_URL}}/djangopowered.gif" border="0"></a>
 {% endblock %}
