@@ -123,7 +123,7 @@ class Post(models.Model):
 	class Meta:
 		verbose_name = "post"
 		verbose_name_plural = "posts"
-		ordering = ['created_on']
+		ordering = ['id']
 
 	def __unicode__(self):
 		return str(self.pk)
