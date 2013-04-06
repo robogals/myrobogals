@@ -26,7 +26,7 @@ IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
 '''
 
-from pytz import timezone, utc
+from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from myrobogals.auth.models import Group, User
@@ -39,7 +39,7 @@ class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
 	chapter = models.ForeignKey(Group, blank=True, null=True)
 	exec_only = models.BooleanField("For executives only", default=False)
-	created_on = models.DateTimeField(auto_now_add=True)
+	created_on = models.DateTimeField(default=datetime.utcnow())
 
 	class Meta:
 		verbose_name = _('category')
@@ -64,7 +64,7 @@ class Forum(models.Model):
 	name = models.CharField('Name', max_length=80)
 	description = models.TextField(default = '')
 	category = models.ForeignKey(Category)
-	created_on = models.DateTimeField(auto_now_add=True)
+	created_on = models.DateTimeField(default=datetime.utcnow())
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
@@ -90,7 +90,7 @@ class Topic(models.Model):
 	posted_by = models.ForeignKey(User, related_name='topic_posted_by')
 	subject = models.CharField(max_length=80)
 	num_views = models.IntegerField("Number of views", default=0)
-	created_on = models.DateTimeField(auto_now_add=True)
+	created_on = models.DateTimeField(default=datetime.utcnow())
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
 	sticky = models.BooleanField("Set sticky", default=False)
@@ -115,7 +115,7 @@ class Post(models.Model):
 	topic = models.ForeignKey(Topic)
 	posted_by = models.ForeignKey(User, related_name='post_posted_by')
 	message = models.TextField()
-	created_on = models.DateTimeField(auto_now_add=True)
+	created_on = models.DateTimeField(default=datetime.utcnow())
 	updated_on = models.DateTimeField(blank=True, null=True)
 	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
 	upload_file = models.FileField(upload_to='forum_uploads', blank=True)
