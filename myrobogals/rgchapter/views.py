@@ -159,6 +159,11 @@ class FormPartFive(forms.Form):
 	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
 	welcome_email_html = forms.BooleanField(required=False)
 
+class FormPartSix(forms.Form):
+	invite_email_subject = forms.CharField(required=False, max_length=256)
+	invite_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
+	invite_email_html = forms.BooleanField(required=False)
+
 @login_required
 def progresschapter(request):
 	chapter_sum = 0.0
@@ -230,7 +235,8 @@ def editchapter(request, chapterurl):
 			formpart3 = FormPartThree(request.POST)
 			formpart4 = FormPartFour(request.POST, chapter=c)
 			formpart5 = FormPartFive(request.POST)
-			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
+			formpart6 = FormPartSix(request.POST)
+			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid() and formpart6.is_valid():
 				data = formpart1.cleaned_data
 				c.infobox = data['infobox']
 				c.website_url = data['website_url']
@@ -265,6 +271,10 @@ def editchapter(request, chapterurl):
 				c.welcome_email_subject = data['welcome_email_subject']
 				c.welcome_email_msg = data['welcome_email_msg']
 				c.welcome_email_html = data['welcome_email_html']
+				data = formpart6.cleaned_data
+				c.invite_email_subject = data['invite_email_subject']
+				c.invite_email_msg = data['invite_email_msg']
+				c.invite_email_html = data['invite_email_html']
 				c.save()
 				request.user.message_set.create(message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
@@ -304,7 +314,11 @@ def editchapter(request, chapterurl):
 				'welcome_email_subject': c.welcome_email_subject,
 				'welcome_email_msg': c.welcome_email_msg,
 				'welcome_email_html': c.welcome_email_html})
-		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'c': c}, context_instance=RequestContext(request))
+			formpart6 = FormPartSix({
+				'invite_email_subject': c.invite_email_subject,
+				'invite_email_msg': c.invite_email_msg,
+				'invite_email_html': c.invite_email_html})
+		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'formpart6': formpart6, 'c': c}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 

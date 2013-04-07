@@ -408,7 +408,15 @@ def detail(request, username):
 		show_job = True
 	else:
 		show_job = False
-	visits = EventAttendee.objects.filter(user=u, actual_status=1).order_by('-event__visit_start')
+	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())))
+	for account in account_list:
+		subAliasesSet = set(ac for ac in account.aliases.all())
+		supAliasesSet = set(ac for ac in account.user_aliases.all())
+		subset = subAliasesSet.union(supAliasesSet)
+		for alias in subset:
+			if alias not in account_list:
+				account_list.append(alias)
+	visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
 	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
 
 @login_required

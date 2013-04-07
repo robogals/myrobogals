@@ -60,6 +60,18 @@ class SchoolVisitFormOne(forms.Form):
 		else:
 			self.fields["school"].queryset = School.objects.filter(chapter=chapter)
 
+	def clean(self):
+		cleaned_data = super(SchoolVisitFormOne, self).clean()
+		start = cleaned_data.get("start_time")
+		end = cleaned_data.get("end_time")
+		if start and end and end <= start:
+			msg = _("Start time must before End time.")
+			self._errors["start_time"] = self.error_class([msg])
+			self._errors["end_time"] = self.error_class([msg])
+			del cleaned_data["start_time"]
+			del cleaned_data["end_time"]
+		return cleaned_data
+
 class SchoolVisitFormTwo(forms.Form):
 	meeting_location = forms.CharField(label=_("Meeting location"), help_text=_("Where people will meet at university to go as a group to the school, if applicable"), initial=_("N/A"), required=False)
 	meeting_time = forms.TimeField(label=_("Meeting time"), help_text=_("What time people can meet to go to the school"), initial="09:30:00", required=False)
@@ -269,6 +281,10 @@ class InviteForm(forms.Form):
 		super(InviteForm, self).__init__(*args, **kwargs)
 		self.fields['memberselect'].queryset = User.objects.filter(chapter=user.chapter, is_active=True, email_reminder_optin=True, pk__in=MemberStatus.objects.filter(statusType__pk=1, status_date_end__isnull=True).values_list('user_id', flat=True)).order_by('last_name')
 		self.fields['list'].queryset = UserList.objects.filter(chapter=user.chapter)
+		if visit.chapter.invite_email_subject:
+			self.fields['subject'].initial = visit.chapter.invite_email_subject
+		if visit.chapter.invite_email_msg:
+			self.fields['body'].initial = visit.chapter.invite_email_msg
 
 @login_required
 def invitetovisit(request, visit_id):
@@ -297,7 +313,7 @@ def invitetovisit(request, visit_id):
 					message.from_address = request.user.email
 					message.reply_address = request.user.email
 					message.sender = request.user
-					message.html = True
+					message.html = v.chapter.invite_email_html
 					message.from_name = chapter.name
 					
 					# Don't send it yet until the recipient list is done

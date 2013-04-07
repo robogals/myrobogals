@@ -395,6 +395,7 @@ class User(models.Model):
     name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
     forum_last_act = models.DateTimeField('Forum last activity', default=datetime.datetime.now)
     objects = UserManager()
+    aliases = models.ManyToManyField('User', blank=True, null=True, related_name='user_aliases')
 
     class Meta:
         verbose_name = 'member'
