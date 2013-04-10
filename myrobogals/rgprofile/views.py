@@ -828,6 +828,28 @@ def edituser(request, username, chapter=None):
 							recipient.save()
 							message.status = 0
 							message.save()
+						if not adduser and chapter.notify_enable and chapter.notify_list:
+							message = EmailMessage()
+							message.subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
+							message.body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
+							message.from_name = "myRobogals"
+							message.from_address = "my@robogals.org"
+							message.reply_address = "my@robogals.org"
+							message.sender = User.objects.get(username='edit')
+							message.html = True
+							message.email_type = 0
+							message.status = -1
+							message.save()
+							users = chapter.notify_list.users.all()
+							for user in users:
+								recipient = EmailRecipient()
+								recipient.message = message
+								recipient.user = user
+								recipient.to_name = user.get_full_name()
+								recipient.to_address = user.email
+								recipient.save()
+							message.status = 0
+							message.save()
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
