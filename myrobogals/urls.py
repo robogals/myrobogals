@@ -155,6 +155,8 @@ urlpatterns = patterns('',
 	(r'^newsletter/(?P<chapterurl>.+)/subscribe/done/$', 'rgprofile.views.newslettersubdone'),
 	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/$', 'rgprofile.views.newsletterunsub'),
 	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/done/$', 'rgprofile.views.newsletterunsubdone'),
+	# Careers newsletter API
+	(r'^api/newslettercareers/$', 'rgmessages.views.careersapi'),
 	# Amplifier newsletter API
 	(r'^api/newsletter/$', 'rgmessages.views.api'),
 	# SMSGlobal delivery receipts API
