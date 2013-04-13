@@ -4,6 +4,7 @@ from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newslette
 from datetime import datetime, date
 import re
 from django.core.validators import email_re
+from django.db.models import Q
 
 class RgImportCsvException(Exception):
 	def __init__(self, errmsg):
@@ -251,7 +252,7 @@ def importFromAmplifierToAUcareer():
 	for user in User.objects.filter(chapter__country=country, email_newsletter_optin=True):
 		user.email_careers_newsletter_AU_optin = True
 		user.save()
-	for subscriber in NewsletterSubscriber.objects.filter(newsletter=amplifier, country=country, active=True):
+	for subscriber in NewsletterSubscriber.objects.filter(Q(newsletter=amplifier) & (Q(country=country) | Q(email__iregex=r'au$')) & Q(active=True)):
 		if NewsletterSubscriber.objects.filter(email=subscriber.email, newsletter=career).count() > 0:
 			continue	# This email address is already subscribed
 		users_count = User.objects.filter(is_active=True, email=subscriber.email, email_careers_newsletter_AU_optin=True).count()
