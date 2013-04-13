@@ -243,3 +243,20 @@ def genandsendpw(user, welcomeemail, chapter):
 	recipient.save()
 	message.status = 0
 	message.save()
+
+def importFromAmplifierToAUcareer():
+	country = Country.objects.get(code="AU")
+	amplifier = Newsletter.objects.get(pk=1)
+	career = Newsletter.objects.get(pk=5)
+	for user in User.objects.filter(chapter__country=country, email_newsletter_optin=True):
+		user.email_careers_newsletter_AU_optin = True
+		user.save()
+	for subscriber in NewsletterSubscriber.objects.filter(newsletter=amplifier, country=country):
+		if NewsletterSubscriber.objects.filter(email=subscriber.email, newsletter=career).count() > 0:
+			continue	# This email address is already subscribed
+		users_count = User.objects.filter(is_active=True, email=subscriber.email, email_careers_newsletter_AU_optin=True).count()
+		if users_count > 0:
+			continue    # This email address is already subscribed by having User.email_careers_newsletter_AU_optin True
+		subscriber.id = None
+		subscriber.newsletter = career
+		subscriber.save()

@@ -663,12 +663,17 @@ class FormPartFour(forms.Form):
 		super(FormPartFour, self).__init__(*args, **kwargs)
 		self.fields['email_chapter_optin'].label=_('Allow %s to send me email updates') % chapter.name
 		self.fields['mobile_marketing_optin'].label=_('Allow %s to send me SMS updates') % chapter.name
+		if chapter.country.code == 'AU':
+			self.fields['email_careers_newsletter_AU_optin'].initial = True
+		else:
+			self.fields['email_careers_newsletter_AU_optin'].initial = False
 
 	email_reminder_optin = forms.BooleanField(label=_('Allow email reminders about my upcoming school visits'), initial=True, required=False)
 	mobile_reminder_optin = forms.BooleanField(label=_('Allow SMS reminders about my upcoming school visits'), initial=True, required=False)
 	email_chapter_optin = forms.BooleanField(initial=True, required=False)
 	mobile_marketing_optin = forms.BooleanField(initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+	email_careers_newsletter_AU_optin = forms.BooleanField(label=_('Subscribe to The Careers Newsletter - Australia'), required=False)
 
 # Bio
 class FormPartFive(forms.Form):
@@ -786,6 +791,7 @@ def edituser(request, username, chapter=None):
 					u.mobile_reminder_optin = data['mobile_reminder_optin']
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
+					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
 					data = formpart5.cleaned_data
 					if 'internal_notes' in data:
 						u.internal_notes = data['internal_notes']
@@ -901,7 +907,8 @@ def edituser(request, username, chapter=None):
 					'email_chapter_optin': u.email_chapter_optin,
 					'mobile_reminder_optin': u.mobile_reminder_optin,
 					'mobile_marketing_optin': u.mobile_marketing_optin,
-					'email_newsletter_optin': u.email_newsletter_optin}, chapter=chapter)
+					'email_newsletter_optin': u.email_newsletter_optin,
+					'email_careers_newsletter_AU_optin': u.email_careers_newsletter_AU_optin}, chapter=chapter)
 				formpart5 = FormPartFive({
 					'internal_notes': u.internal_notes,
 					'trained': u.trained}, chapter=chapter)

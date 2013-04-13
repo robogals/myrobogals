@@ -208,6 +208,8 @@ def writeemail(request):
 					# Special rule for The Amplifier
 					if data['newsletters'].pk == 1:
 						users = User.objects.filter(is_active=True, email_newsletter_optin=True).exclude(email='')
+					elif data['newsletters'].pk == 5:
+						users = User.objects.filter(is_active=True, email_careers_newsletter_AU_optin=True).exclude(email='')
 					else:
 						users = User.objects.none()
 			else:
