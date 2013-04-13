@@ -251,7 +251,7 @@ def importFromAmplifierToAUcareer():
 	for user in User.objects.filter(chapter__country=country, email_newsletter_optin=True):
 		user.email_careers_newsletter_AU_optin = True
 		user.save()
-	for subscriber in NewsletterSubscriber.objects.filter(newsletter=amplifier, country=country):
+	for subscriber in NewsletterSubscriber.objects.filter(newsletter=amplifier, country=country, active=True):
 		if NewsletterSubscriber.objects.filter(email=subscriber.email, newsletter=career).count() > 0:
 			continue	# This email address is already subscribed
 		users_count = User.objects.filter(is_active=True, email=subscriber.email, email_careers_newsletter_AU_optin=True).count()
