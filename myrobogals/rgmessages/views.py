@@ -6,7 +6,7 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import User, Group, MemberStatusType
-from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
+from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException, EmailHeader
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -74,6 +74,7 @@ class WriteEmailForm(forms.Form):
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
 	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)
 	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
+	header_list = forms.ModelChoiceField(queryset=EmailHeader.objects.all(), required=False)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -149,7 +150,11 @@ def writeemail(request):
 			if request.POST['step'] == '2':
 				message = EmailMessage()
 				message.subject = data['subject']
-				message.body = data['body']
+				if data['header_list']:
+					hl = data['header_list']
+					message.body = hl.upper_body + data['body'] + hl.lower_body
+				else:
+					message.body = data['body']
 				message.from_address = request.user.email
 				message.reply_address = request.user.email
 				message.sender = request.user
@@ -538,7 +543,20 @@ def downloademailfile(request, email_id, file_name):
 	else:
 		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
 		return HttpResponseRedirect('/messages/history/')
-	
+
+@login_required
+def previewemail(request):
+	message = EmailMessage()
+	if request.POST['header']:
+		h = EmailHeader.objects.filter(pk=request.POST['header'])
+		if h:
+			message.body = h[0].upper_body + request.POST['msg'] + h[0].lower_body
+		else:
+			message.body = request.POST['msg']
+	else:
+		message.body = request.POST['msg']
+	message.html = True
+	return render_to_response('email_show.html', {'email': message}, context_instance=RequestContext(request))
 
 @login_required
 def showemail(request, email_id):

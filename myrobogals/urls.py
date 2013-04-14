@@ -142,6 +142,7 @@ urlpatterns = patterns('',
 	(r'^messages/showemail/(?P<email_id>\d+)/$', 'rgmessages.views.showemail'),
 	(r'^messages/downloademailfile/(?P<email_id>\d+)/(?P<file_name>.+)/$', 'rgmessages.views.downloademailfile'),
 	(r'^messages/history/$', 'rgmessages.views.msghistory'),
+	(r'^messages/previewemail/$', 'rgmessages.views.previewemail'),
 	
 	# Wiki
 	(r'^wiki/$', 'rgmain.views.wiki'),
