@@ -546,6 +546,8 @@ def downloademailfile(request, email_id, file_name):
 
 @login_required
 def previewemail(request):
+	if not request.user.is_staff and not request.user.is_superuser:
+		raise Http404
 	message = EmailMessage()
 	if request.POST['header']:
 		h = EmailHeader.objects.filter(pk=request.POST['header'])
@@ -953,6 +955,9 @@ def newslettercp(request, newsletter_id):
 	sub_totals = {}
 	if newsletter.pk == 1:  # for The Amplifier only
 		sub_totals["Robogals member"] = User.objects.filter(is_active=True, email_newsletter_optin=True).count()
+		total += sub_totals["Robogals member"]
+	if newsletter.pk == 5:  # for Careers newsletter - AU
+		sub_totals["Robogals member"] = User.objects.filter(is_active=True, email_careers_newsletter_AU_optin=True).count()
 		total += sub_totals["Robogals member"]
 	for subscriber in subscribers:
 		if subscriber.subscriber_type is None:

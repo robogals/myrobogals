@@ -1026,6 +1026,7 @@ class DefaultsFormTwo(forms.Form):
 	email_chapter_optin = forms.BooleanField(label=_('Allow email updates from local Robogals chapter'), initial=True, required=False)
 	mobile_marketing_optin = forms.BooleanField(label=_('Allow SMS updates from local Robogals chapter'), initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+	email_careers_newsletter_AU_optin = forms.BooleanField(label=_('Subscribe to The Careers Newsletter - Australia'), required=False)
 
 @login_required
 def importusers(request, chapterurl):
@@ -1182,6 +1183,7 @@ PRIVACY_FIELDS = (
 	('email_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive email reminders about school visits from myRobogals'),
 	('mobile_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive SMS reminders about school visits from myRobogals'),
 	('email_newsletter_optin', 'Either \'True\' or \'False\', specifies whether this member will receive The Amplifier, the monthly email newsletter of Robogals Global'),
+	('email_careers_newsletter_AU_optin', 'Either \'True\' or \'False\', specifies whether this member will receive The Careers Newsletter - AU'),
 )
 
 HELPINFO = (

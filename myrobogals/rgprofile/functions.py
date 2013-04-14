@@ -342,6 +342,8 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 					boolval(colname, cell, newuser, defaults)
 				elif colname == 'email_newsletter_optin':
 					boolval(colname, cell, newuser, defaults)
+				elif colname == 'email_careers_newsletter_AU_optin':
+					boolval(colname, cell, newuser, defaults)
 				else:
 					pass   # Unknown column, ignore
 				# Increment column and do the loop again
