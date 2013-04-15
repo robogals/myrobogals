@@ -408,7 +408,7 @@ def detail(request, username):
 		show_job = True
 	else:
 		show_job = False
-	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())))
+	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())).union(set([u])))
 	for account in account_list:
 		subAliasesSet = set(ac for ac in account.aliases.all())
 		supAliasesSet = set(ac for ac in account.user_aliases.all())
