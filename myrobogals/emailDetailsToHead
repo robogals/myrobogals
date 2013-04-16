@@ -1,0 +1,73 @@
+from myrobogals.rgprofile.models import Position, UserList
+from myrobogals.rgteaching.models import SchoolVisitStats
+from myrobogals.auth.models import Group, User
+from myrobogals.rgmain.models import Country
+from django.template import RequestContext, Context, loader
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from myrobogals.auth.decorators import login_required
+from django import forms
+from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
+from myrobogals.rgchapter.models import REGION_CHOICES
+from myrobogals.filters.templatetags.get_user_attr import get_user_attr
+from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException, EmailHeader
+from django.db import connection
+from django.db.models import Q
+import datetime
+import StringIO
+
+for chapter in Group.objects.all():
+	committee = Position.objects.filter(positionChapter=chapter).filter(position_date_end=None).order_by('positionType__rank')
+	if committee:
+		head = committee[0]
+		message = EmailMessage()
+		message.subject = chapter.name + ' chapter summary'
+		message.body  = '<table width="100%" cellpadding="5" border="1" rules="all" frame="BOX" cellspacing="0">'
+		message.body += '<tr>'
+		message.body += '<td>Name</td><td>Email</td><td>Position</td>'
+		message.body += '</tr>'
+		for member in committee:
+			message.body += '<tr>'
+			message.body += '<td>' + member.user.get_full_name() + '</td>'
+			message.body += '<td><a href="mailto:' + member.user.email + '">' + member.user.email + '</a></td>'
+			message.body += '<td>' + str(member) + '</td>'
+			message.body += '</tr>'
+		message.body += '</table><br/><br/>'
+		message.body += '<table width="100%" cellpadding="5" border="1" rules="all" frame="BOX" cellspacing="0">'
+		message.body += '<tr><td>Postal address</td><td>Faculty contact</td><td>Infobox</td><td>Website URL</td><td>Facebook URL</td></tr>'
+		message.body += '<tr>'
+		message.body += '<td>'
+		message.body += chapter.address + '<br/>'
+		message.body += chapter.city + '<br/>'
+		message.body += chapter.state + '<br/>'
+		message.body += chapter.postcode + '<br/>'
+		message.body += str(chapter.country)
+		message.body += '</td>'
+		message.body += '<td>' + chapter.faculty_contact + '</td>'
+		message.body += '<td>' + chapter.infobox + '</td>'
+		message.body += '<td><a href="' + chapter.website_url + '">' + chapter.website_url + '</a></td>'
+		message.body += '<td><a href="' + chapter.facebook_url + '">' + chapter.facebook_url + '</a></td>'
+		message.body += '</tr>'
+		message.body += '</table>'
+		message.body += '<p>Please reply to <a href="mailto:support@robogals.org">support@robogals.org</a>, if any of the information needs to be updated.</p>'
+		message.from_name = 'support@robogals.org'
+		message.from_address = 'support@robogals.org'
+		message.reply_address = 'support@robogals.org'
+		message.sender = User.objects.get(username='edit')
+		message.status = -1
+		message.html = True
+		message.email_type = 0
+		message.save()
+		recipient = EmailRecipient()
+		recipient.message = message
+		recipient.user = head.user
+		recipient.to_name = head.user.get_full_name()
+		recipient.to_address = head.user.email
+		recipient.save()
+		message.status = 0
+		message.save()
+
+exit()
+y
