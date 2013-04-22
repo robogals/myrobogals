@@ -141,6 +141,31 @@ Most options can be modified here, but you will need to contact <strong>support@
     <td valign="top">HTML</td>
     <td>{{ formpart5.welcome_email_html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
   </tr>
+  <tr>
+    <td colspan="2">&nbsp;<br /><strong>{% trans "Workshop invitation email" %}</strong></td>
+  </tr>
+  {% if formpart6.invite_email_subject.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in formpart6.invite_email_subject.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td valign="top" style="width: 70px">{% trans "Subject" %}</td>
+    <td>{{ formpart6.invite_email_subject }}</td>
+  </tr>
+  {% if formpart6.invite_email_msg.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in formpart6.invite_email_msg.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td valign="top">Message</td>
+    <td>{{ formpart6.invite_email_msg }}</td>
+  </tr>
+  <tr>
+    <td valign="top">HTML</td>
+    <td>{{ formpart6.invite_email_html }} Treat this message as HTML (note that line breaks will <b>not</b> be automatically converted to &lt;br&gt;)</td>
+  </tr>
 </table>
 {% autoescape off %}
 <table>

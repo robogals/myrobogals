@@ -52,7 +52,7 @@
 		{% for cur_position in post.1.posted_by.cur_positions %}
 		<br /><span style="font-size: 9pt"><em>{{cur_position.positionType}}<br />{{cur_position.positionChapter}}</em></span>
 		{% empty %}
-		<br /><em>{{request.user.chapter}}</em>
+		<br /><em>{{post.1.posted_by.chapter}}</em>
 		{% endfor %}
 		<br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
 		<td style="border-bottom: solid 1px grey;">{{post.1.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.1.updated_on %} | {% trans "Last edit:" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
