@@ -392,6 +392,7 @@ class User(models.Model):
     union_member = models.BooleanField(default=False)
     tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
     trained = models.BooleanField(default=False)
+    security_check = models.BooleanField(default=False)
     name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
     forum_last_act = models.DateTimeField('Forum last activity', default=datetime.datetime.now)
     objects = UserManager()

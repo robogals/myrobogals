@@ -682,6 +682,7 @@ class FormPartFive(forms.Form):
 		del kwargs['chapter']
 		super(FormPartFive, self).__init__(*args, **kwargs)
 
+	security_check = forms.BooleanField(label=_('Passed The Working With Children Check'), initial=False, required=False)
 	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
@@ -711,6 +712,14 @@ def edituser(request, username, chapter=None):
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			formpart5 = FormPartFive(request.POST, chapter=chapter)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
+				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST)):
+					attempt_modify_exec_fields = True
+				else:
+					attempt_modify_exec_fields = False
+				if (attempt_modify_exec_fields and join and not adduser):
+					raise Http404
+				if attempt_modify_exec_fields and (not request.user.is_superuser) and (not request.user.is_staff):
+					raise Http404
 				data = formpart1.cleaned_data
 				if join or (data['username'] != '' and data['username'] != u.username):
 					new_username = data['username']
@@ -793,10 +802,12 @@ def edituser(request, username, chapter=None):
 					u.email_newsletter_optin = data['email_newsletter_optin']
 					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
 					data = formpart5.cleaned_data
-					if 'internal_notes' in data:
+					if attempt_modify_exec_fields:
 						u.internal_notes = data['internal_notes']
-					if 'trained' in data:
+					if attempt_modify_exec_fields:
 						u.trained = data['trained']
+					if attempt_modify_exec_fields:
+						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
@@ -911,7 +922,8 @@ def edituser(request, username, chapter=None):
 					'email_careers_newsletter_AU_optin': u.email_careers_newsletter_AU_optin}, chapter=chapter)
 				formpart5 = FormPartFive({
 					'internal_notes': u.internal_notes,
-					'trained': u.trained}, chapter=chapter)
+					'trained': u.trained,
+					'security_check': u.security_check}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:

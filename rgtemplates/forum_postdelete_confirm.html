@@ -9,7 +9,7 @@
 {% block pagetitle %}Confirm deletion of post{% endblock %}
 
 {% block content %}
-<form action="/forums/post/delete/{{post.pk}}/?return={{return}}" method="post">
+<form action="/forums/post/delete/{{post.pk}}/?return={{return|urlencode}}" method="post">
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 	<tr style="color:white; background-color:#1366A3">
 		<td>{% trans "User" %}</td>

@@ -18,7 +18,7 @@
 		<td>{% trans "Last Post" %}</td>
 	</tr>
 	<tr class="odd">
-		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
 		{% if request.user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
@@ -27,7 +27,7 @@
 		</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 	</tr>
 </table>
 <p style="clear: both; font-size: 200%;">
