@@ -1464,7 +1464,10 @@ def report_global_breakdown(request, chaptershorten):
 			chapter_totals[chapter.short_en]['schools'] += 1
 			for eventattendee in set(EventAttendee.objects.filter(event__pk__in=this_schools_visits.values_list('visit__event_ptr_id', flat=True)).values_list('user_id', flat=True)):
 				ea = User.objects.get(pk=eventattendee)
-				attendance[ea.get_full_name()]['schools'] += 1
+				try:
+					attendance[ea.get_full_name()]['schools'] += 1
+				except:
+					pass
 			for each_visit in this_schools_visits:
 				first = xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
 				chapter_totals[chapter.short_en]['first'] += first
@@ -1472,9 +1475,12 @@ def report_global_breakdown(request, chaptershorten):
 				chapter_totals[chapter.short_en]['repeat'] += repeat
 				chapter_totals[chapter.short_en]['workshops'] += 1	
 				for eventattendee in EventAttendee.objects.filter(event__pk=each_visit.visit.event_ptr_id):
-					attendance[eventattendee.user.get_full_name()]['first'] += first
-					attendance[eventattendee.user.get_full_name()]['repeat'] += repeat
-					attendance[eventattendee.user.get_full_name()]['workshops'] += 1
+					try:
+						attendance[eventattendee.user.get_full_name()]['first'] += first
+						attendance[eventattendee.user.get_full_name()]['repeat'] += repeat
+						attendance[eventattendee.user.get_full_name()]['workshops'] += 1
+					except:
+						pass
 	chapter_totals[chapter.short_en]['girl_workshops'] += chapter_totals[chapter.short_en]['first'] + chapter_totals[chapter.short_en]['repeat']
 	chapter_totals[chapter.short_en]['weighted'] = chapter_totals[chapter.short_en]['first'] + (float(chapter_totals[chapter.short_en]['repeat'])/2)
 	for atten in attendance:
