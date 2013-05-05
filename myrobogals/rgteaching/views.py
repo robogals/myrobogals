@@ -1338,6 +1338,9 @@ def report_global(request):
 			chapter_totals = {}
 			region_totals = {}
 			global_totals = {}
+			request.session['globalReportStartDate'] = formdata['start_date']
+			request.session['globalReportEndDate'] = formdata['end_date']
+			request.session['globalReportVisitType'] = formdata['visit_type']
 			if formdata['start_date'] < datetime.date(2011, 2, 11):
 				warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
 			chapters = Group.objects.filter(exclude_in_reports=False)
@@ -1402,7 +1405,79 @@ def report_global(request):
 		chapter_totals = {}
 		region_totals = {}
 		global_totals = {}
+	if request.user.is_superuser or request.user.chapter.id == 1:
+		user_chapter_children = Group.objects.filter(exclude_in_reports=False).values_list('short_en', flat=True)
+	else:
+		user_chapter_children = Group.objects.filter(parent__pk=request.user.chapter.pk, exclude_in_reports=False).values_list('short_en', flat=True)
 	if printview:
 		return render_to_response('print_report.html',{'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
 	else:
-		return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
+		return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning, 'user_chapter_children': set(user_chapter_children)},context_instance=RequestContext(request))
+
+@login_required
+def report_global_breakdown(request, chaptershorten):
+	chapter = get_object_or_404(Group, short_en=chaptershorten)
+	if (not request.user.is_staff) and (not request.user.is_superuser):
+		raise Http404
+	if (not chapter.parent) or (not chapter.parent.parent):
+		raise Http404
+	if (not request.user.is_superuser) and (request.user.chapter.pk != chapter.parent.pk) and (request.user.chapter.pk != chapter.parent.parent.pk):
+		raise Http404
+	if (not request.session.get('globalReportStartDate', False)) or (not request.session.get('globalReportEndDate', False)) or (not request.session.get('globalReportVisitType', False)):
+		raise Http404
+	start_date = request.session.get('globalReportStartDate', False)
+	end_date = request.session.get('globalReportEndDate', False)
+	visit_type = request.session.get('globalReportVisitType', False)
+	chapter_totals = {}
+	attendance = {}
+	for u in User.objects.filter(chapter=chapter):
+		attendance[u.get_full_name()]={}
+		attendance[u.get_full_name()]['workshops'] = 0
+		attendance[u.get_full_name()]['schools'] = 0
+		attendance[u.get_full_name()]['first'] = 0
+		attendance[u.get_full_name()]['repeat'] = 0
+		attendance[u.get_full_name()]['girl_workshops'] = 0
+		attendance[u.get_full_name()]['weighted'] = 0
+	chapter_totals[chapter.short_en] = {}
+	chapter_totals[chapter.short_en]['workshops'] = 0
+	chapter_totals[chapter.short_en]['schools'] = 0
+	chapter_totals[chapter.short_en]['first'] = 0
+	chapter_totals[chapter.short_en]['repeat'] = 0
+	chapter_totals[chapter.short_en]['girl_workshops'] = 0
+	chapter_totals[chapter.short_en]['weighted'] = 0
+	event_id_list = Event.objects.filter(visit_start__range=[start_date,end_date], chapter=chapter, status=1).values_list('id',flat=True)
+	event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
+	visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
+	event_list = set(event_list)
+	for school_id in event_list:
+		this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id, visit__visit_start__range=[start_date,end_date], visit__status=1)
+		if int(visit_type) == -1:
+			# include all stats categories
+			pass
+		elif int(visit_type) == -2:
+			# include both metro and regional robotics workshops
+			this_schools_visits = this_schools_visits.filter(visit_type__in = [0,7])
+		else:
+			# only include specific stats category
+			this_schools_visits = this_schools_visits.filter(visit_type = visit_type)
+		if this_schools_visits:
+			chapter_totals[chapter.short_en]['schools'] += 1
+			for eventattendee in set(EventAttendee.objects.filter(event__pk__in=this_schools_visits.values_list('visit__event_ptr_id', flat=True)).values_list('user_id', flat=True)):
+				ea = User.objects.get(pk=eventattendee)
+				attendance[ea.get_full_name()]['schools'] += 1
+			for each_visit in this_schools_visits:
+				first = xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
+				chapter_totals[chapter.short_en]['first'] += first
+				repeat = xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)
+				chapter_totals[chapter.short_en]['repeat'] += repeat
+				chapter_totals[chapter.short_en]['workshops'] += 1	
+				for eventattendee in EventAttendee.objects.filter(event__pk=each_visit.visit.event_ptr_id):
+					attendance[eventattendee.user.get_full_name()]['first'] += first
+					attendance[eventattendee.user.get_full_name()]['repeat'] += repeat
+					attendance[eventattendee.user.get_full_name()]['workshops'] += 1
+	chapter_totals[chapter.short_en]['girl_workshops'] += chapter_totals[chapter.short_en]['first'] + chapter_totals[chapter.short_en]['repeat']
+	chapter_totals[chapter.short_en]['weighted'] = chapter_totals[chapter.short_en]['first'] + (float(chapter_totals[chapter.short_en]['repeat'])/2)
+	for atten in attendance:
+		attendance[atten]['girl_workshops'] += attendance[atten]['first'] + attendance[atten]['repeat']
+		attendance[atten]['weighted'] = attendance[atten]['first'] + (float(attendance[atten]['repeat'])/2)
+	return render_to_response('stats_global_report_breakdown.html',{'chapter_totals': sorted(chapter_totals.iteritems()), 'attendance': sorted(attendance.iteritems(), key=lambda item: item[1]['weighted'], reverse=True)},context_instance=RequestContext(request))

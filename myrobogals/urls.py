@@ -124,6 +124,7 @@ urlpatterns = patterns('',
 	(r'^teaching/video/$', 'rgteaching.views.videotute'),
 	(r'^reports/$', 'rgteaching.views.report_standard'),
 	(r'^globalreports/$', 'rgteaching.views.report_global'),
+	(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', 'rgteaching.views.report_global_breakdown'),
 	(r'^progress/$', 'rgchapter.views.progresschapter'),
 
 	# Email & SMS menu

@@ -682,7 +682,7 @@ class FormPartFive(forms.Form):
 		del kwargs['chapter']
 		super(FormPartFive, self).__init__(*args, **kwargs)
 
-	security_check = forms.BooleanField(label=_('Passed The Working With Children Check'), initial=False, required=False)
+	security_check = forms.BooleanField(label=_('Passed the Police Check'), initial=False, required=False)
 	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
@@ -716,10 +716,6 @@ def edituser(request, username, chapter=None):
 					attempt_modify_exec_fields = True
 				else:
 					attempt_modify_exec_fields = False
-				if (attempt_modify_exec_fields and join and not adduser):
-					raise Http404
-				if attempt_modify_exec_fields and (not request.user.is_superuser) and (not request.user.is_staff):
-					raise Http404
 				data = formpart1.cleaned_data
 				if join or (data['username'] != '' and data['username'] != u.username):
 					new_username = data['username']
@@ -801,12 +797,10 @@ def edituser(request, username, chapter=None):
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
 					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
-					data = formpart5.cleaned_data
-					if attempt_modify_exec_fields:
+					if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
+						data = formpart5.cleaned_data
 						u.internal_notes = data['internal_notes']
-					if attempt_modify_exec_fields:
 						u.trained = data['trained']
-					if attempt_modify_exec_fields:
 						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
