@@ -1462,10 +1462,9 @@ def report_global_breakdown(request, chaptershorten):
 			this_schools_visits = this_schools_visits.filter(visit_type = visit_type)
 		if this_schools_visits:
 			chapter_totals[chapter.short_en]['schools'] += 1
-			for eventattendee in set(EventAttendee.objects.filter(event__pk__in=this_schools_visits.values_list('visit__event_ptr_id', flat=True)).values_list('user_id', flat=True)):
-				ea = User.objects.get(pk=eventattendee)
+			for eventattendee in User.objects.filter(pk__in=EventAttendee.objects.filter(event__pk__in=this_schools_visits.values_list('visit__event_ptr_id', flat=True)).values_list('user_id', flat=True)):
 				try:
-					attendance[ea.get_full_name()]['schools'] += 1
+					attendance[eventattendee.get_full_name()]['schools'] += 1
 				except:
 					pass
 			for each_visit in this_schools_visits:
