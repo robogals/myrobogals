@@ -672,9 +672,10 @@ def viewforum(request, forum_id):
 	else:
 		can_delete = False
 	response = render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnFromNewTopic': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'return': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'can_delete': can_delete, 'sort': sort}, context_instance=RequestContext(request))
-	response.set_cookie("forumpage", page)
-	response.set_cookie("forumsort", sort)
-	response.set_cookie("forumpk", f.pk)
+	cookie_life = 300
+	response.set_cookie("forumpage", page, max_age=cookie_life)
+	response.set_cookie("forumsort", sort, max_age=cookie_life)
+	response.set_cookie("forumpk", f.pk, max_age=cookie_life)
 	return response
 
 @login_required
