@@ -610,7 +610,9 @@ def viewforum(request, forum_id):
 	g = f.category
 	c = g.chapter
 	topicsPerPage = 3
-	pageNumber = request.GET.get('page')
+	pageNumber = request.GET.get('page', None)
+	if (not pageNumber) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
+		pageNumber = request.COOKIES.get('forumpage')
 	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
 	if c and c != request.user.chapter and not request.user.is_superuser:
 		raise Http404
@@ -618,7 +620,9 @@ def viewforum(request, forum_id):
 	if g.exec_only and not request.user.is_staff:
 		raise Http404
 	topicform = NewTopicForm()
-	sort = request.GET.get('sort')
+	sort = request.GET.get('sort', None)
+	if (not sort) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
+		sort = request.COOKIES.get('forumsort')
 	if sort == 'votes_up':
 		topics_list = f.topic_set.all().annotate(numvotes=Count('vote')).order_by('-sticky', 'numvotes')
 	elif sort == 'votes_down':
@@ -659,13 +663,19 @@ def viewforum(request, forum_id):
 		topics = paginator.page(page)
 	except EmptyPage:
 		topics = paginator.page(paginator.num_pages)
+		page = paginator.num_pages
 	except:
 		topics = paginator.page(1)
+		page = 1
 	if request.user.is_superuser or (request.user.is_staff and c == request.user.chapter) or (request.user.is_staff and request.user.chapter.pk == 1 and c == None):
 		can_delete = True
 	else:
 		can_delete = False
-	return render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnFromNewTopic': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'return': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'can_delete': can_delete, 'sort': sort}, context_instance=RequestContext(request))
+	response = render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnFromNewTopic': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'return': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'can_delete': can_delete, 'sort': sort}, context_instance=RequestContext(request))
+	response.set_cookie("forumpage", page)
+	response.set_cookie("forumsort", sort)
+	response.set_cookie("forumpk", f.pk)
+	return response
 
 @login_required
 def deletepost(request, post_id):
