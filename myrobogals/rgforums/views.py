@@ -10,7 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from myrobogals.auth.decorators import login_required
 from myrobogals.auth.models import Group, User
-from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offense, ForumSettings
+from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offense, ForumSettings, PostFile
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from django.utils.http import urlquote, base36_to_int
 from django.db.models import Avg, Max, Min, Count
@@ -80,7 +80,7 @@ def newcategory(request):
 				else:
 					newCategory.save()
 			else:
-				msg = '- The field "Category name" can not be empty'
+				msg = '- The field "Category name" can not be empty.'
 				request.user.message_set.create(message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -135,7 +135,7 @@ def newforum(request):
 				else:
 					newForum.save()
 			else:
-				msg = '- The fields "Forum name" and "Description" can not be empty'
+				msg = '- The fields "Forum name" and "Description" can not be empty.'
 				request.user.message_set.create(message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -162,7 +162,7 @@ def editforum(request, forum_id):
 			edit.description = request.POST['description']
 			edit.save()
 		else:
-			msg = '- The fields "new forum name" and "new description" can not be empty'
+			msg = '- The fields "new forum name" and "new description" can not be empty.'
 			request.user.message_set.create(message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -288,7 +288,6 @@ def forums(request):
 class NewTopicForm(forms.Form):
 	subject = forms.CharField(label=_('New Topic:'), max_length=80, widget=forms.TextInput(attrs={'size': '60'}))
 	message = forms.CharField(label=_('Message:'), widget=TinyMCE(attrs={'cols': 50}))
-	upload_file = forms.FileField(required=False)
 
 @login_required
 def newtopic(request, forum_id):
@@ -298,6 +297,8 @@ def newtopic(request, forum_id):
 	g = f.category
 	c = g.chapter
 	user = request.user
+	msg = '- '
+	newTopicPk = None
 	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or (user not in f.blacklist.filter(pk=user.pk) and (((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
 		if request.method == 'POST':
 			topicform = NewTopicForm(request.POST, request.FILES)
@@ -309,29 +310,40 @@ def newtopic(request, forum_id):
 				newTopic.subject = data['subject']
 				newTopic.last_post_time = datetime.datetime.now()
 				newTopic.last_post_user = user
+				fileWarning = False
+				maxfilesize = 10
+				maxfilesetting = ForumSettings.objects.filter(key='maxuploadfilesize')
+				if maxfilesetting:
+					maxfilesize = int(maxfilesetting[0].value)
+				for upload_file in request.FILES.getlist('upload_files'):
+					if (upload_file.size <= maxfilesize * 1024*1024) and (upload_file.name.__len__() <= 70):
+						pass
+					else:
+						fileWarning = True
+						msg += 'File: ' + upload_file.name + ' is not uploaded due to:'
+						if (upload_file.size > maxfilesize * 1024*1024):
+							msg = msg + ' File size exceeds ' + str(maxfilesize) + ' MB. '
+						if (upload_file.name.__len__() > 70):
+							msg = msg + ' File name exceeds 70 characters.'
+						msg += '<br>'
+				alreadyExistWarning = False
 				if Topic.objects.filter(forum=newTopic.forum, subject=newTopic.subject):
-					msg = '- A similar topic already exists'
+					alreadyExistWarning = True
+					msg += 'A similar topic already exists.'
+				if alreadyExistWarning or fileWarning:
 					request.user.message_set.create(message=unicode(_(msg)))
 				else:
 					newTopic.save()
+					newTopicPk = newTopic.pk
 					postMessage = Post()
 					postMessage.topic = newTopic
 					postMessage.posted_by = user
 					postMessage.message = data['message']
-					maxfilesize = 10
-					maxfilesetting = ForumSettings.objects.filter(key='maxuploadfilesize')
-					if maxfilesetting:
-						maxfilesize = int(maxfilesetting[0].value)
-					if ('upload_file' in request.FILES):
-						if (request.FILES['upload_file'].size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70):
-							postMessage.upload_file=request.FILES['upload_file']
-						else:
-							msg = '- File is not uploaded due to:'
-							if (request.FILES['upload_file'].size > maxfilesize * 1024*1024):
-								msg = msg + ' file size exceeds ' + str(maxfilesize) + ' MB '
-							if (request.FILES['upload_file'].name.__len__() > 70):
-								msg = msg + ' file name exceeds 70 characters'
-							request.user.message_set.create(message=unicode(_(msg)))
+					postMessage.save()
+					for upload_file in request.FILES.getlist('upload_files'):
+						pf = PostFile(postfile=upload_file)
+						pf.save()
+						postMessage.upload_files.add(pf)
 					postMessage.save()
 					f.last_post_time = datetime.datetime.now()
 					f.last_post_user = user
@@ -373,11 +385,14 @@ def newtopic(request, forum_id):
 						message.status = 0
 						message.save()
 			else:
-				request.user.message_set.create(message=unicode(_('- The fields "New Topic" and "Message" can not be empty')))
+				request.user.message_set.create(message=unicode(_('- The fields "New Topic" and "Message" can not be empty.')))
 		else:
 			raise Http404
 		if 'return' in request.GET:
-			return HttpResponseRedirect(request.GET['return'])
+			if newTopicPk:
+				return HttpResponseRedirect(request.GET['return'] + '&targettopicpk=' + str(newTopicPk))
+			else:
+				return HttpResponseRedirect(request.GET['return'])
 		elif 'return' in request.POST:
 			return HttpResponseRedirect(request.POST['return'])
 		else:
@@ -386,7 +401,7 @@ def newtopic(request, forum_id):
 		raise Http404
 
 @login_required
-def downloadpostfile(request, post_id):
+def downloadpostfile(request, post_id, file_id):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
 	post = get_object_or_404(Post, pk=post_id)
@@ -396,20 +411,25 @@ def downloadpostfile(request, post_id):
 	g = f.category
 	c = g.chapter
 	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or (user not in f.blacklist.filter(pk=user.pk) and (((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
-		if post.upload_file:
+		if post.upload_files.filter(pk=file_id):
 			try:
-				response = HttpResponse(post.upload_file.read(), content_type='application/octet-stream')
-				response['Content-Disposition'] = 'attachment; filename="%s"' % post.uploadfilename()
-				response['Content-Length'] = post.uploadfilesize()
+				postfile = post.upload_files.get(pk=file_id)
+				response = HttpResponse(postfile.postfile.read(), content_type='application/octet-stream')
+				response['Content-Disposition'] = 'attachment; filename="%s"' % postfile.filename()
+				response['Content-Length'] = postfile.filesize()
 				return response
 			except:
-				request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % post.uploadfilename())))
+				request.user.message_set.create(message=unicode(_('- File: "%s" does not exist' % postfile.filename())))
 				if 'return' in request.GET:
 					return HttpResponseRedirect(request.GET['return'])
 				else:
 					return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
 		else:
-			Http404
+			request.user.message_set.create(message=unicode(_('- File does not exist')))
+			if 'return' in request.GET:
+				return HttpResponseRedirect(request.GET['return'])
+			else:
+				return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
 	else:
 		raise Http404
 
@@ -589,6 +609,10 @@ def viewforum(request, forum_id):
 	f = get_object_or_404(Forum, pk=forum_id)
 	g = f.category
 	c = g.chapter
+	topicsPerPage = 3
+	pageNumber = request.GET.get('page', None)
+	if (not pageNumber) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
+		pageNumber = request.COOKIES.get('forumpage')
 	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
 	if c and c != request.user.chapter and not request.user.is_superuser:
 		raise Http404
@@ -596,20 +620,63 @@ def viewforum(request, forum_id):
 	if g.exec_only and not request.user.is_staff:
 		raise Http404
 	topicform = NewTopicForm()
-	topics_list = f.topic_set.all()
-	paginator = Paginator(topics_list, 25)
-	page = request.GET.get('page')
+	sort = request.GET.get('sort', None)
+	if (not sort) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
+		sort = request.COOKIES.get('forumsort')
+	if sort == 'votes_up':
+		topics_list = f.topic_set.all().annotate(numvotes=Count('vote')).order_by('-sticky', 'numvotes')
+	elif sort == 'votes_down':
+		topics_list = f.topic_set.all().annotate(numvotes=Count('vote')).order_by('-sticky', '-numvotes')
+	elif sort == 'topics_up':
+		topics_list = f.topic_set.all().order_by('-sticky', 'subject')
+	elif sort == 'topics_down':
+		topics_list = f.topic_set.all().order_by('-sticky', '-subject')
+	elif sort == 'replies_up':
+		topics_list = f.topic_set.all().annotate(numreplies=Count('post')).order_by('-sticky', 'numreplies')
+	elif sort == 'replies_down':
+		topics_list = f.topic_set.all().annotate(numreplies=Count('post')).order_by('-sticky', '-numreplies')
+	elif sort == 'views_up':
+		topics_list = f.topic_set.all().order_by('-sticky', 'num_views')
+	elif sort == 'views_down':
+		topics_list = f.topic_set.all().order_by('-sticky', '-num_views')
+	elif sort == 'last_post_up':
+		topics_list = f.topic_set.all().order_by('-sticky', 'last_post_time')
+	elif sort == 'last_post_down':
+		topics_list = f.topic_set.all().order_by('-sticky', '-last_post_time')
+	else:
+		sort = 'last_post_down'
+		topics_list = f.topic_set.all().order_by('-sticky', '-last_post_time')
+	if ('targettopicpk' in request.GET):
+		index = 0
+		found = False
+		for topic in topics_list:
+			if str(topic.pk) == request.GET['targettopicpk']:
+				found = True
+				break
+			else:
+				index += 1
+		if found:
+			pageNumber = int(index) / int(topicsPerPage) + 1
+	paginator = Paginator(topics_list, topicsPerPage)
+	page = pageNumber
 	try:
 		topics = paginator.page(page)
 	except EmptyPage:
 		topics = paginator.page(paginator.num_pages)
+		page = paginator.num_pages
 	except:
 		topics = paginator.page(1)
+		page = 1
 	if request.user.is_superuser or (request.user.is_staff and c == request.user.chapter) or (request.user.is_staff and request.user.chapter.pk == 1 and c == None):
 		can_delete = True
 	else:
 		can_delete = False
-	return render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + request.META['QUERY_STRING'], 'can_delete': can_delete}, context_instance=RequestContext(request))
+	response = render_to_response('forum_view.html', {'chapter': c, 'topics': topics, 'topicform': topicform, 'forum': f, 'returnFromNewTopic': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'return': request.path + '?' + 'page=' + str(page) + '&sort=' + sort, 'can_delete': can_delete, 'sort': sort}, context_instance=RequestContext(request))
+	cookie_life = 300
+	response.set_cookie("forumpage", page, max_age=cookie_life)
+	response.set_cookie("forumsort", sort, max_age=cookie_life)
+	response.set_cookie("forumpk", f.pk, max_age=cookie_life)
+	return response
 
 @login_required
 def deletepost(request, post_id):
@@ -647,44 +714,11 @@ def deletepost(request, post_id):
 
 class WritePostForm(forms.Form):
 	message = forms.CharField(widget=TinyMCE(attrs={'cols': 65}))
-	upload_file = forms.FileField(required=False)
 
 @login_required
-def deletefile(request, post_id):
+def topicundoupvote(request, post_id):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
-	user = request.user
-	p = get_object_or_404(Post, pk=post_id)
-	t = p.topic
-	f = t.forum
-	g = f.category
-	c = g.chapter
-	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None) or (p.posted_by == user and (user not in f.blacklist.filter(pk=user.pk))):
-		if p.upload_file:
-			if (request.method != 'POST') or ('delpostfile' not in request.POST):
-				return render_to_response('forum_postfiledelete_confirm.html', {'post': p, 'return': request.GET['return']}, context_instance=RequestContext(request))
-			else:
-				p.upload_file.delete()
-				votes = Vote.objects.filter(post=p)
-				if votes:
-					for v in votes:
-						v.delete()
-		if 'return' in request.GET:
-			return HttpResponseRedirect(request.GET['return'])
-		elif 'return' in request.POST:
-			return HttpResponseRedirect(request.POST['return'])
-		else:
-			return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
-	else:
-		raise Http404
-
-@login_required
-def filevote(request, post_id, score):
-	request.user.forum_last_act = datetime.datetime.now()
-	request.user.save()
-	score=int(score)
-	if (score < 0 or score > 10):
-		raise Http404
 	user = request.user
 	p = get_object_or_404(Post, pk=post_id)
 	t = p.topic
@@ -693,17 +727,48 @@ def filevote(request, post_id, score):
 	c = g.chapter
 	if f.blacklist.filter(pk=user.pk):
 		raise Http404
-	votes = Vote.objects.filter(post=p, voter=user, status=True)
-	if votes:
-		for v in votes:
-			v.status=False
-			v.save()
-	vote = Vote()
-	vote.post = p
-	vote.voter = user
-	vote.score = score
-	vote.status = True
-	vote.save()
+	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
+	if c and c != request.user.chapter and not request.user.is_superuser:
+		raise Http404
+	# If the forum is for exec only, check that they are exec
+	if g.exec_only and not request.user.is_staff:
+		raise Http404
+	exist_vote = Vote.objects.filter(topic=t, voter=user)
+	for v in exist_vote:
+		v.delete()
+	if 'return' in request.GET:
+		return HttpResponseRedirect(request.GET['return'])
+	elif 'return' in request.POST:
+		return HttpResponseRedirect(request.POST['return'])
+	else:
+		return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
+
+@login_required
+def topicupvote(request, post_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	user = request.user
+	p = get_object_or_404(Post, pk=post_id)
+	t = p.topic
+	f = t.forum
+	g = f.category
+	c = g.chapter
+	if f.blacklist.filter(pk=user.pk):
+		raise Http404
+	# If the forum is "owned" by a chapter, ensure that this user is a member of that chapter or a superuser
+	if c and c != request.user.chapter and not request.user.is_superuser:
+		raise Http404
+	# If the forum is for exec only, check that they are exec
+	if g.exec_only and not request.user.is_staff:
+		raise Http404
+	exist_vote = Vote.objects.filter(topic=t, voter=user)
+	if exist_vote:
+		request.user.message_set.create(message=unicode(_('- You have already voted for this topic')))
+	else:
+		vote = Vote()
+		vote.topic = t
+		vote.voter = user
+		vote.save()
 	if 'return' in request.GET:
 		return HttpResponseRedirect(request.GET['return'])
 	elif 'return' in request.POST:
@@ -722,6 +787,7 @@ def editpost(request, post_id):
 	g = f.category
 	c = g.chapter
 	warning = False
+	msg = '- '
 	maxfilesize = 10
 	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None) or (p.posted_by == user and (user not in f.blacklist.filter(pk=user.pk))):
 		if (request.method == 'POST'):
@@ -729,15 +795,27 @@ def editpost(request, post_id):
 			maxfilesetting = ForumSettings.objects.filter(key='maxuploadfilesize')
 			if maxfilesetting:
 				maxfilesize = int(maxfilesetting[0].value)
-			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or ((postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70))):
+			for upload_file in request.FILES.getlist('upload_files'):
+				if (upload_file.size <= maxfilesize * 1024*1024) and (upload_file.name.__len__() <= 70):
+					pass
+				else:
+					warning = True
+					msg += 'File: ' + upload_file.name + ' is not uploaded due to:'
+					if (upload_file.size > maxfilesize * 1024*1024):
+						msg = msg + ' File size exceeds ' + str(maxfilesize) + ' MB. '
+					if (upload_file.name.__len__() > 70):
+						msg = msg + ' File name exceeds 70 characters.'
+					msg += '<br>'
+			if postform.is_valid() and (not warning):
 				data = postform.cleaned_data
 				p.message = data['message']
 				p.updated_on = datetime.datetime.now()
 				p.edited_by = user
-				if 'upload_file' in request.FILES:
-					if p.upload_file:
-						p.upload_file.delete()
-					p.upload_file=request.FILES['upload_file']
+				p.save()
+				for upload_file in request.FILES.getlist('upload_files'):
+					pf = PostFile(postfile=upload_file)
+					pf.save()
+					p.upload_files.add(pf)
 				p.save()
 				t.num_views = t.num_views - 1
 				t.save()
@@ -756,14 +834,9 @@ def editpost(request, post_id):
 						t.watchers.remove(user)
 			else:
 				if not postform.is_valid():
-					request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
-					warning = True
-				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._size > maxfilesize * 1024*1024):
-					request.user.message_set.create(message=unicode(_('- File size exceeds %s MB') % str(maxfilesize)))
-					warning = True
-				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._name.__len__() > 70):
-					request.user.message_set.create(message=unicode(_('- File name exceeds 70 characters')))
-					warning = True
+					msg += 'The field "Message" can not be empty.'
+				request.user.message_set.create(message=unicode(_(msg)))
+				warning = True
 			if 'return' in request.GET:
 				if warning:
 					ret = request.GET['return'].rsplit('#',1)[0]
@@ -936,21 +1009,15 @@ def newpost(request, topic_id):
 	f = t.forum
 	g = f.category
 	c = g.chapter
-	maxfilesize = 10
 	if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or (user not in f.blacklist.filter(pk=user.pk) and (((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
 		if request.method == 'POST':
 			postform = WritePostForm(request.POST, request.FILES)
-			maxfilesetting = ForumSettings.objects.filter(key='maxuploadfilesize')
-			if maxfilesetting:
-				maxfilesize = int(maxfilesetting[0].value)
-			if postform.is_valid() and ((not ('upload_file' in request.FILES)) or ((postform.cleaned_data.get('upload_file', False)._size <= maxfilesize * 1024*1024) and (request.FILES['upload_file'].name.__len__() <= 70))):
+			if postform.is_valid():
 				data = postform.cleaned_data
 				postMessage = Post()
 				postMessage.topic = t
 				postMessage.posted_by = user
 				postMessage.message = data['message']
-				if 'upload_file' in request.FILES:
-					postMessage.upload_file=request.FILES['upload_file']
 				postMessage.save()
 				t.num_views = t.num_views - 1
 				t.last_post_time = datetime.datetime.now()
@@ -996,12 +1063,7 @@ def newpost(request, topic_id):
 					message.status = 0
 					message.save()
 			else:
-				if not postform.is_valid():
-					request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty')))
-				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._size > maxfilesize * 1024*1024):
-					request.user.message_set.create(message=unicode(_('- File size exceeds %s MB ') % str(maxfilesize)))
-				if postform.is_valid() and ('upload_file' in request.FILES and postform.cleaned_data.get('upload_file', False)._name.__len__() > 70):
-					request.user.message_set.create(message=unicode(_('- File name exceeds 70 characters')))
+				request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty.')))
 		else:
 			raise Http404
 		if 'return' in request.GET:
@@ -1029,9 +1091,14 @@ def deletetopic(request, topic_id):
 			chapter = f.category.chapter
 			request.user.message_set.create(message=unicode(_('Topic "%s" deleted') % t.subject))
 			t.delete()
-			last_post_forum = Post.objects.filter(topic__forum=f).latest('created_on')
-			f.last_post_time = last_post_forum.created_on
-			f.last_post_user = last_post_forum.posted_by
+			all_posts = Post.objects.filter(topic__forum=f)
+			if all_posts:
+				last_post_forum = all_posts.latest('created_on')
+				f.last_post_time = last_post_forum.created_on
+				f.last_post_user = last_post_forum.posted_by
+			else:
+				f.last_post_time = None
+				f.last_post_user = None
 			f.save()
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
@@ -1098,7 +1165,8 @@ def viewtopic(request, topic_id):
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			else:
 				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-	paginator = Paginator(posts_list, 10)
+	paginator = Paginator(posts_list, 3)
+#	paginator = Paginator(posts_list, 10)
 	page = request.GET.get('page')
 	try:
 		posts = paginator.page(page)
@@ -1116,7 +1184,41 @@ def viewtopic(request, topic_id):
 		canDelete = False
 		canEdit = False
 		canFileOffenses = False
-	return render_to_response('topic_view.html', {'chapter': c, 'posts': posts, 'postform': postform, 'topic': t, 'forum': f, 'editPost': editPost, 'returnLastPage': request.path + '?' + 'page=' + '-1', 'return': request.path + '?' + 'page=' + str(page), 'canDelete': canDelete, 'canEdit': canEdit, 'canFileOffenses': canFileOffenses}, context_instance=RequestContext(request))
+	if Vote.objects.filter(topic=t, voter=request.user):
+		hasAlreadyVoted = True
+	else:
+		hasAlreadyVoted = False
+	forumpage = request.GET.get('forumpage') if request.GET.get('forumpage') else ''
+	forumsort = request.GET.get('forumsort') if request.GET.get('forumsort') else ''
+	return render_to_response('topic_view.html', {'chapter': c, 'posts': posts, 'postform': postform, 'topic': t, 'forum': f, 'editPost': editPost, 'returnLastPage': request.path + '?' + 'page=' + '-1' + '&forumpage=' + forumpage + '&forumsort=' + forumsort, 'return': request.path + '?' + 'page=' + str(page) + '&forumpage=' + forumpage + '&forumsort=' + forumsort, 'canDelete': canDelete, 'canEdit': canEdit, 'canFileOffenses': canFileOffenses, 'hasAlreadyVoted': hasAlreadyVoted, 'forumsort': forumsort, 'forumpage': forumpage}, context_instance=RequestContext(request))
+
+@login_required
+def deletefile(request, post_id, file_id):
+	request.user.forum_last_act = datetime.datetime.now()
+	request.user.save()
+	user = request.user
+	p = get_object_or_404(Post, pk=post_id)
+	t = p.topic
+	f = t.forum
+	g = f.category
+	c = g.chapter
+	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None) or (p.posted_by == user and (user not in f.blacklist.filter(pk=user.pk))):
+		file_to_delete = p.upload_files.get(pk=file_id)
+		if file_to_delete:
+			if (request.method != 'POST') or ('delpostfile' not in request.POST):
+				return render_to_response('forum_postfiledelete_confirm.html', {'post': p, 'file_id': int(file_id), 'return': request.GET['return']}, context_instance=RequestContext(request))
+			else:
+				p.upload_files.remove(file_to_delete)
+				file_to_delete.postfile.delete()
+				file_to_delete.delete()
+		if 'return' in request.GET:
+			return HttpResponseRedirect(request.GET['return'])
+		elif 'return' in request.POST:
+			return HttpResponseRedirect(request.POST['return'])
+		else:
+			return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
+	else:
+		raise Http404
 
 @login_required
 def search(request, chapterurl):

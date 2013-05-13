@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Global workshop reports breakdown{% endblock %}
+
+{% block pagetitle %}Global workshop reports breakdown{% endblock %}
+
+{% block content %}
+{% if chapter_totals %}
+	<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<tr class="even" style="">
+			<td><strong>{% trans "Chapter" %}</strong></td>
+			<td><strong>{% trans "Total Workshops" %}</strong></td>
+			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
+			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
+			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
+		</tr>
+		{% for name, chapter in chapter_totals %}
+		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+			<td>{{ name }}</td>
+			<td>{{ chapter.workshops }} </td>
+			<td>{{ chapter.schools }}</td>
+			<td>{{ chapter.first }}</td>
+			<td>{{ chapter.girl_workshops }}</td>
+			<td>{{ chapter.weighted }}</td>
+		</tr>
+		{% endfor %}
+		<tr class="even" style="">
+			<td><strong>{% trans "Name" %}</strong></td>
+			<td><strong>{% trans "Total Workshops" %}</strong></td>
+			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
+			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
+			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
+		</tr>
+		{% for name, chapter in attendance %}
+		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+			<td>{{ name }}</td>
+			<td>{{ chapter.workshops }} </td>
+			<td>{{ chapter.schools }}</td>
+			<td>{{ chapter.first }}</td>
+			<td>{{ chapter.girl_workshops }}</td>
+			<td>{{ chapter.weighted }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endif %}
+{% endblock %}

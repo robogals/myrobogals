@@ -1,4 +1,4 @@
-from myrobogals.rgprofile.models import Position
+from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgteaching.models import SchoolVisitStats
 from myrobogals.auth.models import Group, User
 from myrobogals.rgmain.models import Country
@@ -108,6 +108,24 @@ class FormPartOne(forms.Form):
 	facebook_url = forms.CharField(max_length=128, label=_("Facebook URL"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	goal = forms.CharField(max_length=32, label=_("Goal"), help_text=_("Number of students"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("The goal will be compared against girls taught since this date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+	notify_enable = forms.BooleanField(required=False, help_text=_("Notify when a new member signs up online"))
+	notify_list = forms.ModelChoiceField(label=_(), queryset=UserList.objects.none(), required=False)
+
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(FormPartOne, self).__init__(*args, **kwargs)
+		self.fields['notify_list'].queryset = UserList.objects.filter(chapter=chapter)
+
+	def clean(self):
+		cleaned_data = super(FormPartOne, self).clean()
+		notify_enable = cleaned_data.get("notify_enable")
+		notify_list = cleaned_data.get("notify_list")
+		if notify_enable and not notify_list:
+			msg = _("Please specify user list for notification.")
+			self._errors["notify_list"] = self.error_class([msg])
+			del cleaned_data["notify_list"]
+		return cleaned_data
 
 class FormPartTwo(forms.Form):
 	faculty_contact = forms.CharField(max_length=64, label=_("Person"), help_text=_("e.g. Professor John Doe"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
@@ -158,6 +176,11 @@ class FormPartFive(forms.Form):
 	welcome_email_subject = forms.CharField(required=False, max_length=256)
 	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
 	welcome_email_html = forms.BooleanField(required=False)
+
+class FormPartSix(forms.Form):
+	invite_email_subject = forms.CharField(required=False, max_length=256)
+	invite_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
+	invite_email_html = forms.BooleanField(required=False)
 
 @login_required
 def progresschapter(request):
@@ -225,12 +248,13 @@ def editchapter(request, chapterurl):
 	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
 	if (request.user.is_staff and request.user.chapter == c) or request.user.is_superuser:
 		if request.method == 'POST':
-			formpart1 = FormPartOne(request.POST)
+			formpart1 = FormPartOne(request.POST, chapter=c)
 			formpart2 = FormPartTwo(request.POST)
 			formpart3 = FormPartThree(request.POST)
 			formpart4 = FormPartFour(request.POST, chapter=c)
 			formpart5 = FormPartFive(request.POST)
-			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
+			formpart6 = FormPartSix(request.POST)
+			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid() and formpart6.is_valid():
 				data = formpart1.cleaned_data
 				c.infobox = data['infobox']
 				c.website_url = data['website_url']
@@ -243,6 +267,11 @@ def editchapter(request, chapterurl):
 					c.goal_start = data['goal_start']
 				else:
 					c.goal_start = None
+				if data['notify_enable']:
+					c.notify_enable = True
+				else:
+					c.notify_enable = False
+				c.notify_list = data['notify_list']
 				data = formpart2.cleaned_data
 				c.faculty_contact = data['faculty_contact']
 				c.faculty_position = data['faculty_position']
@@ -265,6 +294,10 @@ def editchapter(request, chapterurl):
 				c.welcome_email_subject = data['welcome_email_subject']
 				c.welcome_email_msg = data['welcome_email_msg']
 				c.welcome_email_html = data['welcome_email_html']
+				data = formpart6.cleaned_data
+				c.invite_email_subject = data['invite_email_subject']
+				c.invite_email_msg = data['invite_email_msg']
+				c.invite_email_html = data['invite_email_html']
 				c.save()
 				request.user.message_set.create(message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
@@ -272,12 +305,18 @@ def editchapter(request, chapterurl):
 			display_columns = []
 			for col in c.display_columns.all():
 				display_columns.append(int(col.pk))
+			if c.notify_list:
+				nl = c.notify_list.id
+			else:
+				nl = None
 			formpart1 = FormPartOne({
 				'infobox': c.infobox,
 				'website_url': c.website_url,
 				'facebook_url': c.facebook_url,
 				'goal': c.goal,
-				'goal_start': c.goal_start})
+				'goal_start': c.goal_start,
+				'notify_enable': c.notify_enable,
+				'notify_list': nl}, chapter=c)
 			formpart2 = FormPartTwo({
 				'faculty_contact': c.faculty_contact,
 				'faculty_position': c.faculty_position,
@@ -304,7 +343,11 @@ def editchapter(request, chapterurl):
 				'welcome_email_subject': c.welcome_email_subject,
 				'welcome_email_msg': c.welcome_email_msg,
 				'welcome_email_html': c.welcome_email_html})
-		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'c': c}, context_instance=RequestContext(request))
+			formpart6 = FormPartSix({
+				'invite_email_subject': c.invite_email_subject,
+				'invite_email_msg': c.invite_email_msg,
+				'invite_email_html': c.invite_email_html})
+		return render_to_response('chapter_edit.html', {'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'formpart6': formpart6, 'c': c}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 

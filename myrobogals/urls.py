@@ -82,9 +82,10 @@ urlpatterns = patterns('',
 	(r'^forums/newtopic/(?P<forum_id>\d+)/$', 'rgforums.views.newtopic'),
 	(r'^forums/newpost/(?P<topic_id>\d+)/$', 'rgforums.views.newpost'),
 	(r'^forums/editpost/(?P<post_id>\d+)/$', 'rgforums.views.editpost'),
-	(r'^forums/filevote/(?P<post_id>\d+)/(?P<score>\d+)/$', 'rgforums.views.filevote'),
-	(r'^forums/deletefile/(?P<post_id>\d+)/$', 'rgforums.views.deletefile'),
-	(r'^forums/downloadpostfile/(?P<post_id>\d+)/$', 'rgforums.views.downloadpostfile'),
+	(r'^forums/upvote/(?P<post_id>\d+)/$', 'rgforums.views.topicupvote'),
+	(r'^forums/undoupvote/(?P<post_id>\d+)/$', 'rgforums.views.topicundoupvote'),
+	(r'^forums/deletefile/(?P<post_id>\d+)/(?P<file_id>\d+)/$', 'rgforums.views.deletefile'),
+	(r'^forums/downloadpostfile/(?P<post_id>\d+)/(?P<file_id>\d+)/$', 'rgforums.views.downloadpostfile'),
 	(r'^forums/editforum/(?P<forum_id>\d+)/$', 'rgforums.views.editforum'),
 	(r'^forums/topic/(?P<topic_id>\d+)/$', 'rgforums.views.viewtopic'),
 	(r'^forums/forum/(?P<forum_id>\d+)/$', 'rgforums.views.viewforum'),
@@ -123,6 +124,7 @@ urlpatterns = patterns('',
 	(r'^teaching/video/$', 'rgteaching.views.videotute'),
 	(r'^reports/$', 'rgteaching.views.report_standard'),
 	(r'^globalreports/$', 'rgteaching.views.report_global'),
+	(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', 'rgteaching.views.report_global_breakdown'),
 	(r'^progress/$', 'rgchapter.views.progresschapter'),
 
 	# Email & SMS menu
@@ -142,6 +144,7 @@ urlpatterns = patterns('',
 	(r'^messages/showemail/(?P<email_id>\d+)/$', 'rgmessages.views.showemail'),
 	(r'^messages/downloademailfile/(?P<email_id>\d+)/(?P<file_name>.+)/$', 'rgmessages.views.downloademailfile'),
 	(r'^messages/history/$', 'rgmessages.views.msghistory'),
+	(r'^messages/previewemail/$', 'rgmessages.views.previewemail'),
 	
 	# Wiki
 	(r'^wiki/$', 'rgmain.views.wiki'),
@@ -155,6 +158,8 @@ urlpatterns = patterns('',
 	(r'^newsletter/(?P<chapterurl>.+)/subscribe/done/$', 'rgprofile.views.newslettersubdone'),
 	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/$', 'rgprofile.views.newsletterunsub'),
 	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/done/$', 'rgprofile.views.newsletterunsubdone'),
+	# Careers newsletter API
+	(r'^api/newslettercareers/$', 'rgmessages.views.careersapi'),
 	# Amplifier newsletter API
 	(r'^api/newsletter/$', 'rgmessages.views.api'),
 	# SMSGlobal delivery receipts API

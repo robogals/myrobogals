@@ -40,6 +40,14 @@ class EmailFile(models.Model):
 			size = -1
 		return size
 
+class EmailHeader(models.Model):
+	name = models.CharField("Name", max_length=256)
+	upper_body = models.TextField("Upper Body")
+	lower_body = models.TextField("Lower Body")
+
+	def __unicode__(self):
+		return self.name
+
 class EmailMessage(models.Model):
 	STATUS_CODES_MSG = (
 		(-1, 'Wait'),

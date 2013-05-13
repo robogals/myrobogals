@@ -1,6 +1,11 @@
 {% load i18n %}
+{% load emailpendingerror %}
     <!--Begin Header-->
+	{% if request.user.is_superuser %}
+	{% emailpendingerror "header-bg" "emailpendingerror" %}
+	{% else %}
     <div id="header-bg">
+	{% endif %}
         <!--Begin Horizontal Menu-->
                 <div id="horiz-menu" class="fusion">
             <div class="wrapper">

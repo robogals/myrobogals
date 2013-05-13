@@ -50,6 +50,7 @@ class UserAdmin(admin.ModelAdmin):
         ('Bio', {'fields': ('bio',)}),
         ('Internal notes', {'fields': ('internal_notes',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
+        ('Aliases', {'fields': ('aliases',)}),
     )
     form = UserChangeForm
     add_form = UserCreationForm
@@ -59,6 +60,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email', 'mobile')
     ordering = ('username',)
     inlines = (MemberStatusAdmin, PositionAdmin)
+    filter_horizontal = ('aliases',)
 
     def __call__(self, request, url):
         # this should not be here, but must be due to the way __call__ routes

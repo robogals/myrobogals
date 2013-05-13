@@ -62,7 +62,7 @@
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="4">
+	<td colspan="{% if request.user.is_superuser or request.user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>
@@ -131,7 +131,7 @@
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="4">
+	<td colspan="{% if request.user.is_superuser or request.user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>

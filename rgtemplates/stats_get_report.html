@@ -9,14 +9,24 @@
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}
-                        <div>
+				<table>
+					<tr>
+                        <td>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.start_date.name }}">{{ theform.start_date.label }}</label>
+						</td>
+						<td>
                                 {{ theform.start_date }} 
-                        </div>
-                        <div>
+                        </td>
+					</tr>
+					<tr>
+                        <td>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.end_date.name }}">{{ theform.end_date.label }}</label>
+						</td>
+						<td>
                                 {{ theform.end_date }} 
-                        </div>
+                        </td>
+					</tr>
+				</table>
                         <div>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.visit_type.name }}">{{ theform.visit_type.label }}</label>
                                 {{ theform.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{theform.visit_type.help_text}}{% endautoescape %}</span>

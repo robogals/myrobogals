@@ -6,7 +6,7 @@ from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.auth.models import User, Group, MemberStatusType
-from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException
+from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException, EmailHeader
 from myrobogals.rgprofile.models import UserList
 from myrobogals.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
@@ -74,6 +74,7 @@ class WriteEmailForm(forms.Form):
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
 	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)
 	schedule_zone = forms.ChoiceField(choices=SCHEDULED_DATE_TYPES, initial=2, required=False)
+	header_list = forms.ModelChoiceField(queryset=EmailHeader.objects.all(), required=False)
 
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
@@ -149,7 +150,11 @@ def writeemail(request):
 			if request.POST['step'] == '2':
 				message = EmailMessage()
 				message.subject = data['subject']
-				message.body = data['body']
+				if data['header_list']:
+					hl = data['header_list']
+					message.body = hl.upper_body + data['body'] + hl.lower_body
+				else:
+					message.body = data['body']
 				message.from_address = request.user.email
 				message.reply_address = request.user.email
 				message.sender = request.user
@@ -208,6 +213,8 @@ def writeemail(request):
 					# Special rule for The Amplifier
 					if data['newsletters'].pk == 1:
 						users = User.objects.filter(is_active=True, email_newsletter_optin=True).exclude(email='')
+					elif data['newsletters'].pk == 5:
+						users = User.objects.filter(is_active=True, email_careers_newsletter_AU_optin=True).exclude(email='')
 					else:
 						users = User.objects.none()
 			else:
@@ -536,7 +543,22 @@ def downloademailfile(request, email_id, file_name):
 	else:
 		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
 		return HttpResponseRedirect('/messages/history/')
-	
+
+@login_required
+def previewemail(request):
+	if not request.user.is_staff and not request.user.is_superuser:
+		raise Http404
+	message = EmailMessage()
+	if request.POST['header']:
+		h = EmailHeader.objects.filter(pk=request.POST['header'])
+		if h:
+			message.body = h[0].upper_body + request.POST['msg'] + h[0].lower_body
+		else:
+			message.body = request.POST['msg']
+	else:
+		message.body = request.POST['msg']
+	message.html = True
+	return render_to_response('email_show.html', {'email': message}, context_instance=RequestContext(request))
 
 @login_required
 def showemail(request, email_id):
@@ -554,6 +576,126 @@ def msghistory(request):
 	emailMsgsReceived = EmailRecipient.objects.filter(user=request.user, message__email_type=0).order_by('-scheduled_date')
 	SMSMsgsReceived = SMSRecipient.objects.filter(user=request.user, message__sms_type=0).order_by('-scheduled_date')
 	return render_to_response('message_history.html', {'chapter': request.user.chapter, 'emailMsgsSent': emailMsgsSent, 'SMSMsgsSent': SMSMsgsSent, 'emailMsgsReceived': emailMsgsReceived, 'SMSMsgsReceived': SMSMsgsReceived}, context_instance=RequestContext(request))
+
+def careersapi(request):
+	careersNewsletter = ["5"]
+	if 'api' not in request.GET:
+		return HttpResponse("-1")
+	elif request.GET['api'] != API_SECRET:
+		return HttpResponse("-1")
+	elif 'action' in request.GET:
+		try:
+			if request.GET['newsletter'] not in careersNewsletter:
+				raise Newsletter.DoesNotExist
+			n = Newsletter.objects.get(pk=request.GET['newsletter'])
+		except Newsletter.DoesNotExist:
+			return HttpResponse("-1")
+		try:
+			if request.GET['action'] == 'subscribe':
+				email = unquote_plus(request.GET['email']).strip()
+				if not email_re.match(email):
+					return HttpResponse("C")  # Invalid email
+				c = NewsletterSubscriber.objects.filter(email=email, newsletter=n, active=True).count()
+				if c != 0:
+					return HttpResponse("B")  # Already subscribed
+				if n.pk == 5:
+					users_count = User.objects.filter(is_active=True, email=email, email_careers_newsletter_AU_optin=True).count()
+					if users_count > 0:
+						return HttpResponse("B")  # Already subscribed
+				else:
+					return HttpResponse("-1")
+				# They've tried to subscribe already, so resend confirmation email
+				p = PendingNewsletterSubscriber.objects.filter(email=email, newsletter=n)
+				if p:
+					p = p[0]
+				else:
+					p = PendingNewsletterSubscriber()
+					p.email = email
+					p.uniqid = md5(SECRET_KEY + email + n.name).hexdigest()
+					p.newsletter = n
+					p.save()
+				confirm_url = n.confirm_url + "pid=" + str(p.pk) + "&key=" + p.uniqid
+				message = EmailMessage()
+				message.subject = n.confirm_subject
+				message.body = n.confirm_email.replace('{email}', email).replace('{url}', confirm_url)
+				message.from_address = n.confirm_from_email
+				message.from_name = n.confirm_from_name
+				message.reply_address = n.confirm_from_email
+				message.sender = n.confirm_from_user
+				message.html = n.confirm_html
+				# Don't send it yet until the recipient list is done
+				message.status = -1
+				# Save to database so we get a value for the primary key,
+				# which we need for entering the recipient entries
+				message.save()
+				recipient = EmailRecipient()
+				recipient.message = message
+				recipient.to_name = ""
+				recipient.to_address = email
+				recipient.save()
+				message.status = 0
+				message.save()
+				return HttpResponse("A")  # Success!
+			elif request.GET['action'] == 'confirm':
+				pid = unquote_plus(request.GET['id'])
+				key = unquote_plus(request.GET['key'])
+				try:
+					p = PendingNewsletterSubscriber.objects.get(pk=pid, newsletter=n, uniqid=key)
+				except PendingNewsletterSubscriber.DoesNotExist:
+					return HttpResponse("B")
+				try:
+					try:
+						u = User.objects.get(email=p.email)
+					except User.MultipleObjectsReturned:
+						# Subscribe the first user with this email address
+						u = User.objects.filter(email=p.email)[0]
+					# This user is already a Robogals member
+					if n.pk == 5:
+						u.email_careers_newsletter_AU_optin = True
+						u.save()
+					else:
+						return HttpResponse("-1")
+				except User.DoesNotExist:
+					ns = NewsletterSubscriber()
+					ns.newsletter = n
+					ns.email = p.email
+					ns.active = True
+					ns.details_verified = False
+					ns.save()
+				PendingNewsletterSubscriber.objects.filter(email=p.email, newsletter=n).delete()
+				return HttpResponse("A")
+			elif request.GET['action'] == 'unsubscribe':
+				email = unquote_plus(request.GET['email']).strip()
+				try:
+					ns = NewsletterSubscriber.objects.get(email=email, newsletter=n, active=True)
+				except NewsletterSubscriber.DoesNotExist:
+					# Not on the list. Perhaps subscribed as a Robogals member?
+					try:
+						if n.pk == 5:
+							for u in User.objects.filter(email=email):
+								if u.email_careers_newsletter_AU_optin:
+									u.email_careers_newsletter_AU_optin = False
+									u.save()
+									return HttpResponse("A")
+						else:
+							return HttpResponse("-1")
+						return HttpResponse("B")  # Not subscribed
+					except User.DoesNotExist:
+						return HttpResponse("B")  # Not subscribed
+				ns.unsubscribed_date = datetime.now()
+				ns.active = False
+				ns.save()
+				if n.pk == 5:
+					for u in User.objects.filter(is_active=True, email=email, email_careers_newsletter_AU_optin=True):
+						u.email_careers_newsletter_AU_optin = False
+						u.save()
+				return HttpResponse("A")
+			else:
+				return HttpResponse("-1")
+		except KeyError:
+			return HttpResponse("-1")
+	else:
+		return HttpResponse("-1")
 
 def api(request):
 	if 'api' not in request.GET:
@@ -813,6 +955,9 @@ def newslettercp(request, newsletter_id):
 	sub_totals = {}
 	if newsletter.pk == 1:  # for The Amplifier only
 		sub_totals["Robogals member"] = User.objects.filter(is_active=True, email_newsletter_optin=True).count()
+		total += sub_totals["Robogals member"]
+	if newsletter.pk == 5:  # for Careers newsletter - AU
+		sub_totals["Robogals member"] = User.objects.filter(is_active=True, email_careers_newsletter_AU_optin=True).count()
 		total += sub_totals["Robogals member"]
 	for subscriber in subscribers:
 		if subscriber.subscriber_type is None:

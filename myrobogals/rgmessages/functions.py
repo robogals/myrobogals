@@ -4,6 +4,7 @@ from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, Newslette
 from datetime import datetime, date
 import re
 from django.core.validators import email_re
+from django.db.models import Q
 
 class RgImportCsvException(Exception):
 	def __init__(self, errmsg):
@@ -102,6 +103,10 @@ def importcsv(filerows, welcomeemail, defaults, newsletter, user):
 						raise SkipRowException   # This email address is already subscribed
 					if newsletter.pk == 1:
 						users_count = User.objects.filter(is_active=True, email=newsubscriber.email, email_newsletter_optin=True).count()
+						if users_count > 0:
+							raise SkipRowException   # This email address is already subscribed by having User.email_newsletter_optin True
+					if newsletter.pk == 5:
+						users_count = User.objects.filter(is_active=True, email=newsubscriber.email, email_careers_newsletter_AU_optin=True).count()
 						if users_count > 0:
 							raise SkipRowException   # This email address is already subscribed by having User.email_newsletter_optin True
 				elif colname == 'first_name':
@@ -243,3 +248,20 @@ def genandsendpw(user, welcomeemail, chapter):
 	recipient.save()
 	message.status = 0
 	message.save()
+
+def importFromAmplifierToAUcareer():
+	country = Country.objects.get(code="AU")
+	amplifier = Newsletter.objects.get(pk=1)
+	career = Newsletter.objects.get(pk=5)
+	for user in User.objects.filter(chapter__country=country, email_newsletter_optin=True):
+		user.email_careers_newsletter_AU_optin = True
+		user.save()
+	for subscriber in NewsletterSubscriber.objects.filter(newsletter=amplifier, active=True):
+		if NewsletterSubscriber.objects.filter(email=subscriber.email, newsletter=career).count() > 0:
+			continue	# This email address is already subscribed
+		users_count = User.objects.filter(is_active=True, email=subscriber.email, email_careers_newsletter_AU_optin=True).count()
+		if users_count > 0:
+			continue    # This email address is already subscribed by having User.email_careers_newsletter_AU_optin True
+		subscriber.id = None
+		subscriber.newsletter = career
+		subscriber.save()

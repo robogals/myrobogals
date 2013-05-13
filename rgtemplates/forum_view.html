@@ -24,11 +24,11 @@
 {% if topics.number == 1 %}
 	{% trans "home" %} |
 {% else %}
-	<a href="?page=1">{% trans "home" %}</a> |
+	<a href="?page=1&sort={{sort}}">{% trans "home" %}</a> |
 {% endif %}
 
 {% if topics.has_previous %}
-	<a href="?page={{ topics.previous_page_number }}">{% trans "previous" %}</a> |
+	<a href="?page={{ topics.previous_page_number }}&sort={{sort}}">{% trans "previous" %}</a> |
 {% else %}
 	{% trans "previous" %} |
 {% endif %}
@@ -36,7 +36,7 @@
 {% trans "Page" %} {{ topics.number }} {% trans "of" %} {{ topics.paginator.num_pages }}
 
 {% if topics.has_next %}
-	| <a href="?page={{ topics.next_page_number }}">{% trans "next" %}</a>
+	| <a href="?page={{ topics.next_page_number }}&sort={{sort}}">{% trans "next" %}</a>
 {% else %}
 	| {% trans "next" %}
 {% endif %}
@@ -44,16 +44,97 @@
 {% if topics.number == topics.paginator.num_pages %}
 	| {% trans "last" %}
 {% else %}
-	| <a href="?page={{topics.paginator.num_pages}}">{% trans "last" %}</a>
+	| <a href="?page={{topics.paginator.num_pages}}&sort={{sort}}">{% trans "last" %}</a>
 {% endif %}
 
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 <form action="/forums/stickytopic/?return={{return|urlencode}}" method="POST">
 	<tr style="color:white; background-color:#1366A3">
-		<td>{% trans "Topics" %}</td>
-		<td>{% trans "Replies" %}</td>
-		<td>{% trans "Views" %}</td>
-		<td>{% trans "Last Post" %}</td>
+		<td>
+			<table>
+			<tr>
+			{% if sort == "votes_up" %}
+			<td>{% trans "Votes" %}</td>
+			<td><a style="color:white" href="?page=1&sort=votes_down"><img src="{{ MEDIA_URL }}/images/sort_up.png" alt="down" /></a></td>
+			{% else %}
+				{% if sort == "votes_down" %}
+				<td>{% trans "Votes" %}</td>
+				<td><a style="color:white" href="?page=1&sort=votes_up"><img src="{{ MEDIA_URL }}/images/sort_down.png" alt="up" /></a></td>
+				{% else %}
+					<td><a style="color:white" href="?page=1&sort=votes_down">{% trans "Votes" %}</a></td>
+				{% endif %}
+			{% endif %}
+			</tr>
+			</table>
+		</td>
+		<td>
+			<table>
+			<tr>
+			{% if sort == "topics_up" %}
+			<td>{% trans "Topics" %}</td>
+			<td><a style="color:white" href="?page=1&sort=topics_down"><img src="{{ MEDIA_URL }}/images/sort_up.png" alt="down" /></a></td>
+			{% else %}
+				{% if sort == "topics_down" %}
+				<td>{% trans "Topics" %}</td>
+				<td><a style="color:white" href="?page=1&sort=topics_up"><img src="{{ MEDIA_URL }}/images/sort_down.png" alt="up" /></a></td>
+				{% else %}
+					<td><a style="color:white" href="?page=1&sort=topics_down">{% trans "Topics" %}</a></td>
+				{% endif %}
+			{% endif %}
+			</tr>
+			</table>
+		</td>
+		<td>
+			<table>
+			<tr>
+			{% if sort == "replies_up" %}
+			<td>{% trans "Replies" %}</td>
+			<td><a style="color:white" href="?page=1&sort=replies_down"><img src="{{ MEDIA_URL }}/images/sort_up.png" alt="down" /></a></td>
+			{% else %}
+				{% if sort == "replies_down" %}
+				<td>{% trans "Replies" %}</td>
+				<td><a style="color:white" href="?page=1&sort=replies_up"><img src="{{ MEDIA_URL }}/images/sort_down.png" alt="up" /></a></td>
+				{% else %}
+					<td><a style="color:white" href="?page=1&sort=replies_down">{% trans "Replies" %}</a></td>
+				{% endif %}
+			{% endif %}
+			</tr>
+			</table>
+		</td>
+		<td>
+			<table>
+			<tr>
+			{% if sort == "views_up" %}
+			<td>{% trans "Views" %}</td>
+			<td><a style="color:white" href="?page=1&sort=views_down"><img src="{{ MEDIA_URL }}/images/sort_up.png" alt="down" /></a></td>
+			{% else %}
+				{% if sort == "views_down" %}
+				<td>{% trans "Views" %}</td>
+				<td><a style="color:white" href="?page=1&sort=views_up"><img src="{{ MEDIA_URL }}/images/sort_down.png" alt="up" /></a></td>
+				{% else %}
+					<td><a style="color:white" href="?page=1&sort=views_down">{% trans "Views" %}</a></td>
+				{% endif %}
+			{% endif %}
+			</tr>
+			</table>
+		</td>
+		<td>
+			<table>
+			<tr>
+			{% if sort == "last_post_up" %}
+			<td>{% trans "Last Post" %}</td>
+			<td><a style="color:white" href="?page=1&sort=last_post_down"><img src="{{ MEDIA_URL }}/images/sort_up.png" alt="down" /></a></td>
+			{% else %}
+				{% if sort == "last_post_down" %}
+				<td>{% trans "Last Post" %}</td>
+				<td><a style="color:white" href="?page=1&sort=last_post_up"><img src="{{ MEDIA_URL }}/images/sort_down.png" alt="up" /></a></td>
+				{% else %}
+					<td><a style="color:white" href="?page=1&sort=last_post_down">{% trans "Last Post" %}</a></td>
+				{% endif %}
+			{% endif %}
+			</tr>
+			</table>
+		</td>
 		{% if can_delete %}
 		<td>{% trans "Delete" %}</td>
 		<td><input type="submit" value="Sticky Toggle" /></td>
@@ -61,7 +142,8 @@
 	</tr>
 	{% for topic in topics.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
+		<td align="center">{{ topic.number_of_upvotes }}</td>
+		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/topic/{{ topic.pk }}/?forumpage={{topics.number}}&forumsort={{sort}}">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		{% if request.user in topic.forum.watchers.all or request.user in topic.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchtopic/{{topic.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
@@ -70,7 +152,7 @@
 		</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 		{% if can_delete %}
 		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		<td><input type="checkbox" name="{{topic.pk}}" /></td>
@@ -78,26 +160,28 @@
 	</tr>
 	{% endfor %}
 </form>
-<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnLastPage|urlencode}}" method="POST" enctype="multipart/form-data">
+<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnFromNewTopic|urlencode}}" method="POST" enctype="multipart/form-data">
   <tr style="border-top:solid 1px grey;">
     <td valign="top"><strong>{{topicform.subject.label_tag}}</strong></td>
-    <td {% if can_delete %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.subject }}</td>
+    <td {% if can_delete %} colspan="6" {% else %} colspan="4" {% endif %}>{{ topicform.subject }}</td>
   </tr>
   <tr style="border-top:solid 1px grey;">
     <td valign="top"><strong>{{topicform.message.label_tag}}</strong></td>
-	<td {% if can_delete %} colspan="5" {% else %} colspan="3" {% endif %}>{{ topicform.message }}</td>
+	<td {% if can_delete %} colspan="6" {% else %} colspan="4" {% endif %}>{{ topicform.message }}</td>
   </tr>
-  <tr><td colspan="4"><input type="checkbox" name="watch" value="1" checked="checked"/> {% trans "Email me when someone posts in this topic" %}</td>
+  <tr><td colspan="5"><input type="checkbox" name="watch" value="1" checked="checked"/> {% trans "Email me when someone posts in this topic" %}</td>
   {% if can_delete %}
   <td colspan="2"></td>
   {% endif %}
   </tr>
-  <tr><td colspan="4">{{topicform.upload_file}}</td>
+  <tr><td colspan="5">
+		<input type="file" name="upload_files" id="id_upload_files" multiple>
+      </td>
   {% if can_delete %}
   <td colspan="2"></td>
   {% endif %}
   </tr>
-  <tr><td colspan="4"><input type="submit" value="Add Topic" /></td>
+  <tr><td colspan="5"><input type="submit" value="Add Topic" /></td>
   {% if can_delete %}
   <td colspan="2"></td>
   {% endif %}

@@ -408,7 +408,15 @@ def detail(request, username):
 		show_job = True
 	else:
 		show_job = False
-	visits = EventAttendee.objects.filter(user=u, actual_status=1).order_by('-event__visit_start')
+	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())).union(set([u])))
+	for account in account_list:
+		subAliasesSet = set(ac for ac in account.aliases.all())
+		supAliasesSet = set(ac for ac in account.user_aliases.all())
+		subset = subAliasesSet.union(supAliasesSet)
+		for alias in subset:
+			if alias not in account_list:
+				account_list.append(alias)
+	visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
 	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
 
 @login_required
@@ -655,12 +663,17 @@ class FormPartFour(forms.Form):
 		super(FormPartFour, self).__init__(*args, **kwargs)
 		self.fields['email_chapter_optin'].label=_('Allow %s to send me email updates') % chapter.name
 		self.fields['mobile_marketing_optin'].label=_('Allow %s to send me SMS updates') % chapter.name
+		if chapter.country.code == 'AU':
+			self.fields['email_careers_newsletter_AU_optin'].initial = True
+		else:
+			self.fields['email_careers_newsletter_AU_optin'].initial = False
 
 	email_reminder_optin = forms.BooleanField(label=_('Allow email reminders about my upcoming school visits'), initial=True, required=False)
 	mobile_reminder_optin = forms.BooleanField(label=_('Allow SMS reminders about my upcoming school visits'), initial=True, required=False)
 	email_chapter_optin = forms.BooleanField(initial=True, required=False)
 	mobile_marketing_optin = forms.BooleanField(initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+	email_careers_newsletter_AU_optin = forms.BooleanField(label=_('Subscribe to The Careers Newsletter - Australia'), required=False)
 
 # Bio
 class FormPartFive(forms.Form):
@@ -669,6 +682,7 @@ class FormPartFive(forms.Form):
 		del kwargs['chapter']
 		super(FormPartFive, self).__init__(*args, **kwargs)
 
+	security_check = forms.BooleanField(label=_('Passed the Police Check'), initial=False, required=False)
 	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
@@ -698,6 +712,10 @@ def edituser(request, username, chapter=None):
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			formpart5 = FormPartFive(request.POST, chapter=chapter)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
+				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST)):
+					attempt_modify_exec_fields = True
+				else:
+					attempt_modify_exec_fields = False
 				data = formpart1.cleaned_data
 				if join or (data['username'] != '' and data['username'] != u.username):
 					new_username = data['username']
@@ -778,11 +796,12 @@ def edituser(request, username, chapter=None):
 					u.mobile_reminder_optin = data['mobile_reminder_optin']
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
-					data = formpart5.cleaned_data
-					if 'internal_notes' in data:
+					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
+					if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
+						data = formpart5.cleaned_data
 						u.internal_notes = data['internal_notes']
-					if 'trained' in data:
 						u.trained = data['trained']
+						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
 						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
@@ -818,6 +837,28 @@ def edituser(request, username, chapter=None):
 							recipient.to_name = u.get_full_name()
 							recipient.to_address = u.email
 							recipient.save()
+							message.status = 0
+							message.save()
+						if not adduser and chapter.notify_enable and chapter.notify_list:
+							message = EmailMessage()
+							message.subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
+							message.body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
+							message.from_name = "myRobogals"
+							message.from_address = "my@robogals.org"
+							message.reply_address = "my@robogals.org"
+							message.sender = User.objects.get(username='edit')
+							message.html = True
+							message.email_type = 0
+							message.status = -1
+							message.save()
+							users = chapter.notify_list.users.all()
+							for user in users:
+								recipient = EmailRecipient()
+								recipient.message = message
+								recipient.user = user
+								recipient.to_name = user.get_full_name()
+								recipient.to_address = user.email
+								recipient.save()
 							message.status = 0
 							message.save()
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
@@ -871,10 +912,12 @@ def edituser(request, username, chapter=None):
 					'email_chapter_optin': u.email_chapter_optin,
 					'mobile_reminder_optin': u.mobile_reminder_optin,
 					'mobile_marketing_optin': u.mobile_marketing_optin,
-					'email_newsletter_optin': u.email_newsletter_optin}, chapter=chapter)
+					'email_newsletter_optin': u.email_newsletter_optin,
+					'email_careers_newsletter_AU_optin': u.email_careers_newsletter_AU_optin}, chapter=chapter)
 				formpart5 = FormPartFive({
 					'internal_notes': u.internal_notes,
-					'trained': u.trained}, chapter=chapter)
+					'trained': u.trained,
+					'security_check': u.security_check}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
@@ -989,6 +1032,7 @@ class DefaultsFormTwo(forms.Form):
 	email_chapter_optin = forms.BooleanField(label=_('Allow email updates from local Robogals chapter'), initial=True, required=False)
 	mobile_marketing_optin = forms.BooleanField(label=_('Allow SMS updates from local Robogals chapter'), initial=True, required=False)
 	email_newsletter_optin = forms.BooleanField(label=_('Subscribe to The Amplifier, the monthly email newsletter of Robogals Global'), initial=True, required=False)
+	email_careers_newsletter_AU_optin = forms.BooleanField(label=_('Subscribe to The Careers Newsletter - Australia'), required=False)
 
 @login_required
 def importusers(request, chapterurl):
@@ -1145,6 +1189,7 @@ PRIVACY_FIELDS = (
 	('email_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive email reminders about school visits from myRobogals'),
 	('mobile_reminder_optin', 'Either \'True\' or \'False\', specifies whether this member will receive SMS reminders about school visits from myRobogals'),
 	('email_newsletter_optin', 'Either \'True\' or \'False\', specifies whether this member will receive The Amplifier, the monthly email newsletter of Robogals Global'),
+	('email_careers_newsletter_AU_optin', 'Either \'True\' or \'False\', specifies whether this member will receive The Careers Newsletter - AU'),
 )
 
 HELPINFO = (

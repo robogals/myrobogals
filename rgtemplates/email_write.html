@@ -6,6 +6,38 @@
 {% block pagetitle %}{% trans "Send bulk email" %}{% endblock %}
 
 {% block content %}
+<script>
+function post_to_url(path, params, method) {
+    method = method || "post"; // Set method to post by default, if not specified.
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less wordy if you use one.
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+    form.setAttribute("target", "_blank");
+
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function previewEmail() {
+	var header = document.getElementById("id_header_list").value;
+	var msg = document.getElementById("id_body").value;
+	post_to_url("/messages/previewemail/", {"header": header, "msg": msg}, "post");
+}
+</script>
 <form action="/messages/email/write/" method="POST">
 {% if emailform.errors %}
 <div class="error">
@@ -108,6 +140,10 @@
 </table>
 <table border="0" width="100%" cellpadding="0" cellspacing="0">
   <tr>
+    <td valign="top"><strong>{% trans "Header:" %}</strong></td>
+    <td>{{ emailform.header_list }}</td>
+  </tr>
+  <tr>
     <td valign="top"><strong>{% trans "Filter by:" %}</strong></td>
     <td><span id="status_normal"><select name="status">
 	{% for memberstatustype in memberstatustypes %}
@@ -129,6 +165,10 @@
   <tr>
     <td valign="top"><strong>{% trans "Message:" %}</strong></td>
     <td>{{ emailform.body }}</td>
+  </tr>
+  <tr>
+    <td valign="top"><strong>&nbsp;</strong></td>
+    <td><form><input type="button" value="preview email" onclick="previewEmail()"></form></td>
   </tr>
   <tr>
     <td valign="top"><strong>{% trans "Scheduling:" %}</strong></td>

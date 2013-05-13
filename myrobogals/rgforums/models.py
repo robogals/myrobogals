@@ -39,7 +39,7 @@ class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
 	chapter = models.ForeignKey(Group, blank=True, null=True)
 	exec_only = models.BooleanField("For executives only", default=False)
-	created_on = models.DateTimeField(default=datetime.utcnow())
+	created_on = models.DateTimeField(default=datetime.utcnow)
 
 	class Meta:
 		verbose_name = _('category')
@@ -64,7 +64,7 @@ class Forum(models.Model):
 	name = models.CharField('Name', max_length=80)
 	description = models.TextField(default = '')
 	category = models.ForeignKey(Category)
-	created_on = models.DateTimeField(default=datetime.utcnow())
+	created_on = models.DateTimeField(default=datetime.utcnow)
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
@@ -90,7 +90,7 @@ class Topic(models.Model):
 	posted_by = models.ForeignKey(User, related_name='topic_posted_by')
 	subject = models.CharField(max_length=80)
 	num_views = models.IntegerField("Number of views", default=0)
-	created_on = models.DateTimeField(default=datetime.utcnow())
+	created_on = models.DateTimeField(default=datetime.utcnow)
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
 	sticky = models.BooleanField("Set sticky", default=False)
@@ -111,14 +111,33 @@ class Topic(models.Model):
 		else:
 			return 0
 
+	def number_of_upvotes(self):
+		return Vote.objects.filter(topic=self).count()
+
+class PostFile(models.Model):
+	postfile = models.FileField(upload_to='forum_uploads')
+
+	def __unicode__(self):
+		return self.postfile.name
+
+	def filename(self):
+		return os.path.basename(self.postfile.name)
+
+	def filesize(self):
+		try:
+			size = self.postfile.size
+		except:
+			size = -1
+		return size
+
 class Post(models.Model):
 	topic = models.ForeignKey(Topic)
 	posted_by = models.ForeignKey(User, related_name='post_posted_by')
 	message = models.TextField()
-	created_on = models.DateTimeField(default=datetime.utcnow())
+	created_on = models.DateTimeField(default=datetime.utcnow)
 	updated_on = models.DateTimeField(blank=True, null=True)
 	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
-	upload_file = models.FileField(upload_to='forum_uploads', blank=True)
+	upload_files = models.ManyToManyField(PostFile, related_name='post_upload_files')
 
 	class Meta:
 		verbose_name = "post"
@@ -134,45 +153,18 @@ class Post(models.Model):
 		msg = msg + '\n'
 		return msg
 
-	def uploadfilename(self):
-		return os.path.basename(self.upload_file.name)
-
-	def uploadfilesize(self):
-		try:
-			size = self.upload_file.size
-		except:
-			size = -1
-		return size
-
-	def vote_average(self):
-		votes = Vote.objects.filter(post=self, status=True)
-		return (votes.aggregate(Avg('score'))['score__avg'] if votes else 0)
-
-	def vote_count(self):
-		votes = Vote.objects.filter(post=self, status=True)
-		return (votes.count() if votes else 0)
-
-#	def delete(self, *args, **kwargs):
-#		try:
-#			if self.upload_file:
-#				self.upload_file.delete()
-#		except:
-#			pass
-#		super(Post, self).delete(*args, **kwargs)
-
 @receiver(pre_delete, sender=Post)
 def post_delete(sender, instance, **kwargs):
 	try:
-		if instance.upload_file:
-			instance.upload_file.delete()
+		for f in instance.upload_files.all():
+			f.postfile.delete()
+			f.delete()
 	except:
 		pass
 
 class Vote(models.Model):
-	post = models.ForeignKey(Post)
+	topic = models.ForeignKey(Topic)
 	voter = models.ForeignKey(User, related_name='vote')
-	score = models.IntegerField()
-	status = models.BooleanField(default=True)
 
 class Offense(models.Model):
 	forum = models.ForeignKey(Forum)

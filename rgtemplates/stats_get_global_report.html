@@ -10,14 +10,24 @@
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}
-                        <div>
+				<table>
+					<tr>
+                        <td>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.start_date.name }}">{{ theform.start_date.label }}</label>
+						</td>
+						<td>
                                 {{ theform.start_date }} 
-                        </div>
-                        <div>
+                        </td>
+					</tr>
+					<tr>
+                        <td>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.end_date.name }}">{{ theform.end_date.label }}</label>
+						</td>
+						<td>
                                 {{ theform.end_date }} 
-                        </div>
+                        </td>
+					</tr>
+				</table>
 						
                         <div>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.visit_type.name }}">{{ theform.visit_type.label }}</label>
@@ -45,7 +55,12 @@
 		</tr>
 		{% for name, chapter in chapter_totals %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-			<td>{{ name }}</td>
+			<td>{% if name in user_chapter_children %}
+					<a href="/globalreports/breakdown/{{name}}/">{{ name }}</a>
+				{% else %}
+					{{ name }}
+				{% endif %}
+			</td>
 			<td>{{ chapter.workshops }} </td>
 			<td>{{ chapter.schools }}</td>
 			<td>{{ chapter.first }}</td>

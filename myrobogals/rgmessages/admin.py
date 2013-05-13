@@ -1,9 +1,16 @@
-from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, NewsletterSubscriber, PendingNewsletterSubscriber, Newsletter, SubscriberType
+from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, NewsletterSubscriber, PendingNewsletterSubscriber, Newsletter, SubscriberType, EmailHeader
 from myrobogals import admin
 
 class EmailRecipientAdmin(admin.TabularInline):
 	model = EmailRecipient
 	extra = 2
+
+class EmailHeaderAdmin(admin.ModelAdmin):
+	list_display = ('name',)
+	search_fields = ('name',)
+	fieldsets = (
+		(None, {'fields': ('name', 'upper_body', 'lower_body')}),
+	)
 
 class EmailMessageAdmin(admin.ModelAdmin):
 	fieldsets = (
@@ -55,3 +62,4 @@ admin.site.register(Newsletter, NewsletterAdmin)
 admin.site.register(EmailMessage, EmailMessageAdmin)
 admin.site.register(SMSMessage, SMSMessageAdmin)
 admin.site.register(PendingNewsletterSubscriber)
+admin.site.register(EmailHeader, EmailHeaderAdmin)
