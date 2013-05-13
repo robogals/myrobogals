@@ -2,7 +2,8 @@
 {% load emailpendingerror %}
     <!--Begin Header-->
 	{% if request.user.is_superuser %}
-	{% emailpendingerror "header-bg" "emailpendingerror" %}
+	<!--{% emailpendingerror "header-bg" "emailpendingerror" %}-->
+    <div id="header-bg">
 	{% else %}
     <div id="header-bg">
 	{% endif %}
