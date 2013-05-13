@@ -397,7 +397,7 @@ class User(models.Model):
     forum_last_act = models.DateTimeField('Forum last activity', default=datetime.datetime.now)
     objects = UserManager()
     aliases = models.ManyToManyField('User', blank=True, null=True, related_name='user_aliases')
-    email_careers_newsletter_AU_optin = models.BooleanField("Subscribe to The Careers Newsletter - AU", default=False)
+    email_careers_newsletter_AU_optin = models.BooleanField("Subscribe to Robogals Careers Newsletter - Australia", default=False)
 
     class Meta:
         verbose_name = 'member'
