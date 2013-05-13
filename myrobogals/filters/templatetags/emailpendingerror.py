@@ -7,7 +7,7 @@ from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipi
 import datetime
 
 def emailpendingerror(idNoError, idError):
-	if EmailRecipient.objects.filter(scheduled_date__lt=(datetime.datetime.now() - datetime.timedelta(hours=3)), status=0):
+	if EmailMessage.objects.filter(scheduled_date__lt=(datetime.datetime.now() - datetime.timedelta(hours=3)), status=0):
 		return '<div id="' + idError + '">'
 	else:
 		return '<div id="' + idNoError + '">'
