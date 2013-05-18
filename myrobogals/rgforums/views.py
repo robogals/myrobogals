@@ -371,7 +371,7 @@ def newtopic(request, forum_id):
 						message.from_address = "my@robogals.org"
 						message.reply_address = "my@robogals.org"
 						message.sender = User.objects.get(username='edit')
-						message.html = True
+						message.html = False
 						message.email_type = 1
 						message.status = -1
 						message.save()
@@ -1049,7 +1049,7 @@ def newpost(request, topic_id):
 					message.from_address = "my@robogals.org"
 					message.reply_address = "my@robogals.org"
 					message.sender = User.objects.get(username='edit')
-					message.html = True
+					message.html = False
 					message.email_type = 1
 					message.status = -1
 					message.save()

@@ -70,4 +70,3 @@ for chapter in Group.objects.all():
 		message.save()
 
 exit()
-y
