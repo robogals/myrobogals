@@ -1126,6 +1126,8 @@ def viewtopic(request, topic_id):
 	editPost = ''
 	if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
 		quote = Post.objects.get(pk=request.GET['quotePostId'])
+		if quote.topic.pk != t.pk:
+			raise Http404
 		postform = WritePostForm({'message': quote.get_quote()})
 	elif ('editPostId' in request.GET) and ('quotePostId' not in request.GET):
 		edit = Post.objects.get(pk=request.GET['editPostId'])
