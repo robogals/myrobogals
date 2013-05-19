@@ -363,7 +363,15 @@ def newtopic(request, forum_id):
 									topic.watchers.remove(user)
 						else:
 							newTopic.watchers.remove(user)
-					watchers = f.watchers.all().exclude(pk=request.user.pk)
+					watchers_list = f.watchers.all().exclude(pk=request.user.pk)
+					watchers = []
+					for watcher in watchers_list:
+						if (watcher.is_superuser) or (watcher.is_staff and ((c == watcher.chapter) or (c == None))) or (watcher not in f.blacklist.filter(pk=watcher.pk) and (((c == watcher.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
+							watchers.append(watcher)
+						else:
+							f.watchers.remove(watcher)
+							for topic in f.topic_set.all():
+								topic.watchers.remove(watcher)
 					if watchers:
 						message = EmailMessage()
 						message.subject = 'New Topic: ' + newTopic.subject
@@ -1041,7 +1049,15 @@ def newpost(request, topic_id):
 								topic.watchers.remove(user)
 					else:
 						t.watchers.remove(user)
-				watchers = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
+				watchers_list = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
+				watchers = []
+				for watcher in watchers_list:
+					if (watcher.is_superuser) or (watcher.is_staff and ((c == watcher.chapter) or (c == None))) or (watcher not in f.blacklist.filter(pk=watcher.pk) and (((c == watcher.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
+						watchers.append(watcher)
+					else:
+						f.watchers.remove(watcher)
+						for topic in f.topic_set.all():
+							topic.watchers.remove(watcher)
 				if watchers:
 					message = EmailMessage()
 					message.subject = 'New Post for topic "' + t.subject + '"'
