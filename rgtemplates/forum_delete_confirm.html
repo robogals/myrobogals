@@ -18,12 +18,14 @@
 		<td>{% trans "Last Post" %}</td>
 	</tr>
 	<tr class="odd">
-		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{{ forum.description }}<br />{% trans "Started" %} {{forum.created_on|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT")}}<br />{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
+		<td><a name="{{forum.pk}}"></a><a href="/forums/{{ chapter.myrobogals_url }}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{% autoescape off %}{{ forum.description }}{% endautoescape %}<br />
+		<span style="font-size: 8pt">
 		{% if request.user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
+		</span>
 		</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
