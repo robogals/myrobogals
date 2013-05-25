@@ -14,6 +14,7 @@ from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offen
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from django.utils.http import urlquote, base36_to_int
 from django.db.models import Avg, Max, Min, Count
+import cgi
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -103,7 +104,7 @@ def deletecategory(request, category_id):
 			return render_to_response('forum_categorydelete_confirm.html', {'category': c, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = c.chapter
-			request.user.message_set.create(message=unicode(_('Category "%s" deleted') % c.name))
+			request.user.message_set.create(message=unicode(_('Category "%s" deleted') % cgi.escape(c.name)))
 			c.delete()
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -320,7 +321,7 @@ def newtopic(request, forum_id):
 						pass
 					else:
 						fileWarning = True
-						msg += 'File: ' + upload_file.name + ' is not uploaded due to:'
+						msg += 'File: ' + cgi.escape(upload_file.name) + ' is not uploaded due to:'
 						if (upload_file.size > maxfilesize * 1024*1024):
 							msg = msg + ' File size exceeds ' + str(maxfilesize) + ' MB. '
 						if (upload_file.name.__len__() > 70):
@@ -362,11 +363,19 @@ def newtopic(request, forum_id):
 									topic.watchers.remove(user)
 						else:
 							newTopic.watchers.remove(user)
-					watchers = f.watchers.all().exclude(pk=request.user.pk)
+					watchers_list = f.watchers.all().exclude(pk=request.user.pk)
+					watchers = []
+					for watcher in watchers_list:
+						if (watcher.is_superuser) or (watcher.is_staff and ((c == watcher.chapter) or (c == None))) or (watcher not in f.blacklist.filter(pk=watcher.pk) and (((c == watcher.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
+							watchers.append(watcher)
+						else:
+							f.watchers.remove(watcher)
+							for topic in f.topic_set.all():
+								topic.watchers.remove(watcher)
 					if watchers:
 						message = EmailMessage()
 						message.subject = 'New Topic: ' + newTopic.subject
-						message.body = 'New topic for forum "' + f.name + '" in category "' + g.name +'"<br><br>Topic subject: ' + newTopic.subject + ' (started by ' + newTopic.posted_by.get_full_name() + ')<br><br>Topic Message:<br>' + postMessage.message + '<br><br>--<br>{{unwatchall}}'
+						message.body = 'New topic for forum "' + cgi.escape(f.name) + '" in category "' + cgi.escape(g.name) +'"<br><br>Topic subject: ' + cgi.escape(newTopic.subject) + ' (started by ' + newTopic.posted_by.get_full_name() + ')<br><br>Topic Message:<br>' + cgi.escape(postMessage.message).replace("\n","<br>") + '<br><br>--<br>{{unwatchall}}'
 						message.from_name = "myRobogals"
 						message.from_address = "my@robogals.org"
 						message.reply_address = "my@robogals.org"
@@ -419,7 +428,7 @@ def downloadpostfile(request, post_id, file_id):
 				response['Content-Length'] = postfile.filesize()
 				return response
 			except:
-				request.user.message_set.create(message=unicode(_('- File: "%s" does not exist' % postfile.filename())))
+				request.user.message_set.create(message=unicode(_('- File: "%s" does not exist' % cgi.escape(postfile.filename()))))
 				if 'return' in request.GET:
 					return HttpResponseRedirect(request.GET['return'])
 				else:
@@ -591,7 +600,7 @@ def deleteforum(request, forum_id):
 			return render_to_response('forum_delete_confirm.html', {'forum': f, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = c
-			request.user.message_set.create(message=unicode(_('Forum "' + f.name + '" deleted')))
+			request.user.message_set.create(message=unicode(_('Forum "' + cgi.escape(f.name) + '" deleted')))
 			f.delete()
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -609,7 +618,7 @@ def viewforum(request, forum_id):
 	f = get_object_or_404(Forum, pk=forum_id)
 	g = f.category
 	c = g.chapter
-	topicsPerPage = 10
+	topicsPerPage = 3
 	pageNumber = request.GET.get('page', None)
 	if (not pageNumber) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
 		pageNumber = request.COOKIES.get('forumpage')
@@ -800,7 +809,7 @@ def editpost(request, post_id):
 					pass
 				else:
 					warning = True
-					msg += 'File: ' + upload_file.name + ' is not uploaded due to:'
+					msg += 'File: ' + cgi.escape(upload_file.name) + ' is not uploaded due to:'
 					if (upload_file.size > maxfilesize * 1024*1024):
 						msg = msg + ' File size exceeds ' + str(maxfilesize) + ' MB. '
 					if (upload_file.name.__len__() > 70):
@@ -1040,11 +1049,19 @@ def newpost(request, topic_id):
 								topic.watchers.remove(user)
 					else:
 						t.watchers.remove(user)
-				watchers = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
+				watchers_list = (f.watchers.all() | t.watchers.all()).distinct().exclude(pk=request.user.pk)
+				watchers = []
+				for watcher in watchers_list:
+					if (watcher.is_superuser) or (watcher.is_staff and ((c == watcher.chapter) or (c == None))) or (watcher not in f.blacklist.filter(pk=watcher.pk) and (((c == watcher.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)))):
+						watchers.append(watcher)
+					else:
+						f.watchers.remove(watcher)
+						for topic in f.topic_set.all():
+							topic.watchers.remove(watcher)
 				if watchers:
 					message = EmailMessage()
 					message.subject = 'New Post for topic "' + t.subject + '"'
-					message.body = 'New post for topic "' + t.subject + '" for forum "' + f.name + '" in category "' + g.name + '"<br><br>Post message: (posted by ' + postMessage.posted_by.get_full_name() + ')<br>' + postMessage.message + '<br><br>--<br>{{unwatchall}}'
+					message.body = 'New post for topic "' + cgi.escape(t.subject) + '" for forum "' + cgi.escape(f.name) + '" in category "' + cgi.escape(g.name) + '"<br><br>Post message: (posted by ' + postMessage.posted_by.get_full_name() + ')<br>' + cgi.escape(postMessage.message).replace("\n","<br>") + '<br><br>--<br>{{unwatchall}}'
 					message.from_name = "myRobogals"
 					message.from_address = "my@robogals.org"
 					message.reply_address = "my@robogals.org"
@@ -1089,7 +1106,7 @@ def deletetopic(request, topic_id):
 			return render_to_response('forum_topicdelete_confirm.html', {'topic': t, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = f.category.chapter
-			request.user.message_set.create(message=unicode(_('Topic "%s" deleted') % t.subject))
+			request.user.message_set.create(message=unicode(_('Topic "%s" deleted') % cgi.escape(t.subject)))
 			t.delete()
 			all_posts = Post.objects.filter(topic__forum=f)
 			if all_posts:
@@ -1126,6 +1143,8 @@ def viewtopic(request, topic_id):
 	editPost = ''
 	if ('quotePostId' in request.GET) and ('editPostId' not in request.GET):
 		quote = Post.objects.get(pk=request.GET['quotePostId'])
+		if quote.topic.pk != t.pk:
+			raise Http404
 		postform = WritePostForm({'message': quote.get_quote()})
 	elif ('editPostId' in request.GET) and ('quotePostId' not in request.GET):
 		edit = Post.objects.get(pk=request.GET['editPostId'])

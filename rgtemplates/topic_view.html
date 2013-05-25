@@ -64,7 +64,11 @@
 		<td>{% if post.1.upload_files.all %}
 		{% for file in post.1.upload_files.all %}
 			<a href="/forums/downloadpostfile/{{post.1.pk}}/{{file.pk}}/?return={{return|urlencode}}">{{file.filename}} ({{file.filesize|filesizeformat}})</a>
+			{% if canDelete or post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
 			<a href="/forums/deletefile/{{post.1.pk}}/{{file.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a><br/>
+			{% else %}
+			<br/>
+			{% endif %}
 		{% endfor %}
 {% endif %}</td>
 	</tr>
