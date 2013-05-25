@@ -38,13 +38,13 @@ class PositionAdmin(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'name_display', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'name_display', 'email', 'alt_email', 'dob', 'gender', 'photo', 'tshirt', 'trained', 'security_check')}),
         ('Chapter', {'fields': ('chapter',)}),
         ('University info (student members only)', {'fields': ('course', 'uni_start', 'uni_end', 'university', 'course_type', 'student_type', 'student_number', 'union_member')}),
         ('Work info (industry members only)', {'fields': ('job_title', 'company')}),
         ('Mobile info', {'fields': ('mobile', 'mobile_verified',)}),
         #('Photo'), {'fields': ('photo')}),
-        ('User preferences', {'fields': ('timezone','email_reminder_optin','email_chapter_optin', 'mobile_marketing_optin', 'mobile_reminder_optin', 'email_newsletter_optin', 'email_othernewsletter_optin')}),
+        ('User preferences', {'fields': ('timezone','email_reminder_optin','email_chapter_optin', 'mobile_marketing_optin', 'mobile_reminder_optin', 'email_newsletter_optin', 'email_othernewsletter_optin', 'email_careers_newsletter_AU_optin')}),
         ('Privacy settings', {'fields': ('privacy', 'dob_public', 'email_public')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
         ('Bio', {'fields': ('bio',)}),
