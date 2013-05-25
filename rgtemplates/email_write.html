@@ -34,7 +34,11 @@ function post_to_url(path, params, method) {
 
 function previewEmail() {
 	var header = document.getElementById("id_header_list").value;
-	var msg = document.getElementById("id_body").value;
+	if ((document.getElementById("id_body").style.display !== "none")) {
+		var msg = document.getElementById("id_body").value;
+	} else {
+		var msg = escape(iframeElem.contentDocument.getElementById("tinymce").innerHTML);
+	}
 	post_to_url("/messages/previewemail/", {"header": header, "msg": msg}, "post");
 }
 </script>
