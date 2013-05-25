@@ -25,6 +25,7 @@
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
+    </span>
 		</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>

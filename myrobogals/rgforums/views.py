@@ -618,7 +618,7 @@ def viewforum(request, forum_id):
 	f = get_object_or_404(Forum, pk=forum_id)
 	g = f.category
 	c = g.chapter
-	topicsPerPage = 3
+	topicsPerPage = 10
 	pageNumber = request.GET.get('page', None)
 	if (not pageNumber) and (request.COOKIES.get('forumpk', None)==str(f.pk)):
 		pageNumber = request.COOKIES.get('forumpage')
