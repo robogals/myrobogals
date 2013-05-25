@@ -38,7 +38,7 @@ function previewEmail() {
 		var msg = document.getElementById("id_body").value;
 	} else {
 		var iframeElem = document.getElementById("id_body_ifr");
-		var msg = escape(iframeElem.contentDocument.getElementById("tinymce").innerHTML);
+		var msg = iframeElem.contentDocument.getElementById("tinymce").innerHTML;
 	}
 	post_to_url("/messages/previewemail/", {"header": header, "msg": msg}, "post");
 }
