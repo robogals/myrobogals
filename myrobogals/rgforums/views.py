@@ -1184,8 +1184,7 @@ def viewtopic(request, topic_id):
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			else:
 				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
-	paginator = Paginator(posts_list, 3)
-#	paginator = Paginator(posts_list, 10)
+	paginator = Paginator(posts_list, 10)
 	page = request.GET.get('page')
 	try:
 		posts = paginator.page(page)
