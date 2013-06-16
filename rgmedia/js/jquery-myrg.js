@@ -202,4 +202,24 @@
 			$('#profile-info-expand').hide();
 			$('#profile-info-table').show();
 		}
+    
+    
+    
+    
+    
+    /* 
+     * 2013-06-16 
+     * Invitees to conferences
+     */
+     
+    $("form[action^='/conferences'] input[name='invitee_type']").change(function(){
+      $(".invitee_email_selector").hide();
+      $(".invitee_email_selector").filter("."+$(this).filter(":checked").attr("id")).show();
+    });
+    
+    $("form[action^='/conferences'] input[name='invitee_type']:eq(0)").change();
+    
+    
+    
+    
 	});

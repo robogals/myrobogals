@@ -256,16 +256,27 @@ def rsvplist(request, conf_id):
 
 class EmailAttendeesForm(forms.Form):
 	# Set up form
+	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=ConferenceAttendee.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 
 	def __init__(self, *args, **kwargs):
 		# Grab params, clear scope
+		user=kwargs['user']
+		del kwargs['user']
 		conf=kwargs['conference']
 		del kwargs['conference']
 		
 		super(EmailAttendeesForm, self).__init__(*args, **kwargs)
+		
+		# "From" field
+		self.fields['from_type'].choices = (
+			(0, "Robogals <" + user.email + ">"),
+			(1, user.chapter.name + " <" + user.email + ">"),
+			(2, user.get_full_name() + " <" + user.email + ">")
+		)
+		
 		# Using `ConferenceAttendee`
 		self.fields['memberselect'].queryset = ConferenceAttendee.objects.filter(conference=conf.id).order_by('last_name')
 		
@@ -285,10 +296,11 @@ def rsvpemail(request, conf_id):
 	# Determine if form has been POSTed back
 	if request.method == 'POST':
 		# Validate email form data
-		emailform = EmailAttendeesForm(request.POST, conference=conf)
+		emailform = EmailAttendeesForm(request.POST, conference=conf, user=request.user)
 		if emailform.is_valid():
 			data = emailform.cleaned_data
 			
+			# Set up message
 			message = EmailMessage()
 			message.subject = data['subject']
 			message.body = data['body']
@@ -296,7 +308,14 @@ def rsvpemail(request, conf_id):
 			message.reply_address = request.user.email
 			message.sender = request.user
 			message.html = True
-			message.from_name = chapter.name
+			
+			if int(data['from_type']) == 0:
+				message.from_name = "Robogals"
+			elif int(data['from_type']) == 1:
+				message.from_name = request.user.chapter.name
+			else:
+				message.from_name = request.user.get_full_name()
+				
 			message.scheduled = False
 				
 			# Don't send it yet until the recipient list is done
@@ -340,7 +359,7 @@ def rsvpemail(request, conf_id):
 			request.user.message_set.create(message=unicode(_("Email sent successfully")))
 			return HttpResponseRedirect('/conferences/' + str(conf.pk) + '/')
 	else:
-		emailform = EmailAttendeesForm(None, conference=conf)
+		emailform = EmailAttendeesForm(None, conference=conf, user=request.user)
 	
 	
 	# Display email form
