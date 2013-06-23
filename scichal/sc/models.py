@@ -54,3 +54,38 @@ class EmailMessage(models.Model):
 	
 	def __unicode__(self):
 		return self.subject
+
+
+
+
+################################################################################
+# 2013-06-14
+# New Science Challenge minor challenge entries
+################################################################################
+
+# Minor challenge (the actual challenges, not the entries)
+class MinorChallenge(models.Model):
+	shortname = models.CharField("Short Name", max_length=128);
+	description = models.CharField("Description", max_length=1024);
+	joomla = models.CharField("Joomla Page ID", max_length=8);
+
+	def __unicode__(self):
+		return self.shortname
+
+MCHAL_LEVELS = (
+	(0, 'Junior'),
+	(1, 'Intermediate'),
+	(2, 'Senior'),
+)
+
+# Entries for each minor challenge
+class MinorChallengeEntry(models.Model):
+	entrant = models.ForeignKey(Entrant)
+	date = models.DateTimeField("Date")
+	challenge = models.ForeignKey(MinorChallenge)
+	level = models.IntegerField(choices=MCHAL_LEVELS, default=0)
+	message = models.TextField("Message")
+	youtube = models.CharField("YouTube ID", max_length=11)
+	
+	def __unicode__(self):
+		return self.message
