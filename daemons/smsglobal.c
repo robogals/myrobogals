@@ -14,7 +14,10 @@
 #include <time.h>
 #include <string.h>
 #include <curl/curl.h>
-#include <curl/types.h>
+
+// 2013-05-17
+//#include <curl/types.h>
+
 #include <curl/easy.h>
 #include "smsglobal.h"
 #include "rgsmsd.h"
