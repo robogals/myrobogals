@@ -85,7 +85,8 @@ Content-Transfer-Encoding: base64
 			$filesql = sprintf("SELECT `rgmessages_emailfile`.`emailfile` FROM `rgmessages_emailmessage`, `rgmessages_emailmessage_upload_files`, `rgmessages_emailfile` WHERE `rgmessages_emailmessage`.`id` = %d AND `rgmessages_emailmessage`.`id` = `rgmessages_emailmessage_upload_files`.`emailmessage_id` AND `rgmessages_emailmessage_upload_files`.`emailfile_id` = `rgmessages_emailfile`.`id`", $msg['id']);
 			$result3 = mysql_query($filesql);
 			while ($emailfile = mysql_fetch_assoc($result3)) {
-				$emailfile = "/home/myrobogals/robogals/rgmedia/" . $emailfile['emailfile'];
+				//$emailfile = "/home/myrobogals/robogals/rgmedia/" . $emailfile['emailfile'];
+				$emailfile = "/home/ubuntu/robogals/myrobogals/rgmedia/" . $emailfile['emailfile'];
 				$body .= "
 --robogals{$uniqid}
 Content-Type: application/octet-stream; name=\"" . basename($emailfile) . "\"
