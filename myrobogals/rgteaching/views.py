@@ -313,7 +313,8 @@ def invitetovisit(request, visit_id):
 					message.from_address = request.user.email
 					message.reply_address = request.user.email
 					message.sender = request.user
-					message.html = v.chapter.invite_email_html
+					#message.html = v.chapter.invite_email_html
+					message.html = 1
 					message.from_name = chapter.name
 					
 					# Don't send it yet until the recipient list is done
