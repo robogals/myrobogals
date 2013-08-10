@@ -59,7 +59,6 @@ class EmailMessage(models.Model):
 
 
 ################################################################################
-# 2013-06-14
 # New Science Challenge minor challenge entries
 ################################################################################
 
@@ -86,6 +85,7 @@ class MinorChallengeEntry(models.Model):
 	level = models.IntegerField(choices=MCHAL_LEVELS, default=0)
 	message = models.TextField("Message")
 	youtube = models.CharField("YouTube ID", max_length=11)
+	photo = models.CharField("Photo file name", max_length=100)
 	
 	def __unicode__(self):
 		return self.message
