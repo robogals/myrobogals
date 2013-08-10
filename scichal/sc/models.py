@@ -84,8 +84,8 @@ class MinorChallengeEntry(models.Model):
 	challenge = models.ForeignKey(MinorChallenge)
 	level = models.IntegerField(choices=MCHAL_LEVELS, default=0)
 	message = models.TextField("Message")
-	youtube = models.CharField("YouTube ID", max_length=11)
-	photo = models.CharField("Photo file name", max_length=100)
+	youtube = models.CharField("YouTube ID", max_length=11, blank=True)
+	photo = models.CharField("Photo file name", max_length=100, blank=True)
 	
 	def __unicode__(self):
 		return self.message
