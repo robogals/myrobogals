@@ -8,7 +8,9 @@
 */
 
 /* Where to log errors */
-#define RGSMSD_ERROR_LOG "/home/myrobogals/var/nudgesmsd_error.log"
+//#define RGSMSD_ERROR_LOG "/home/myrobogals/var/nudgesmsd_error.log"
+// 2013-05-17
+#define RGSMSD_ERROR_LOG "/home/ubuntu/var/nudgesmsd_error.log"
 
 /* Default route for SMS */
 #define DEFAULT_ROUTE 1
