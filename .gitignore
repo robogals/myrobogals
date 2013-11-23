@@ -3,4 +3,5 @@
 *.pyc
 *.wsgi
 *.sqlite3
-
+__init__.py
+wsgi.py
