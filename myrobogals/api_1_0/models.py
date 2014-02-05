@@ -18,7 +18,7 @@ class User(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User)
-    preferred_name = models.CharField('Preferred name', max_length=30, help_text="Supports Unicode and permits names to be displayed however the user sees fit within reasonable bounds. For example, first="Yamato"+last="Takahashi" could have "é«˜æ©‹ å¤§å’Œ" for his preferred name. The preferred name shall appear preferentially in the profile page. The first/last name shall be used for URLs, core database, and menu selections, with the preferred name appearing as a secondary element.")
+    preferred_name = models.CharField('Preferred name', max_length=30, help_text='Supports Unicode and permits names to be displayed however the user sees fit within reasonable bounds. For example, first="Yamato"+last="Takahashi" could have "é«˜æ©‹ å¤§å’Œ" for his preferred name. The preferred name shall appear preferentially in the profile page. The first/last name shall be used for URLs, core database, and menu selections, with the preferred name appearing as a secondary element.')
     dob = models.DateField('Date of Birth', null=True, blank=True)
     GENDERS = (
         (0, 'No answer'),
