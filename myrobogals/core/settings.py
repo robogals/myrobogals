@@ -53,6 +53,9 @@ ROOT_URLCONF = 'core.urls'
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+#Bagus comment: add this bit to indicate that this model is the user profile model for our site
+AUTH_PROFILE_MODULE = 'api_1_0.userprofile'
+
 
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases

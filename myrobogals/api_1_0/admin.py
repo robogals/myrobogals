@@ -1,31 +1,20 @@
 from django.contrib import admin
-from api_1_0.models import User, Profile
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
+from api_1_0.models import UserProfile
 
-class UserInline(admin.StackedInline):
-    model = Profile
-    #extra = 5
+# Define an inline admin descriptor for UserProfile model
+# which acts a bit like a singleton
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'profile'
 
-class UserAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None,               {'fields': ['username']}),
-        ('Detail information', {'fields': (['first_name'],
-                              ['last_name'],
-                              ['email'],
-                              ['password'],
-                              ['is_staff'],
-                              ['is_active'],
-                              ['is_superuser'],
-                              #['last_login'],
-                              #['date_joined'],
-                              ['user_permissions']),
-                              
-                              'classes': ['collapse']}),
-    ]
-    inlines = [UserInline]
-    
-#class UserAdmin(admin.ModelAdmin):
-    #exclude = (['last_login'],
-     #          ['date_joined'],)
-    
+# Define a new User admin
+class UserAdmin(UserAdmin):
+    inlines = (UserProfileInline, )
+
+# Re-register UserAdmin
+admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
