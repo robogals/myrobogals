@@ -24,7 +24,10 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
 
-	# Django REST Framework
+    # Django REST Framework
     url(r'^api/1.0/', include(api_router.urls)),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    
+    # OAuth Django Toolkit
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
