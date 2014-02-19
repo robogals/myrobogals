@@ -14,7 +14,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-import myrg_core.settings
+from django.conf import settings
 
 # Based upon:
 # * https://docs.djangoproject.com/en/1.6/topics/auth/customizing/#substituting-a-custom-user-model
@@ -137,7 +137,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     # Refer to myrg_core/settings.py for LANGUAGES
     preferred_language = models.CharField(_('preferred language'),
                                           max_length=5,
-                                          choices=myrg_core.settings.LANGUAGES,
+                                          choices=settings.LANGUAGES,
                                           default='en',   # This MUST exist
                                           help_text=_('Preferred language for myRobogals and related services. Interface language can be separately overridden on a session-by-session basis.'))
     
