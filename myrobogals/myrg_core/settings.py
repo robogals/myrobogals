@@ -50,8 +50,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'myrg_users',
     'oauth2_provider',
+    'myrg_users',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -132,9 +132,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
-    # Oauth 2 authentication.
+
+    # django-oauth-toolkit requires slightly different set up:
+    # https://django-oauth-toolkit.readthedocs.org/en/0.5.0/rest-framework/getting_started.html
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.OAuth2Authentication',
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication',
     ),
 
 }
