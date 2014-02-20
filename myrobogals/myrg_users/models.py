@@ -64,10 +64,13 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #
     # To get around anonymous registrations (e.g. newsletter subscriptions), we
     # will generate random usernames on the fly in the save handler.
+    #
+    # Usernames will not be accepting Unicode characters due to conflicts with
+    # future implementation of the messaging system.
     username = models.CharField(_('username'),
-                                max_length=255,
+                                max_length=63,
                                 unique=True,
-                                help_text=_('Username of length 255 characters or fewer is required.'))
+                                help_text=_('Username of length 63 characters or fewer, consisting of alphanumeric characters and any of ./_/- is required.'))
 
     # As primary emails are the unique identifier, this is required and
     # uniqueness enforced
