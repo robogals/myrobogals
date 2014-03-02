@@ -140,8 +140,8 @@ REST_FRAMEWORK = {
     # django-oauth-toolkit requires slightly different set up:
     # https://django-oauth-toolkit.readthedocs.org/en/0.5.0/rest-framework/getting_started.html
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
         'oauth2_provider.ext.rest_framework.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 
 }

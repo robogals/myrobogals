@@ -25,7 +25,6 @@ from django.conf import settings
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
         primary_email = self.normalize_email(primary_email)
-        print(primary_email)
         
         if not primary_email:
             raise ValueError(_('Users must have a primary email address.'))
