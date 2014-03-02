@@ -24,13 +24,13 @@ from django.conf import settings
 
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
+        primary_email = self.normalize_email(primary_email)
+        print(primary_email)
+        
         if not primary_email:
             raise ValueError(_('Users must have a primary email address.'))
         if not given_name:
             raise ValueError(_('Users must have a given name.'))
-        
-        primary_email = self.normalize_email(primary_email)
-        
         if not username:
             #username = primary_email   # Use email address?
             raise ValueError(_('Users must have a username.'))
@@ -38,7 +38,7 @@ class RobogalsUserManager(BaseUserManager):
         now = timezone.now()
         
         user = self.model(
-            username=username.strip(),
+            username=username,
             primary_email=primary_email,
             given_name=given_name.strip(),
             is_superuser=is_superuser,
@@ -70,6 +70,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_('username'),
                                 max_length=63,
                                 unique=True,
+                                validators=[
+                                    validators.RegexValidator(r'^[\w.-]+$', _('This value may contain only alphanumeric and ./_/- characters.'), 'invalid')
+                                ],
                                 help_text=_('Username of length 63 characters or fewer, consisting of alphanumeric characters and any of ./_/- is required.'))
 
     # As primary emails are the unique identifier, this is required and
@@ -77,12 +80,18 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     primary_email = models.EmailField(_('primary email address'),
                                       max_length=255,
                                       unique=True,
+                                      validators=[
+                                        validators.EmailValidator(_('Enter a valid primary email address.'), 'invalid')
+                                      ],
                                       help_text=_('Primary email address of length 255 characters or fewer is required.'))
 
     # ... however the secondary email isn't.
     secondary_email = models.EmailField(_('secondary email address'),
                                         max_length=255,
                                         blank=True,
+                                        validators=[
+                                            validators.EmailValidator(_('Enter a valid secondary email address.'), 'invalid')
+                                        ],
                                         help_text=_('Secondary email address of length 255 characters or fewer is optional.'))
 
     

@@ -13,14 +13,7 @@ from .models import RobogalsUser
 
 class RobogalsUserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
-    fields, with ASCII usernames and a repeated password."""
-    
-    username = forms.RegexField(label=_("Username"), max_length=63,
-                regex=r'^[\w.-]+$',
-                help_text=_('Username of length 63 characters or fewer, consisting of alphanumeric characters and any of ./_/- is required.'),
-                error_messages={
-                    'invalid': _("This value may contain only alphanumeric and "
-                                 "./_/- characters.")})
+    fields with a repeated password."""
                                  
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
