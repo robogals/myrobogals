@@ -1,0 +1,202 @@
+<?php
+/*
+    myRobogals email delivery script
+    
+    Drop in replacement with Mandrill
+*/
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+//set_time_limit(0);
+date_default_timezone_set('UTC');
+
+
+// ############# Mandrill via. Composer #################
+require '/home/ubuntu/robogals/vendor/autoload.php';    // This needs to be installed separately.
+
+$mandrill_api_key = "1234567890123456789012";
+
+$email_content_privacy = true;     // This must be switched on in production for privacy reasons
+
+// ######################################################
+
+// kill script if already running, as indicated by the presence of a lockfile
+if ($fp = @fopen("/tmp/robogals-cron-email-lock", 'r')) die();
+
+// create lockfile
+$fp = fopen("/tmp/robogals-cron-email-lock", 'w');
+fclose($fp);
+
+$dbh = mysql_connect('localhost', 'myrobogals', 'myrobogals');
+mysql_select_db('myrobogals');
+
+
+// UTF-8 Fix
+mysql_query('SET CHARACTER SET utf8');
+
+
+$sql = "SELECT * FROM rgmessages_emailmessage WHERE `status` = 0 ORDER BY `date` ASC";
+$result = mysql_query($sql);
+
+while($msg = mysql_fetch_assoc($result)) {
+    
+    // Construct headers
+    $headers = array(
+        'Reply-To' => $msg['reply_address']
+    );
+    
+    // identify The Amplifier as a newsletter with appropriate headers
+    if ($msg['from_address'] == 'media-bounces@robogals.org') {
+        $headers['List-Unsubscribe'] = 'media-unsubscribe@robogals.org';
+        $headers['Precedence'] = 'bulk';
+    }
+    
+    
+    // Replace known merge vars into Mandrill format
+    $email_content = str_replace(
+                        '{{to_name}}', '*|TO_NAME|*',
+                    str_replace(
+                        '{{email_id}}', '*|EMAIL_ID|*',
+                    str_replace(
+                        '{{unsubscribe}}', '*|UNSUBSCRIBE|*',
+                    str_replace(
+                        '{{unwatchall}}', '*|UNWATCHALL|*',
+                    $msg['body']))));
+    
+    // Construct recipients and merge_vars
+    $recipients = array();
+    $merge_vars = array();
+    
+    $sql = sprintf("SELECT * FROM rgmessages_emailrecipient WHERE `message_id` = %d AND `status` = 0 AND `scheduled_date` < NOW()", $msg['id']);
+    $result2 = mysql_query($sql);
+    
+    while ($recipient = mysql_fetch_assoc($result2)) {
+        
+        // Skip empty email addresses
+        if (empty($recipient['to_address'])){
+            continue;
+        }
+        
+        $recipients[] = array(
+            'email' => $recipient['to_address'],
+            'name' => $recipient['to_name'],
+            'type' => 'to'
+        );
+        
+        // Timecoded unsub links
+        $now = time();
+        $beg = strtotime("2001-01-01");
+        $datediff = $now - $beg;
+        $ts = floor($datediff/(60*60*24));
+        $unicd = sha1(sprintf("%s%s", $recipient['user_id'], $ts));
+        $unicode = "";
+        for ($i = 0; $i < strlen($unicd); $i = $i + 2) {
+            $unicode = $unicode.$unicd[$i];
+        }
+        $uniqurl = sprintf('<a href="https://my.robogals.org/unsubscribe/%s/%s-%s/1/">unsubscribe<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
+        $uniqurlunwatchall = sprintf('<a href="https://my.robogals.org/forums/unwatchall/%s/%s-%s/1/">Empty watch list<a>', base_convert($recipient['user_id'], 10, 36), base_convert($ts, 10, 36), $unicode);
+        
+        $merge_vars[] = array(
+            'rcpt' => $recipient['to_address'],
+            'vars' => array(
+                        array(
+                            'name' => 'to_name',
+                            'content' => $recipient['to_name']
+                        ),
+                        array(
+                            'name' => 'email_id',
+                            'content' => $recipient['id']
+                        ),
+                        array(
+                            'name' => 'unsubscribe',
+                            'content' => $uniqurl
+                        ),
+                        array(
+                            'name' => 'unwatchall',
+                            'content' => $uniqurlunwatchall
+                        )
+                      )
+        );
+        
+        // Force "sent" status (assuming Mandrill works)
+        $status = 1;
+        $sql = sprintf("UPDATE rgmessages_emailrecipient SET `status` = %d WHERE `id` = %d", $status, $recipient['id']);
+        mysql_query($sql);
+    }
+    mysql_free_result($result2);
+
+    // Construct attachments
+    $attachments = array();
+    
+    $filesql = sprintf("SELECT `rgmessages_emailfile`.`emailfile` FROM `rgmessages_emailmessage`, `rgmessages_emailmessage_upload_files`, `rgmessages_emailfile` WHERE `rgmessages_emailmessage`.`id` = %d AND `rgmessages_emailmessage`.`id` = `rgmessages_emailmessage_upload_files`.`emailmessage_id` AND `rgmessages_emailmessage_upload_files`.`emailfile_id` = `rgmessages_emailfile`.`id`", $msg['id']);
+    $result3 = mysql_query($filesql);
+    
+    
+    while ($emailfile = mysql_fetch_assoc($result3)) {
+        $emailfile = "/home/ubuntu/robogals/myrobogals/rgmedia/" . $emailfile['emailfile'];
+        
+        $fp = @fopen($emailfile, "rb");
+        $file = @fread($fp, filesize($emailfile));
+        @fclose($fp);
+        
+        $attachments[] = array(
+            'type' => 'application/octet-stream',
+            'name' => basename($emailfile),
+            'content' => base64_encode($file)
+        );
+    }
+    mysql_free_result($result3);
+
+    
+    
+    // Construct message
+    $message = array(
+        'subject' => $msg['subject'],
+        'from_email' => $msg['from_address'],
+        'from_name' => $msg['from_name'],
+        'to' => $recipients,
+        'headers' => $headers,
+        'merge' => true,
+        'merge_vars' => $merge_vars,
+        'attachments' => $attachments,
+        'auto_text' => true,
+        'preserve_recipients' => false,
+        'view_content_link' => !$email_content_privacy
+    );
+    
+    // Control body type
+    if ($msg['html'] == 1) {
+        $message['html'] = $email_content;
+    } else {
+        $message['text'] = $email_content;
+    }
+    
+    
+    $async = true;
+    
+
+    try {
+        $mandrill = new Mandrill($mandrill_api_key);
+        $mandrill_result = $mandrill->messages->send($message, $async);
+    } catch(Mandrill_Error $e) {
+        // Mandrill errors are thrown as exceptions
+        echo 'A mandrill error occurred: ' . get_class($e) . ' - ' . $e->getMessage();
+        throw $e;
+    }
+        
+    $sql = sprintf("SELECT COUNT(*) FROM rgmessages_emailrecipient WHERE `message_id` = %d AND `status` = 0", $msg['id']);
+    $result2 = mysql_query($sql);
+    $count = mysql_fetch_row($result2);
+    if (intval($count[0]) == 0) {
+        $sql = sprintf("UPDATE rgmessages_emailmessage SET `status` = 1 WHERE `id` = %d", $msg['id']);
+        mysql_query($sql);
+    }
+    mysql_free_result($result2);
+
+}
+mysql_free_result($result);
+
+// remove lock file
+unlink("/tmp/robogals-cron-email-lock");
+
+?>
