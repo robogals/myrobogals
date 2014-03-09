@@ -25,7 +25,7 @@ def list(request):
 				chapters_all = Group.objects.filter(parent=superchapter)
 				chapters_display = []
 				for chapter in chapters_all:
-					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter or request.user.is_superuser)):
+					if chapter.status != 1:
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
