@@ -56,9 +56,9 @@ class SchoolVisitFormOne(forms.Form):
 		del kwargs['chapter']
 		super(SchoolVisitFormOne, self).__init__(*args, **kwargs)
 		if chapter == None:
-			self.fields["school"].queryset = School.objects.all()
+			self.fields["school"].queryset = School.objects.all().order_by('name')
 		else:
-			self.fields["school"].queryset = School.objects.filter(chapter=chapter)
+			self.fields["school"].queryset = School.objects.filter(chapter=chapter).order_by('name')
 
 	def clean(self):
 		cleaned_data = super(SchoolVisitFormOne, self).clean()
