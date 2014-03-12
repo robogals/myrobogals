@@ -31,12 +31,6 @@ def teachhome(request):
 	return HttpResponseRedirect('/teaching/list/')
 	#return render_to_response('teaching.html', {}, context_instance=RequestContext(request))
 
-@login_required
-def videotute(request):
-	if not request.user.is_staff:
-		raise Http404
-	return render_to_response('video.html', {}, context_instance=RequestContext(request))
-
 class SchoolVisitFormOne(forms.Form):
 	ALLOW_RSVP_CHOICES = (
 		(0, 'Allow anyone to RSVP'),
