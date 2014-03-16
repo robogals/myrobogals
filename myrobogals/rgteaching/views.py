@@ -31,12 +31,6 @@ def teachhome(request):
 	return HttpResponseRedirect('/teaching/list/')
 	#return render_to_response('teaching.html', {}, context_instance=RequestContext(request))
 
-@login_required
-def videotute(request):
-	if not request.user.is_staff:
-		raise Http404
-	return render_to_response('video.html', {}, context_instance=RequestContext(request))
-
 class SchoolVisitFormOne(forms.Form):
 	ALLOW_RSVP_CHOICES = (
 		(0, 'Allow anyone to RSVP'),
@@ -56,9 +50,9 @@ class SchoolVisitFormOne(forms.Form):
 		del kwargs['chapter']
 		super(SchoolVisitFormOne, self).__init__(*args, **kwargs)
 		if chapter == None:
-			self.fields["school"].queryset = School.objects.all()
+			self.fields["school"].queryset = School.objects.all().order_by('name')
 		else:
-			self.fields["school"].queryset = School.objects.filter(chapter=chapter)
+			self.fields["school"].queryset = School.objects.filter(chapter=chapter).order_by('name')
 
 	def clean(self):
 		cleaned_data = super(SchoolVisitFormOne, self).clean()
