@@ -192,19 +192,8 @@ def progresschapter(request):
 	displaycats = [0, 7]
 	careertalkview = False
 
-	if request.user.is_superuser:
+	if request.user.is_superuser or request.user.is_staff:
 		c = Group.objects.get(pk=1)
-	elif request.user.is_staff:
-		# Allow global and regional exec to see global progress bars
-		if request.user.chapter.pk == 1:
-			c = request.user.chapter
-		elif request.user.chapter.parent:
-			if request.user.chapter.parent.pk == 1:
-				c = Group.objects.get(pk=1)
-			else:
-				c = request.user.chapter
-		else:
-			c = request.user.chapter
 	else:
 		raise Http404
 	
