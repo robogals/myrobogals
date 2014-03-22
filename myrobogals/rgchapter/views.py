@@ -18,11 +18,11 @@ import StringIO
 
 def list(request):
 	listing = []
-	superchapters = Group.objects.filter(parent=1).exclude(myrobogals_url='special').order_by('name')
+	superchapters = Group.objects.filter(parent=1).exclude(myrobogals_url='special').order_by('short','name')
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
 			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter or request.user.is_superuser or request.user.chapter.parent == superchapter)):
-				chapters_all = Group.objects.filter(parent=superchapter).order_by('name')
+				chapters_all = Group.objects.filter(parent=superchapter).order_by('short','name')
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status != 1:
@@ -30,13 +30,13 @@ def list(request):
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
 			if superchapter.status == 0:
-				chapters_all = Group.objects.filter(parent=superchapter).order_by('name')
+				chapters_all = Group.objects.filter(parent=superchapter).order_by('short','name')
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status == 0:
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
-		specialch = Group.objects.filter(parent__myrobogals_url='special', status=0).order_by('name')
+		specialch = Group.objects.filter(parent__myrobogals_url='special', status=0).order_by('short','name')
 	return render_to_response('chapter_listing.html', {'listing': listing, 'specialch': specialch}, context_instance=RequestContext(request))
 
 def joinlist(request):
