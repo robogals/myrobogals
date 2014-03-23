@@ -1,6 +1,6 @@
 """
     myRobogals
-    myrg_groups/model.py
+    myrg_groups/models.py
     Custom RobogalsGroup and RobogalsChapter model definition
 
     2014
