@@ -24,7 +24,14 @@ class RobogalsUserCreationForm(forms.ModelForm):
                     'username',
                     'primary_email',
                   )
-                  
+
+    def clean_primary_email(self):
+        primary_email = self.cleaned_data['primary_email']
+        return RobogalsUser.objects.normalize_email(primary_email)
+
+    def clean_given_name(self):
+        return self.cleaned_data['given_name'].strip()
+
     def clean_password2(self):
         # Check that the two password entries match
         password1 = self.cleaned_data.get('password1')
