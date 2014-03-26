@@ -1,6 +1,6 @@
 """
     myRobogals
-    myrg_users/model.py
+    myrg_users/models.py
     Custom RobogalsUser model definition
 
     2014

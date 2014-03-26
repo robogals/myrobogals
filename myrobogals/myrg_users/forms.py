@@ -42,7 +42,6 @@ class RobogalsUserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         # Save the provided password in hashed format
-        #import pdb; pdb.set_trace()
         user = super(RobogalsUserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password1'])
         if commit:
