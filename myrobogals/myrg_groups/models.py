@@ -17,7 +17,7 @@ from myrg_users.models import RobogalsUser
 # Based upon:
 # * https://docs.djangoproject.com/en/dev/ref/models/fields/
 
-class RobogalsGroup(models.Model):
+class Group(models.Model):
     name = models.CharField(_('name'),
                             blank=False)
     preferred_name = models.CharField(_('preferred name'),
@@ -41,7 +41,7 @@ class RobogalsGroup(models.Model):
     date_created = models.DateField(_('date created'),
                                     blank=False)
 
-class RobogalsChapter(models.Model):
+class Chapter(models.Model):
     group = models.ForeignKey(Group)
 
     university = models.CharField(_('university'),
@@ -101,12 +101,12 @@ class RoleType(models.Model):
     def __unicode__(self):
         return self.name
 
-    def applicableGroups(self):
+    def get_applicable_groups(self):
         if self.group_include.all():
-            applGroups = self.group_include.exclude(pk__in = self.group_exclude.all())
+            applicable_groups = self.group_include.exclude(pk__in = self.group_exclude.all())
         else:
-            applGroups = Group.objects.exclude(pk__in = self.group_exclude.all())
-        return applGroups
+            applicable_groups = Group.objects.exclude(pk__in = self.group_exclude.all())
+        return applicable_groups
 
 class Role(models.Model):
     user = models.ForeignKey(RobogalsUser)
