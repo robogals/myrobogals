@@ -1,7 +1,7 @@
 """
     myRobogals
     myrg_groups/models.py
-    Custom RobogalsGroup and RobogalsChapter model definition
+    Custom Group, Chapter, Role, RoleType model definition
 
     2014
     Robogals Software Team
@@ -11,7 +11,6 @@ from django.db import models
 from django.core import validators
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import Group
 from myrg_users.models import RobogalsUser
 
 # Based upon:
