@@ -14,8 +14,8 @@ from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
 
 class RepoContainer(models.Model):
-    user = models.ForeignKey('RobogalsUser')
-    role = models.ForeignKey('Role')
+    user = models.ForeignKey(RobogalsUser)
+    role = models.ForeignKey(Role)
     title = models.CharField(_('title'),
                              blank=False)
     body = models.TextField(_('body'),
@@ -43,4 +43,4 @@ class RepoFile(models.Model):
                             blank=False)
     file = models.FileField(_('file'),
                             blank=False)
-    container = models.ForeignKey('RepoContainer')
+    container = models.ForeignKey(RepoContainer)

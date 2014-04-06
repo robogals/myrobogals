@@ -14,8 +14,8 @@ from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
 
 class MessageDefinition(models.Model):
-    sender = models.ForeignKey('RobogalsUser')
-    sender_role = models.ForeignKey('Role')
+    sender = models.ForeignKey(RobogalsUser)
+    sender_role = models.ForeignKey(Role)
     sender_manual = models.CharField(_('sender manual'),
                                      blank=True)
     subject = models.CharField(_('subject'),
@@ -38,8 +38,8 @@ class MessageDefinition(models.Model):
                                     blank=False)
 
 class Message(models.Model):
-    definition = models.ForeignKey('MessageDefinition')
-    recipient_user = models.ForeignKey('RobogalsUser',
+    definition = models.ForeignKey(MessageDefinition)
+    recipient_user = models.ForeignKey(RobogalsUser,
                                        blank=True,
                                        null=True)
     recipient_manual = models.CharField(_('recipient manual'),
