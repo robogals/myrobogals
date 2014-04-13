@@ -20,7 +20,7 @@ class MessageDefinition(models.Model):
                                      blank=True)
     subject = models.CharField(_('subject'),
                                blank=True)
-    body = models.CharField(_('body'),
+    body = models.TextField(_('body'),
                             blank=False)
     variables = models.TextField(_('variables'),
                                  blank=False)
