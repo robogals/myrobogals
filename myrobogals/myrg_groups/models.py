@@ -1,6 +1,7 @@
 """
     myRobogals
     myrg_groups/models.py
+    Custom Group, Chapter, Role, RoleType model definition
 
     2014
     Robogals Software Team
@@ -10,8 +11,68 @@ from django.db import models
 from django.core import validators
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import Group
 from myrg_users.models import RobogalsUser
+
+# Based upon:
+# * https://docs.djangoproject.com/en/dev/ref/models/fields/
+
+class Group(models.Model):
+    name = models.CharField(_('name'),
+                            blank=False)
+    preferred_name = models.CharField(_('preferred name'),
+                                      blank=True)
+
+    parent = models.ForeignKey('self',
+                               null=True,
+                               blank=True)
+
+    STATUS_CHOICES = (
+        (0, 'Inactive'),
+        (1, 'Hidden'),
+        (8, 'Active, Non-joinable'),
+        (9, 'Active, Joinable'),
+    )
+    status = models.PositiveSmallIntegerField(_('status'),
+                              choices=STATUS_CHOICES,
+                              default=0,
+                              blank=False)
+
+    date_created = models.DateField(_('date created'),
+                                    blank=False)
+
+class Chapter(models.Model):
+    group = models.ForeignKey(Group)
+
+    university = models.CharField(_('university'),
+                                  blank=True)
+
+    address = models.CharField(_('address'),
+                               blank=False)
+    city = models.CharField(_('city'),
+                            blank=True)
+    state = models.CharField(_('state'),
+                             blank=True)
+    postcode = models.CharField(_('postcode'),
+                                blank=True,
+                                max_length=16)
+    country = models.CharField(_('country'),
+                               blank=False)
+    latitude = models.FloatField(_('latitude'),
+                                 blank=True)
+    longitude = models.FloatField(_('longitude'),
+                                  blank=True)
+
+    timezone = models.CharField(_('timezone'),
+                                blank=False,
+                                default='Etc/UTC')
+
+    url = models.CharField(_('url'),
+                           blank=True)
+    html = models.TextField(_('html'),
+                            blank=True,
+                            help_text=_('Holds HTML content for chapter info page and is different from an actual website.'))
+
+
 
 class RoleType(models.Model):
     name = models.CharField(_('name'),
@@ -39,12 +100,12 @@ class RoleType(models.Model):
     def __unicode__(self):
         return self.name
 
-    def applicableGroups(self):
+    def get_applicable_groups(self):
         if self.group_include.all():
-            applGroups = self.group_include.exclude(pk__in = self.group_exclude.all())
+            applicable_groups = self.group_include.exclude(pk__in = self.group_exclude.all())
         else:
-            applGroups = Group.objects.exclude(pk__in = self.group_exclude.all())
-        return applGroups
+            applicable_groups = Group.objects.exclude(pk__in = self.group_exclude.all())
+        return applicable_groups
 
 class Role(models.Model):
     user = models.ForeignKey(RobogalsUser)
@@ -57,3 +118,7 @@ class Role(models.Model):
     date_end = models.DateTimeField(_('date end'),
         blank=True,
         null=True)
+
+
+
+

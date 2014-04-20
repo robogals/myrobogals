@@ -1,7 +1,7 @@
 """
     myRobogals
-    myrg_users/models.py
-    Custom RobogalsUser model definition
+    myrg_users/model.py
+    Custom RobogalsUserManager, RobogalsUser, PermissionDefinition model definition
 
     2014
     Robogals Software Team
@@ -293,3 +293,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         # We are implying superusers = staff
         return self.is_superuser
+
+class PermissionDefinition(models.Model):
+    role_type = models.ForeignKey(RoleType)
+    definition = models.TextField(_('definition'),
+                                  blank=False,
+                                  help_text=_('Json list of permission key-value pairs or just a list for positive permissions.'))
