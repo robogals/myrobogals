@@ -32,7 +32,7 @@ class Group(models.Model):
         (8, 'Active, Non-joinable'),
         (9, 'Active, Joinable'),
     )
-    status = models.CharField(_('status'),
+    status = models.PositiveSmallIntegerField(_('status'),
                               choices=STATUS_CHOICES,
                               default=0,
                               blank=False)
