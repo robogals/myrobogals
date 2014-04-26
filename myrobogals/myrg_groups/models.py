@@ -1,7 +1,7 @@
 """
     myRobogals
     myrg_groups/models.py
-    Custom Group, Chapter, Role, RoleType model definition
+    Custom LocatableEntity, Role, RoleType model definition
 
     2014
     Robogals Software Team
