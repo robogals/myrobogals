@@ -1,7 +1,7 @@
 """
     myRobogals
     myrg_groups/models.py
-    Custom Group, Chapter, Role, RoleType model definition
+    Custom LocatableEntity, Role, RoleType model definition
 
     2014
     Robogals Software Team
@@ -16,36 +16,8 @@ from myrg_users.models import RobogalsUser
 # Based upon:
 # * https://docs.djangoproject.com/en/dev/ref/models/fields/
 
-class Group(models.Model):
-    name = models.CharField(_('name'),
-                            blank=False)
-    preferred_name = models.CharField(_('preferred name'),
-                                      blank=True)
-
-    parent = models.ForeignKey('self',
-                               null=True,
-                               blank=True)
-
-    STATUS_CHOICES = (
-        (0, 'Inactive'),
-        (1, 'Hidden'),
-        (8, 'Active, Non-joinable'),
-        (9, 'Active, Joinable'),
-    )
-    status = models.PositiveSmallIntegerField(_('status'),
-                              choices=STATUS_CHOICES,
-                              default=0,
-                              blank=False)
-
-    date_created = models.DateField(_('date created'),
-                                    blank=False)
-
-class Chapter(models.Model):
+class LocatableEntity(models.Model):
     group = models.ForeignKey(Group)
-
-    university = models.CharField(_('university'),
-                                  blank=True)
-
     address = models.CharField(_('address'),
                                blank=False)
     city = models.CharField(_('city'),
@@ -72,7 +44,16 @@ class Chapter(models.Model):
                             blank=True,
                             help_text=_('Holds HTML content for chapter info page and is different from an actual website.'))
 
+class Chapter(LocatableEntity):
+    university = models.CharField(_('university'),
+                                  blank=True)
 
+class School(LocatableEntity):
+    pass
+
+class Company(LocatableEntity):
+    legal_name = models.CharField(_('legal name'),
+                                  blank=True)
 
 class RoleType(models.Model):
     name = models.CharField(_('name'),
