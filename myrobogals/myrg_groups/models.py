@@ -13,8 +13,33 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from myrg_users.models import RobogalsUser
 
+
+
 # Based upon:
 # * https://docs.djangoproject.com/en/dev/ref/models/fields/
+
+class Group(models.Model):
+    name = models.CharField(_('name'), blank=False)
+    preferred_name = models.CharField(_('preferred name'),
+                                      blank=True)
+
+    parent = models.ForeignKey('self',
+                               null=True,
+                               blank=True)
+
+    STATUS_CHOICES = (
+        (0, 'Inactive'),
+        (1, 'Hidden'),
+        (8, 'Active, Non-joinable'),
+        (9, 'Active, Joinable'),
+    )
+    status = models.PositiveSmallIntegerField(_('status'),
+                              choices=STATUS_CHOICES,
+                              default=0,
+                              blank=False)
+
+    date_created = models.DateField(_('date created'),
+                                    blank=False)
 
 class LocatableEntity(models.Model):
     group = models.ForeignKey(Group)

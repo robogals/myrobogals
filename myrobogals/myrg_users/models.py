@@ -16,8 +16,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
 
-from myrg_groups.models import RoleType
-
 # Based upon:
 # * https://docs.djangoproject.com/en/1.6/topics/auth/customizing/#substituting-a-custom-user-model
 # * http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
@@ -296,8 +294,4 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         # We are implying superusers = staff
         return self.is_superuser
 
-class PermissionDefinition(models.Model):
-    role_type = models.ForeignKey(RoleType)
-    definition = models.TextField(_('definition'),
-                                  blank=False,
-                                  help_text=_('Json list of permission key-value pairs or just a list for positive permissions.'))
+
