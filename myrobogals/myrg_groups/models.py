@@ -19,9 +19,12 @@ from myrg_users.models import RobogalsUser
 # * https://docs.djangoproject.com/en/dev/ref/models/fields/
 
 class Group(models.Model):
-    name = models.CharField(_('name'), blank=False)
+    name = models.CharField(_('name'),
+                            max_length=63,
+                            blank=False)
     preferred_name = models.CharField(_('preferred name'),
-                                      blank=True)
+                                        max_length=63,
+                                        blank=True)
 
     parent = models.ForeignKey('self',
                                null=True,
@@ -43,16 +46,19 @@ class Group(models.Model):
 
 class LocatableEntity(models.Model):
     group = models.ForeignKey(Group)
-    address = models.CharField(_('address'),
+    address = models.TextField(_('address'),
                                blank=False)
     city = models.CharField(_('city'),
+                            max_length=63,
                             blank=True)
     state = models.CharField(_('state'),
+                             max_length=63,
                              blank=True)
     postcode = models.CharField(_('postcode'),
                                 blank=True,
                                 max_length=16)
     country = models.CharField(_('country'),
+                               max_length=63,
                                blank=False)
     latitude = models.FloatField(_('latitude'),
                                  blank=True)
@@ -60,10 +66,12 @@ class LocatableEntity(models.Model):
                                   blank=True)
 
     timezone = models.CharField(_('timezone'),
+                                max_length=63,
                                 blank=False,
                                 default='Etc/UTC')
 
     url = models.CharField(_('url'),
+                           max_length=255,
                            blank=True)
     html = models.TextField(_('html'),
                             blank=True,
@@ -71,6 +79,7 @@ class LocatableEntity(models.Model):
 
 class Chapter(LocatableEntity):
     university = models.CharField(_('university'),
+                                  max_length=63,
                                   blank=True)
 
 class School(LocatableEntity):
@@ -78,6 +87,7 @@ class School(LocatableEntity):
 
 class Company(LocatableEntity):
     legal_name = models.CharField(_('legal name'),
+                                  max_length=63,
                                   blank=True)
 
 class RoleType(models.Model):
