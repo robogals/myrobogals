@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'myrg_users',
     'myrg_groups',
+    'myrg_message',
 )
 
 MIDDLEWARE_CLASSES = (

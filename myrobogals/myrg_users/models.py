@@ -295,7 +295,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         return self.is_superuser
 
 class PermissionDefinition(models.Model):
-    role_type = models.ForeignKey(RoleType)
+    role_type = models.ForeignKey('myrg_groups.RoleType')
     definition = models.TextField(_('definition'),
                                   blank=False,
                                   help_text=_('Json list of permission key-value pairs or just a list for positive permissions.'))

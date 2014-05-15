@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group
 from .models import RobogalsUser
+from myrg_groups.models import Group
 
 from rest_framework import viewsets
 from .serializers import RobogalsUserSerializer, GroupSerializer

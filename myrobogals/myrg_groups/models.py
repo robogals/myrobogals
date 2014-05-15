@@ -18,8 +18,10 @@ from myrg_users.models import RobogalsUser
 
 class Group(models.Model):
     name = models.CharField(_('name'),
+                            max_length=127,
                             blank=False)
     preferred_name = models.CharField(_('preferred name'),
+                                      max_length=127,
                                       blank=True)
 
     parent = models.ForeignKey('self',
@@ -44,29 +46,37 @@ class Chapter(models.Model):
     group = models.ForeignKey(Group)
 
     university = models.CharField(_('university'),
+                                  max_length=127,
                                   blank=True)
 
     address = models.CharField(_('address'),
+                               max_length=255,
                                blank=False)
     city = models.CharField(_('city'),
+                            max_length=64,
                             blank=True)
     state = models.CharField(_('state'),
+                             max_length=16,
                              blank=True)
     postcode = models.CharField(_('postcode'),
                                 blank=True,
                                 max_length=16)
     country = models.CharField(_('country'),
+                               max_length=128,
                                blank=False)
+
     latitude = models.FloatField(_('latitude'),
                                  blank=True)
     longitude = models.FloatField(_('longitude'),
                                   blank=True)
 
     timezone = models.CharField(_('timezone'),
+                                max_length=64,
                                 blank=False,
                                 default='Etc/UTC')
 
     url = models.CharField(_('url'),
+                           max_length=128,
                            blank=True)
     html = models.TextField(_('html'),
                             blank=True,
@@ -118,7 +128,3 @@ class Role(models.Model):
     date_end = models.DateTimeField(_('date end'),
         blank=True,
         null=True)
-
-
-
-

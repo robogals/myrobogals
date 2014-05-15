@@ -10,6 +10,7 @@
 from django.db import models
 from django.core import validators
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
 
@@ -17,8 +18,10 @@ class MessageDefinition(models.Model):
     sender = models.ForeignKey(RobogalsUser)
     sender_role = models.ForeignKey(Role)
     sender_manual = models.CharField(_('sender manual'),
+                                     max_length=255,
                                      blank=True)
     subject = models.CharField(_('subject'),
+                               max_length=255,
                                blank=True)
     body = models.TextField(_('body'),
                             blank=False)
@@ -35,6 +38,7 @@ class MessageDefinition(models.Model):
                                                default=1,
                                                blank=False)
     date_created = models.DateField(_('date created'),
+                                    default=timezone.now,
                                     blank=False)
 
 class Message(models.Model):
@@ -43,12 +47,17 @@ class Message(models.Model):
                                        blank=True,
                                        null=True)
     recipient_manual = models.CharField(_('recipient manual'),
+                                        max_length=255,
                                         blank=True)
     service_id = models.CharField(_('service id'),
+                                  max_length=255,
                                   blank=True)
     service_status = models.CharField(_('service status'),
+                                      max_length=255,
                                       blank=True)
     date_created = models.DateField(_('date created'),
+                                    default=timezone.now,
                                     blank=False)
     date_delivered = models.DateField(_('date delivered'),
+                                      default=timezone.now,
                                       blank=False)

@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group
 from .models import RobogalsUser
+from myrg_groups.models import Group
 
 from rest_framework import serializers
 
@@ -11,5 +11,5 @@ class RobogalsUserSerializer(serializers.HyperlinkedModelSerializer):
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
-        fields = ('url', 'name')
+        fields = ('name', 'preferred_name', 'parent', 'status', 'date_created',)
 
