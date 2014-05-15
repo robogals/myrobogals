@@ -71,7 +71,7 @@ def send_email(sender, recipients, message):
     to = []
     try_later = False
     msg_record_dict = {}
-    recipients_per_req = 3
+    recipients_per_req = 100
     retval = 1
     for rs in [recipients[i:i+recipients_per_req] for i in xrange(0, len(recipients), recipients_per_req)]:
         for r in rs:
