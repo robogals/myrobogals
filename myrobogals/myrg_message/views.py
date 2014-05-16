@@ -54,7 +54,11 @@ def delete_template(mandrill_client, template_name):
 # to mandrill throws exception, all subsequent requests will be
 # aborted, but database entries "msg_def_record" and
 # "msg_record" will still be stored in disk, for future
-# retry.
+# retry. If number of requests to mandrill is greater than
+# or equal to "template_threshold" then a message template
+# will be created in mandrill so message content need not
+# be re-sent in subsequent request. (How to add attachment
+# to template?)
 def send_email(sender, recipients, message):
     mandrill_client = mandrill.Mandrill('HGjH3nx8VBhbdiYqymkYZQ')
     sender_user = get_object_or_404(RobogalsUser, pk=sender['user'])
@@ -141,7 +145,6 @@ def send_email(sender, recipients, message):
             retval = 2
     return retval
 
-@csrf_exempt
 def send_message(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
