@@ -13,6 +13,7 @@ from myrg_groups.models import RoleType, Role
 
 import base64
 import mandrill
+import math
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -28,9 +29,25 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
-# Error checking is rely on the fact that exceptions
-# will be through for "var['key']" if 'key' is not in
-# the dict "var", database entries "msg_def_record" and
+def create_template(mandrill_client, msg):
+    count = 1
+    template_name = "tmp"
+    success = False
+    while not success:
+        try:
+            result = mandrill_client.templates.add(name=template_name + str(count), from_email=msg['from_email'], from_name=msg['from_name'], subject=msg['subject'], code=msg['html'], publish=True)
+            success = True
+        except mandrill.InvalidTemplateError as e:
+            count = count + 1
+    return result['name']
+
+def delete_template(mandrill_client, template_name):
+    result = mandrill_client.templates.delete(name=template_name)
+    return result
+
+# Error checking rely on the fact that exceptions
+# will be thrown for "var['key']" if 'key' is not in
+# "var", database entries "msg_def_record" and
 # "msg_record" will be stored if no exception is thrown.
 # Each request to mandrill contains no more than
 # "recipients_per_req" recipients. If any one request
@@ -72,7 +89,10 @@ def send_email(sender, recipients, message):
     try_later = False
     msg_record_dict = {}
     recipients_per_req = 100
+    template_threshold = 10
     retval = 1
+    number_requests = int(math.ceil(len(recipients) / float(recipients_per_req)))
+    template_created = False
     for rs in [recipients[i:i+recipients_per_req] for i in xrange(0, len(recipients), recipients_per_req)]:
         for r in rs:
             recipient_user = get_object_or_404(RobogalsUser, pk=r['user'])
@@ -92,9 +112,18 @@ def send_email(sender, recipients, message):
         try:
             if try_later:
                 raise Exception("try later")
+            elif number_requests >= template_threshold:
+                if not template_created:
+                    template_name = create_template(mandrill_client, msg)
+                    template_created = True
+                    del msg['from_email']
+                    del msg['from_name']
+                    del msg['subject']
+                    del msg['html']
+                template_content = []
+                results = mandrill_client.messages.send_template(template_name=template_name, template_content=template_content, message=msg, async=False, ip_pool='Main Pool')
             else:
-                results = mandrill_client.messages.send(message=msg, async=False,
-                             ip_pool='Main Pool')
+                results = mandrill_client.messages.send(message=msg, async=False, ip_pool='Main Pool')
         except Exception as e:
             try_later = True
             retval = 2
@@ -105,8 +134,14 @@ def send_email(sender, recipients, message):
                 msg_record_dict[r['email']].save()
         to = []
         msg_record_dict = {}
+    if template_created:
+        try:
+            delete_template(mandrill_client, template_name)
+        except:
+            retval = 2
     return retval
 
+@csrf_exempt
 def send_message(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
