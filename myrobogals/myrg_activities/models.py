@@ -104,7 +104,52 @@ class Participant(models.Model):
                                  blank=False,
                                  default=0)
 
-# todo: PecuniaryTransaction, PecuniaryItem
+class PecuniaryItem(models.Model):
+    activity = models.ForeignKey('Activity')
+    name = models.CharField(_('name'),
+                            blank=False)
+    description = models.TextField(_('Description'),
+                                   blank=True)
+    amount = models.FloatField(_('Amount'),
+                               blank=False)
+    date_start = models.DateField(_('date start'),
+                                  blank=False)
+    date_end = models.DateField(_('date end'),
+                                blank=False)
+    variable_quantity = models.BooleanField(_('variable quantity'),
+                                            blank=False,
+                                            default=False)
+    default_quantity = models.FloatField(_('default quantity'),
+                                         blank=True,
+                                         default=1)
+    STATUS_CHOICES = (
+        (0, 'Invalid'),
+        (1, 'Valid'),
+    )
+    status = models.IntegerField(_('status'),
+                                 choices=STATUS_CHOICES,
+                                 blank=False,
+                                 default=0)
+    order = models.PositiveIntegerField(_('order'),
+                                        blank=False,
+                                        default=0)
+
+class PecuniaryTransaction(models.Model):
+    date = models.DateTimeField(_('date'),
+                                blank=False,
+                                auto_now=True)
+    activity = models.ForeignKey('Activity')
+    initiator = models.ForeignKey('RobogalsUser',
+                                  help_text=_('The user *applying* the transaction'))
+    participant = models.ForeignKey('Participant',
+                                    help_text=_('The user against which the transaction is held against'))
+    label = models.CharField(_('Label'),
+                             blank=False)
+    description = models.TextField(_('Description'),
+                                   blank=True)
+    amount = models.FloatField(_('Amount'),
+                               blank=False)
+
 
 class Question(models.Model):
     acitivity = models.ForeignKey('Activity')
@@ -114,7 +159,7 @@ class Question(models.Model):
                             blank=False,
                             help_text=_('Will contain question HTML content'))
     definition = models.TextField(_('definition'),
-                                  blank=False) # todo: json list
+                                  blank=False)
     required = models.BooleanField(_('required'),
                                    blank=False)
     order = models.PositiveIntegerField(_('order'),
@@ -125,5 +170,5 @@ class QuestionResponse(models.Model):
     question = models.ForeignKey('Question')
     participant = models.ForeignKey('Participant')
     response = models.TextField(_('response'),
-                                blank=False) # todo: json
+                                blank=False)
     
