@@ -38,7 +38,10 @@ def create_template(mandrill_client, msg):
             result = mandrill_client.templates.add(name=template_name + str(count), from_email=msg['from_email'], from_name=msg['from_name'], subject=msg['subject'], code=msg['html'], publish=True)
             success = True
         except mandrill.InvalidTemplateError as e:
-            count = count + 1
+            if str(e).endswith('already exists'):
+                count = count + 1
+            else:
+                raise Exception("Invalid Char")
     return result['name']
 
 def delete_template(mandrill_client, template_name):
@@ -92,7 +95,7 @@ def send_email(sender, recipients, message):
     to = []
     try_later = False
     msg_record_dict = {}
-    recipients_per_req = 100
+    recipients_per_req = 400
     template_threshold = 10
     retval = 1
     number_requests = int(math.ceil(len(recipients) / float(recipients_per_req)))
