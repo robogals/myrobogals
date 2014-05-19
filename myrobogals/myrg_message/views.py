@@ -38,7 +38,8 @@ def create_template(mandrill_client, msg):
             result = mandrill_client.templates.add(name=template_name + str(count), from_email=msg['from_email'], from_name=msg['from_name'], subject=msg['subject'], code=msg['html'], publish=True)
             success = True
         except mandrill.InvalidTemplateError as e:
-            if str(e).endswith('already exists'):
+            err_msg = 'A template with name "' + template_name + str(count) + '" already exists'
+            if str(e) == err_msg:
                 count = count + 1
             else:
                 raise Exception("Invalid Char")
