@@ -29,7 +29,10 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
+# temporary file name range for template creation
+# tmp1 ... tmp<max_count>
 def create_template(mandrill_client, msg):
+    max_count = 10000000
     count = 1
     template_name = "tmp"
     success = False
@@ -39,7 +42,7 @@ def create_template(mandrill_client, msg):
             success = True
         except mandrill.InvalidTemplateError as e:
             err_msg = 'A template with name "' + template_name + str(count) + '" already exists'
-            if str(e) == err_msg:
+            if (str(e) == err_msg) and (count < max_count):
                 count = count + 1
             else:
                 raise Exception("Invalid Char")
@@ -101,52 +104,54 @@ def send_email(sender, recipients, message):
     retval = 1
     number_requests = int(math.ceil(len(recipients) / float(recipients_per_req)))
     template_created = False
-    for rs in [recipients[i:i+recipients_per_req] for i in xrange(0, len(recipients), recipients_per_req)]:
-        for r in rs:
-            recipient_user = get_object_or_404(RobogalsUser, pk=r['user'])
-            to_user = {'email': recipient_user.primary_email}
-            if 'name' in r:
-                to_user['name'] = r['name']
+    try:
+        for rs in [recipients[i:i+recipients_per_req] for i in xrange(0, len(recipients), recipients_per_req)]:
+            for r in rs:
+                recipient_user = get_object_or_404(RobogalsUser, pk=r['user'])
+                to_user = {'email': recipient_user.primary_email}
+                if 'name' in r:
+                    to_user['name'] = r['name']
+                else:
+                    to_user['name'] = recipient_user.get_full_name()
+                to.append(to_user)
+                msg_record = Message(
+                    definition = msg_def_record,
+                    recipient_user = recipient_user
+                )
+                msg_record.save()
+                msg_record_dict[recipient_user.primary_email] = msg_record
+            msg['to'] = to
+            try:
+                if try_later:
+                    raise Exception("try later")
+                elif number_requests >= template_threshold:
+                    if not template_created:
+                        template_name = create_template(mandrill_client, msg)
+                        template_created = True
+                        del msg['from_email']
+                        del msg['from_name']
+                        del msg['subject']
+                        del msg['html']
+                    template_content = []
+                    results = mandrill_client.messages.send_template(template_name=template_name, template_content=template_content, message=msg, async=False, ip_pool='Main Pool')
+                else:
+                    results = mandrill_client.messages.send(message=msg, async=False, ip_pool='Main Pool')
+            except Exception as e:
+                try_later = True
+                retval = 2
             else:
-                to_user['name'] = recipient_user.get_full_name()
-            to.append(to_user)
-            msg_record = Message(
-                definition = msg_def_record,
-                recipient_user = recipient_user
-            )
-            msg_record.save()
-            msg_record_dict[recipient_user.primary_email] = msg_record
-        msg['to'] = to
-        try:
-            if try_later:
-                raise Exception("try later")
-            elif number_requests >= template_threshold:
-                if not template_created:
-                    template_name = create_template(mandrill_client, msg)
-                    template_created = True
-                    del msg['from_email']
-                    del msg['from_name']
-                    del msg['subject']
-                    del msg['html']
-                template_content = []
-                results = mandrill_client.messages.send_template(template_name=template_name, template_content=template_content, message=msg, async=False, ip_pool='Main Pool')
-            else:
-                results = mandrill_client.messages.send(message=msg, async=False, ip_pool='Main Pool')
-        except Exception as e:
-            try_later = True
-            retval = 2
-        else:
-            for r in results:
-                msg_record_dict[r['email']].service_id = r['_id']
-                msg_record_dict[r['email']].service_status = r['status']
-                msg_record_dict[r['email']].save()
-        to = []
-        msg_record_dict = {}
-    if template_created:
-        try:
-            delete_template(mandrill_client, template_name)
-        except:
-            retval = 2
+                for r in results:
+                    msg_record_dict[r['email']].service_id = r['_id']
+                    msg_record_dict[r['email']].service_status = r['status']
+                    msg_record_dict[r['email']].save()
+            to = []
+            msg_record_dict = {}
+    finally:
+        if template_created:
+            try:
+                delete_template(mandrill_client, template_name)
+            except:
+                retval = 2
     return retval
 
 def send_message(request):
