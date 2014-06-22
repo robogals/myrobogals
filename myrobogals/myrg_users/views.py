@@ -6,6 +6,7 @@ from django.core import serializers
 import json
 
 from .models import RobogalsUser
+from .serializers import RobogalsUserSerializer
 
 class ListUsers(APIView):
     """
@@ -28,7 +29,8 @@ class ListUsers(APIView):
                 # {
                     # "field": "",
                     # "query": "",
-                    # "order": ""
+                    # "order": "",
+                    # "visibility": "",
                 # },
                 # ...
             # ],
@@ -45,7 +47,7 @@ class ListUsers(APIView):
         
         if (not requested_columns) or (not requested_pagination):
             return Response({"detail":"Insufficient information."})
-            
+        
         
         # Pagination
         pagination_page_index = requested_pagination.get("page")
@@ -57,7 +59,9 @@ class ListUsers(APIView):
         pagination_start_index = pagination_page_index * pagination_page_length
         pagination_end_index = pagination_start_index + pagination_page_length
             
-            
+        if pagination_start_index < 0 or pagination_end_index < 0:
+            return Response({"detail":"Negative indexing not supported."})
+        
         
         
         # Build query
@@ -65,41 +69,41 @@ class ListUsers(APIView):
         
         # Filter
         filter_dict = {}
-        sort_dict = {}
+        sort_columns = []
         columns = []
         
         for definition in requested_columns:
             field = definition.get("field")
             field_query = definition.get("query")
             field_order = definition.get("order")
+            field_visibility = definition.get("visibility")
             
             if (field is None):
                 return Response({"detail":"Insufficient information."})
             
             field = str(field)
             
-            columns.append(field)
-            
             if (field_query is not None):
                 filter_dict.update({field+"__icontains": str(field_query)})
             
-            #if (field_order is not None):
-            #    sort_dict.update({field: str(field_order)})
-
-        
+            if (field_order is not None):
+                field_order = str(field_order)
+                
+                if field_order == "a":
+                    sort_columns.append(field)
+                if field_order == "d":
+                    sort_columns.append("-"+field)
+            
+            if not (field_visibility == False):
+                columns.append(field)
         
         query = query.filter(**filter_dict)
+        query = query.order_by(*sort_columns)
         query = query[pagination_start_index:pagination_end_index]
-        query = query.values(*columns)
         
+        serializer = RobogalsUserSerializer
+        serializer.Meta.fields = columns
         
+        serialized_query = serializer(query, many=True)
         
-        
-        # Pull out the columns ("request")
-        # Limit queries by "pagination"
-        
-        
-        
-        
-        
-        return Response(query)
+        return Response(serialized_query.data)
