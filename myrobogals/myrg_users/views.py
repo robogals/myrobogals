@@ -65,7 +65,7 @@ class ListUsers(APIView):
         
         
         # Build query
-        query = RobogalsUser.objects.all()
+        query = RobogalsUser.objects.filter(is_active=True)
         
         # Filter
         filter_dict = {}
@@ -107,3 +107,26 @@ class ListUsers(APIView):
         serialized_query = serializer(query, many=True)
         
         return Response(serialized_query.data)
+
+class DeleteUsers(APIView):
+    authentication_classes = (authentication.SessionAuthentication,authentication.BasicAuthentication,)
+    permission_classes = (permissions.IsAdminUser,)
+    
+    def post(self, request, format=None):
+        # {
+            # "id": [pk, ...]
+        # }
+        
+        requested_ids = request.DATA.get("id")
+        
+        if (not requested_ids):
+            return Response({"detail":"Insufficient information."})
+        
+        if not all(isinstance(pk, int) for pk in requested_ids):
+            return Response({"detail":"ID list is not valid."})
+        
+        query = RobogalsUser.objects.filter(id__in=requested_ids)
+        number_of_rows = query.update(is_active=False)
+        
+        return Response({"detail":"User deletion successful.", "affected_rows": number_of_rows, "id": requested_ids})
+        

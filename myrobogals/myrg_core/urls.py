@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 
 # from myrg_users.views import RobogalsUserViewSet, GroupViewSet
-from myrg_users.views import ListUsers
+from myrg_users.views import ListUsers, DeleteUsers
 
 
 ############# Django REST Framework ###############
@@ -36,6 +36,7 @@ urlpatterns = patterns('',
 
 api_urlpatterns = patterns('',
     url(r'^api/1.0/users/list$', ListUsers.as_view()),
+    url(r'^api/1.0/users/delete$', DeleteUsers.as_view()),
 )
 
 api_urlpatterns = format_suffix_patterns(api_urlpatterns, allowed=['json'])
