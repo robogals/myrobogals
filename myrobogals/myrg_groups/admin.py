@@ -7,10 +7,20 @@
 """
 
 from django.contrib import admin
-from myrg_groups.models import RoleType, Role
+
+from .models import Group, Chapter, School, Company, RoleType, Role
 
 from .forms import RoleCreationForm, RoleChangeForm
 
+class GroupAdmin(admin.ModelAdmin):
+    list_display = (
+                    'name',
+                    'status',
+                   )
+
+    search_fields = ('name',)
+    ordering = ('name',)
+    
 class RoleTypeAdmin(admin.ModelAdmin):
     list_display = (
                     'name',
@@ -65,6 +75,11 @@ class RoleAdmin(admin.ModelAdmin):
         defaults.update(kwargs)
         return super(RoleAdmin, self).get_form(request, obj, **defaults)
 
+
+admin.site.register(Group, GroupAdmin)
+admin.site.register(Chapter, GroupAdmin)
+admin.site.register(School, GroupAdmin)
+admin.site.register(Company, GroupAdmin)
 
 admin.site.register(RoleType, RoleTypeAdmin)
 admin.site.register(Role, RoleAdmin)

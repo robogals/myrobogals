@@ -244,6 +244,19 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                         'given_name',
                         ]
     
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ("password",)
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id","date_joined",)
+    
+    
+    
+    
     # Defining information for display of this class in admin
     class Meta:
         verbose_name = _('User')

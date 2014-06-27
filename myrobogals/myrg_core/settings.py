@@ -129,14 +129,15 @@ AUTH_USER_MODEL = 'myrg_users.RobogalsUser'
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
     # Only used if the `serializer_class` attribute is not set on a view.
-    'DEFAULT_MODEL_SERIALIZER_CLASS':
-        'rest_framework.serializers.HyperlinkedModelSerializer',
-
+    # 'DEFAULT_MODEL_SERIALIZER_CLASS': [
+        # 'rest_framework.serializers.HyperlinkedModelSerializer',
+    # ],
+    
     # Use Django's standard permissions, or allow read-only access for
     #unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
 
     # django-oauth-toolkit requires slightly different set up:
     # https://django-oauth-toolkit.readthedocs.org/en/0.5.0/rest-framework/getting_started.html
@@ -145,4 +146,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+    
 }

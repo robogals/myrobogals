@@ -14,7 +14,7 @@ class RoleCreationForm(forms.ModelForm):
 
     def clean_group(self):
         group = self.cleaned_data['group']
-        applGroups = self.cleaned_data['role_type'].applicableGroups()
+        applGroups = self.cleaned_data['role_type'].get_applicable_groups()
         if group in applGroups:
             return group
         else:
@@ -34,7 +34,7 @@ class RoleChangeForm(forms.ModelForm):
 
     def clean_group(self):
         group = self.cleaned_data['group']
-        applGroups = self.cleaned_data['role_type'].applicableGroups()
+        applGroups = self.cleaned_data['role_type'].get_applicable_groups()
         if group in applGroups:
             return group
         else:

@@ -6,4 +6,5 @@ class RobogalsUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = RobogalsUser
         #fields = ('url', 'username', 'given_name', 'primary_email', 'groups', 'is_active', 'is_superuser',)
-        write_only_fields = ('password',)
+        read_only_fields = RobogalsUser.READONLY_FIELDS
+        write_only_fields = RobogalsUser.PROTECTED_FIELDS

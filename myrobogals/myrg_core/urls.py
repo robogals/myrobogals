@@ -18,6 +18,7 @@ from myrg_users.views import ListUsers, DeleteUsers
 
 # Auto generate/collate Django admin panels
 admin.autodiscover()
+admin.site.unregister(Group)
 
 urlpatterns = patterns('',
     # Examples:

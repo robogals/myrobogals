@@ -30,6 +30,10 @@ class Group(models.Model):
                                null=True,
                                blank=True)
 
+    description = models.TextField(_('description'),
+                            blank=True,
+                            help_text=_('Description, with HTML support'))
+                            
     STATUS_CHOICES = (
         (0, 'Inactive'),
         (1, 'Hidden'),
@@ -44,8 +48,22 @@ class Group(models.Model):
     date_created = models.DateField(_('date created'),
                                     blank=False)
 
-class LocatableEntity(models.Model):
-    group = models.ForeignKey(Group)
+    def get_preferred_name(self):
+        """Retrieves the preferred name of the group, for display purposes.
+        
+        Format:
+            <preferred> (where available)
+            <given> (otherwise)
+        """
+        return '{}'.format(self.preferred_name or self.name)
+        
+    def get_sortable_name(self):
+        return self.get_preferred_name(self)
+    
+    def __str__(self):
+        return self.get_preferred_name()
+        
+class LocatableEntity(Group):
     address = models.TextField(_('address'),
                                blank=False)
     city = models.CharField(_('city'),
@@ -73,10 +91,9 @@ class LocatableEntity(models.Model):
     url = models.CharField(_('url'),
                            max_length=255,
                            blank=True)
-    html = models.TextField(_('html'),
-                            blank=True,
-                            help_text=_('Holds HTML content for chapter info page and is different from an actual website.'))
-
+    class Meta:
+        abstract = True
+        
 class Chapter(LocatableEntity):
     university = models.CharField(_('university'),
                                   max_length=63,
@@ -93,11 +110,7 @@ class Company(LocatableEntity):
 class RoleType(models.Model):
     name = models.CharField(_('name'),
         max_length=63,
-        unique=True,
-        validators=[
-            validators.RegexValidator(r'^[\w.-]+$', _('This value may contain only alphanumeric and ./_/- characters.'), 'invalid')
-        ],
-        help_text=_('Name of length 63 characters or fewer, consisting of alphanumeric characters and any of ./_/- is required.'))
+        unique=True)
 
     description = models.TextField(_('description'),
         blank=True,
@@ -113,7 +126,7 @@ class RoleType(models.Model):
         blank=True,
         null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_applicable_groups(self):
