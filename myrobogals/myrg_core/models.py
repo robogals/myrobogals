@@ -12,9 +12,6 @@ from django.core import validators
 from django.utils import timezone
 
 class APILog(models.Model):
-    user = models.ForeignKey(_('user'),
-                             blank=True
-                             null=True)
     role = models.ForeignKey(_('role'),
                              blank=True
                              null=True)
@@ -22,6 +19,9 @@ class APILog(models.Model):
                                blank=False)
     api_call = models.TextField(_('api call'),
                                 blank=False)
+    note = models.TextField(_('note'),
+                            blank=True,
+                            null=True)
     date = models.DateTimeField(_('date'),
                                 blank=False,
-                                default=timezone.now)
+                                auto_now_add=True)

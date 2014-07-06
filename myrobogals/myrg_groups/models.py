@@ -26,6 +26,8 @@ class Group(models.Model):
                                         max_length=63,
                                         blank=True)
 
+    creator = models.ForeignKey(RobogalsUser)
+
     parent = models.ForeignKey('self',
                                null=True,
                                blank=True)
@@ -47,7 +49,7 @@ class Group(models.Model):
 
     date_created = models.DateField(_('date created'),
                                     blank=False)
-
+                                    
     def get_preferred_name(self):
         """Retrieves the preferred name of the group, for display purposes.
         

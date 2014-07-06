@@ -246,13 +246,13 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     
     
     # Fields that cannot be listed or filtered/sorted with
-    PROTECTED_FIELDS = ("password",)
+    PROTECTED_FIELDS = ("password","groups","user_permissions","last_login","is_superuser")
 
     # Fields that cannot be listed (but can be filtered/sorted with)
     # NONVISIBLE_FIELDS = ()
     
     # Fields that cannot be written to
-    READONLY_FIELDS = ("id","date_joined",)
+    READONLY_FIELDS = ("id","mobile_verified","groups","user_permissions","date_joined","last_login","is_superuser")
     
     
     
