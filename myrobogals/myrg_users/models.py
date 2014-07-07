@@ -56,6 +56,10 @@ class RobogalsUserManager(BaseUserManager):
         return self._create_user(username, primary_email, given_name, password, is_superuser=True, **extra_fields)
 
 class RobogalsUser(AbstractBaseUser, PermissionsMixin):
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+        
     ############################################################################
     # Identifiers
     ############################################################################
@@ -66,6 +70,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #
     # Usernames will not be accepting Unicode characters due to conflicts with
     # future implementation of the messaging system.
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    
     username = models.CharField(_('username'),
                                 max_length=63,
                                 unique=True,
@@ -252,7 +259,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     # NONVISIBLE_FIELDS = ()
     
     # Fields that cannot be written to
-    READONLY_FIELDS = ("id","mobile_verified","groups","user_permissions","date_joined","last_login","is_superuser")
+    READONLY_FIELDS = ("id","mobile_verified","groups","user_permissions","date_joined","last_login","is_superuser","is_active")
     
     
     

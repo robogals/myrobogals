@@ -8,7 +8,7 @@
 
 from django.contrib import admin
 
-from .models import Group, Chapter, School, Company, RoleType, Role
+from .models import Group, Chapter, School, Company, RoleClass, Role
 
 from .forms import RoleCreationForm, RoleChangeForm
 
@@ -21,7 +21,7 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
     
-class RoleTypeAdmin(admin.ModelAdmin):
+class RoleClassAdmin(admin.ModelAdmin):
     list_display = (
                     'name',
                     'description',
@@ -38,7 +38,7 @@ class RoleAdmin(admin.ModelAdmin):
 
     list_display = (
                     'user',
-                    'role_type',
+                    'role_class',
                     'group',
                    )
 
@@ -47,7 +47,7 @@ class RoleAdmin(admin.ModelAdmin):
             'classes': ('wide',),
             'fields': (
                         'user',
-                        'role_type',
+                        'role_class',
                         'group',
                         'date_start',
                         'date_end',
@@ -56,7 +56,7 @@ class RoleAdmin(admin.ModelAdmin):
         ),
     )
 
-    search_fields = ('user__username','role_type__name',)
+    search_fields = ('user__username','role_class__name',)
     ordering = ('user__username',)
 
     def get_fieldsets(self, request, obj=None):
@@ -81,5 +81,5 @@ admin.site.register(Chapter, GroupAdmin)
 admin.site.register(School, GroupAdmin)
 admin.site.register(Company, GroupAdmin)
 
-admin.site.register(RoleType, RoleTypeAdmin)
+admin.site.register(RoleClass, RoleClassAdmin)
 admin.site.register(Role, RoleAdmin)

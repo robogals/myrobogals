@@ -151,6 +151,7 @@ class DeleteUsers(APIView):
         # Filter out bad IDs
         ids_to_remove = []
         failed_ids = {}
+        affected_ids = []
         
         for idx,pk in enumerate(requested_ids):
             if not isinstance(pk, int):
@@ -176,10 +177,15 @@ class DeleteUsers(APIView):
         requested_ids = [pk for idx,pk in enumerate(requested_ids) if idx not in ids_to_remove]
         
         # Run query
-        query = RobogalsUser.objects.filter(is_active=True, id__in=requested_ids)
-        affected_ids = [obj.get("id") for obj in query.values("id")]
-        affected_num_rows = query.update(is_active=False)
-        
+        try:
+            with transaction.atomic():
+                query = RobogalsUser.objects.filter(is_active=True, id__in=requested_ids)
+                affected_ids = [obj.get("id") for obj in query.values("id")]
+                affected_num_rows = query.update(is_active=False)
+        except:
+            for pk in requested_ids:
+                failed_ids.update({pk: "OBJECT_NOT_MODIFIED"})
+
         # Gather up non-deleted IDs
         non_deleted_ids = list(set(requested_ids)-set(affected_ids))
         
@@ -224,7 +230,7 @@ class EditUsers(APIView):
             
             
             try:
-                user_id = int(user_object.get("id"))
+                user_id = str(user_object.get("id"))
                 user_data = dict(user_object.get("data"))
             except:
                 return Response({"detail":"DATA_FORMAT_INVALID"}, status=status.HTTP_400_BAD_REQUEST)

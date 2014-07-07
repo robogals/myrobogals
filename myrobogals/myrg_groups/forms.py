@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from myrg_users.models import RobogalsUser
 from django.contrib.admin import widgets, helpers
 
-from .models import RoleType, Role
+from .models import RoleClass, Role
 
 class RoleCreationForm(forms.ModelForm):
     class Meta:
@@ -14,7 +14,7 @@ class RoleCreationForm(forms.ModelForm):
 
     def clean_group(self):
         group = self.cleaned_data['group']
-        applGroups = self.cleaned_data['role_type'].get_applicable_groups()
+        applGroups = self.cleaned_data['role_class'].get_applicable_groups()
         if group in applGroups:
             return group
         else:
@@ -34,7 +34,7 @@ class RoleChangeForm(forms.ModelForm):
 
     def clean_group(self):
         group = self.cleaned_data['group']
-        applGroups = self.cleaned_data['role_type'].get_applicable_groups()
+        applGroups = self.cleaned_data['role_class'].get_applicable_groups()
         if group in applGroups:
             return group
         else:

@@ -1,7 +1,7 @@
 """
     myRobogals
     myrg_groups/models.py
-    Custom LocatableEntity, Role, RoleType model definition
+    Custom LocatableEntity, Role, RoleClass model definition
 
     2014
     Robogals Software Team
@@ -22,12 +22,11 @@ class Group(models.Model):
     name = models.CharField(_('name'),
                             max_length=63,
                             blank=False)
-    preferred_name = models.CharField(_('preferred name'),
-                                        max_length=63,
-                                        blank=True)
 
     creator = models.ForeignKey(RobogalsUser)
 
+    #administrators = models.ManyToManyField(RobogalsUser, limit_choices_to={'is_active': True})
+    
     parent = models.ForeignKey('self',
                                null=True,
                                blank=True)
@@ -37,10 +36,13 @@ class Group(models.Model):
                             help_text=_('Description, with HTML support'))
                             
     STATUS_CHOICES = (
-        (0, 'Inactive'),
-        (1, 'Hidden'),
-        (8, 'Active, Non-joinable'),
-        (9, 'Active, Joinable'),
+        (0, 'Deleted'),
+        (1, 'Active, Private, Non-joinable'),
+        (2, 'Active, Private, Gated'),
+        (3, 'Active, Private, Joinable'),
+        (7, 'Active, Public, Non-joinable'),
+        (8, 'Active, Public, Gated'),
+        (9, 'Active, Public, Joinable'),
     )
     status = models.PositiveSmallIntegerField(_('status'),
                               choices=STATUS_CHOICES,
@@ -48,8 +50,19 @@ class Group(models.Model):
                               blank=False)
 
     date_created = models.DateField(_('date created'),
-                                    blank=False)
-                                    
+                                    blank=False,
+                                    default=timezone.now)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id","date_created",)
+    
+    
     def get_preferred_name(self):
         """Retrieves the preferred name of the group, for display purposes.
         
@@ -76,14 +89,16 @@ class LocatableEntity(Group):
                              blank=True)
     postcode = models.CharField(_('postcode'),
                                 blank=True,
-                                max_length=16)
+                                max_length=15)
     country = models.CharField(_('country'),
                                max_length=63,
                                blank=False)
     latitude = models.FloatField(_('latitude'),
-                                 blank=True)
+                                 blank=True,
+                                 null=True)
     longitude = models.FloatField(_('longitude'),
-                                  blank=True)
+                                  blank=True,
+                                  null=True)
 
     timezone = models.CharField(_('timezone'),
                                 max_length=63,
@@ -109,25 +124,36 @@ class Company(LocatableEntity):
                                   max_length=63,
                                   blank=True)
 
-class RoleType(models.Model):
+class RoleClass(models.Model):
     name = models.CharField(_('name'),
         max_length=63,
         unique=True)
 
     description = models.TextField(_('description'),
         blank=True,
-        help_text=_('Short description of the role type.'))
+        help_text=_('Short description of the role class.'))
 
     group_exclude = models.ManyToManyField(Group,
-        related_name='roletype_exclude',
+        related_name='roleclass_exclude',
         blank=True,
         null=True)
 
     group_include = models.ManyToManyField(Group,
-        related_name='roletype_include',
+        related_name='roleclass_include',
         blank=True,
         null=True)
 
+    is_active = models.BooleanField(_('active'), default=True)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id","is_active")
+    
     def __str__(self):
         return self.name
 
@@ -140,7 +166,7 @@ class RoleType(models.Model):
 
 class Role(models.Model):
     user = models.ForeignKey(RobogalsUser)
-    role_type = models.ForeignKey(RoleType)
+    role_class = models.ForeignKey(RoleClass)
     group = models.ForeignKey(Group)
 
     date_start = models.DateTimeField(_('date start'),
@@ -149,6 +175,15 @@ class Role(models.Model):
     date_end = models.DateTimeField(_('date end'),
         blank=True,
         null=True)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id")
 
 
 

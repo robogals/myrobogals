@@ -87,8 +87,6 @@ class RobogalsUserAdmin(UserAdmin):
         (_('Internal info'), {'fields': (
                                             'is_active',
                                             'is_superuser',
-                                            'groups',
-                                            'user_permissions',
                                             'date_joined',
                                             'last_login',
                                         )
