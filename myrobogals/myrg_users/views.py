@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from django.db.models.fields import FieldDoesNotExist
@@ -160,7 +161,7 @@ class DeleteUsers(APIView):
                 continue
                 
             if request.user.is_authenticated():
-                if pk == request.user.id:
+                if pk == request.user.pk:
                     ids_to_remove.append(idx)
                     failed_ids.update({pk: "OBJECT_SELF_NOT_DELETABLE"})
                     continue
@@ -375,7 +376,7 @@ class CreateUsers(APIView):
                 try:
                     with transaction.atomic():
                         user = serialized_user.save()
-                        completed_user_creations.update({user_nonce: user.id})
+                        completed_user_creations.update({user_nonce: user.pk})
                 except:
                     failed_user_creations.update({user_nonce: "OBJECT_NOT_MODIFIED"})
             else:
@@ -426,3 +427,66 @@ class ResetUserPasswords(APIView):
                 "primary_email": primary_emails
             }
         })
+        
+        
+        
+class WhoAmI(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def metadata(self, request):
+        """
+        Don't include the view description in OPTIONS responses.
+        """ 
+        data = super(WhoAmI, self).metadata(request)
+        data.pop('description')
+        return data
+
+    def post(self, request, format=None):
+        # request.user
+        user_id = request.user.pk
+        
+        # Build query
+        try:
+            query = RobogalsUser.objects.get(pk = user_id)
+        except:
+            query = None
+            
+        # Serialize
+        serializer = RobogalsUserSerializer
+        serializer.Meta.fields = ("display_name","username","primary_email",)
+        
+        serialized_query = serializer(query)
+                
+        return Response({
+            "user": {
+                "data": serialized_query.data,
+                "id": user_id,
+            },
+            "role_class": {
+                "id": None
+            },
+            "group": {
+                "id": None
+            },
+        })       
+        
+class KillSessions(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def metadata(self, request):
+        """
+        Don't include the view description in OPTIONS responses.
+        """ 
+        data = super(KillSessions, self).metadata(request)
+        data.pop('description')
+        return data
+
+    def post(self, request, format=None):
+        return Response({
+            "fail": {
+            },
+            "success": {
+                "sessions_deleted":  request.user.delete_all_unexpired_sessions()
+            }
+        })
+

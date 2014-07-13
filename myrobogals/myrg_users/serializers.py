@@ -3,6 +3,8 @@ from .models import RobogalsUser
 from rest_framework import serializers
 
 class RobogalsUserSerializer(serializers.ModelSerializer):
+    display_name = serializers.Field(source='get_preferred_name')
+
     class Meta:
         model = RobogalsUser
         read_only_fields = RobogalsUser.READONLY_FIELDS

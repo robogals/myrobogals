@@ -6,7 +6,8 @@ from myrg_users.models import RobogalsUser
 from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords
+from myrg_core.views import Time
+from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, WhoAmI, KillSessions
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses 
 
 # Auto generate/collate Django admin panels
@@ -20,16 +21,22 @@ urlpatterns = patterns('',
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     
     # OAuth Django Toolkit
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^api/o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
 
 # API 1.0
 api_urlpatterns = patterns('',
+    url(r'^api/1.0/utils/time$', Time.as_view()),
+    url(r'^api/1.0/utils/pwdreset/initiate$', ResetUserPasswords.as_view()),
+    #url(r'^api/1.0/utils/pwdreset/complete', SetUserPasswords.as_view()),
+    
     url(r'^api/1.0/users/list$', ListUsers.as_view()),
     url(r'^api/1.0/users/delete$', DeleteUsers.as_view()),
     url(r'^api/1.0/users/edit$', EditUsers.as_view()),
     url(r'^api/1.0/users/create$', CreateUsers.as_view()),
-    url(r'^api/1.0/users/pwdreset$', ResetUserPasswords.as_view()),
+    
+    url(r'^api/1.0/self/whoami$', WhoAmI.as_view()),
+    url(r'^api/1.0/self/killsessions$', KillSessions.as_view()),
                            
     url(r'^api/1.0/groups/list$', ListGroups.as_view()),
     url(r'^api/1.0/groups/delete$', DeleteGroups.as_view()),
@@ -46,9 +53,6 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/roleclasses/create$', CreateRoleClasses.as_view()),
 )
 
-                           
-''''''
-    
     
 api_urlpatterns = format_suffix_patterns(api_urlpatterns, allowed=['json'])
 

@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'oauth2_provider',
+    'myrg_core',
     'myrg_users',
     'myrg_groups',
     'myrg_permissions',
@@ -99,7 +100,11 @@ LANGUAGES = (
     #('en-au', _('English (Australian)')),
     #('en-gb', _('English (British)')),
     #('en-us', _('English (American)')),
+    
     ('ja', _('Japanese')),
+    
+    #('zh-hans', _('Chinese (Simplified)')),
+    #('zh-hant', _('Chinese (Traditional)')),
 )
 
 TIME_ZONE = 'UTC'
@@ -116,6 +121,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+# Media, Static file storage locations
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root/')
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
+
+
 # Template search directories
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates/'),
@@ -128,18 +141,6 @@ AUTH_USER_MODEL = 'myrg_users.RobogalsUser'
 # Django REST Framework
 
 REST_FRAMEWORK = {
-    # Use hyperlinked styles by default.
-    # Only used if the `serializer_class` attribute is not set on a view.
-    # 'DEFAULT_MODEL_SERIALIZER_CLASS': [
-        # 'rest_framework.serializers.HyperlinkedModelSerializer',
-    # ],
-    
-    # Use Django's standard permissions, or allow read-only access for
-    #unauthenticated users.
-    # 'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    # ],
-
     # django-oauth-toolkit requires slightly different set up:
     # https://django-oauth-toolkit.readthedocs.org/en/0.5.0/rest-framework/getting_started.html
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -152,3 +153,7 @@ REST_FRAMEWORK = {
     ),
     
 }
+
+
+# Mandrill
+MANDRILL_API_KEY = ""

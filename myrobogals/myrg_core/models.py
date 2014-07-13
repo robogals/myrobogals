@@ -8,16 +8,21 @@
 """
 
 from django.db import models
-from django.core import validators
-from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from myrg_groups.models import Role
 
 class APILog(models.Model):
-    role = models.ForeignKey(_('role'),
-                             blank=True
+    user_role = models.ForeignKey(Role,
+                             blank=True,
                              null=True)
+    ip = models.CharField(_('ip address'),
+                            max_length=63,
+                           blank=False)
     api_url = models.CharField(_('api url'),
+                                max_length=255,
                                blank=False)
-    api_call = models.TextField(_('api call'),
+    api_body = models.TextField(_('api body'),
                                 blank=False)
     note = models.TextField(_('note'),
                             blank=True,

@@ -370,7 +370,7 @@ class CreateGroups(APIView):
                 continue
             
             # Creator is the requester
-            group_create_dict.update({"creator": request.user.id})
+            group_create_dict.update({"creator": request.user.pk})
         
             # Group model
             serializer = GroupSerializer

@@ -10,6 +10,7 @@
 from django.db import models
 from django.core import validators
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.sessions.models import Session
 
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -143,10 +144,10 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                               default='X')
     
     ############################################################################
-    # i18n
+    # i18n/l10n
     ############################################################################
     # The preferred_language setting is not intended to force language settings
-    # for users, but to give preference to particular i10n-supported elements of
+    # for users, but to give preference to particular l10n-supported elements of
     # the myRobogals service, for example in emails.
     #
     # Django's `django_language` user session key should handle the user's
@@ -207,9 +208,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     # deployment will cause mismatching privacy level interpretations.
     PRIVACY_VISIBILITIES = (
         (0, 'Private'),
-        (10, 'Managers of your Robogals chapter'),
-        (20, 'Everyone in your Robogals chapter'),
-        (50, 'All Robogals chapters'),
+        #(10, 'Managers of your Robogals chapter'),
+        #(20, 'Everyone in your Robogals chapter'),
+        (50, 'Anyone in myRobogals'),
         (99, 'Public'),
     )
     
@@ -305,6 +306,30 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     def get_username(self):
         "Retrieves the username of the user."
         return self.username
+    
+    
+    
+    
+    
+    # http://stackoverflow.com/a/6657043
+    def all_unexpired_sessions(self):
+        user_sessions = []
+        all_sessions  = Session.objects.filter(expire_date__gte=timezone.now())
+        for session in all_sessions:
+            session_data = session.get_decoded()
+            if self.pk == session_data.get('_auth_user_id'):
+                user_sessions.append(session.pk)
+        return Session.objects.filter(pk__in=user_sessions)
+
+    def delete_all_unexpired_sessions(self):
+        session_list = self.all_unexpired_sessions()
+        session_list_count = len(session_list)
+        session_list.delete()
+        
+        return session_list_count
+    
+    
+    
     
     def __str__(self):
         return self.get_full_name()

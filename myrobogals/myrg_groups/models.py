@@ -37,9 +37,15 @@ class Group(models.Model):
                             
     STATUS_CHOICES = (
         (0, 'Deleted'),
-        (1, 'Active, Private, Non-joinable'),
-        (2, 'Active, Private, Gated'),
-        (3, 'Active, Private, Joinable'),
+        #(1, 'Inactive'),
+        
+        (2, 'Active, Private, Non-joinable'),
+        (3, 'Active, Private, Gated'),
+        (4, 'Active, Private, Joinable'),
+        
+        #(5, 'Unused'),
+        #(6, 'Unused'),
+        
         (7, 'Active, Public, Non-joinable'),
         (8, 'Active, Public, Gated'),
         (9, 'Active, Public, Joinable'),
@@ -49,7 +55,7 @@ class Group(models.Model):
                               default=0,
                               blank=False)
 
-    date_created = models.DateField(_('date created'),
+    date_created = models.DateTimeField(_('date created'),
                                     blank=False,
                                     default=timezone.now)
     
@@ -62,21 +68,8 @@ class Group(models.Model):
     # Fields that cannot be written to
     READONLY_FIELDS = ("id","date_created",)
     
-    
-    def get_preferred_name(self):
-        """Retrieves the preferred name of the group, for display purposes.
-        
-        Format:
-            <preferred> (where available)
-            <given> (otherwise)
-        """
-        return '{}'.format(self.preferred_name or self.name)
-        
-    def get_sortable_name(self):
-        return self.get_preferred_name(self)
-    
     def __str__(self):
-        return self.get_preferred_name()
+        return self.name
         
 class LocatableEntity(Group):
     address = models.TextField(_('address'),
@@ -165,6 +158,12 @@ class RoleClass(models.Model):
         return applicable_groups
 
 class Role(models.Model):
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    
     user = models.ForeignKey(RobogalsUser)
     role_class = models.ForeignKey(RoleClass)
     group = models.ForeignKey(Group)
