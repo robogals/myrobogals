@@ -24,7 +24,7 @@ class MessageDefinition(models.Model):
     #variables = models.TextField(_('variables'),
     #                             blank=False)
                                    
-    date_created = models.DateField(_('date created'),
+    date_created = models.DateTimeField(_('date created'),
                                     blank=False,
                                     auto_now_add=True)
     
@@ -83,11 +83,11 @@ class Message(models.Model):
                                       max_length=31,
                                       blank=True)
                                       
-    date_created = models.DateField(_('date created'),
+    date_created = models.DateTimeField(_('date created'),
                                     blank=False,
                                     auto_now_add=True)
                                     
-    date_delivered = models.DateField(_('date delivered'),
+    date_delivered = models.DateTimeField(_('date delivered'),
                                       null=True,
                                       blank=True)
                                       
