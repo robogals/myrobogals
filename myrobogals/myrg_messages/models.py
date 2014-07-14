@@ -10,8 +10,10 @@
 from django.db import models
 from django.core import validators
 from django.utils import timezone
-# from myrg_users.models import RobogalsUser
+from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
+
+from django.utils.translation import ugettext_lazy as _
 
 class MessageDefinition(models.Model):
     sender_role = models.ForeignKey(Role)
@@ -41,15 +43,22 @@ class MessageDefinition(models.Model):
                                     
 class EmailDefinition(MessageDefinition):
     sender_name = models.CharField(_('sender name'),
+                                     max_length=127,
+                                     blank=False)
+                                     
+    sender_address = models.CharField(_('sender address'),
+                                     max_length=255,
                                      blank=False)
                                      
     subject = models.CharField(_('subject'),
-                               blank=True)
+                               max_length=255,
+                               blank=False)
 
     html = models.BooleanField(_('html'), default=False)
     
     attachments = models.TextField(_('attachments'),
-                                   blank=False)
+                                   null=True,
+                                   blank=True)
                                     
 class SMSDefinition(MessageDefinition):
     pass
@@ -62,14 +71,16 @@ class SMSDefinition(MessageDefinition):
     
     
 class Message(models.Model):
-    recipient_user_role = models.ForeignKey(Role,
+    recipient_user = models.ForeignKey(RobogalsUser,
                                        blank=True,
                                        null=True)
 
     service_id = models.CharField(_('service id'),
+                                  max_length=63,
                                   blank=True)
                                   
     service_status = models.CharField(_('service status'),
+                                      max_length=31,
                                       blank=True)
                                       
     date_created = models.DateField(_('date created'),
@@ -77,15 +88,19 @@ class Message(models.Model):
                                     auto_now_add=True)
                                     
     date_delivered = models.DateField(_('date delivered'),
-                                      blank=False)
+                                      null=True,
+                                      blank=True)
                                       
     class Meta:
         abstract = True
 
 class EmailMessage(Message):
     definition = models.ForeignKey(EmailDefinition)
-    
+    recipient_name = models.CharField(_('recipient name'),
+                                     max_length=127,
+                                     blank=False)
     recipient_address = models.CharField(_('recipient address'),
+                                         max_length=255,
                                          blank=False)
                                         
 class SMSMessage(Message):

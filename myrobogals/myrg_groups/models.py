@@ -145,7 +145,7 @@ class RoleClass(models.Model):
     # NONVISIBLE_FIELDS = ()
     
     # Fields that cannot be written to
-    READONLY_FIELDS = ("id","is_active")
+    READONLY_FIELDS = ("id","is_active",)
     
     def __str__(self):
         return self.name
@@ -182,7 +182,7 @@ class Role(models.Model):
     # NONVISIBLE_FIELDS = ()
     
     # Fields that cannot be written to
-    READONLY_FIELDS = ("id")
+    READONLY_FIELDS = ("id",)
 
 
 

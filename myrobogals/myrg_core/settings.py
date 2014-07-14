@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'myrg_users',
     'myrg_groups',
     'myrg_permissions',
+    'myrg_messages',
 )
 
 MIDDLEWARE_CLASSES = (

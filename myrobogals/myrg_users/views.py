@@ -4,7 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from django.db.models.fields import FieldDoesNotExist
+from django.db.models import Q
 from django.db import transaction
+from django.utils import timezone
 
 from .models import RobogalsUser
 from .serializers import RobogalsUserSerializer
@@ -180,7 +182,7 @@ class DeleteUsers(APIView):
         # Run query
         try:
             with transaction.atomic():
-                query = RobogalsUser.objects.filter(is_active=True, id__in=requested_ids)
+                query = RobogalsUser.objects.filter(is_active=True, pk__in=requested_ids)
                 affected_ids = [obj.get("id") for obj in query.values("id")]
                 affected_num_rows = query.update(is_active=False)
         except:
@@ -442,31 +444,67 @@ class WhoAmI(APIView):
         return data
 
     def post(self, request, format=None):
-        # request.user
+        from myrg_groups.serializers import GroupSerializer, RoleClassSerializer
+        
+        # request
         user_id = request.user.pk
+        role_id = request.DATA.get("role")
+        
+        group_id = None
+        role_class_id = None
+        
+        group_data = {}
+        role_class_data = {}
         
         # Build query
         try:
-            query = RobogalsUser.objects.get(pk = user_id)
-        except:
-            query = None
+            user_query = request.user
             
-        # Serialize
-        serializer = RobogalsUserSerializer
-        serializer.Meta.fields = ("display_name","username","primary_email",)
-        
-        serialized_query = serializer(query)
+            if not (role_id is None):
+                role_query = user_query.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now()))).get(pk = str(role_id))
                 
+        except:
+            return Response({"detail":"ROLE_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Serialize
+        user_serializer = RobogalsUserSerializer
+        user_serializer.Meta.fields = ("display_name","username","primary_email",)
+        user_serialized_query = user_serializer(user_query)
+        
+        
+        
+        # Role -> Group, Role Class
+        if not (role_id is None):
+            group = role_query.group
+            group_id = group.id
+            
+            role_class = role_query.role_class
+            role_class_id = role_class.id
+
+            group_serializer = GroupSerializer
+            group_serializer.Meta.fields = ("name",)
+            group_serialized_query = group_serializer(group)
+            group_data = group_serialized_query.data
+            
+            role_class_serializer = RoleClassSerializer
+            role_class_serializer.Meta.fields = ("name",)
+            role_class_serialized_query = role_class_serializer(role_class)
+            role_class_data = role_class_serialized_query.data
+        
+        
+        
         return Response({
             "user": {
-                "data": serialized_query.data,
+                "data": user_serialized_query.data,
                 "id": user_id,
             },
             "role_class": {
-                "id": None
+                "data": role_class_data,
+                "id": role_class_id,
             },
             "group": {
-                "id": None
+                "data": group_data,
+                "id": group_id,
             },
         })       
         
