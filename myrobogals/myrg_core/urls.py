@@ -11,6 +11,8 @@ from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, Res
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses 
 from myrg_messages.views import SendMessage
 
+
+
 # Auto generate/collate Django admin panels
 admin.autodiscover()
 admin.site.unregister(Group)
@@ -61,4 +63,16 @@ api_urlpatterns = format_suffix_patterns(api_urlpatterns, allowed=['json'])
 
 urlpatterns += api_urlpatterns
 
-
+urlpatterns += patterns(
+    'django.contrib.auth.views',
+    url(r'^password-change/done/$', 'password_change_done', name='password_change_done'),
+    url(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        'password_reset_confirm',
+        name='password_reset_confirm'),
+    url(r'^password-reset/done/$',
+        'password_reset_done',
+        name='password_reset_done'),
+    url(r'^password-reset/complete/$',
+        'password_reset_complete',
+        name='password_reset_complete'),
+)

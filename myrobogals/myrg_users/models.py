@@ -17,6 +17,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+ 
+from django.db.models.signals import post_save
+
 # Based upon:
 # * https://docs.djangoproject.com/en/1.6/topics/auth/customizing/#substituting-a-custom-user-model
 # * http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
@@ -340,3 +346,12 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         return self.is_superuser
 
 
+post_save.connect(user_saved, User)
+
+def user_saved(sender, instance, created, *args, **kwargs):
+    if created:
+        context = {
+            'token': default_token_generator.make_token(instance),
+            'uid': urlsafe_base64_encode(force_bytes(instance.pk)),
+            'user': instance,
+        }
