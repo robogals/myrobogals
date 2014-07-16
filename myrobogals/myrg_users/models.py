@@ -16,6 +16,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.conf import settings
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+
+from django.db.models.signals import post_save
+
 # Based upon:
 # * https://docs.djangoproject.com/en/1.6/topics/auth/customizing/#substituting-a-custom-user-model
 # * http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
@@ -25,7 +31,7 @@ from django.conf import settings
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
         primary_email = self.normalize_email(primary_email)
-        
+
         if not primary_email:
             raise ValueError(_('Users must have a primary email address.'))
         if not given_name:
@@ -33,9 +39,9 @@ class RobogalsUserManager(BaseUserManager):
         if not username:
             #username = primary_email   # Use email address?
             raise ValueError(_('Users must have a username.'))
-        
+
         now = timezone.now()
-        
+
         user = self.model(
             username=username,
             primary_email=primary_email,
@@ -44,11 +50,11 @@ class RobogalsUserManager(BaseUserManager):
             date_joined=now,
             **extra_fields
         )
-        
+
         user.set_password(password) # If password = None => unusable password.
         user.save(using=self._db)
         return user
-        
+
     def create_user(self, username, primary_email, given_name, password=None, **extra_fields):
         return self._create_user(username, primary_email, given_name, password, is_superuser=False, **extra_fields)
 
@@ -93,7 +99,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                                         ],
                                         help_text=_('Secondary email address of length 255 characters or fewer is optional.'))
 
-    
+
     ############################################################################
     # Personal information
     ############################################################################
@@ -122,7 +128,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     dob = models.DateField(_('date of birth'),
                             blank=True,
                             null=True)
-                                        
+
     # Genders have now altered in definition to give better data representation
     # compared to previous {0,1,2} representation
     GENDERS = (
@@ -134,7 +140,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                               max_length=1,
                               choices=GENDERS,
                               default='X')
-    
+
     ############################################################################
     # i18n
     ############################################################################
@@ -151,7 +157,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                                           choices=settings.LANGUAGES,
                                           default='en',   # This MUST exist
                                           help_text=_('Preferred language for myRobogals and related services. Interface language can be separately overridden on a session-by-session basis.'))
-    
+
     ############################################################################
     # Contact details
     ############################################################################
@@ -160,7 +166,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                               blank=True,
                               help_text=_('Mobile number in E.164 compatible format, of length 15 digits or fewer, without the + sign.'))
     mobile_verified = models.BooleanField(default=False)
-    
+
     # Countries are stored in the database as a ForeignKey.
     #country = models.ForeignKey(Country,
     #    verbose_name=_('Country'),
@@ -180,23 +186,23 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #    verbose_name=_('subscriptions'),
     #    blank=True,
     #    null=True)
-    
+
     #biography = models.TextField(_('biography'),
     #    blank=True,
     #    help_text=_('Short biography of the user for their profile page.'))
-    
+
     # ImageField requires PIL - will need to investigate if we can get something
     # like Pillow to work with Django.
     #photo = models.ImageField(upload_to='profilepics',
     #    blank=True,
     #    null=True)
-    
+
     ############################################################################
     # Privacy and Flags
     ############################################################################
     # Privacy settings range from 0 to 99 inclusive.
     #
-    # Modifications to values should be done with care as varying numbers after 
+    # Modifications to values should be done with care as varying numbers after
     # deployment will cause mismatching privacy level interpretations.
     PRIVACY_VISIBILITIES = (
         (0, 'Private'),
@@ -205,7 +211,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         (50, 'All Robogals chapters'),
         (99, 'Public'),
     )
-    
+
     dob_visibility = models.PositiveSmallIntegerField(_('date of birth visibility'),
                                                       choices=PRIVACY_VISIBILITIES,
                                                       default=0,
@@ -222,7 +228,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                                                           choices=PRIVACY_VISIBILITIES,
                                                           default=0,
                                                           help_text=_('Level of visibility of general profile. Overrides other profile visibility settings where visibility settings exceed that set here.'))
-    
+
     # Generally useful Django flags
     # Note that `is_superuser` and `last_login` is already provided by
     # `AbstractBaseUser`
@@ -230,7 +236,7 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                                     default=True,
                                     help_text=_('Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    
+
     # Setting the user manager to the custom class as defined above.
     objects = RobogalsUserManager()
 
@@ -243,36 +249,36 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                         'username',
                         'given_name',
                         ]
-    
+
     # Defining information for display of this class in admin
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
-        
+
     def get_full_name(self):
         """Retrieves the full name of the user in standard format.
         Use get_sortable_name() for sorting.
         Use get_preferred_name() for most other use cases.
-        
+
         Format:
             <given> <family> (where family name available)
             <given> (otherwise)
         """
         return '{} {}'.format(self.given_name, self.family_name or '').strip()
-        
+
     def get_sortable_name(self):
         """Retrieves the full name of the user in reverse format, suitable for
         sorting.
-        
+
         Format:
             <family>, <given> (where family name available)
             ~, <given> (otherwise)
         """
         return '{}, {}'.format(self.family_name or '~', self.given_name)
-            
+
     def get_preferred_name(self):
         """Retrieves the preferred name of the user, for display purposes.
-        
+
         Format:
             <preferred> (where available)
             <given> (otherwise)
@@ -281,17 +287,26 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.get_preferred_name()
-    
+
     def get_username(self):
         "Retrieves the username of the user."
         return self.username
-    
+
     def __str__(self):
         return self.get_full_name()
-        
+
     @property
     def is_staff(self):
         # We are implying superusers = staff
         return self.is_superuser
 
+post_save.connect(user_saved, User)
 
+def user_saved(sender, instance, created, *args, **kwargs):
+    if created:
+        context = {
+            'token': default_token_generator.make_token(instance),
+            'uid': urlsafe_base64_encode(force_bytes(instance.pk)),
+            'user': instance,
+        }
+        # here, send an email with this context
