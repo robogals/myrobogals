@@ -355,3 +355,4 @@ def user_saved(sender, instance, created, *args, **kwargs):
             'uid': urlsafe_base64_encode(force_bytes(instance.pk)),
             'user': instance,
         }
+        # here, send an email with this context
