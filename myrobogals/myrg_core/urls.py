@@ -27,7 +27,22 @@ urlpatterns = patterns('',
     # Django REST Framework
     url(r'^api/1.0/', include(api_router.urls)),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
-    
+
     # OAuth Django Toolkit
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
+
+urlpatterns += patterns(
+    'django.contrib.auth.views',
+    url(r'^password-change/done/$', 'password_change_done', name='password_change_done'),
+    url(r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        'password_reset_confirm',
+        name='password_reset_confirm'),
+    url(r'^password-reset/done/$',
+        'password_reset_done',
+        name='password_reset_done'),
+    url(r'^password-reset/complete/$',
+        'password_reset_complete',
+        name='password_reset_complete'),
+)
+ 
