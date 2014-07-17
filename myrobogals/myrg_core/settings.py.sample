@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 '''
 
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
@@ -51,11 +52,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'oauth2_provider',
+    
     'myrg_core',
     'myrg_users',
     'myrg_groups',
     'myrg_permissions',
-    'myrg_messages',
+    
+    'myrg_webapp',
 )
 
 MIDDLEWARE_CLASSES = (

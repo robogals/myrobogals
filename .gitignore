@@ -3,5 +3,7 @@
 *.pyc
 *.wsgi
 *.sqlite3
+myrobogals/myrg_core/settings.py
+myrobogals/static_root
 #__init__.py
 #wsgi.py

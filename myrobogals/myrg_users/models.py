@@ -116,18 +116,18 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #
     # http://www.w3.org/International/questions/qa-personal-names
     family_name = models.CharField(_('family name'),
-                                   max_length=63,
+                                   max_length=127,
                                    blank=True,
                                    validators=[
                                         validators.RegexValidator(r'^[\s\w"\'-]+$', _('Enter a valid Romanised family name.'), 'invalid')
                                    ],
-                                   help_text=_('Family name of length 63 Latin characters or fewer is optional.'))
+                                   help_text=_('Family name of length 127 Latin characters or fewer is optional.'))
     given_name = models.CharField(_('given name'),
-                                  max_length=63,
+                                  max_length=127,
                                   validators=[
                                         validators.RegexValidator(r'^[\s\w"\'-]+$', _('Enter a valid Romanised given name.'), 'invalid')
                                   ],
-                                  help_text=_('Given name of length 63 Latin characters or fewer is required.'))
+                                  help_text=_('Given name of length 127 Latin characters or fewer is required.'))
     preferred_name = models.CharField(_('preferred name'),
                                       max_length=127,
                                       blank=True,

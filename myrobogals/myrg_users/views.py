@@ -468,7 +468,7 @@ class WhoAmI(APIView):
         
         # Serialize
         user_serializer = RobogalsUserSerializer
-        user_serializer.Meta.fields = ("display_name","username","primary_email",)
+        user_serializer.Meta.fields = ("display_name","username","primary_email","gravatar_hash")
         user_serialized_query = user_serializer(user_query)
         
         

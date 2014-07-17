@@ -192,7 +192,7 @@ class DeleteGroups(APIView):
         # Run query
         try:
             with transaction.atomic():
-                query = Group.objects.filter(status__gt=0, pk__in=requested_ids)
+                query = Group.objects.filter(status__gt=0, id__in=requested_ids)
                 affected_ids = [obj.get("id") for obj in query.values("id")]
                 affected_num_rows = query.update(status=0)
         except:
@@ -575,7 +575,7 @@ class DeleteRoleClasses(APIView):
         # Run query
         try:
             with transaction.atomic():
-                query = RoleClass.objects.filter(is_active=True, pk__in=requested_ids)
+                query = RoleClass.objects.filter(is_active=True, id__in=requested_ids)
                 affected_ids = [obj.get("id") for obj in query.values("id")]
                 affected_num_rows = query.update(is_active=False)
         except:
