@@ -1,19 +1,19 @@
 """
     myRobogals
     myrg_core/functions.py
-    Custom APILog model definition
 
     2014
     Robogals Software Team
 """
 from .models import APILog
 
-def log(request, note = None):
+def log_api_call(request, role = None, note = None):
     log_dict = {
-        "role": None,
+        "user_role": role,
+        "ip": get_client_ip(request),
         "api_url": request.get_full_path(),
-        "api_body": "{'test':'test'}",
-        "note": None,
+        "api_body": request.body,
+        "note": note,
     }
     
     new_log = APILog(**log_dict)

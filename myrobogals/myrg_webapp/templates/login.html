@@ -1,0 +1,132 @@
+<style>
+    #content {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        
+        text-align: center;
+    }
+    
+    #content:before {
+        content: '';
+        display: inline-block;
+        height: 80%;
+        vertical-align: middle;
+    }
+    
+    #login-form {
+        text-align: left;
+        
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 30rem;
+        
+        color: #fff;
+        
+        font-size: 1.2rem;
+    }
+    
+    #login-form .logo {
+        background-image: url("/static/images/myrobogals.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-origin: content-box;
+        
+        padding: 1rem 1.6rem;
+        margin-right: 2rem;
+        
+        width: auto;
+        max-width: 25rem;
+    }
+    
+    #login-form .logo .filler {
+        padding-bottom: 15%;
+    }
+    
+    #login-form .container {
+        padding: 1rem;
+    }
+    
+    #login-form .container .row {
+        padding: 0.5rem;
+    }
+    
+    #login-form .container .col {
+        vertical-align: middle;
+    }
+    
+    #login-form .container .left.col {
+        width: 10rem;
+        font-weight: 500;
+    }
+    
+    #login-form input,
+    #login-form button {
+        border: 0;
+        background: #fff;
+        color: #000;
+        padding: 0.3rem;
+        
+        width: 100%;
+    }
+    
+    #login-form button#reset-password {
+        background: transparent;
+        padding: 0;
+        color: #fff;
+        width: auto;
+    }
+    
+    #login-form button#login {
+        color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 2rem;
+        width: auto;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+</style>
+<div id="content">
+    <form id="login-form" action="/app/login/" method="post">
+        {% csrf_token %}
+        <div class="logo bg-rg-dark-blue"><div class="filler"></div></div>
+        <div class="container bg-rg-dark-blue" >
+            
+            <div class="row">
+                <div class="left col">
+                    <label for="id_email">Email address</label>
+                </div>
+                <div class="col">
+                    <input id="id_email" type="email" name="email" placeholder="volunteer@robogals.org" autofocus>
+                </div>
+            </div>
+            <div class="row">
+                <div class="left col">
+                    <label for="id_password">Password</label>
+                </div>
+                <div class="col">
+                    <input id="id_password" type="password" name="password">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button id="reset-password">Reset Password</button>
+                </div>
+                <div class="right col">
+                    <button id="login" class="bg-rg-dark-green mobile-width-100" type="submit">Login</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="row" id="links">
+        <div class="col"><a href="http://www.robogals.org"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
+    </div>
+</div>

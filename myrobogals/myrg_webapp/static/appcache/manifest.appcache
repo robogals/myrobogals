@@ -1,9 +1,15 @@
 CACHE MANIFEST
-# version 20140717-1
+# version 20140717-4
 
 CACHE:
+/static/css/normalize.css
+/static/css/font-awesome.min.css
 /static/css/myrobogals.css
 
+/static/js/fastclick.min.js
+/static/js/jquery.min.js
+/static/js/jquery.history.min.js
+/static/js/jquery.tabbable.min.js
 /static/js/myrobogals.js
 
 /static/fonts/Roboto-Light-webfont.woff
@@ -13,6 +19,8 @@ CACHE:
 /static/fonts/fontawesome-webfont.woff?v=4.1.0
 
 /static/images/myrobogals.png
+/static/images/favicon.ico
+
 
 NETWORK:
 *

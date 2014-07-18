@@ -88,8 +88,8 @@ myRobogals
 //   10     content
 //  400     menu-underlay
 //  500     menu
-//  600     overlay
-//  700     header
+//  600     header
+//  700     overlay
 //  800     tray
 // 1000     ie-old-warning
 //==============================================================================
@@ -224,6 +224,26 @@ a {
 }
 
 //==============================================================================
+
+.bg-rg-dark-blue {
+    background-color: @colour-robogals-dark-blue !important;
+}
+.bg-rg-light-blue {
+    background-color: @colour-robogals-light-blue !important;
+}
+.bg-rg-dark-purple {
+    background-color: @colour-robogals-dark-purple !important;
+}
+.bg-rg-light-purple {
+    background-color: @colour-robogals-light-purple !important;
+}
+.bg-rg-dark-green {
+    background-color: @colour-robogals-dark-green !important;
+}
+.bg-rg-dark-red {
+    background-color: @colour-robogals-dark-red !important;
+}
+
 
 .blocks {
     display: inline-block;
@@ -415,7 +435,7 @@ body {
 #header {
     .common-header-style();
     
-    z-index: 700;
+    z-index: 600;
 
     background: @colour-robogals-dark-blue url(../images/myrobogals.png) center center no-repeat;
     background-size: contain;
@@ -666,7 +686,7 @@ body {
     background: rgba(0,0,0,0.2);
     
     position: fixed;
-    z-index: 600;
+    z-index: 700;
     
     top: 0;
     left: 0;
@@ -676,6 +696,75 @@ body {
     display: none;
     
     opacity: 0;
+    
+    text-align: center;
+    
+    &:before {
+        content: '';
+        display: inline-block;
+        height: 80%;
+        vertical-align: middle;
+    }
+    
+    .modal-window {
+        text-align: left;
+        
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 30rem;
+        
+        padding: 1rem;
+        
+        .title {
+            display: inline-block;
+            vertical-align: middle;
+            
+            padding: 0.8rem 1.2rem;
+            margin-right: 3rem;
+            
+            font-weight: 500;
+            
+            width: auto;
+            max-width: 25rem;
+            
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            
+            background: #fff;
+        }
+        
+        .close-button {
+            display: inline-block;
+            vertical-align: middle;
+            
+            padding: 0.8rem;
+            
+            float: right;
+            
+            background: #fff;
+            
+            &:before {
+                content: "\f00d";
+                font-family: FontAwesome;
+            }
+        }
+        
+        .content {
+            padding: 1.2rem;
+            background: #fff;
+        }
+        
+        .buttons {
+            border-top: 1px solid #eee;
+            padding: 1.2rem; 
+            background: #fff;
+        }
+        
+    }
 }
 
 #hidden {
@@ -886,6 +975,10 @@ body {
                 top: @header-height;
             }
         }
+    }
+    
+    .mobile-width-100 {
+        width: 100% !important;
     }
 }
 

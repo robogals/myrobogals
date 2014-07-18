@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -16,15 +16,7 @@ PAGINATION_MAX_LENGTH = 1000
         
 # Group
 ################################################################################
-class ListGroups(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(ListGroups, self).metadata(request)
-        data.pop('description')
-        return data
-    
+class ListGroups(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -146,15 +138,7 @@ class ListGroups(APIView):
                             "group": output_list
                         })
 
-class DeleteGroups(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(DeleteGroups, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class DeleteGroups(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -214,15 +198,7 @@ class DeleteGroups(APIView):
             }
         })
         
-class EditGroups(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(EditGroups, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class EditGroups(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -311,15 +287,7 @@ class EditGroups(APIView):
             }
         })
 
-class CreateGroups(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(CreateGroups, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class CreateGroups(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -415,15 +383,7 @@ class CreateGroups(APIView):
         
 # Role Class
 ################################################################################
-class ListRoleClasses(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(ListRoleClasses, self).metadata(request)
-        data.pop('description')
-        return data
-    
+class ListRoleClasses(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -530,15 +490,7 @@ class ListRoleClasses(APIView):
                             "role_class": output_list
                         })
 
-class DeleteRoleClasses(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(DeleteRoleClasses, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class DeleteRoleClasses(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -599,15 +551,7 @@ class DeleteRoleClasses(APIView):
             }
         })
         
-class EditRoleClasses(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(EditRoleClasses, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class EditRoleClasses(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -696,15 +640,7 @@ class EditRoleClasses(APIView):
             }
         })
 
-class CreateRoleClasses(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(CreateRoleClasses, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class CreateRoleClasses(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -780,15 +716,7 @@ class CreateRoleClasses(APIView):
         
 # Role
 ################################################################################
-class ListRoles(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(ListRoles, self).metadata(request)
-        data.pop('description')
-        return data
-    
+class ListRoles(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -895,15 +823,7 @@ class ListRoles(APIView):
                             "role": output_list
                         })
 
-class EditRoles(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(EditRoles, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class EditRoles(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -992,15 +912,7 @@ class EditRoles(APIView):
             }
         })
 
-class CreateRoles(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(CreateRoles, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class CreateRoles(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:

@@ -1,9 +1,7 @@
 /*!
 
 myRobogals
-R2D2
 
-James Li
 20140705
 
 */
@@ -44,9 +42,6 @@ var myRG = myRG || {};
             }
         }
     });
-    
-    
-    
     
     
     // Useful functions
@@ -103,7 +98,7 @@ var myRG = myRG || {};
         
         
     // Set settings
-    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 500);   // ms
+    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 0);     // ms
     
     s.set("TRAY_MIN_TIME", 3500);                   // ms
     s.set("TRAY_WAIT_BEFORE_SCROLL", 1500);         // ms
@@ -111,9 +106,8 @@ var myRG = myRG || {};
     s.set("TRAY_SCROLL_SPEED", 12);                 // ms/px (lower = faster)
     s.set("TRAY_TRANSITION_SPEED", 500);            // ms/px (lower = faster)
     
-
-    
     s.set("API_ROOT_URL", "/api/1.0/");
+    s.set("RESOURCE_ROOT_URL", "/app/resource/");
     
     
     
@@ -123,26 +117,63 @@ var myRG = myRG || {};
     
     
     // Core functions
-    
-    f.getAPIURL = function(endpoint) {
+    f.generateAPIURL = function(endpoint) {
         return s.get("API_ROOT_URL") + endpoint.replace(/^\/|\/$/g, '') + ".json";
     }
-
-    f.fetchWhoAmI = function(){
-        return $.post(f.getAPIURL("/self/whoami"), {});
+    
+    f.generateResURL = function(resource) {
+        return s.get("RESOURCE_ROOT_URL") + resource.replace(/^\/|\/$/g, '') + ".html";
+    }
+    
+    f.getTabbableElem = function() {
+        return $(":tabbable");
+    }
+    
+    f.storeTabbableElem = function() {
+        var tabbableElemArr = [];
+        f.getTabbableElem().each(function(){
+            var elemPairObj = {};
+            elemPairObj.elem = this;
+            elemPairObj.tabIndex = $(this).attr("tabindex") || 0;
+            tabbableElemArr.push(elemPairObj);
+        });
+        
+        return g.set("TABBABLE_ELEM_ARR", tabbableElemArr);
+    }
+    
+    f.disableAllTabbableElem = function() {
+        var tabbableElemArr = g.get("TABBABLE_ELEM_ARR") || f.storeTabbableElem();
+        $.each(tabbableElemArr, function(i,elemPairObj){
+            $(elemPairObj.elem).attr("tabindex",-1);
+        });
+    }
+    
+    f.enableAllTabbableElem = function() {
+        var tabbableElemArr = g.get("TABBABLE_ELEM_ARR") || [];
+        $.each(tabbableElemArr, function(i,elemPairObj){
+            $(elemPairObj.elem).attr("tabindex",elemPairObj.tabIndex);
+        });
+        g.set("TABBABLE_ELEM_ARR", 0);
     }
     
     
     
     
+    // Pre DOM ready
+    // Prefetch user information
+    f.fetchWhoAmI = function(){
+        return $.post(f.generateAPIURL("/self/whoami"));
+    }
     
+    f.fetchMyRoles = function(){
+        return $.get(f.generateAPIURL("/self/roles"));
+    }
     
-    // Start prefetching before DOM ready
     u.set("WHOAMI_XHR",f.fetchWhoAmI());
+    u.set("MYROLES_XHR",f.fetchMyRoles());
     
-    
-    
-    
+    // Grab state
+    g.set("STATE", History.getState());
     
     
     
@@ -150,11 +181,14 @@ var myRG = myRG || {};
     $(function(){
         jq.body = $("body");
         jq.menu = $("#menu");
-        jq.header = $("#header");
         jq.tray = $("#tray");
+        jq.header = $("#header");
+        jq.overlay = $("#overlay");
         jq.profile = jq.menu.find(".profile");
         jq.menuUnderlay = $("#menu-underlay");
         
+        
+        // Grab Gravatar template
         g.set("GRAVATAR_TEMPLATE", jq.profile.find(".image").data("image"));
         
         
@@ -169,16 +203,6 @@ var myRG = myRG || {};
         
         
         
-        
-        
-        
-        f.setMenuTabbability = function (){
-            // if (jq.body.hasClass("menu-open")) {
-                // jq.menu.find("*[tabindex]").attr("tabindex","0");
-            // } else {
-                // jq.menu.find("*[tabindex]").attr("tabindex","-1");
-            // }
-        }
         
         f.clearTrayActivity = function () {
             jq.tray.stop();
@@ -242,10 +266,63 @@ var myRG = myRG || {};
         
         
         
+        f.showOverlay = function() {
+            f.disableAllTabbableElem();
+            jq.body.addClass("overlay");
+        }
+        
+        f.closeOverlay = function() {
+            f.enableAllTabbableElem();
+            jq.body.removeClass("overlay");
+            jq.overlay.children(".modal-window").remove();
+        }
+        
+        
+        
+        f.openModal = function () {
+            f.showOverlay();
+        }
+        
+        f.setModal = function (html, title, buttons, className, closable) {
+            closable = typeof closable !== 'undefined' ? closable : true;
+            title = title || "";
+            buttons = buttons || {};
+            className = className || "";
+            
+            var modalWindowElem = $("<div>", {"class": "modal-window"}).addClass(className);
+            modalWindowElem.append($("<div>", {"class": "title"}).html(title));
+            if (closable){
+                modalWindowElem.append($("<div>", {"class": "close-button", "tabindex": 0}).click(function(){
+                    f.closeModal();
+                }));
+            }
+            modalWindowElem.append($("<div>", {"class": "content"}).html(html));
+            modalWindowElem.append($("<div>", {"class": "buttons"}).html(""));
+            
+            jq.overlay.append(modalWindowElem);
+            
+            f.openModal();
+        }
+        
+        f.closeModal = function (){
+            f.closeOverlay();
+        }
+        
+        
+        
+        
+        
+        
+        
+        
         
         f.toggleMenu = function (){
+            if (!jq.body.hasClass("menu-open")) {
+                if (!jq.body.hasClass("menu-enabled")) {
+                    return;
+                }
+            }
             jq.body.toggleClass("menu-open");
-            f.setMenuTabbability();
         }
         
         f.toggleUserMenu = function (){
@@ -259,21 +336,47 @@ var myRG = myRG || {};
         f.updateUser = function(whoami) {
             if (whoami) {
                 u.set("ID",whoami.user.id);
-                f.loadProfileImage(whoami.user.data.gravatar_hash);
-                f.loadProfileName(whoami.user.data.display_name);
-                f.loadProfileRole("");
-                f.loadProfileGroup("");
+                u.set("WHOAMI_OBJ",whoami);
             } else {
                 u.set("ID",0);
-                f.loadProfileImage(0);
+                u.set("WHOAMI_OBJ",0);
+            }
+            
+            f.updateProfile();
+        }
+        
+        f.updateProfile = function() {
+            var whoami = u.get("WHOAMI_OBJ");
+            
+            if (whoami) {
+                f.loadProfileImage(whoami.user.data.gravatar_hash);
+                f.loadProfileName(whoami.user.data.display_name);
+                
+                if (testPropertyExists(whoami, 'role_class.data')){
+                    f.loadProfileRole(whoami.role_class.data.name);
+                    f.loadProfileGroup(whoami.group.data.name);
+                } else {
+                    f.loadProfileRole("");
+                    f.loadProfileGroup("");
+                }
+            } else {
+                f.loadProfileImage();
                 f.loadProfileName("Anonymous User");
                 f.loadProfileRole("");
                 f.loadProfileGroup("");
             }
+            
+            
         }
         
         f.loadProfileImage = function (gravatarHash){
-            jq.profile.find(".image").css("background-image","url("+ g.get("GRAVATAR_TEMPLATE").replace("{gravatar_hash}",gravatarHash) +")");
+            var backgroundImage = "none";
+            
+            if (gravatarHash){
+                backgroundImage = "url("+ g.get("GRAVATAR_TEMPLATE").replace("{gravatar_hash}",gravatarHash) +")";
+            }
+            
+            jq.profile.find(".image").css("background-image",backgroundImage);
         }
         
         f.loadProfileName = function (name){
@@ -328,39 +431,35 @@ var myRG = myRG || {};
         
         // Grab user info
         
-        // Add a little bit of latency allowance so that the loading message
-        // doesn't flicker for those on high speed connections
-        // --- disabled for now
-        
+        // Add a little bit of latency allowance
         var initLoadMessageTimer = setTimeout(function(){
                                                 f.setTray("Loading...","indeterminate",false);
-                                                //}, s.get("INIT_STARTUP_LATENCY_ALLOWANCE"));
                                                 }, 0);
         
         // XHR is done before DOM ready. See above.
-        
-        u.get("WHOAMI_XHR").always(function(){
-            clearTimeout(initLoadMessageTimer);
-        });
-        
-        u.get("WHOAMI_XHR").done(function(data){
-            f.updateUser(data);
-            f.closeTray();
-            jq.body.addClass("loaded menu-enabled header-enabled stage-enabled");
-        });
-        
-        u.get("WHOAMI_XHR").fail(function(jqXHR){                
-                if (jqXHR.status == 401){
+        $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
+            .done(function(whoamiXhrArr, myrolesXhrArr){
+                f.updateUser(whoamiXhrArr[0]);
+                f.closeTray();
+                jq.body.addClass("loaded menu-enabled header-enabled stage-enabled");
+            })
+            .always(function(){
+                clearTimeout(initLoadMessageTimer);
+            })
+            .fail(function(whoamiXhr, myrolesXhr){                
+                // Fires on first error
+                if (whoamiXhr.status == 401 || myrolesXhr.status == 401){
+                    // 401 => Anon user
                     f.updateUser();
                     f.closeTray();
                     jq.body.addClass("loaded menu-enabled header-enabled stage-enabled");
                 } else {
                     f.throwError({
-                                    name: 'PROFILE_UNAVAILABLE',
-                                    message: 'Profile unavailable. Reload page to try again.'
+                                    name: 'SERVICE_UNAVAILABLE',
+                                    message: 'Service unavailable. Go online or reload the page.'
                                 });
                 }
-        });
+            });
         
         
     });

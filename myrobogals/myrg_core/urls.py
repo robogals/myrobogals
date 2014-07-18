@@ -8,7 +8,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 
 from myrg_core.views import Time
-from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, WhoAmI, KillSessions
+from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, WhoAmI, ListMyRoles, KillSessions
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses 
 
 from myrg_webapp.views import WebApp
@@ -39,6 +39,7 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/users/create$', CreateUsers.as_view()),
     
     url(r'^api/1.0/self/whoami$', WhoAmI.as_view()),
+    url(r'^api/1.0/self/roles$', ListMyRoles.as_view()),
     url(r'^api/1.0/self/killsessions$', KillSessions.as_view()),
                            
     url(r'^api/1.0/groups/list$', ListGroups.as_view()),
@@ -63,6 +64,7 @@ urlpatterns += api_urlpatterns
 urlpatterns += patterns('',
     url(r'^app/login/$', 'myrg_webapp.views.login', name='login'),
     url(r'^app/logout/$', 'myrg_webapp.views.logout', name='logout'),
+    url(r'^app/set_role_id/$', 'myrg_webapp.views.set_role_id'),
     url(r'^app/resource/(?P<resource_id>.+?)$', 'myrg_webapp.views.get_resource'),
     url(r'^$', WebApp.as_view(), name='home'),
 )

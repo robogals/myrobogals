@@ -1,4 +1,4 @@
-from rest_framework.views import APIView
+from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
@@ -16,15 +16,7 @@ PAGINATION_MAX_LENGTH = 1000
 
 
 
-class ListUsers(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(ListUsers, self).metadata(request)
-        data.pop('description')
-        return data
-    
+class ListUsers(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -131,15 +123,7 @@ class ListUsers(APIView):
                             "user": output_user_list
                         })
 
-class DeleteUsers(APIView):
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(DeleteUsers, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class DeleteUsers(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -207,15 +191,7 @@ class DeleteUsers(APIView):
         })
         
 
-class EditUsers(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(EditUsers, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class EditUsers(RobogalsAPIView):
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -306,15 +282,7 @@ class EditUsers(APIView):
 
         
 
-class CreateUsers(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(CreateUsers, self).metadata(request)
-        data.pop('description')
-        return data
-        
+class CreateUsers(RobogalsAPIView): 
     def post(self, request, format=None):
         # request.DATA
         try:
@@ -395,14 +363,7 @@ class CreateUsers(APIView):
         
         
 
-class ResetUserPasswords(APIView):    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(ResetUserPasswords, self).metadata(request)
-        data.pop('description')
-        return data
+class ResetUserPasswords(RobogalsAPIView):
         
     def post(self, request, format=None):
         # request.DATA
@@ -432,23 +393,13 @@ class ResetUserPasswords(APIView):
         
         
         
-class WhoAmI(APIView):
+class WhoAmI(RobogalsAPIView):
     permission_classes = (IsAuthenticated,)
-    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(WhoAmI, self).metadata(request)
-        data.pop('description')
-        return data
 
     def post(self, request, format=None):
         from myrg_groups.serializers import GroupSerializer, RoleClassSerializer
         
-        # request
-        user_id = request.user.pk
-        role_id = request.DATA.get("role")
+        role_id = self.role_id
         
         group_id = None
         role_class_id = None
@@ -456,29 +407,21 @@ class WhoAmI(APIView):
         group_data = {}
         role_class_data = {}
         
-        # Build query
-        try:
-            user_query = request.user
-            
-            if not (role_id is None):
-                role_query = user_query.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now()))).get(pk = str(role_id))
-                
-        except:
-            return Response({"detail":"ROLE_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
-        
         # Serialize
         user_serializer = RobogalsUserSerializer
         user_serializer.Meta.fields = ("display_name","username","primary_email","gravatar_hash")
-        user_serialized_query = user_serializer(user_query)
+        user_serialized_query = user_serializer(self.user_obj)
         
         
         
         # Role -> Group, Role Class
         if not (role_id is None):
-            group = role_query.group
+            role_obj = self.role_obj
+        
+            group = role_obj.group
             group_id = group.id
             
-            role_class = role_query.role_class
+            role_class = role_obj.role_class
             role_class_id = role_class.id
 
             group_serializer = GroupSerializer
@@ -496,7 +439,7 @@ class WhoAmI(APIView):
         return Response({
             "user": {
                 "data": user_serialized_query.data,
-                "id": user_id,
+                "id": self.user_id,
             },
             "role_class": {
                 "data": role_class_data,
@@ -507,17 +450,25 @@ class WhoAmI(APIView):
                 "id": group_id,
             },
         })       
-        
-class KillSessions(APIView):
+
+class ListMyRoles(RobogalsAPIView):
     permission_classes = (IsAuthenticated,)
-    
-    def metadata(self, request):
-        """
-        Don't include the view description in OPTIONS responses.
-        """ 
-        data = super(KillSessions, self).metadata(request)
-        data.pop('description')
-        return data
+
+    def get(self, request, format=None):
+        from myrg_groups.serializers import RoleSerializer
+        
+        role_query = self.user_obj.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now())))
+        
+        role_serializer = RoleSerializer
+        role_serializer.Meta.fields = ("id","group","role_class",)        
+        role_serializer_query = role_serializer(role_query, many=True)
+        
+        return Response({
+            "role": role_serializer_query.data
+        })
+
+class KillSessions(RobogalsAPIView):
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
         return Response({

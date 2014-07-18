@@ -142,5 +142,4 @@ def send_email(definition_dict,supplied_recipients):
     except:
         return return_status(False,"MESSAGE_MARKER_SAVE_FAILED")
 
-    
     return return_status(True,message_def.pk)
