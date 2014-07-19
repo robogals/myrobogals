@@ -8,7 +8,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 
 from myrg_core.views import Time
-from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, WhoAmI, ListMyRoles, KillSessions
+from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, ResetUserPasswordsComplete, WhoAmI, ListMyRoles, KillSessions
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses 
 
 from myrg_webapp.views import WebApp
@@ -31,7 +31,7 @@ urlpatterns = patterns('',
 api_urlpatterns = patterns('',
     url(r'^api/1.0/utils/time$', Time.as_view()),
     url(r'^api/1.0/utils/pwdreset/initiate$', ResetUserPasswords.as_view()),
-    #url(r'^api/1.0/utils/pwdreset/complete', SetUserPasswords.as_view()),
+    url(r'^api/1.0/utils/pwdreset/complete', ResetUserPasswordsComplete.as_view()),
     
     url(r'^api/1.0/users/list$', ListUsers.as_view()),
     url(r'^api/1.0/users/delete$', DeleteUsers.as_view()),

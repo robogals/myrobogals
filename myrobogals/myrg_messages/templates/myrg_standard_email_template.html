@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        @import url(http://fonts.googleapis.com/css?family=Roboto:700,700italic);
+        @import url(http://fonts.googleapis.com/css?family=Roboto:400,400italic);
+        
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif;
+        }
+        
+        table,
+        td {
+            font-family: 'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+        }
+        
+        a {
+            border: 0;
+            border-style: none;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #a82304;
+        }
+        
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #a82304;
+        }
+        
+        h3 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #a82304;
+        }
+        
+        h1:first-child,
+        h2:first-child,
+        h3:first-child {
+            margin-top: 0;
+        }
+        
+        blockquote {
+            font-style: italic;
+        }
+        
+        .cite {
+            text-align: right;
+            font-style: italic;
+        }
+        
+        img {
+            vertical-align: middle;
+            border: 0;
+            border-style: none;
+        }
+        
+        img.border {
+            border: 1px solid #aaa;
+        }
+        
+        img.full {
+            width: 418px;
+        }
+        
+        .caption {
+            text-align: center;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        
+        .left-sidebar {
+            font-size: 12px;
+        }
+        
+        .left-sidebar ul {
+            padding-left: 15px;
+            margin-left: 5px;
+        }
+        
+        .left-sidebar li {
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body bgcolor="#dadada">
+    <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#dadada">
+            <tr bgcolor="#08003c">
+                <td align="center" valign="top">
+                    <table cellpadding="0" cellspacing="10" border="0" width="640">
+                        <tr>
+                            <td valign="middle" align="left">
+                                <a href="http://beta.my.robogals.org" title="Visit the myRobogals website"><img src="http://beta.my.robogals.org/static/images/myrobogals.png" width="184" height="32" alt="myRobogals"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" valign="top">
+                    <table cellpadding="0" cellspacing="0" border="0" width="640" bgcolor="#ffffff">
+                        <tr>
+                            <td valign="top">
+                                <table cellpadding="0" cellspacing="0" border="0" width="640">
+                                    <tr>
+                                        <td height="20">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="639" valign="bottom">
+                                            <table cellpadding="10" cellspacing="0" border="0" bgcolor="#a82304">
+                                                <tr>
+                                                    <td valign="middle" style="color: #fffff6; font-size: 18px;">
+                                                        <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif" style="color: #fffff6; font-size: 18px;">myRobogals beta</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table cellpadding="10" cellspacing="0" border="0" bgcolor="#08003c">
+                                                <tr>
+                                                    <td valign="middle" style="color: #fffff6; font-size: 32px;">
+                                                        <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif" style="color: #fffff6; font-size: 32px;">{{ title }}</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table cellpadding="0" cellspacing="10" border="0" width="640" bgcolor="#ffffff">
+                                    <tr>
+                                        <td valign="top" align="left">
+                                            <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif">
+                                            {{ body|safe }}
+                                            </font>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" align="left">
+                                            <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif" color="red">
+                                                This message was delivered from the myRobogals beta.<br>Please continue to use the <a href="https://my.robogals.org">main myRobogals service</a> for all general tasks.
+                                            </font>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" valign="top">
+                    <table cellpadding="5" cellspacing="0" border="0" width="640">
+                        <tr>
+                            <td align="center" class="footer">
+                                <font face="'Roboto', 'Lucida Sans Unicode', 'Lucida Grande', Lucida, Helvetica, Arial, sans-serif">
+                                    <p>
+                                        Robogals Global<br>
+                                        <br>
+                                        Level 4, Walter Boas Building<br>
+                                        University of Melbourne<br>
+                                        PO Box 4435<br>
+                                        Parkville VIC 3052<br>
+                                        Australia
+                                    </p>
+                                    <hr>
+                                    <p>
+                                        <a href="http://beta.my.robogals.org">myRobogals</a> | <a href="http://www.robogals.org">Robogals</a>
+                                    </p>
+                                    <hr>
+                                    <p>
+                                        <a href="http://www.robogals.org/comms">Manage communications from Robogals</a>
+                                    </p>
+                                </font>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </font>
+</body>
+</html>

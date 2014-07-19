@@ -36,6 +36,8 @@ class RobogalsAPIView(APIView):
         """
         self.format_kwarg = self.get_format_suffix(**kwargs)
         
+        request_body = request.body
+        
         # Set user/role information
         user_obj = request.user
         role_id = request.DATA.get("role_id")
@@ -58,7 +60,7 @@ class RobogalsAPIView(APIView):
             raise RoleInvalidException()
             
         # Log the call
-        if not log_api_call(request, role_query):
+        if not log_api_call(request, request_body, role_query):
             raise CallNotProcessedException()
             
             

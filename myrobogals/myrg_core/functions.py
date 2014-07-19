@@ -7,12 +7,12 @@
 """
 from .models import APILog
 
-def log_api_call(request, role = None, note = None):
+def log_api_call(request, request_body, role = None, note = None):    
     log_dict = {
         "user_role": role,
         "ip": get_client_ip(request),
         "api_url": request.get_full_path(),
-        "api_body": request.body,
+        "api_body": request_body,
         "note": note,
     }
     

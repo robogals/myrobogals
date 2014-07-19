@@ -1,1 +1,14 @@
-<!DOCTYPE html><html manifest="manifest.appcache"></html>
+<!DOCTYPE html>
+<html manifest="manifest.appcache">
+    <head>
+        <script>
+            function onUpdateReady() {
+              console.log('AppCache update ready.');
+            }
+            window.applicationCache.addEventListener('updateready', onUpdateReady);
+            if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+              onUpdateReady();
+            }
+        </script>
+    </head>
+</html>

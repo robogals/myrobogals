@@ -307,7 +307,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         "Retrieves the username of the user."
         return self.username
     
-    
+    def get_gravatar_hash(self):
+        import hashlib
+        return hashlib.md5(self.primary_email.lower().encode('utf-8')).hexdigest()
     
     
     

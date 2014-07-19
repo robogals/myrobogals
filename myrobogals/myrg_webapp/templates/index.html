@@ -51,14 +51,11 @@
                         </div>
                     </div>
                 </li>
-                <li><a href="#" class="menu-item"><i class="fa fa-dashboard"></i>Dashboard</a></li>
-                <li><a href="#" class="menu-item"><i class="fa fa-flag"></i>Activities</a></li>
-                <li><a href="#" class="menu-item"><i class="fa fa-flask"></i>Extras</a></li>
             </ul>
         </nav>
         <div id="menu-underlay"></div>
         <div id="stage"></div>
         <div id="overlay"></div>
-        <iframe src="{{ STATIC_URL }}appcache/appcache.html" width="1" height="1" style="display:none;"></iframe>
+        <iframe src="{{ STATIC_URL }}appcache/appcache.html" width="1" height="1" style="position:absolute;z-index:-1;"></iframe>
     </body>
 </html>

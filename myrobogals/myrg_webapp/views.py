@@ -3,6 +3,7 @@ from rest_framework import status
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
 from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from django.contrib.auth import (login as auth_login, logout as auth_logout)
 from django.contrib.auth.forms import AuthenticationForm
@@ -13,6 +14,7 @@ import calendar
 from django.utils import timezone
 from django.utils.http import http_date
 
+#@ensure_csrf_cookie
 class WebApp(TemplateView):
     template_name = "index.html"
     

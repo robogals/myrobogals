@@ -9,54 +9,10 @@ myRobogals
 var myRG = myRG || {};
 
 (function(myRG){
-    // Start up
-    
-    // CSRF and AJAX
-    /*! https://docs.djangoproject.com/en/1.6/ref/contrib/csrf/#ajax */
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-    var csrftoken = getCookie('csrftoken');
-
-    function csrfSafeMethod(method) {
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-    
-    
-    // Useful functions
-    
-    // Test nested obj properties
-    /*! http://stackoverflow.com/a/4676258 */
-    function testPropertyExists(a,e){for(var c=e.split("."),b=0,f=c.length;b<f;b++){var d=c[b];if(null!==a&&"object"===typeof a&&d in a)a=a[d];else return!1}return!0};
-
-    
-    
-    
-    
-    
-    
-    // Stamp store obj
+    /*
+     *  Start up
+     */     
+    // Model store object for stamping
     function modelStore(){
         this.store = {};
         
@@ -90,13 +46,6 @@ var myRG = myRG || {};
     var u = myRG.userStore;
     var f = myRG.functions;
         
-        
-        
-        
-        
-        
-        
-        
     // Set settings
     s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 0);     // ms
     
@@ -109,14 +58,19 @@ var myRG = myRG || {};
     s.set("API_ROOT_URL", "/api/1.0/");
     s.set("RESOURCE_ROOT_URL", "/app/resource/");
     
+    // CSRF and AJAX
+    // https://docs.djangoproject.com/en/1.6/ref/contrib/csrf/#ajax
+    function getCookie(a){var b=null;if(document.cookie&&""!=document.cookie)for(var d=document.cookie.split(";"),c=0;c<d.length;c++){var e=jQuery.trim(d[c]);if(e.substring(0,a.length+1)==a+"="){b=decodeURIComponent(e.substring(a.length+1));break}}return b}
+    var csrftoken=getCookie("csrftoken");
+    function csrfSafeMethod(a){return/^(GET|HEAD|OPTIONS|TRACE)$/.test(a)}
+    $.ajaxSetup({beforeSend:function(a,b){csrfSafeMethod(b.type)||this.crossDomain||a.setRequestHeader("X-CSRFToken",csrftoken)}});    
     
-    
-    
-    
-    
-    
-    
-    // Core functions
+    // Functions
+    // Test nested obj properties
+    // http://stackoverflow.com/a/4676258
+    function testPropertyExists(a,e){for(var c=e.split("."),b=0,f=c.length;b<f;b++){var d=c[b];if(null!==a&&"object"===typeof a&&d in a)a=a[d];else return!1}return!0};
+
+    // URL generators
     f.generateAPIURL = function(endpoint) {
         return s.get("API_ROOT_URL") + endpoint.replace(/^\/|\/$/g, '') + ".json";
     }
@@ -125,6 +79,7 @@ var myRG = myRG || {};
         return s.get("RESOURCE_ROOT_URL") + resource.replace(/^\/|\/$/g, '') + ".html";
     }
     
+    // Tabbable elements (for overlay and tabbing disabling)
     f.getTabbableElem = function() {
         return $(":tabbable");
     }
@@ -156,19 +111,43 @@ var myRG = myRG || {};
         g.set("TABBABLE_ELEM_ARR", 0);
     }
     
+    // AppCache
+    f.updateApp = function(){
+        g.set("MYRG_UPDATE_READY",1);
+    };
     
     
+    // API and resource calls
+    f.fetchAPI = function(endpoint, data, type){
+        var data = data || {};
+        var type = type || "POST";
+        
+        switch (type) {
+            case "GET":
+                return $.get(f.generateAPIURL(endpoint),data);
+            case "POST":
+                return $.post(f.generateAPIURL(endpoint),data);
+        }
+        
+    }
     
-    // Pre DOM ready
-    // Prefetch user information
+    f.fetchResource = function(resource){
+        return $.get(f.generateAPIURL(endpoint));
+    }
+    
+    
+    // Common API calls
     f.fetchWhoAmI = function(){
-        return $.post(f.generateAPIURL("/self/whoami"));
+        return f.fetchAPI("/self/whoami",{});
     }
     
     f.fetchMyRoles = function(){
-        return $.get(f.generateAPIURL("/self/roles"));
+        return f.fetchAPI("/self/roles", null, "GET");
     }
     
+    
+    
+    // Prefetch user information
     u.set("WHOAMI_XHR",f.fetchWhoAmI());
     u.set("MYROLES_XHR",f.fetchMyRoles());
     
@@ -177,8 +156,12 @@ var myRG = myRG || {};
     
     
     
-    // DOM ready
+    
+    /*
+     *  DOM Ready
+     */  
     $(function(){
+        // Grab jQuery objects of common DOM elements
         jq.body = $("body");
         jq.menu = $("#menu");
         jq.tray = $("#tray");
@@ -187,23 +170,19 @@ var myRG = myRG || {};
         jq.profile = jq.menu.find(".profile");
         jq.menuUnderlay = $("#menu-underlay");
         
-        
         // Grab Gravatar template
         g.set("GRAVATAR_TEMPLATE", jq.profile.find(".image").data("image"));
         
         
-        
         // Functions
-        
+        // Error message -> Tray
         f.throwError = function(error) {
             f.setTray('<b><i class="fa fa-frown-o"></i> Error: </b>'+error.message,"fail",false);
             
             throw error;
         }
         
-        
-        
-        
+        // Tray
         f.clearTrayActivity = function () {
             jq.tray.stop();
             
@@ -262,10 +241,7 @@ var myRG = myRG || {};
             }), s.get("TRAY_TRANSITION_SPEED")+33)
         }
         
-        
-        
-        
-        
+        // Overlay + Modal window
         f.showOverlay = function() {
             f.disableAllTabbableElem();
             jq.body.addClass("overlay");
@@ -276,8 +252,6 @@ var myRG = myRG || {};
             jq.body.removeClass("overlay");
             jq.overlay.children(".modal-window").remove();
         }
-        
-        
         
         f.openModal = function () {
             f.showOverlay();
@@ -308,14 +282,7 @@ var myRG = myRG || {};
             f.closeOverlay();
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
+        // Menu
         f.toggleMenu = function (){
             if (!jq.body.hasClass("menu-open")) {
                 if (!jq.body.hasClass("menu-enabled")) {
@@ -329,10 +296,7 @@ var myRG = myRG || {};
             jq.body.toggleClass("user-open");
         }
         
-        
-        
-        
-        
+        // User profile
         f.updateUser = function(whoami) {
             if (whoami) {
                 u.set("ID",whoami.user.id);
@@ -392,11 +356,7 @@ var myRG = myRG || {};
         }
         
         
-        
-        
-        
         // Events
-        
         jq.tray.click(function(){
             if (g.get("TRAY_CLOSE_TIMER") != -1){
                 f.closeTray();
@@ -418,9 +378,9 @@ var myRG = myRG || {};
         
        
         
-        
-        
-        // Start!
+        /*
+         * Start!
+         */         
         
         // If old IE (lt. IE 9) then stop
         if ($("#ie-old-warning").length){
@@ -430,12 +390,10 @@ var myRG = myRG || {};
         
         
         // Grab user info
-        
         // Add a little bit of latency allowance
         var initLoadMessageTimer = setTimeout(function(){
                                                 f.setTray("Loading...","indeterminate",false);
                                                 }, 0);
-        
         // XHR is done before DOM ready. See above.
         $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
             .done(function(whoamiXhrArr, myrolesXhrArr){
@@ -460,7 +418,5 @@ var myRG = myRG || {};
                                 });
                 }
             });
-        
-        
     });
 })(myRG);

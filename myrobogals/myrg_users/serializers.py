@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 class RobogalsUserSerializer(serializers.ModelSerializer):
     display_name = serializers.Field(source='get_preferred_name')
-    gravatar_hash = serializers.SerializerMethodField('get_gravatar_hash')
+    gravatar_hash = serializers.Field(source='get_gravatar_hash')
     
     class Meta:
         model = RobogalsUser
@@ -26,7 +26,4 @@ class RobogalsUserSerializer(serializers.ModelSerializer):
 
         return instance
         
-    def get_gravatar_hash(self, obj):
-        import hashlib
-        
-        return hashlib.md5(obj.primary_email.lower().encode('utf-8')).hexdigest()
+    

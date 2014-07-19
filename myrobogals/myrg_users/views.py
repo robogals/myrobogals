@@ -364,23 +364,50 @@ class CreateUsers(RobogalsAPIView):
         
 
 class ResetUserPasswords(RobogalsAPIView):
-        
     def post(self, request, format=None):
+        from django.conf import settings
+        from urllib.parse import quote
+        from myrg_messages.functions import send_email
+        from django.contrib.auth.tokens import PasswordResetTokenGenerator
+        
         # request.DATA
         try:
             primary_emails = list(request.DATA.get("primary_email"))
         except:
             return Response({"detail":"DATA_FORMAT_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
                 
-        failed_resets = {}
-        
         # Run query
         query = RobogalsUser.objects.filter(primary_email__in=primary_emails)
         
-        ##### <<<< RESET CODE HERE >>>>
-        
-        
-        
+        for user in query:
+            email_definition = {
+                "sender_role": None,
+                "sender_name": "myRobogals beta",
+                "sender_address": "my@robogals.org",
+                "subject": "Password reset requested",
+                "body": "\
+Hi {user_preferred_name},<br>\
+<br>\
+A password reset has been requested on your myRobogals beta user account.<br>\
+<br>\
+<a href='http://beta.my.robogals.org/?app=pwdreset&email={user_email}&token={reset_token}' style='font-size:1.5em;'>Click this link to complete your password reset.</a><br>\
+<br>\
+This link expires in {password_reset_days} days.<br>\
+<br>\
+<br>\
+If you did not action this, you may safely ignore this email. Your password has not changed.<br>".format(user_preferred_name=user.get_preferred_name(),
+                                                                                                         user_email=quote(user.primary_email, safe=''),
+                                                                                                         reset_token=PasswordResetTokenGenerator().make_token(user),
+                                                                                                         password_reset_days=settings.PASSWORD_RESET_TIMEOUT_DAYS),
+                "html": True,
+            }
+            
+            recipients = [{ "user": user.pk },]
+            
+            template = { "template": "myrg_standard_email_template.html", "title": "Password reset requested" }
+            
+            send_email(email_definition,recipients,template)
+
         # There is no OBJECT_NOT_FOUND response for privacy and security reasons
         return Response({
             "fail": {
@@ -391,7 +418,75 @@ class ResetUserPasswords(RobogalsAPIView):
             }
         })
         
+class ResetUserPasswordsComplete(RobogalsAPIView):
+    def post(self, request, format=None):
+        from myrg_messages.functions import send_email
+        from django.contrib.auth.tokens import PasswordResetTokenGenerator
         
+        # request.DATA
+        primary_email = str(request.DATA.get("primary_email"))
+        token = str(request.DATA.get("token"))
+        
+        new_password = request.DATA.get("password")
+        
+        if new_password is None:
+            return Response({"detail":"BLANK_PASSWORD"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Run query
+        user = RobogalsUser.objects.get(primary_email=primary_email)
+        
+        if user:
+            if PasswordResetTokenGenerator().check_token(user,token):
+                serializer = RobogalsUserSerializer
+                serialized_user = serializer(user, data={"password":new_password}, partial=True)
+                
+                if serialized_user.is_valid():
+                    try:
+                        with transaction.atomic():
+                            serialized_user.save()
+                            
+                        email_definition = {
+                                            "sender_role": None,
+                                            "sender_name": "myRobogals beta",
+                                            "sender_address": "my@robogals.org",
+                                            "subject": "Password reset successful",
+                                            "body": "\
+Hi {user_preferred_name},<br>\
+<br>\
+Your myRobogals beta user account has had its password successfully set after a password reset.<br>\
+You may now log into myRobogals beta with your new password.<br>\
+<br>\
+<br>\
+If you did not action this, please immediately perform a new password reset and inform Robogals Support immediately for support.<br>".format(user_preferred_name=user.get_preferred_name()),
+                                            "html": True,
+                                        }
+                                        
+                        recipients = [{ "user": user.pk },]
+                        
+                        template = { "template": "myrg_standard_email_template.html", "title": "Password reset successful" }
+                        
+                        send_email(email_definition,recipients,template)
+                                                
+                        return Response({
+                            "fail": {
+                                "primary_email": {}
+                            },
+                            "success": {
+                                "primary_email": primary_email
+                            }
+                        })
+                        
+                    except:
+                        pass
+    
+        return Response({
+            "fail": {
+                "primary_email": primary_email
+            },
+            "success": {
+                "primary_email": {}
+            }
+        })
         
 class WhoAmI(RobogalsAPIView):
     permission_classes = (IsAuthenticated,)

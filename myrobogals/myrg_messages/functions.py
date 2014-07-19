@@ -1,5 +1,6 @@
 from django.db.models.fields import FieldDoesNotExist
 from django.db import transaction
+from django.template.loader import render_to_string
 
 from myrg_users.models import RobogalsUser
 
@@ -12,9 +13,11 @@ from collections import OrderedDict
 
 import mandrill
 
-def send_email(definition_dict,supplied_recipients):
+def send_email(definition_dict,supplied_recipients,template_dict = None):
     def return_status(success,message):
         return { "success": success, "message": message }
+    
+    definition_dict_internal = definition_dict
     
     message_dict = {
                     'auto_html': False,
@@ -35,8 +38,20 @@ def send_email(definition_dict,supplied_recipients):
                     'track_clicks': True,
                     'track_opens': True,
                    }
-          
-          
+        
+    if template_dict:
+        template = template_dict.get("template")
+        title = template_dict.get("title")
+        body = definition_dict_internal.get("body")
+        
+        try:
+            definition_dict_internal['body'] = render_to_string(template, {
+                                                                    'title': title,
+                                                                    'body': body,
+                                                                 })
+        except:
+                return return_status(False,"MESSAGE_GENERATION_FAILED")
+    
     # Email Definition
     # definition_dict = {
                         # "sender_role": role_query.pk,
@@ -48,7 +63,7 @@ def send_email(definition_dict,supplied_recipients):
                       # }
 
     serializer = EmailDefinitionSerializer
-    serialized_message_def = serializer(data=definition_dict)
+    serialized_message_def = serializer(data=definition_dict_internal)
     
     if not serialized_message_def.is_valid():
         return return_status(False,"DATA_VALIDATION_FAILED")
@@ -97,19 +112,16 @@ def send_email(definition_dict,supplied_recipients):
     # Finish message
     message_dict.update({
                             "to": recipients_list,
-                            "subject": definition_dict.get("subject"),
-                            "from_name": definition_dict.get("sender_name"),
-                            "from_email": definition_dict.get("sender_address"),
+                            "subject": definition_dict_internal.get("subject"),
+                            "from_name": definition_dict_internal.get("sender_name"),
+                            "from_email": definition_dict_internal.get("sender_address"),
                         })
     
-    if definition_dict.get("html"):
-        message_dict.update({"html": definition_dict.get("body")})
+    if definition_dict_internal.get("html"):
+        message_dict.update({"html": definition_dict_internal.get("body")})
     else:
-        message_dict.update({"text": definition_dict.get("body")})
+        message_dict.update({"text": definition_dict_internal.get("body")})
 
-    
-    
-    
     
     # Send
     try:
