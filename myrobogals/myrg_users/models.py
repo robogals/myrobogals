@@ -21,7 +21,7 @@ from django.conf import settings
 # * https://github.com/jonathanchu/django-custom-user-example/blob/master/customuser/accounts/models.py
 # * https://github.com/django/django/blob/master/django/contrib/auth/models.py
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
         primary_email = self.normalize_email(primary_email)

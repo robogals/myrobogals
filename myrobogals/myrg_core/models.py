@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from myrg_groups.models import Role
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class APILog(models.Model):
     user_role = models.ForeignKey(Role,
                              blank=True,

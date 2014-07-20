@@ -9,7 +9,7 @@ from django.utils import timezone
 from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class RepoContainer(models.Model):
     user = models.ForeignKey(RobogalsUser)
     role = models.ForeignKey(Role)
@@ -35,7 +35,7 @@ class RepoContainer(models.Model):
     date_updated = models.DateField(_('date created'),
                                     blank=False)
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class RepoFile(models.Model):
     name = models.CharField(_('name'),
                             blank=False)

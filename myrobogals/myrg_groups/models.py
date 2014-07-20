@@ -68,7 +68,7 @@ class Group(models.Model):
     def __str__(self):
         return self.name
         
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class LocatableEntity(Group):
     address = models.TextField(_('address'),
                                blank=False)
@@ -102,17 +102,17 @@ class LocatableEntity(Group):
     class Meta:
         abstract = True
         
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class Chapter(LocatableEntity):
     university = models.CharField(_('university'),
                                   max_length=63,
                                   blank=True)
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class School(LocatableEntity):
     pass
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class Company(LocatableEntity):
     legal_name = models.CharField(_('legal name'),
                                   max_length=63,
@@ -159,7 +159,7 @@ class RoleClass(models.Model):
             applicable_groups = Group.objects.exclude(pk__in = self.group_exclude.all())
         return applicable_groups
 
-@python_2_unicode_compatible
+#@python_2_unicode_compatible
 class Role(models.Model):
     def uuid_generator():
         from uuid import uuid4
