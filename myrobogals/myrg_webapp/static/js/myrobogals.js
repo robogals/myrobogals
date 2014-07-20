@@ -47,7 +47,9 @@ var myRG = myRG || {};
     var f = myRG.functions;
         
     // Set settings
-    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 0);     // ms
+    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 500);     // ms
+    s.set("INIT_DEFAULT_ANON_APP", "login");
+    s.set("INIT_DEFAULT_USER_APP", "dashboard");
     
     s.set("TRAY_MIN_TIME", 3500);                   // ms
     s.set("TRAY_WAIT_BEFORE_SCROLL", 1500);         // ms
@@ -122,17 +124,20 @@ var myRG = myRG || {};
         var data = data || {};
         var type = type || "POST";
         
-        switch (type) {
-            case "GET":
-                return $.get(f.generateAPIURL(endpoint),data);
-            case "POST":
-                return $.post(f.generateAPIURL(endpoint),data);
+        var data_obj = {
+                        contentType: 'application/json',
+                        type: type
+                       }
+                       
+        if (!csrfSafeMethod(type)){
+            data_obj.data = JSON.stringify(data);
         }
         
+        return $.ajax(f.generateAPIURL(endpoint), data_obj);
     }
     
     f.fetchResource = function(resource){
-        return $.get(f.generateAPIURL(endpoint));
+        return $.get(f.generateResURL(resource));
     }
     
     
@@ -151,6 +156,8 @@ var myRG = myRG || {};
     u.set("WHOAMI_XHR",f.fetchWhoAmI());
     u.set("MYROLES_XHR",f.fetchMyRoles());
     
+    
+    
     // Grab state
     g.set("STATE", History.getState());
     
@@ -165,11 +172,20 @@ var myRG = myRG || {};
         jq.body = $("body");
         jq.menu = $("#menu");
         jq.tray = $("#tray");
+        jq.stage = $("#stage");
         jq.header = $("#header");
         jq.overlay = $("#overlay");
         jq.profile = jq.menu.find(".profile");
         jq.menuUnderlay = $("#menu-underlay");
-        
+
+        // Media Queries
+        enquire.register("(min-width: 950px)", function() {
+            $("html").removeClass().addClass("large");
+        });
+        enquire.register("(max-width: 949px)", function() {
+            $("html").removeClass().addClass("small");
+        });
+    
         // Grab Gravatar template
         g.set("GRAVATAR_TEMPLATE", jq.profile.find(".image").data("image"));
         
@@ -356,6 +372,37 @@ var myRG = myRG || {};
         }
         
         
+        // App (resource) loading
+        f.loadApp = function (appName){
+            // Reset the application store
+            a.reset();
+            
+            var app_xhr = f.fetchResource(appName);
+            
+            app_xhr
+                .always(function(){
+                    
+                })
+                .done(function(data){
+                    // Remove classes which end in "-enabled"
+                    // http://stackoverflow.com/a/5182103
+                    jq.body.removeClass(function (i, css){
+                        return (css.match (/\S+-enabled\b/g) || []).join(' ');
+                    });                   
+                    
+                    // data -> #stage
+                    jq.stage.html(data);
+                    
+                    // Apply classes which the app requires
+                    jq.body.addClass(a.get("BODY_CLASS").join(" "));
+                })
+                .fail(function(){
+                
+                })
+                
+            return app_xhr;
+        }
+        
         // Events
         jq.tray.click(function(){
             if (g.get("TRAY_CLOSE_TIMER") != -1){
@@ -393,16 +440,16 @@ var myRG = myRG || {};
         // Add a little bit of latency allowance
         var initLoadMessageTimer = setTimeout(function(){
                                                 f.setTray("Loading...","indeterminate",false);
-                                                }, 0);
+                                                }, s.get("INIT_STARTUP_LATENCY_ALLOWANCE"));
         // XHR is done before DOM ready. See above.
         $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
+            .always(function(){
+                clearTimeout(initLoadMessageTimer);
+                jq.body.addClass("loaded");
+            })
             .done(function(whoamiXhrArr, myrolesXhrArr){
                 f.updateUser(whoamiXhrArr[0]);
                 f.closeTray();
-                jq.body.addClass("loaded menu-enabled header-enabled stage-enabled");
-            })
-            .always(function(){
-                clearTimeout(initLoadMessageTimer);
             })
             .fail(function(whoamiXhr, myrolesXhr){                
                 // Fires on first error
@@ -410,7 +457,7 @@ var myRG = myRG || {};
                     // 401 => Anon user
                     f.updateUser();
                     f.closeTray();
-                    jq.body.addClass("loaded menu-enabled header-enabled stage-enabled");
+                    f.loadApp(s.get("INIT_DEFAULT_ANON_APP"));
                 } else {
                     f.throwError({
                                     name: 'SERVICE_UNAVAILABLE',

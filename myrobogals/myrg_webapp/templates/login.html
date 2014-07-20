@@ -9,14 +9,7 @@
         text-align: center;
     }
     
-    #content:before {
-        content: '';
-        display: inline-block;
-        height: 80%;
-        vertical-align: middle;
-    }
-    
-    #login-form {
+    #app-container {
         text-align: left;
         
         display: inline-block;
@@ -30,43 +23,43 @@
         font-size: 1.2rem;
     }
     
-    #login-form .logo {
+    #app-container .logo {
         background-image: url("/static/images/myrobogals.png");
         background-position: center center;
         background-repeat: no-repeat;
         background-size: contain;
         background-origin: content-box;
         
-        padding: 1rem 1.6rem;
+        padding: 1rem 0;
         margin-right: 2rem;
         
         width: auto;
         max-width: 25rem;
     }
     
-    #login-form .logo .filler {
+    #app-container .logo .filler {
         padding-bottom: 15%;
     }
     
-    #login-form .container {
+    #app-container .container {
         padding: 1rem;
     }
     
-    #login-form .container .row {
+    #app-container .container .row {
         padding: 0.5rem;
     }
     
-    #login-form .container .col {
+    #app-container .container .col {
         vertical-align: middle;
     }
     
-    #login-form .container .left.col {
+    #app-container .container .left.col {
         width: 10rem;
         font-weight: 500;
     }
     
-    #login-form input,
-    #login-form button {
+    #app-container input,
+    #app-container button {
         border: 0;
         background: #fff;
         color: #000;
@@ -75,58 +68,189 @@
         width: 100%;
     }
     
-    #login-form button#reset-password {
+    #app-container button#reset-password,
+    #app-container button#cancel-reset-password {
         background: transparent;
         padding: 0;
         color: #fff;
         width: auto;
     }
     
-    #login-form button#login {
+    #app-container button#login,
+    #app-container button#submit-reset-password {
         color: #fff;
         font-weight: 500;
         padding: 0.5rem 2rem;
         width: auto;
     }
     
+    #links {
+        color: rgba(0,0,0,0.5);
+        margin: 1rem;
+    }
+    
+    #links a {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
     .row .col.right {
         text-align: right;
     }
     
+    html.small #reset-password {
+        margin-bottom: 1rem;
+    }
+    
+    html.large #content:before {
+        content: '';
+        display: inline-block;
+        height: 80%;
+        vertical-align: middle;
+    }
+}
 </style>
-<div id="content">
-    <form id="login-form" action="/app/login/" method="post">
+<div id="content" tabindex="0">
+    <div id="app-container">
         <div class="logo bg-rg-dark-blue"><div class="filler"></div></div>
         <div class="container bg-rg-dark-blue" >
-            
-            <div class="row">
-                <div class="left col">
-                    <label for="id_email">Email address</label>
-                </div>
-                <div class="col">
-                    <input id="id_email" type="email" name="email" placeholder="volunteer@robogals.org" autofocus>
-                </div>
+            <div id="message-container">
+                <div class="messages" id="neg-message"></div>
+                <div class="messages" id="pos-message"></div>
             </div>
-            <div class="row">
-                <div class="left col">
-                    <label for="id_password">Password</label>
+            <form id="login-form" method="post">
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_email">Email address</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_email" type="email" name="email" placeholder="volunteer@robogals.org">
+                    </div>
                 </div>
-                <div class="col">
-                    <input id="id_password" type="password" name="password">
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_password">Password</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_password" type="password" name="password">
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <button id="reset-password">Reset Password</button>
+                <div class="row">
+                    <div class="col">
+                        <button id="reset-password">Reset Password</button>
+                    </div>
+                    <div class="right col">
+                        <button id="login" class="bg-rg-dark-green mobile-width-100" type="submit">Login</button>
+                    </div>
                 </div>
-                <div class="right col">
-                    <button id="login" class="bg-rg-dark-green mobile-width-100" type="submit">Login</button>
+            </form>
+            <form id="password-reset-form" method="post" style="display:none;">
+                <h3>Password reset</h3>
+                <p>Enter your new password for <span class="email_address" />:</p>
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_password">New password</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_password" type="password" name="password">
+                    </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col">
+                        <button id="cancel-reset-password">Cancel</button>
+                    </div>
+                    <div class="right col">
+                        <button id="submit-reset-password" class="bg-rg-dark-green mobile-width-100" type="submit">Reset</button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
     <div class="row" id="links">
         <div class="col"><a href="http://www.robogals.org"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
-        <div class="right col"><a href="http://www.robogals.org"><i class="fa fa-language"></i> Language</a></div>
+        <!--<div class="col"><a href="#"><i class="fa fa-language"></i> Language</a></div>-->
     </div>
 </div>
+<script>
+    (function(){
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "stage-enabled"
+            ]);
+        
+        // Common elem
+        var el = a.set("JQELEM",{});
+        el.email = $("#id_email");
+        el.password = $("#id_password");
+        
+        // Autofocus on content (prevents mobile browsers from bringing keyboard)
+        $("#content").focus();
+        
+        function hideMessages() {
+            $(".messages").hide();
+        }
+        
+        function showMessage(html, type) {
+            hideMessages();
+            $("#"+type+"-message").html(html).show();
+        }
+        
+        // Login form
+        $("#login-form").submit(function(e){
+            e.preventDefault();
+            
+        });
+        
+        $("button#reset-password").click(function(e){
+            e.preventDefault();
+            
+            hideMessages();
+                
+            if (!el.email.val()){
+                showMessage("Please enter the email address of your account.","neg");
+                return;
+            }
+            
+            f.setTray("Please wait...","indeterminate",false);
+            
+            var api_data = {"primary_email": [el.email.val()]}
+                            
+            var api_xhr = f.fetchAPI("/utils/pwdreset/initiate",api_data,"POST");
+            
+            api_xhr
+                .always(function(){
+                    f.closeTray();
+                })
+                .done(function(){
+                    showMessage("Password reset instructions have been sent to your email.<br><br>Please look in your inbox or spam folder for the message.","pos");
+                })
+                .fail(function(){
+                    showMessage("Something went wrong.<br><br>Try again in a few minutes.","neg");
+                })
+        });
+        
+        // Hide messages by default
+        hideMessages();
+    })();
+</script>

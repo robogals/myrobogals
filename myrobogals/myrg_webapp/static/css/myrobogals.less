@@ -106,6 +106,10 @@ myRobogals
     box-sizing: border-box;
 }
 
+*:focus {
+    outline: 0;
+}
+
 html {
   height: 100%;
 }
@@ -166,6 +170,15 @@ a {
     color: inherit;
 }
 
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="button"],
+input[type="submit"] {
+     -webkit-appearance: none;
+     border-radius: 0;
+}
 //==============================================================================
 
 .transition(@var){
@@ -946,11 +959,7 @@ body {
 }
 
 //==============================================================================
-@media (max-width: (@desktop-threshold - 1px)){
-    
-    #stage {
-    }
-    
+html {
     body {
         &.menu-open {
             #header {
@@ -976,14 +985,16 @@ body {
             }
         }
     }
-    
+}
+
+html.small {
     .mobile-width-100 {
         width: 100% !important;
     }
 }
 
-@media (min-width: @desktop-threshold) {
-    html,
+html.large {
+    &,
     body {
         font-size: @1em-desktop;
     }
@@ -995,6 +1006,23 @@ body {
     }
     
     body {
+        &.menu-open {
+            #header {
+                &:before {
+                    opacity: 0;
+                    .translate(0);
+                }
+            }
+            
+            #menu {
+                .menu-open;
+            }
+            
+            #menu-underlay {
+                opacity: 0;
+            }
+        }
+        
         &.menu-enabled {
             #menu {
                 .menu-open;
@@ -1005,15 +1033,8 @@ body {
             }
             
         }
-        &.header-enabled {
-            #stage {
-                top: @header-height;
-            }
-        }
     }
     
-    #stage {
-    }
     
     .row { width: 100%; display: table; table-layout: fixed; }
     .col { display: table-cell; vertical-align: top;}

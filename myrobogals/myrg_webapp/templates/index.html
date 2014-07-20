@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome.min.css">
         <link rel="stylesheet" href="{{ STATIC_URL }}css/myrobogals.css">
         
+        <script src="{{ STATIC_URL }}js/enquire.min.js"></script>
         <script src="{{ STATIC_URL }}js/fastclick.min.js"></script>
         <script>
             window.addEventListener('DOMContentLoaded', function() {
@@ -31,6 +32,7 @@
         <script src="{{ STATIC_URL }}js/myrobogals.js"></script>
     </head>
     <body data-app="" class="">
+        <iframe src="{{ STATIC_URL }}appcache/appcache.html" width="1" height="1" style="position:absolute;z-index:-1;"></iframe>
         <!--[if lt IE 9]><div id="ie-old-warning">The myRobogals web app does not support your version of Internet Explorer.<br>Please <a href="http://browsehappy.com/">upgrade or use an alternative browser</a> to continue to use myRobogals.</div><![endif]-->
         <div id="header"></div>
         <div id="tray"><span class="text"></span></div>
@@ -56,6 +58,5 @@
         <div id="menu-underlay"></div>
         <div id="stage"></div>
         <div id="overlay"></div>
-        <iframe src="{{ STATIC_URL }}appcache/appcache.html" width="1" height="1" style="position:absolute;z-index:-1;"></iframe>
     </body>
 </html>
