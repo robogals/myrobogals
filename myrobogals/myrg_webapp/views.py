@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
 from django.views.generic.base import TemplateView
 from rest_framework import status
 from django.http import HttpResponse

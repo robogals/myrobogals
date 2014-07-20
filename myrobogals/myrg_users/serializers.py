@@ -1,3 +1,9 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
+
 from .models import RobogalsUser
 
 from rest_framework import serializers
@@ -15,7 +21,7 @@ class RobogalsUserSerializer(serializers.ModelSerializer):
         if instance is None:
             instance = self.opts.model()
             
-        for key, val in attrs.items():
+        for key, val in six.iteritems(attrs):
             try:
                 if key == "password":
                     instance.set_password(attrs.get('password', instance.password))

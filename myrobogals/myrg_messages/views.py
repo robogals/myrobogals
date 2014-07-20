@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
 from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -64,7 +69,7 @@ class SendMessage(RobogalsAPIView):
             
             
             
-            for field,value in message_data.items():
+            for field,value in six.iteritems(message_data):
                 field = str(field)
                 
                 if field == "email":

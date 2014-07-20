@@ -1,10 +1,7 @@
-"""
-    myRobogals
-    myrg_groups/admin.py
+from __future__ import unicode_literals
+from future.builtins import *
+import six
 
-    2014
-    Robogals Software Team
-"""
 
 from django.contrib import admin
 

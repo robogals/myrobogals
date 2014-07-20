@@ -1,11 +1,7 @@
-"""
-    myRobogals
-    myrg_message/models.py
-    Custom Message, MessageDefinition model definition
-
-    2014
-    Robogals Software Team
-"""
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
 from django.db import models
 from django.core import validators
@@ -15,6 +11,7 @@ from myrg_groups.models import Role
 
 from django.utils.translation import ugettext_lazy as _
 
+@python_2_unicode_compatible
 class MessageDefinition(models.Model):
     sender_role = models.ForeignKey(Role, blank=True, null=True)
     
@@ -41,6 +38,7 @@ class MessageDefinition(models.Model):
         abstract = True
                                     
                                     
+@python_2_unicode_compatible
 class EmailDefinition(MessageDefinition):
     sender_name = models.CharField(_('sender name'),
                                      max_length=127,
@@ -60,6 +58,7 @@ class EmailDefinition(MessageDefinition):
                                    null=True,
                                    blank=True)
                                     
+@python_2_unicode_compatible
 class SMSDefinition(MessageDefinition):
     pass
 
@@ -70,6 +69,7 @@ class SMSDefinition(MessageDefinition):
     
     
     
+@python_2_unicode_compatible
 class Message(models.Model):
     recipient_user = models.ForeignKey(RobogalsUser,
                                        blank=True,
@@ -94,6 +94,7 @@ class Message(models.Model):
     class Meta:
         abstract = True
 
+@python_2_unicode_compatible
 class EmailMessage(Message):
     definition = models.ForeignKey(EmailDefinition)
     recipient_name = models.CharField(_('recipient name'),
@@ -103,6 +104,7 @@ class EmailMessage(Message):
                                          max_length=255,
                                          blank=False)
                                         
+@python_2_unicode_compatible
 class SMSMessage(Message):
     definition = models.ForeignKey(SMSDefinition)
     

@@ -1,10 +1,6 @@
-"""
-    myRobogals
-    myrg_permissions/admin.py
-
-    2014
-    Robogals Software Team
-"""
+from __future__ import unicode_literals
+from future.builtins import *
+import six
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _

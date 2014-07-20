@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
 from django import forms
 
 from django.contrib.auth.models import Group

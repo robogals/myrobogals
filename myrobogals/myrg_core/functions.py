@@ -1,10 +1,8 @@
-"""
-    myRobogals
-    myrg_core/functions.py
+from __future__ import unicode_literals
+from future.builtins import *
+import six
 
-    2014
-    Robogals Software Team
-"""
+
 from .models import APILog
 
 def log_api_call(request, request_body, role = None, note = None):    

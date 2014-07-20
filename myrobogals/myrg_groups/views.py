@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
 from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -224,7 +229,7 @@ class EditGroups(RobogalsAPIView):
             if (group_id is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in group_data.items():
+            for field,value in six.iteritems(group_data):
                 field = str(field)
                 
                 # Read only fields
@@ -312,7 +317,7 @@ class CreateGroups(RobogalsAPIView):
             if (group_nonce is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in group_data.items():
+            for field,value in six.iteritems(group_data):
                 field = str(field)
                 
                 # Read only fields
@@ -577,7 +582,7 @@ class EditRoleClasses(RobogalsAPIView):
             if (roleclass_id is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in roleclass_data.items():
+            for field,value in six.iteritems(roleclass_data):
                 field = str(field)
                 
                 # Read only fields
@@ -665,7 +670,7 @@ class CreateRoleClasses(RobogalsAPIView):
             if (roleclass_nonce is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in roleclass_data.items():
+            for field,value in six.iteritems(roleclass_data):
                 field = str(field)
                 
                 # Read only fields
@@ -849,7 +854,7 @@ class EditRoles(RobogalsAPIView):
             if (role_id is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in role_data.items():
+            for field,value in six.iteritems(role_data):
                 field = str(field)
                 
                 # Read only fields
@@ -937,7 +942,7 @@ class CreateRoles(RobogalsAPIView):
             if (role_nonce is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in role_data.items():
+            for field,value in six.iteritems(role_data):
                 field = str(field)
                 
                 # Read only fields

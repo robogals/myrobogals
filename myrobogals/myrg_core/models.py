@@ -1,17 +1,15 @@
-"""
-    myRobogals
-    myrg_core/models.py
-    Custom APILog model definition
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
-    2014
-    Robogals Software Team
-"""
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from myrg_groups.models import Role
 
+@python_2_unicode_compatible
 class APILog(models.Model):
     user_role = models.ForeignKey(Role,
                              blank=True,

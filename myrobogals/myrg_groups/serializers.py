@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
 from .models import Group, RoleClass, Role
 
 from rest_framework import serializers

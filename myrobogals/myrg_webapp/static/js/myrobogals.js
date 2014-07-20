@@ -456,7 +456,6 @@ var myRG = myRG || {};
                 if (whoamiXhr.status == 401 || myrolesXhr.status == 401){
                     // 401 => Anon user
                     f.updateUser();
-                    f.closeTray();
                     f.loadApp(s.get("INIT_DEFAULT_ANON_APP"));
                 } else {
                     f.throwError({

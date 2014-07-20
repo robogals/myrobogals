@@ -1,11 +1,7 @@
-"""
-    myRobogals
-    myrg_groups/models.py
-    Custom LocatableEntity, Role, RoleClass model definition
-
-    2014
-    Robogals Software Team
-"""
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
 from django.db import models
 from django.core import validators
@@ -18,6 +14,7 @@ from myrg_users.models import RobogalsUser
 # Based upon:
 # * https://docs.djangoproject.com/en/dev/ref/models/fields/
 
+@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(_('name'),
                             max_length=63,
@@ -71,6 +68,7 @@ class Group(models.Model):
     def __str__(self):
         return self.name
         
+@python_2_unicode_compatible
 class LocatableEntity(Group):
     address = models.TextField(_('address'),
                                blank=False)
@@ -104,19 +102,23 @@ class LocatableEntity(Group):
     class Meta:
         abstract = True
         
+@python_2_unicode_compatible
 class Chapter(LocatableEntity):
     university = models.CharField(_('university'),
                                   max_length=63,
                                   blank=True)
 
+@python_2_unicode_compatible
 class School(LocatableEntity):
     pass
 
+@python_2_unicode_compatible
 class Company(LocatableEntity):
     legal_name = models.CharField(_('legal name'),
                                   max_length=63,
                                   blank=True)
 
+@python_2_unicode_compatible
 class RoleClass(models.Model):
     name = models.CharField(_('name'),
         max_length=63,
@@ -157,6 +159,7 @@ class RoleClass(models.Model):
             applicable_groups = Group.objects.exclude(pk__in = self.group_exclude.all())
         return applicable_groups
 
+@python_2_unicode_compatible
 class Role(models.Model):
     def uuid_generator():
         from uuid import uuid4

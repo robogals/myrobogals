@@ -1,11 +1,9 @@
-"""
-    myRobogals
-    myrg_users/model.py
-    Custom RobogalsUserManager, RobogalsUser, PermissionDefinition model definition
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
-    2014
-    Robogals Software Team
-"""
+
 
 from django.db import models
 from django.core import validators
@@ -23,6 +21,7 @@ from django.conf import settings
 # * https://github.com/jonathanchu/django-custom-user-example/blob/master/customuser/accounts/models.py
 # * https://github.com/django/django/blob/master/django/contrib/auth/models.py
 
+@python_2_unicode_compatible
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
         primary_email = self.normalize_email(primary_email)
@@ -56,6 +55,7 @@ class RobogalsUserManager(BaseUserManager):
     def create_superuser(self, username, primary_email, given_name, password, **extra_fields):
         return self._create_user(username, primary_email, given_name, password, is_superuser=True, **extra_fields)
 
+@python_2_unicode_compatible
 class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     def uuid_generator():
         from uuid import uuid4

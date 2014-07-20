@@ -1,3 +1,8 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
 from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -141,11 +146,6 @@ class DeleteUsers(RobogalsAPIView):
         affected_ids = []
         
         for idx,pk in enumerate(requested_ids):
-            if not isinstance(pk, int):
-                ids_to_remove.append(idx)
-                failed_ids.update({pk: "DATA_FORMAT_INVALID"})
-                continue
-                
             if request.user.is_authenticated():
                 if pk == request.user.pk:
                     ids_to_remove.append(idx)
@@ -217,7 +217,7 @@ class EditUsers(RobogalsAPIView):
             if (user_id is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in user_data.items():
+            for field,value in six.iteritems(user_data):
                 field = str(field)
                 
                 # Read only fields
@@ -307,7 +307,7 @@ class CreateUsers(RobogalsAPIView):
             if (user_nonce is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
-            for field,value in user_data.items():
+            for field,value in six.iteritems(user_data):
                 field = str(field)
                 
                 # Read only fields
@@ -366,9 +366,13 @@ class CreateUsers(RobogalsAPIView):
 class ResetUserPasswords(RobogalsAPIView):
     def post(self, request, format=None):
         from django.conf import settings
-        from urllib.parse import quote
         from myrg_messages.functions import send_email
         from django.contrib.auth.tokens import PasswordResetTokenGenerator
+        
+        if six.PY2:
+            from urllib import quote
+        else:
+            from urllib.parse import quote
         
         # request.DATA
         try:

@@ -1,10 +1,7 @@
-"""
-    myRobogals
-    myrg_core/classes.py
+from __future__ import unicode_literals
+from future.builtins import *
+import six
 
-    2014
-    Robogals Software Team
-"""
 from rest_framework import status, exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response

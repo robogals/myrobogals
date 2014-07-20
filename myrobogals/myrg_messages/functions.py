@@ -1,3 +1,9 @@
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+
+
+
 from django.db.models.fields import FieldDoesNotExist
 from django.db import transaction
 from django.template.loader import render_to_string
@@ -78,7 +84,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
     email_user_dict = {}
         
     for recipient_object in supplied_recipients:
-        for field2,value2 in recipient_object.items():
+        for field2,value2 in six.iteritems(recipient_object):
             field2 = str(field2)
             
             if field2 == "user":
