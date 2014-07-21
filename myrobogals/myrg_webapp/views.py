@@ -19,9 +19,14 @@ import calendar
 from django.utils import timezone
 from django.utils.http import http_date
 
-#@ensure_csrf_cookie
-class WebApp(TemplateView):
-    template_name = "index.html"
+import json
+
+@ensure_csrf_cookie
+def webapp(request):
+    try:
+        return render(request, "index.html")
+    except TemplateDoesNotExist:
+        return HttpResponse(status=404)
     
 def get_resource(request, resource_id):
     try:
@@ -40,40 +45,48 @@ def get_resource(request, resource_id):
     except TemplateDoesNotExist:
         return HttpResponse(status=404)
 
-def set_role_id(request):
-    if request.method == "POST":
-        user_obj = request.user
-        role_id = request.POST.get("role_id")
-        
-        if role_id is None:
-            return HttpResponse(status=400)
-        
-        try:
-            role_id = str(role_id)
-            role_query = user_obj.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now()))).get(pk = role_id)
+def set_role_id(request):                                                                                                                      
+    if request.is_ajax():
+        if request.method == "POST":
+            user_obj = request.user
+            role_id = request.POST.get("role_id")
             
-            request.session['role_id'] = role_id
+            if role_id is None:
+                return HttpResponse(status=400)
             
-            return HttpResponse(status=200)
-        except:
-            return HttpResponse(status=401)
+            try:
+                role_id = str(role_id)
+                role_query = user_obj.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now()))).get(pk = role_id)
+                
+                request.session['role_id'] = role_id
+                
+                return HttpResponse(status=200)
+            except:
+                return HttpResponse(status=401)
             
     return HttpResponse(status=400)
         
 # https://github.com/django/django/blob/master/django/contrib/auth/views.py
 def login(request):                                                                                                                         
-    if request.method == "POST":
-        request.POST['username'] = request.POST.get("email");
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            try:
-                auth_login(request, form.get_user())
-            except:
-                return HttpResponse(status=500)
-        
-            return HttpResponse(status=200)
+    if request.is_ajax():
+        if request.method == "POST":
+            post = json.loads(request.body.decode())
+            post['username'] = post.pop("primary_email");
+            
+            form = AuthenticationForm(request, data=post)
+            
+            if form.is_valid():
+                try:
+                    auth_login(request, form.get_user())
+                except:
+                    return HttpResponse(status=500)
+            
+                return HttpResponse(status=200)
 
+        return HttpResponse(status=401)
+    
     return HttpResponse(status=401)
+        
     
 def logout(request):
     try:

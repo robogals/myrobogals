@@ -16,8 +16,6 @@ from myrg_core.views import Time
 from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, ResetUserPasswordsComplete, WhoAmI, ListMyRoles, KillSessions
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses 
 
-from myrg_webapp.views import WebApp
-
 # Auto generate/collate Django admin panels
 admin.autodiscover()
 admin.site.unregister(Group)
@@ -67,9 +65,9 @@ api_urlpatterns = format_suffix_patterns(api_urlpatterns, allowed=['json'])
 urlpatterns += api_urlpatterns
 
 urlpatterns += patterns('',
-    url(r'^app/login/$', 'myrg_webapp.views.login', name='login'),
-    url(r'^app/logout/$', 'myrg_webapp.views.logout', name='logout'),
-    url(r'^app/set_role_id/$', 'myrg_webapp.views.set_role_id'),
+    url(r'^app/login$', 'myrg_webapp.views.login', name='login'),
+    url(r'^app/logout$', 'myrg_webapp.views.logout', name='logout'),
+    url(r'^app/set_role_id$', 'myrg_webapp.views.set_role_id'),
     url(r'^app/resource/(?P<resource_id>.+?)$', 'myrg_webapp.views.get_resource'),
-    url(r'^$', WebApp.as_view(), name='home'),
+    url(r'^$', 'myrg_webapp.views.webapp', name='home'),
 )

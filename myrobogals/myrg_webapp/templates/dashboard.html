@@ -1,0 +1,62 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+}
+</style>
+<div id="content" tabindex="0">
+    <div id="app-container">
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "dashboard";
+        var appName = "Dashboard";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName);
+    })();
+</script>

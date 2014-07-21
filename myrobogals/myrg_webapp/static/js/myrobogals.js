@@ -45,9 +45,10 @@ var myRG = myRG || {};
     var a = myRG.appStore;
     var u = myRG.userStore;
     var f = myRG.functions;
-        
+    var hjs = window.History;
+    
     // Set settings
-    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 500);     // ms
+    s.set("INIT_STARTUP_LATENCY_ALLOWANCE", 0);     // ms
     s.set("INIT_DEFAULT_ANON_APP", "login");
     s.set("INIT_DEFAULT_USER_APP", "dashboard");
     
@@ -63,18 +64,27 @@ var myRG = myRG || {};
     // CSRF and AJAX
     // https://docs.djangoproject.com/en/1.6/ref/contrib/csrf/#ajax
     function getCookie(a){var b=null;if(document.cookie&&""!=document.cookie)for(var d=document.cookie.split(";"),c=0;c<d.length;c++){var e=jQuery.trim(d[c]);if(e.substring(0,a.length+1)==a+"="){b=decodeURIComponent(e.substring(a.length+1));break}}return b}
-    var csrftoken=getCookie("csrftoken");
     function csrfSafeMethod(a){return/^(GET|HEAD|OPTIONS|TRACE)$/.test(a)}
-    $.ajaxSetup({beforeSend:function(a,b){csrfSafeMethod(b.type)||this.crossDomain||a.setRequestHeader("X-CSRFToken",csrftoken)}});    
+    $.ajaxSetup({beforeSend:function(a,b){csrfSafeMethod(b.type)||this.crossDomain||a.setRequestHeader("X-CSRFToken",getCookie("csrftoken"))}});    
     
     // Functions
     // Test nested obj properties
     // http://stackoverflow.com/a/4676258
     function testPropertyExists(a,e){for(var c=e.split("."),b=0,f=c.length;b<f;b++){var d=c[b];if(null!==a&&"object"===typeof a&&d in a)a=a[d];else return!1}return!0};
+    
+    // Deparam URL
+    // http://stackoverflow.com/a/1131651
+    var QueryStringToHash=function(c){var b={};c=c.split("&");for(var d=0;d<c.length;d++){var a=c[d].split("=");a[0]=decodeURIComponent(a[0]);a[1]=decodeURIComponent(a[1]);"undefined"===typeof b[a[0]]?b[a[0]]=a[1]:"string"===typeof b[a[0]]?b[a[0]]=[b[a[0]],a[1]]:b[a[0]].push(a[1])}return b};
 
     // URL generators
-    f.generateAPIURL = function(endpoint) {
-        return s.get("API_ROOT_URL") + endpoint.replace(/^\/|\/$/g, '') + ".json";
+    f.generateAPIURL = function(endpoint, isInternal) {
+        var url = endpoint.replace(/^\/|\/$/g, '');
+
+        if (isInternal){
+            return "/" + url;
+        }
+        
+        return s.get("API_ROOT_URL") + url + ".json";
     }
     
     f.generateResURL = function(resource) {
@@ -120,7 +130,7 @@ var myRG = myRG || {};
     
     
     // API and resource calls
-    f.fetchAPI = function(endpoint, data, type){
+    f.fetchAPI = function(endpoint, data, type, isInternal){
         var data = data || {};
         var type = type || "POST";
         
@@ -133,13 +143,58 @@ var myRG = myRG || {};
             data_obj.data = JSON.stringify(data);
         }
         
-        return $.ajax(f.generateAPIURL(endpoint), data_obj);
+        return $.ajax(f.generateAPIURL(endpoint, isInternal), data_obj);
     }
     
     f.fetchResource = function(resource){
         return $.get(f.generateResURL(resource));
     }
     
+    // Set title
+    g.set("BASE_TITLE", document.title);
+    
+    f.pushState = function(data, title, replace){
+        var url = "/";
+        var url_params = {};
+        var state_data = {};
+        
+        // Each item in `data` is: {"content": <data>, "in_url": <bool>}
+        var has_params = false;
+        $.each(data, function(key, value) {
+            state_data[key] = value.content;
+            if (!(value.in_url == false)){
+                has_params = true;
+                url_params[key] = value.content;
+            }
+        });
+        
+        if (has_params){
+            url += ("?" + $.param(url_params));
+        }
+                
+        if (title){
+            title = g.get("BASE_TITLE") + " - " + title;
+        } else {
+            title = document.title;
+        }
+        
+        if (replace){
+            return hjs.replaceState(state_data,title,url);
+        }
+        
+        return hjs.pushState(state_data,title,url);
+    }
+    
+    f.processStateData = function(state){
+        var data = Arg.parse(state.url);
+        $.extend(data, state.data);
+        
+        return data;
+    }
+    
+    f.fetchStateData = function(){ 
+        return f.processStateData(hjs.getState());
+    }
     
     // Common API calls
     f.fetchWhoAmI = function(){
@@ -158,9 +213,6 @@ var myRG = myRG || {};
     
     
     
-    // Grab state
-    g.set("STATE", History.getState());
-    
     
     
     
@@ -177,7 +229,15 @@ var myRG = myRG || {};
         jq.overlay = $("#overlay");
         jq.profile = jq.menu.find(".profile");
         jq.menuUnderlay = $("#menu-underlay");
-
+    
+        // Grab Gravatar template
+        g.set("GRAVATAR_TEMPLATE", jq.profile.find(".image").data("image"));
+        
+        
+        
+        
+        
+        // Event registration
         // Media Queries
         enquire.register("(min-width: 950px)", function() {
             $("html").removeClass().addClass("large");
@@ -185,9 +245,17 @@ var myRG = myRG || {};
         enquire.register("(max-width: 949px)", function() {
             $("html").removeClass().addClass("small");
         });
-    
-        // Grab Gravatar template
-        g.set("GRAVATAR_TEMPLATE", jq.profile.find(".image").data("image"));
+        
+        // Attach History.js
+        hjs.Adapter.bind(window,'statechange',function(){
+            var data = f.fetchStateData();
+            
+            if (data.app == a.get("APP_NAME") && (!(data.force_load))){
+                return;
+            }
+            
+            f.loadApp(data.app);
+        });
         
         
         // Functions
@@ -377,30 +445,58 @@ var myRG = myRG || {};
             // Reset the application store
             a.reset();
             
+            f.setTray("Loading...","indeterminate",false);
+            
             var app_xhr = f.fetchResource(appName);
             
             app_xhr
-                .always(function(){
-                    
-                })
                 .done(function(data){
-                    // Remove classes which end in "-enabled"
+                    jq.body.addClass("loaded");
+                    
+                    // Remove classes which end in "-enabled" and "-open"
                     // http://stackoverflow.com/a/5182103
                     jq.body.removeClass(function (i, css){
                         return (css.match (/\S+-enabled\b/g) || []).join(' ');
+                    }).removeClass(function (i, css){
+                        return (css.match (/\S+-open\b/g) || []).join(' ');
                     });                   
+                    
+                    // Set app name
+                    a.set("APP_NAME", appName);
                     
                     // data -> #stage
                     jq.stage.html(data);
                     
                     // Apply classes which the app requires
                     jq.body.addClass(a.get("BODY_CLASS").join(" "));
+                    
+                    f.closeTray();
                 })
                 .fail(function(){
-                
+                    f.throwError({
+                        name: 'RESOURCE_UNAVAILABLE',
+                        message: 'Resource unavailable. Go online or <a href="/">click here to reload the web app</a>.'
+                    });
                 })
                 
             return app_xhr;
+        }
+        
+        f.gotoApp = function(appName, forceLoad){
+            var state = {
+                app: {
+                    content: appName
+                }
+            }
+            
+            if (forceLoad){
+                state.force_load = {
+                    content: window.Math.random(),
+                    in_url: false
+                }
+            }
+            
+            return f.pushState(state);
         }
         
         // Events
@@ -423,7 +519,10 @@ var myRG = myRG || {};
             e.preventDefault();
         })
         
-       
+        $("#logout").click(function(e){
+            f.gotoApp("login", true);
+            e.preventDefault();
+        })
         
         /*
          * Start!
@@ -435,33 +534,53 @@ var myRG = myRG || {};
             return;
         }
         
+        // Check CSRF token
+        if (!(getCookie("csrftoken"))){
+            f.throwError({
+                name: 'CSRF_COOKIE_NOT_SET',
+                message: 'CSRF cookie is not set. Clear the browser cache and cookies, and reload the page.'
+            });
+            
+            return;
+        }
         
         // Grab user info
         // Add a little bit of latency allowance
         var initLoadMessageTimer = setTimeout(function(){
-                                                f.setTray("Loading...","indeterminate",false);
+                                                    f.setTray("Loading...","indeterminate",false);
                                                 }, s.get("INIT_STARTUP_LATENCY_ALLOWANCE"));
         // XHR is done before DOM ready. See above.
         $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
             .always(function(){
                 clearTimeout(initLoadMessageTimer);
-                jq.body.addClass("loaded");
             })
+            
+            // Logged in
             .done(function(whoamiXhrArr, myrolesXhrArr){
                 f.updateUser(whoamiXhrArr[0]);
-                f.closeTray();
+                f.gotoApp(s.get("INIT_DEFAULT_USER_APP"), true);
             })
+            
+            // Not logged in or failure
             .fail(function(whoamiXhr, myrolesXhr){                
                 // Fires on first error
                 if (whoamiXhr.status == 401 || myrolesXhr.status == 401){
                     // 401 => Anon user
                     f.updateUser();
-                    f.loadApp(s.get("INIT_DEFAULT_ANON_APP"));
+                    f.pushState({
+                        app: {
+                            content: s.get("INIT_DEFAULT_ANON_APP")
+                        },
+                        ref_state: {
+                            content: f.fetchStateData(),
+                            in_url: false
+                        }
+                    });
                 } else {
                     f.throwError({
-                                    name: 'SERVICE_UNAVAILABLE',
-                                    message: 'Service unavailable. Go online or reload the page.'
-                                });
+                        name: 'SERVICE_UNAVAILABLE',
+                        message: 'Service unavailable. Go online or reload the page.'
+                    });
                 }
             });
     });

@@ -781,7 +781,7 @@ body {
     }
 }
 
-#hidden {
+.hidden {
     display: none;
 }
 
@@ -914,11 +914,33 @@ body {
     }
     
     &.header-enabled {
+        #stage {
+            top: @header-height;
+        }
+        
         #header {
             .translate(0);
         }
     }
     
+    &.menu-open {
+        #header {
+            &:before {
+                opacity: 0.4;
+                .translate(-0.35em);
+            }
+        }
+        
+        #menu {
+            .menu-open;
+        }
+        
+        #menu-underlay {
+            bottom: 0;
+            opacity: 0.6;
+        }
+    }
+        
     &.menu-enabled {
         #header {
             &:before {
@@ -960,34 +982,6 @@ body {
 }
 
 //==============================================================================
-html {
-    body {
-        &.menu-open {
-            #header {
-                &:before {
-                    opacity: 0.4;
-                    .translate(-0.35em);
-                }
-            }
-            
-            #menu {
-                .menu-open;
-            }
-            
-            #menu-underlay {
-                bottom: 0;
-                opacity: 0.6;
-            }
-        }
-        
-        &.header-enabled {
-            #stage {
-                top: @header-height;
-            }
-        }
-    }
-}
-
 html.small {
     .mobile-width-100 {
         width: 100% !important;
@@ -995,15 +989,8 @@ html.small {
 }
 
 html.large {
-    &,
-    body {
+    & {
         font-size: @1em-desktop;
-    }
-    
-    #header {
-        &:before {
-            display: none;
-        }
     }
     
     body {
@@ -1015,27 +1002,28 @@ html.large {
                 }
             }
             
-            #menu {
-                .menu-open;
-            }
-            
             #menu-underlay {
-                opacity: 0;
+                display: none;
             }
-        }
-        
-        &.menu-enabled {
-            #menu {
-                .menu-open;
-            }
-            
-            #stage {
-                left: @menu-width;
-            }
-            
         }
     }
+
+    // LESS bug? Only works when pulled out of above rule.
+    body.menu-enabled {
+        #stage {
+            left: @menu-width;
+        }
+        
+        #menu {
+            .menu-open;
+        } 
+    }
     
+    #header {
+        &:before {
+            display: none;
+        }
+    }
     
     .row { width: 100%; display: table; table-layout: fixed; }
     .col { display: table-cell; vertical-align: top;}

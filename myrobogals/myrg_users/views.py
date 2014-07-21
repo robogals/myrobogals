@@ -392,9 +392,9 @@ class ResetUserPasswords(RobogalsAPIView):
                 "body": "\
 Hi {user_preferred_name},<br>\
 <br>\
-A password reset has been requested on your myRobogals beta user account.<br>\
+A password reset has been requested on your myRobogals beta account.<br>\
 <br>\
-<a href='http://beta.my.robogals.org/?app=pwdreset&email={user_email}&token={reset_token}' style='font-size:1.5em;'>Click this link to complete your password reset.</a><br>\
+<a href='http://beta.my.robogals.org/?app=login&action=pwdreset&email={user_email}&token={reset_token}' style='font-size:1.5em;'>Click this link to complete your password reset.</a><br>\
 <br>\
 This link expires in {password_reset_days} days.<br>\
 <br>\

@@ -68,20 +68,24 @@
         width: 100%;
     }
     
-    #app-container button#reset-password,
-    #app-container button#cancel-reset-password {
+    #app-container #reset-password,
+    #app-container #cancel-reset-password {
         background: transparent;
         padding: 0;
         color: #fff;
         width: auto;
     }
     
-    #app-container button#login,
-    #app-container button#submit-reset-password {
+    #app-container #login,
+    #app-container #submit-reset-password {
         color: #fff;
         font-weight: 500;
         padding: 0.5rem 2rem;
         width: auto;
+    }
+    
+    #reset_email {
+        font-style: italic;
     }
     
     #links {
@@ -115,14 +119,15 @@
         text-align: right;
     }
     
-    html.small #reset-password {
+    html.small #reset-password,
+    html.small #cancel-reset-password {
         margin-bottom: 1rem;
     }
     
     html.large #content:before {
         content: '';
         display: inline-block;
-        height: 80%;
+        height: 90%;
         vertical-align: middle;
     }
 }
@@ -149,35 +154,41 @@
                         <label for="id_password">Password</label>
                     </div>
                     <div class="col">
-                        <input id="id_password" type="password" name="password">
+                        <input id="id_password" type="password" name="password" placeholder="********">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
-                        <button id="reset-password">Reset Password</button>
+                        <input id="reset-password" type="button" value="Reset Password">
                     </div>
                     <div class="right col">
-                        <button id="login" class="bg-rg-dark-green mobile-width-100" type="submit">Login</button>
+                        <input id="login" class="bg-rg-dark-green mobile-width-100" type="submit" value="Login">
                     </div>
                 </div>
             </form>
             <form id="password-reset-form" method="post" style="display:none;">
-                <h3>Password reset</h3>
-                <p>Enter your new password for <span class="email_address" />:</p>
+                <div class="row">
+                    <div class="col">
+                        <h3>Password reset</h3>
+                        <p>Enter your new password for <span id="reset_email" /></p>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="left col">
-                        <label for="id_password">New password</label>
+                        <label for="id_password_reset">New password</label>
                     </div>
                     <div class="col">
-                        <input id="id_password" type="password" name="password">
+                        <input id="id_email_reset" type="hidden" name="primary_email">
+                        <input id="id_token_reset" type="hidden" name="token">
+                        <input id="id_password_reset" type="password" name="password">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
-                        <button id="cancel-reset-password">Cancel</button>
+                        <input id="cancel-reset-password" type="button" value="Cancel">
                     </div>
                     <div class="right col">
-                        <button id="submit-reset-password" class="bg-rg-dark-green mobile-width-100" type="submit">Reset</button>
+                        <input id="submit-reset-password" class="bg-rg-dark-green mobile-width-100" type="submit" value="Reset">
                     </div>
                 </div>
             </form>
@@ -190,8 +201,14 @@
 </div>
 <script>
     (function(){
+        var resourceName = "login";
+        var appName = "Login";
+    
         var a = myRG.appStore;
         var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
         
         // Set body style classes
         a.set("BODY_CLASS", 
@@ -203,9 +220,7 @@
         var el = a.set("JQELEM",{});
         el.email = $("#id_email");
         el.password = $("#id_password");
-        
-        // Autofocus on content (prevents mobile browsers from bringing keyboard)
-        $("#content").focus();
+
         
         function hideMessages() {
             $(".messages").hide();
@@ -216,13 +231,76 @@
             $("#"+type+"-message").html(html).show();
         }
         
+        function setupUser(){
+            u.set("WHOAMI_XHR",f.fetchWhoAmI());
+            u.set("MYROLES_XHR",f.fetchMyRoles());
+            
+            $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
+                .always(function(){
+                    a.set("STATE_LOGGING_IN",false);
+                })
+                
+                // Full info
+                .done(function(whoamiXhrArr, myrolesXhrArr){
+                    f.updateUser(whoamiXhrArr[0]);
+                    f.gotoApp(myRG.settings.get("INIT_DEFAULT_USER_APP"));
+                })
+                
+                // Failure
+                .fail(function(whoamiXhr, myrolesXhr){                
+                    f.throwError({
+                        name: 'SERVICE_UNAVAILABLE',
+                        message: 'Service unavailable. Go online or reload the page.'
+                    });
+                });
+        }
+        
         // Login form
         $("#login-form").submit(function(e){
             e.preventDefault();
             
+            if (a.get("STATE_LOGGING_IN")) {
+                return;
+            }
+            
+            a.set("STATE_LOGGING_IN",true);
+            
+            f.setTray("Logging in...","indeterminate",false);
+            
+            hideMessages();
+            
+            var api_data = {
+                "primary_email": el.email.val(),
+                "password": el.password.val()
+            }
+                            
+            var api_xhr = f.fetchAPI("/app/login",api_data,"POST",true);
+            
+            api_xhr
+                .always(function(){
+                })
+                .done(function(){
+                    setupUser();
+                })
+                .fail(function(xhr){
+                    f.closeTray();
+                    a.set("STATE_LOGGING_IN",false);
+                    
+                    // 401 => auth fail
+                    if (xhr.status == 401){
+                        showMessage("The email address and password combination was invalid.<br><br>Please check your input and try again.","neg");
+                        return;
+                    }
+                    
+                    // ... otherwise => server fail
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+                
+            
+            
         });
         
-        $("button#reset-password").click(function(e){
+        $("#reset-password").click(function(e){
             e.preventDefault();
             
             hideMessages();
@@ -234,7 +312,7 @@
             
             f.setTray("Please wait...","indeterminate",false);
             
-            var api_data = {"primary_email": [el.email.val()]}
+            var api_data = {"primary_email": [el.email.val()]};
                             
             var api_xhr = f.fetchAPI("/utils/pwdreset/initiate",api_data,"POST");
             
@@ -246,11 +324,106 @@
                     showMessage("Password reset instructions have been sent to your email.<br><br>Please look in your inbox or spam folder for the message.","pos");
                 })
                 .fail(function(){
-                    showMessage("Something went wrong.<br><br>Try again in a few minutes.","neg");
-                })
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
         });
+
+        
+        
+        // Password reset form
+        $("#password-reset-form").submit(function(e){
+            f.setTray("Please wait...","indeterminate",false);
+            
+            hideMessages();
+            
+            var api_data = {
+                "primary_email": $("#id_email_reset").val(),
+                "token": $("#id_token_reset").val(),
+                "password": $("#id_password_reset").val()
+            }
+                            
+            var api_xhr = f.fetchAPI("/utils/pwdreset/complete",api_data,"POST");
+            
+            api_xhr
+                .always(function(){
+                    f.closeTray();
+                })
+                .done(function(){
+                    showMessage("Your password reset was successful.<br><br>You may now log in with your new password.","pos");
+                    $("#content form").hide();
+                    $("#login-form").show();
+                })
+                .fail(function(xhr){
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+                
+            
+            e.preventDefault();
+            
+        });
+        
+        $("#cancel-reset-password").click(function(e){
+            e.preventDefault();
+            
+            hideMessages();
+                
+            f.gotoApp("login", true);
+        });
+        
+
+        
+        // Autofocus on content (rather than <input>, which brings virtual keyboards up)
+        $("#content").focus();
         
         // Hide messages by default
         hideMessages();
+        
+        // Do log off if user logged on
+        if (u.get("ID") || f.fetchStateData().action == "logout"){                            
+            var api_xhr = f.fetchAPI("/app/logout",null,"GET",true);
+            
+            api_xhr
+                .done(function(){
+                    f.setTray("You've been successfully logged out.","success");
+                })
+                .fail(function(){
+                    f.throwError({
+                        name: 'LOG_OFF_NOT_SUCCESSFUL',
+                        message: 'Log off did not complete. <a href="/&app=login&action=logout">Try again</a>.'
+                    });
+                });
+        }
+        
+        // Update title, strip URL params by replacing state
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: false
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+    
+    
+        // Specific actions
+        if (curr_state.ref_state){
+            if (curr_state.ref_state.action){
+                var thisState = curr_state.ref_state;
+                var action = thisState.action;
+                
+                switch (action) {
+                    case "pwdreset":
+                        $("#content form").hide();
+                        $("#reset_email").text(thisState.email);
+                        $("#id_email_reset").val(thisState.email);
+                        $("#id_token_reset").val(thisState.token);
+                        $("#password-reset-form").show();
+                        break;
+                }
+            }
+        }
+        
     })();
 </script>
