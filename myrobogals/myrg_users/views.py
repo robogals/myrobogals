@@ -445,10 +445,15 @@ class ResetUserPasswordsComplete(RobogalsAPIView):
                 serialized_user = serializer(user, data={"password":new_password}, partial=True)
                 
                 if serialized_user.is_valid():
+                    new_password_hash = serialized_user.object.password 
+                    
                     try:
                         with transaction.atomic():
-                            serialized_user.save()
-                            
+                            altered_user = serialized_user.save()
+                        
+                        if not (new_password_hash == altered_user.password):
+                            raise
+                        
                         email_definition = {
                                             "sender_role": None,
                                             "sender_name": "myRobogals beta",
