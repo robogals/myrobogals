@@ -340,5 +340,3 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         # We are implying superusers = staff
         return self.is_superuser
-
-
