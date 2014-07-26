@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from future.builtins import *
 import six
-
+from django.utils.encoding import smart_text
 
 from django.views.generic.base import TemplateView
 from rest_framework import status
@@ -55,7 +55,7 @@ def set_role_id(request):
                 return HttpResponse(status=400)
             
             try:
-                role_id = str(role_id)
+                role_id = smart_text(role_id)
                 role_query = user_obj.role_set.filter(Q(date_start__lte=timezone.now()) & (Q(date_end__isnull=True) | Q(date_end__gte=timezone.now()))).get(pk = role_id)
                 
                 request.session['role_id'] = role_id

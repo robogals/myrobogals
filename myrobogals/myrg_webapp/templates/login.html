@@ -348,7 +348,8 @@
                 .always(function(){
                     f.closeTray();
                 })
-                .done(function(){
+                .done(function(data){
+                    console.log(data)
                     showMessage("Your password reset was successful.<br><br>You may now log in with your new password.","pos");
                     $("#content form").hide();
                     $("#login-form").show();

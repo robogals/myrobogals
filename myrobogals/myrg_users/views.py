@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from future.builtins import *
 import six
+from django.utils.encoding import smart_text
 
 
 from myrg_core.classes import RobogalsAPIView
@@ -65,7 +66,7 @@ class ListUsers(RobogalsAPIView):
             if (field_name is None):
                 return Response({"detail":"FIELD_IDENTIFIER_MISSING"}, status=status.HTTP_400_BAD_REQUEST)
             
-            field_name = str(field_name)
+            field_name = smart_text(field_name)
             
             # Block protected fields like passwords
             if field_name in RobogalsUser.PROTECTED_FIELDS:
@@ -79,10 +80,10 @@ class ListUsers(RobogalsAPIView):
                 return Response({"detail":"`{}` is not a valid field name.".format(field_name)}, status=status.HTTP_400_BAD_REQUEST)
                 
             if (field_query is not None):
-                filter_dict.update({field_name+"__icontains": str(field_query)})
+                filter_dict.update({field_name+"__icontains": smart_text(field_query)})
             
             if (field_order is not None):
-                field_order = str(field_order)
+                field_order = smart_text(field_order)
                 
                 if field_order == "a":
                     sort_fields.append(field_name)
@@ -209,7 +210,7 @@ class EditUsers(RobogalsAPIView):
             
             
             try:
-                user_id = str(user_object.get("id"))
+                user_id = smart_text(user_object.get("id"))
                 user_data = dict(user_object.get("data"))
             except:
                 return Response({"detail":"DATA_FORMAT_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
@@ -218,7 +219,7 @@ class EditUsers(RobogalsAPIView):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
             for field,value in six.iteritems(user_data):
-                field = str(field)
+                field = smart_text(field)
                 
                 # Read only fields
                 if field in RobogalsUser.READONLY_FIELDS:
@@ -308,7 +309,7 @@ class CreateUsers(RobogalsAPIView):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
             for field,value in six.iteritems(user_data):
-                field = str(field)
+                field = smart_text(field)
                 
                 # Read only fields
                 if field in RobogalsUser.READONLY_FIELDS:
@@ -428,8 +429,8 @@ class ResetUserPasswordsComplete(RobogalsAPIView):
         from django.contrib.auth.tokens import PasswordResetTokenGenerator
         
         # request.DATA
-        primary_email = str(request.DATA.get("primary_email"))
-        token = str(request.DATA.get("token"))
+        primary_email = smart_text(request.DATA.get("primary_email"))
+        token = smart_text(request.DATA.get("token"))
         
         new_password = request.DATA.get("password")
         
@@ -441,25 +442,17 @@ class ResetUserPasswordsComplete(RobogalsAPIView):
         
         if user:
             if PasswordResetTokenGenerator().check_token(user,token):
-                serializer = RobogalsUserSerializer
-                serialized_user = serializer(user, data={"password":new_password}, partial=True)
-                
-                if serialized_user.is_valid():
-                    new_password_hash = serialized_user.object.password 
+                try:
+                    with transaction.atomic():
+                        user.set_password(new_password)
+                        user.save()
                     
-                    try:
-                        with transaction.atomic():
-                            altered_user = serialized_user.save()
-                        
-                        if not (new_password_hash == altered_user.password):
-                            raise
-                        
-                        email_definition = {
-                                            "sender_role": None,
-                                            "sender_name": "myRobogals beta",
-                                            "sender_address": "my@robogals.org",
-                                            "subject": "Password reset successful",
-                                            "body": "\
+                    email_definition = {
+                                        "sender_role": None,
+                                        "sender_name": "myRobogals beta",
+                                        "sender_address": "my@robogals.org",
+                                        "subject": "Password reset successful",
+                                        "body": "\
 Hi {user_preferred_name},<br>\
 <br>\
 Your myRobogals beta user account has had its password successfully set after a password reset.<br>\
@@ -467,26 +460,26 @@ You may now log into myRobogals beta with your new password.<br>\
 <br>\
 <br>\
 If you did not action this, please immediately perform a new password reset and inform Robogals Support immediately for support.<br>".format(user_preferred_name=user.get_preferred_name()),
-                                            "html": True,
-                                        }
-                                        
-                        recipients = [{ "user": user.pk },]
-                        
-                        template = { "template": "myrg_standard_email_template.html", "title": "Password reset successful" }
-                        
-                        send_email(email_definition,recipients,template)
-                                                
-                        return Response({
-                            "fail": {
-                                "primary_email": {}
-                            },
-                            "success": {
-                                "primary_email": primary_email
-                            }
-                        })
-                        
-                    except:
-                        pass
+                                        "html": True,
+                                    }
+                                    
+                    recipients = [{ "user": user.pk },]
+                    
+                    template = { "template": "myrg_standard_email_template.html", "title": "Password reset successful" }
+                    
+                    send_email(email_definition,recipients,template)
+                                            
+                    return Response({
+                        "fail": {
+                            "primary_email": {}
+                        },
+                        "success": {
+                            "primary_email": primary_email
+                        }
+                    })
+                    
+                except:
+                    pass
     
         return Response({
             "fail": {
