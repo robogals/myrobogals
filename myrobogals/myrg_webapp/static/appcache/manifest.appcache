@@ -1,0 +1,23 @@
+CACHE MANIFEST
+# version 20140718-4
+
+CACHE:
+/static/css/libraries.css
+/static/css/myrobogals.css
+
+/static/js/jquery.min.js
+/static/js/libraries.js
+/static/js/myrobogals.js
+
+/static/fonts/Roboto-Light-webfont.woff
+/static/fonts/Roboto-LightItalic-webfont.woff
+/static/fonts/Roboto-Medium-webfont.woff
+/static/fonts/Roboto-MediumItalic-webfont.woff
+/static/fonts/fontawesome-webfont.woff?v=4.1.0
+
+/static/images/myrobogals.png
+/static/images/favicon.ico
+
+
+NETWORK:
+*

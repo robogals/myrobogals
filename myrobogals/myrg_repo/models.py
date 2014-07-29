@@ -1,11 +1,7 @@
-"""
-    myRobogals
-    myrg_repo/models.py
-    Custom RepoContainer, RepoFile model definition
-
-    2014
-    Robogals Software Team
-"""
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
 from django.db import models
 from django.core import validators
@@ -13,6 +9,7 @@ from django.utils import timezone
 from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
 
+#@python_2_unicode_compatible
 class RepoContainer(models.Model):
     user = models.ForeignKey(RobogalsUser)
     role = models.ForeignKey(Role)
@@ -38,6 +35,7 @@ class RepoContainer(models.Model):
     date_updated = models.DateField(_('date created'),
                                     blank=False)
 
+#@python_2_unicode_compatible
 class RepoFile(models.Model):
     name = models.CharField(_('name'),
                             blank=False)

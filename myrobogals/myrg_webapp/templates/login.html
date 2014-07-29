@@ -1,0 +1,467 @@
+<style>
+    #content {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        
+        text-align: center;
+    }
+    
+    #app-container {
+        text-align: left;
+        
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 30rem;
+        
+        color: #fff;
+        
+        font-size: 1.2rem;
+    }
+    
+    #app-container .logo {
+        background-image: url("/static/images/myrobogals.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-origin: content-box;
+        
+        padding: 1rem 0;
+        margin-right: 2rem;
+        
+        width: auto;
+        max-width: 25rem;
+    }
+    
+    #app-container .logo .filler {
+        padding-bottom: 15%;
+    }
+    
+    #app-container .container {
+        padding: 1rem;
+    }
+    
+    #app-container .container .row {
+        padding: 0.5rem;
+    }
+    
+    #app-container .container .col {
+        vertical-align: middle;
+    }
+    
+    #app-container .container .left.col {
+        width: 10rem;
+        font-weight: 500;
+    }
+    
+    #app-container input,
+    #app-container button {
+        border: 0;
+        background: #fff;
+        color: #000;
+        padding: 0.3rem;
+        
+        width: 100%;
+    }
+    
+    #app-container #reset-password,
+    #app-container #cancel-reset-password {
+        background: transparent;
+        padding: 0;
+        color: #fff;
+        width: auto;
+    }
+    
+    #app-container #login,
+    #app-container #submit-reset-password {
+        color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 2rem;
+        width: auto;
+    }
+    
+    #reset_email {
+        font-style: italic;
+    }
+    
+    #links {
+        color: rgba(0,0,0,0.5);
+        margin: 1rem;
+    }
+    
+    #links a {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+    html.small #reset-password,
+    html.small #cancel-reset-password {
+        margin-bottom: 1rem;
+    }
+    
+    html.large #content:before {
+        content: '';
+        display: inline-block;
+        height: 90%;
+        vertical-align: middle;
+    }
+}
+</style>
+<div id="content" tabindex="0"
+   ><div id="app-container">
+        <div class="logo bg-rg-dark-blue"><div class="filler"></div></div>
+        <div class="container bg-rg-dark-blue" >
+            <div id="message-container">
+                <div class="messages" id="neg-message"></div>
+                <div class="messages" id="pos-message"></div>
+            </div>
+            <form id="login-form" method="post">
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_email">Email address</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_email" type="email" name="email" placeholder="volunteer@robogals.org">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_password">Password</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_password" type="password" name="password" placeholder="********">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input id="reset-password" type="button" value="Reset Password">
+                    </div>
+                    <div class="right col">
+                        <input id="login" class="bg-rg-dark-green mobile-width-100" type="submit" value="Login">
+                    </div>
+                </div>
+            </form>
+            <form id="password-reset-form" method="post" style="display:none;">
+                <div class="row">
+                    <div class="col">
+                        <h3>Password reset</h3>
+                        <p>Enter your new password for <span id="reset_email" /></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="left col">
+                        <label for="id_password_reset">New password</label>
+                    </div>
+                    <div class="col">
+                        <input id="id_email_reset" type="hidden" name="primary_email">
+                        <input id="id_token_reset" type="hidden" name="token">
+                        <input id="id_password_reset" type="password" name="password">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input id="cancel-reset-password" type="button" value="Cancel">
+                    </div>
+                    <div class="right col">
+                        <input id="submit-reset-password" class="bg-rg-dark-green mobile-width-100" type="submit" value="Reset">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row" id="links">
+        <div class="col"><a href="http://www.robogals.org"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
+        <!--<div class="col"><a href="#"><i class="fa fa-language"></i> Language</a></div>-->
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "login";
+        var appName = "Login";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        var jq = myRG.jq;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "stage-enabled"
+            ]);
+        
+        // Common elem
+        var el = a.set("JQELEM",{});
+        el.email = $("#id_email");
+        el.password = $("#id_password");
+
+        
+        function hideMessages() {
+            $(".messages").hide();
+        }
+        
+        function showMessage(html, type) {
+            hideMessages();
+            $("#"+type+"-message").html(html).show();
+        }
+        
+        function insertMenu(xhr){
+        
+        }
+        
+        function setupEnv(){
+            u.set("WHOAMI_XHR",f.fetchWhoAmI());
+            u.set("MYROLES_XHR",f.fetchMyRoles());
+            u.set("MENU_XHR",f.fetchResource("menu"));
+            
+            $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"), u.get("MENU_XHR"))
+                .always(function(){
+                    a.set("STATE_LOGGING_IN",false);
+                })
+                
+                // Full info
+                .done(function(whoamiXhrArr, myrolesXhrArr, menuXhrArr){
+                    f.updateUser(whoamiXhrArr[0]);
+                    jq.menu.children("ul").append(menuXhrArr[0]);
+                    
+                    if (!(myrolesXhrArr[0].role.length)){
+                        f.throwError({
+                            name: 'ROLE_INVALID',
+                            message: 'Your role is invalid. Please log out and try again, or contact Robogals Support.'
+                        });
+                        
+                        return;
+                    }
+                    
+                    var api_data = {
+                        "role_id": myrolesXhrArr[0].role[0].id
+                    }
+                    
+                    var api_xhr = f.fetchAPI("/app/set_role_id",api_data,"POST",true);
+                
+                    api_xhr
+                        .always(function(){
+                        })
+                        .done(function(){
+                            f.gotoApp(myRG.settings.get("INIT_DEFAULT_USER_APP"));
+                        })
+                        .fail(function(xhr){
+                            f.throwError({
+                                name: 'ROLE_SET_NOT_SUCCESSFUL',
+                                message: 'Your role was unable to be set. Please log out and try again, or contact Robogals Support.'
+                            });
+                            
+                            return;
+                        });
+                    
+                })
+                
+                // Failure
+                .fail(function(whoamiXhr, myrolesXhr, menuXhr){                
+                    f.throwError({
+                        name: 'SERVICE_UNAVAILABLE',
+                        message: 'Service unavailable. Go online or reload the page.'
+                    });
+                });
+        }
+        
+        // Login form
+        $("#login-form").submit(function(e){
+            e.preventDefault();
+            
+            if (a.get("STATE_LOGGING_IN")) {
+                return;
+            }
+            
+            a.set("STATE_LOGGING_IN",true);
+            
+            f.setTray("Logging in...","indeterminate",false);
+            
+            hideMessages();
+            
+            var api_data = {
+                "primary_email": el.email.val(),
+                "password": el.password.val()
+            }
+                            
+            var api_xhr = f.fetchAPI("/app/login",api_data,"POST",true);
+            
+            api_xhr
+                .always(function(){
+                })
+                .done(function(){
+                    setupEnv();
+                })
+                .fail(function(xhr){
+                    f.closeTray();
+                    a.set("STATE_LOGGING_IN",false);
+                    
+                    // 401 => auth fail
+                    if (xhr.status == 401){
+                        showMessage("The email address and password combination was invalid.<br><br>Please check your input and try again.","neg");
+                        return;
+                    }
+                    
+                    // ... otherwise => server fail
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+                
+            
+            
+        });
+        
+        $("#reset-password").click(function(e){
+            e.preventDefault();
+            
+            hideMessages();
+                
+            if (!el.email.val()){
+                showMessage("Please enter the email address of your account.","neg");
+                return;
+            }
+            
+            f.setTray("Please wait...","indeterminate",false);
+            
+            var api_data = {"primary_email": [el.email.val()]};
+                            
+            var api_xhr = f.fetchAPI("/utils/pwdreset/initiate",api_data,"POST");
+            
+            api_xhr
+                .always(function(){
+                    f.closeTray();
+                })
+                .done(function(){
+                    showMessage("Password reset instructions have been sent to your email.<br><br>Please look in your inbox or spam folder for the message.","pos");
+                })
+                .fail(function(){
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+        });
+
+        
+        
+        // Password reset form
+        $("#password-reset-form").submit(function(e){
+            f.setTray("Please wait...","indeterminate",false);
+            
+            hideMessages();
+            
+            var api_data = {
+                "primary_email": $("#id_email_reset").val(),
+                "token": $("#id_token_reset").val(),
+                "password": $("#id_password_reset").val()
+            }
+                            
+            var api_xhr = f.fetchAPI("/utils/pwdreset/complete",api_data,"POST");
+            
+            api_xhr
+                .always(function(){
+                    f.closeTray();
+                })
+                .done(function(data){
+                    console.log(data)
+                    showMessage("Your password reset was successful.<br><br>You may now log in with your new password.","pos");
+                    $("#content form").hide();
+                    $("#login-form").show();
+                })
+                .fail(function(xhr){
+                    showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+                
+            
+            e.preventDefault();
+            
+        });
+        
+        $("#cancel-reset-password").click(function(e){
+            e.preventDefault();
+            
+            hideMessages();
+                
+            f.gotoApp("login", true);
+        });
+        
+
+        
+        // Autofocus on content (rather than <input>, which brings virtual keyboards up)
+        $("#content").focus();
+        
+        // Hide messages by default
+        hideMessages();
+        
+        // Do log off if user logged on
+        if (u.get("ID") || f.fetchStateData().action == "logout"){                            
+            var api_xhr = f.fetchAPI("/app/logout",null,"GET",true);
+            
+            api_xhr
+                .done(function(){
+                    f.setTray("You've been successfully logged out.","success");
+                })
+                .fail(function(){
+                    f.throwError({
+                        name: 'LOG_OFF_NOT_SUCCESSFUL',
+                        message: 'Log off did not complete. <a href="/&app=login&action=logout">Try again</a>.'
+                    });
+                });
+        }
+        
+        // Update title, strip URL params by replacing state
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: false
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+    
+    
+        // Specific actions
+        if (curr_state.ref_state){
+            if (curr_state.ref_state.action){
+                var thisState = curr_state.ref_state;
+                var action = thisState.action;
+                
+                switch (action) {
+                    case "pwdreset":
+                        $("#content form").hide();
+                        $("#reset_email").text(thisState.email);
+                        $("#id_email_reset").val(thisState.email);
+                        $("#id_token_reset").val(thisState.token);
+                        $("#password-reset-form").show();
+                        break;
+                }
+            }
+        }
+        
+    })();
+</script>

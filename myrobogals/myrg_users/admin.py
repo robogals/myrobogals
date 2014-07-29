@@ -1,11 +1,7 @@
-"""
-    myRobogals
-    myrg_users/admin.py
-    Custom RobogalsUser admin management
+from __future__ import unicode_literals
+from future.builtins import *
+import six
 
-    2014
-    Robogals Software Team
-"""
 
 from django import forms
 from django.contrib import admin
@@ -87,8 +83,6 @@ class RobogalsUserAdmin(UserAdmin):
         (_('Internal info'), {'fields': (
                                             'is_active',
                                             'is_superuser',
-                                            'groups',
-                                            'user_permissions',
                                             'date_joined',
                                             'last_login',
                                         )

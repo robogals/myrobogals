@@ -1,15 +1,14 @@
-"""
-    myRobogals
-    myrg_users/model.py
-    Custom RobogalsUserManager, RobogalsUser, PermissionDefinition model definition
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
-    2014
-    Robogals Software Team
-"""
+
 
 from django.db import models
 from django.core import validators
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.sessions.models import Session
 
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -22,6 +21,7 @@ from django.conf import settings
 # * https://github.com/jonathanchu/django-custom-user-example/blob/master/customuser/accounts/models.py
 # * https://github.com/django/django/blob/master/django/contrib/auth/models.py
 
+#@python_2_unicode_compatible
 class RobogalsUserManager(BaseUserManager):
     def _create_user(self, username, primary_email, given_name, password, is_superuser, **extra_fields):
         primary_email = self.normalize_email(primary_email)
@@ -55,7 +55,12 @@ class RobogalsUserManager(BaseUserManager):
     def create_superuser(self, username, primary_email, given_name, password, **extra_fields):
         return self._create_user(username, primary_email, given_name, password, is_superuser=True, **extra_fields)
 
+@python_2_unicode_compatible
 class RobogalsUser(AbstractBaseUser, PermissionsMixin):
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+        
     ############################################################################
     # Identifiers
     ############################################################################
@@ -66,6 +71,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #
     # Usernames will not be accepting Unicode characters due to conflicts with
     # future implementation of the messaging system.
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    
     username = models.CharField(_('username'),
                                 max_length=63,
                                 unique=True,
@@ -102,18 +110,18 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     #
     # http://www.w3.org/International/questions/qa-personal-names
     family_name = models.CharField(_('family name'),
-                                   max_length=127,
+                                   max_length=63,
                                    blank=True,
                                    validators=[
                                         validators.RegexValidator(r'^[\s\w"\'-]+$', _('Enter a valid Romanised family name.'), 'invalid')
                                    ],
-                                   help_text=_('Family name of length 127 Latin characters or fewer is optional.'))
+                                   help_text=_('Family name of length 63 Latin characters or fewer is optional.'))
     given_name = models.CharField(_('given name'),
-                                  max_length=127,
+                                  max_length=63,
                                   validators=[
                                         validators.RegexValidator(r'^[\s\w"\'-]+$', _('Enter a valid Romanised given name.'), 'invalid')
                                   ],
-                                  help_text=_('Given name of length 127 Latin characters or fewer is required.'))
+                                  help_text=_('Given name of length 63 Latin characters or fewer is required.'))
     preferred_name = models.CharField(_('preferred name'),
                                       max_length=127,
                                       blank=True,
@@ -136,10 +144,10 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                               default='X')
     
     ############################################################################
-    # i18n
+    # i18n/l10n
     ############################################################################
     # The preferred_language setting is not intended to force language settings
-    # for users, but to give preference to particular i10n-supported elements of
+    # for users, but to give preference to particular l10n-supported elements of
     # the myRobogals service, for example in emails.
     #
     # Django's `django_language` user session key should handle the user's
@@ -200,9 +208,9 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     # deployment will cause mismatching privacy level interpretations.
     PRIVACY_VISIBILITIES = (
         (0, 'Private'),
-        (10, 'Managers of your Robogals chapter'),
-        (20, 'Everyone in your Robogals chapter'),
-        (50, 'All Robogals chapters'),
+        #(10, 'Managers of your Robogals chapter'),
+        #(20, 'Everyone in your Robogals chapter'),
+        (50, 'Anyone in myRobogals'),
         (99, 'Public'),
     )
     
@@ -243,6 +251,19 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
                         'username',
                         'given_name',
                         ]
+    
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ("password","groups","user_permissions","last_login","is_superuser")
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id","mobile_verified","groups","user_permissions","date_joined","last_login","is_superuser","is_active")
+    
+    
+    
     
     # Defining information for display of this class in admin
     class Meta:
@@ -286,6 +307,32 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
         "Retrieves the username of the user."
         return self.username
     
+    def get_gravatar_hash(self):
+        import hashlib
+        return hashlib.md5(self.primary_email.lower().encode('utf-8')).hexdigest()
+    
+    
+    
+    # http://stackoverflow.com/a/6657043
+    def all_unexpired_sessions(self):
+        user_sessions = []
+        all_sessions  = Session.objects.filter(expire_date__gte=timezone.now())
+        for session in all_sessions:
+            session_data = session.get_decoded()
+            if self.pk == session_data.get('_auth_user_id'):
+                user_sessions.append(session.pk)
+        return Session.objects.filter(pk__in=user_sessions)
+
+    def delete_all_unexpired_sessions(self):
+        session_list = self.all_unexpired_sessions()
+        session_list_count = len(session_list)
+        session_list.delete()
+        
+        return session_list_count
+    
+    
+    
+    
     def __str__(self):
         return self.get_full_name()
         
@@ -293,5 +340,3 @@ class RobogalsUser(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         # We are implying superusers = staff
         return self.is_superuser
-
-

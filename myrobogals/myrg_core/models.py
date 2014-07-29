@@ -1,27 +1,30 @@
-"""
-    myRobogals
-    myrg_core/models.py
-    Custom APILog model definition
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
-    2014
-    Robogals Software Team
-"""
 
 from django.db import models
-from django.core import validators
-from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
+from myrg_groups.models import Role
+
+#@python_2_unicode_compatible
 class APILog(models.Model):
-    user = models.ForeignKey(_('user'),
-                             blank=True
+    user_role = models.ForeignKey(Role,
+                             blank=True,
                              null=True)
-    role = models.ForeignKey(_('role'),
-                             blank=True
-                             null=True)
+    ip = models.CharField(_('ip address'),
+                            max_length=63,
+                           blank=False)
     api_url = models.CharField(_('api url'),
+                                max_length=255,
                                blank=False)
-    api_call = models.TextField(_('api call'),
+    api_body = models.TextField(_('api body'),
                                 blank=False)
+    note = models.TextField(_('note'),
+                            blank=True,
+                            null=True)
     date = models.DateTimeField(_('date'),
                                 blank=False,
-                                default=timezone.now)
+                                auto_now_add=True)
