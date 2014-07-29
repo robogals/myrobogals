@@ -1,0 +1,15 @@
+<style>
+</style>
+<li><a href="dashboard" class="menu-item"><i class="fa fa-dashboard"></i>Dashboard</a></li>
+<li><a href="activities" class="menu-item"><i class="fa fa-flag"></i>Activities</a></li>
+<script>
+    (function(){
+        var f = myRG.functions;
+        
+        $(".menu-item").click(function(e){
+            e.preventDefault();
+            
+            f.gotoApp($(this).attr("href"), true);
+        });
+    })();
+</script>

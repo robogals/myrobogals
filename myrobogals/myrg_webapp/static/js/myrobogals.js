@@ -70,7 +70,7 @@ var myRG = myRG || {};
     // Functions
     // Test nested obj properties
     // http://stackoverflow.com/a/4676258
-    function testPropertyExists(a,e){for(var c=e.split("."),b=0,f=c.length;b<f;b++){var d=c[b];if(null!==a&&"object"===typeof a&&d in a)a=a[d];else return!1}return!0};
+    f.testPropertyExists = function (a,e){for(var c=e.split("."),b=0,f=c.length;b<f;b++){var d=c[b];if(null!==a&&"object"===typeof a&&d in a)a=a[d];else return!1}return!0};
     
     // Deparam URL
     // http://stackoverflow.com/a/1131651
@@ -210,6 +210,7 @@ var myRG = myRG || {};
     // Prefetch user information
     u.set("WHOAMI_XHR",f.fetchWhoAmI());
     u.set("MYROLES_XHR",f.fetchMyRoles());
+    u.set("MENU_XHR",f.fetchResource("menu"));
     
     
     
@@ -400,7 +401,7 @@ var myRG = myRG || {};
                 f.loadProfileImage(whoami.user.data.gravatar_hash);
                 f.loadProfileName(whoami.user.data.display_name);
                 
-                if (testPropertyExists(whoami, 'role_class.data')){
+                if (f.testPropertyExists(whoami, 'role_class.data')){
                     f.loadProfileRole(whoami.role_class.data.name);
                     f.loadProfileGroup(whoami.group.data.name);
                 } else {
@@ -550,19 +551,52 @@ var myRG = myRG || {};
                                                     f.setTray("Loading...","indeterminate",false);
                                                 }, s.get("INIT_STARTUP_LATENCY_ALLOWANCE"));
         // XHR is done before DOM ready. See above.
-        $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"))
+        $.when(u.get("WHOAMI_XHR"), u.get("MYROLES_XHR"), u.get("MENU_XHR"))
             .always(function(){
                 clearTimeout(initLoadMessageTimer);
             })
             
             // Logged in
-            .done(function(whoamiXhrArr, myrolesXhrArr){
+            .done(function(whoamiXhrArr, myrolesXhrArr, menuXhrArr){
                 f.updateUser(whoamiXhrArr[0]);
-                f.gotoApp(s.get("INIT_DEFAULT_USER_APP"), true);
+                jq.menu.children("ul").append(menuXhrArr[0]);
+                
+                if (!(myrolesXhrArr[0].role.length)){
+                    f.throwError({
+                        name: 'ROLE_INVALID',
+                        message: 'Your role is invalid. Please log out and try again, or contact Robogals Support.'
+                    });
+                    
+                    return;
+                }
+                
+                
+                var api_data = {
+                    "role_id": myrolesXhrArr[0].role[0].id
+                }
+                
+                var api_xhr = f.fetchAPI("/app/set_role_id",api_data,"POST",true);
+            
+                api_xhr
+                    .always(function(){
+                    })
+                    .done(function(){
+                        f.gotoApp(myRG.settings.get("INIT_DEFAULT_USER_APP"));
+                    })
+                    .fail(function(xhr){
+                        f.throwError({
+                            name: 'ROLE_SET_NOT_SUCCESSFUL',
+                            message: 'Your role was unable to be set. Please log out and try again, or contact Robogals Support.'
+                        });
+                        
+                        return;
+                    });
+                
+                
             })
             
             // Not logged in or failure
-            .fail(function(whoamiXhr, myrolesXhr){                
+            .fail(function(whoamiXhr, myrolesXhr, menuXhr){                
                 // Fires on first error
                 if (whoamiXhr.status == 401 || myrolesXhr.status == 401){
                     // 401 => Anon user
@@ -575,7 +609,7 @@ var myRG = myRG || {};
                             content: f.fetchStateData(),
                             in_url: false
                         }
-                    });
+                    }, true);
                 } else {
                     f.throwError({
                         name: 'SERVICE_UNAVAILABLE',

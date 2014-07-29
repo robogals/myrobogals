@@ -49,7 +49,8 @@ def set_role_id(request):
     if request.is_ajax():
         if request.method == "POST":
             user_obj = request.user
-            role_id = request.POST.get("role_id")
+            post = json.loads(request.body.decode())
+            role_id = post.get("role_id")
             
             if role_id is None:
                 return HttpResponse(status=400)

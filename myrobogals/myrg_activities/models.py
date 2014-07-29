@@ -1,22 +1,22 @@
-"""
-    myRobogals
-    myrg_activities/models.py
-    Custom Activity, Subactivity, Participant, PecuniaryTransaction
-    Item model definition
-
-    2014
-    Robogals Software Team
-"""
+from __future__ import unicode_literals
+from future.builtins import *
+import six
+from django.utils.encoding import python_2_unicode_compatible
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-# Create your models here.
+from myrg_users.models import RobogalsUser
+from myrg_groups.models import Role
+
+#@python_2_unicode_compatible
 class Activity(models.Model):
-    id = models.CharField(_('id'),
-                          blank=False,
-                          unique=True,
-                          primary_key=True)
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    
     name = models.CharField(_('name'),
                             blank=False)
     description = models.TextField(_('description'))
@@ -37,7 +37,9 @@ class Activity(models.Model):
                               choices=STATUS_CHOICES,
                               default=0,
                               blank=False)
-    creator_role = models.ForeignKey('role')
+                              
+    creator_role = models.ForeignKey(Role)
+    
     date_created = models.DateTimeField(_('date created'),
                                         blank=False)
     date_rsvp_open = models.DateTimeField(_('date rsvp open'),
@@ -49,18 +51,23 @@ class Activity(models.Model):
     date_activity_end = models.DateTimeField(_('date activity end'),
                                         blank=False)
     currency = models.CharField(_('currency'),
+                                max_length=3,
                                 blank=False,
                                 default='XXX')
     tax_rate = models.FloatField(_('tax rate'),
                                  blank=False,
                                  default=0.00)
 
+#@python_2_unicode_compatible
 class SubActivity(models.Model):
-    id = models.CharField(_('id'),
-                          blank=False,
-                          unique=True,
-                          primary_key=True)
-    parent = models.ForeignKey('activity')
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    
+    parent = models.ForeignKey(Activity)
+    
     name = models.CharField(_('name'),
                             blank=False)
     description = models.TextField(_('description'))
@@ -73,13 +80,15 @@ class SubActivity(models.Model):
     date_activity_end = models.DateTimeField(_('date activity end'),
                                           blank=False)
 
+#@python_2_unicode_compatible
 class Participant(models.Model):
-    id = models.CharField(_('id'),
-                          blank=False,
-                          unique=True,
-                          primary_key=True)
-    activity = models.ForeignKey('activity')
-    user_role = models.ForeignKey('role')
+    def uuid_generator():
+        from uuid import uuid4
+        return str(uuid4().hex)
+    
+    id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
+    activity = models.ForeignKey(Activity)
+    user_role = models.ForeignKey(Role)
     STATUS_CHOICES = (
         (0, 'Neutral'),
         (1, 'Negative'),
@@ -91,22 +100,24 @@ class Participant(models.Model):
                               blank=False)
     response = models.TextField(_('response'))
     last_changed = models.DateTimeField(_('last_changed'),
-                                        blank=False)
+                                        blank=False,
+                                        auto_now=True)
 
+#@python_2_unicode_compatible
 class PecuniaryTransaction(models.Model):
     date = models.DateTimeField(_('date'),
                                 blank=False,
-                                auto_now=True)
-    initiator_role = models.ForeignKey('role')
-    participant = models.ForeignKey('participant')
+                                auto_now_add=True)
+    initiator_role = models.ForeignKey(Role)
+    participant = models.ForeignKey(Participant)
     label = models.CharField(_('label'),
                              blank=False)
     description = models.TextField(_('description'))
     amount = models.FloatField(_('amount'),
                                blank=False)
 
+#@python_2_unicode_compatible
 class Item(models.Model):
-    activity = models.ForeignKey('activity')
     name = models.CharField(_('name'),
                             blank=False)
     definition = models.TextField(_('definition'),
@@ -117,3 +128,16 @@ class Item(models.Model):
                                      blank=False)
     date_close = models.DateTimeField(_('date close'),
                                       blank=False)
+                                      
+    class Meta:
+        abstract = True
+
+#@python_2_unicode_compatible
+class ActivityItem(Item):
+    activity = models.ForeignKey(Activity)
+
+#@python_2_unicode_compatible
+class SubActivityItem(Item):
+    subactivity = models.ForeignKey(SubActivity)
+    
+    

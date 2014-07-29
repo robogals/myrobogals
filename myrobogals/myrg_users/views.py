@@ -395,7 +395,7 @@ Hi {user_preferred_name},<br>\
 <br>\
 A password reset has been requested on your myRobogals beta account.<br>\
 <br>\
-<a href='http://beta.my.robogals.org/?app=login&action=pwdreset&email={user_email}&token={reset_token}' style='font-size:1.5em;'>Click this link to complete your password reset.</a><br>\
+<a href='https://beta.my.robogals.org/?app=login&action=pwdreset&email={user_email}&token={reset_token}' style='font-size:1.5em;'>Click this link to complete your password reset.</a><br>\
 <br>\
 This link expires in {password_reset_days} days.<br>\
 <br>\

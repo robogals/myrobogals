@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 from future.builtins import *
 import six
 
-
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.models import Group
@@ -16,8 +15,6 @@ from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, Res
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses
 from myrg_messages.views import SendMessage
 
-
-from myrg_webapp.views import WebApp
 # Auto generate/collate Django admin panels
 admin.autodiscover()
 admin.site.unregister(Group)
@@ -64,12 +61,11 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/messages/send$', SendMessage.as_view()),
 )
 
-
 api_urlpatterns = format_suffix_patterns(api_urlpatterns, allowed=['json'])
 
 urlpatterns += api_urlpatterns
 
-urlpatterns += patterns(
+urlpatterns += patterns('',
     url(r'^app/login$', 'myrg_webapp.views.login', name='login'),
     url(r'^app/logout$', 'myrg_webapp.views.logout', name='logout'),
     url(r'^app/set_role_id$', 'myrg_webapp.views.set_role_id'),
