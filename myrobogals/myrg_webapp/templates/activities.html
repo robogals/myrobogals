@@ -1,0 +1,80 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+</style>
+<div id="content" tabindex="0">
+    <div id="app-container">
+        <div id="hero">
+            <div class="blocks" style="width: auto;">
+                <h1>Activities</h1>
+            </div>
+            <!--<ul class="control-bar">
+            </ul>-->
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;">
+                <h4>How do I use Activities?</h4>
+                <p>Select an Activity you would like to respond to, and enter information as requested.</p>
+                <p>Please note that you will <b>not</b> be able to modify responses after submission.</p>
+                <p>If you have problems or would like to ask a few questions regarding the new system, please contact <a href="http://support.robogals.org/" target="_blank">Robogals Support</a>.</p>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+        </div>
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "activities";
+        var appName = "Activities";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+    })();
+</script>

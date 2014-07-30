@@ -18,7 +18,8 @@ class Activity(models.Model):
     id = models.CharField(max_length=32, primary_key=True, default=uuid_generator)
     
     name = models.CharField(_('name'),
-                            blank=False)
+                            blank=False,
+                            max_length=127)
     description = models.TextField(_('description'))
     location = models.TextField(_('location'))
     STATUS_CHOICES = (
@@ -57,6 +58,19 @@ class Activity(models.Model):
     tax_rate = models.FloatField(_('tax rate'),
                                  blank=False,
                                  default=0.00)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
+
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id",)
+
+    
+    def __str__(self):
+        return self.name
 
 #@python_2_unicode_compatible
 class SubActivity(models.Model):
@@ -69,7 +83,8 @@ class SubActivity(models.Model):
     parent = models.ForeignKey(Activity)
     
     name = models.CharField(_('name'),
-                            blank=False)
+                            blank=False,
+                            max_length=127)
     description = models.TextField(_('description'))
     date_rsvp_open = models.DateTimeField(_('date rsvp open'),
                                           blank=False)
@@ -79,8 +94,21 @@ class SubActivity(models.Model):
                                           blank=False)
     date_activity_end = models.DateTimeField(_('date activity end'),
                                           blank=False)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
 
-#@python_2_unicode_compatible
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id",)
+    
+    def __str__(self):
+        return self.name
+        
+        
+@python_2_unicode_compatible
 class Participant(models.Model):
     def uuid_generator():
         from uuid import uuid4
@@ -102,7 +130,20 @@ class Participant(models.Model):
     last_changed = models.DateTimeField(_('last_changed'),
                                         blank=False,
                                         auto_now=True)
+    
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
 
+    # Fields that cannot be listed (but can be filtered/sorted with)
+    # NONVISIBLE_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id",)
+                                        
+    def __str__(self):
+        return self.user_role
+        
+        
 #@python_2_unicode_compatible
 class PecuniaryTransaction(models.Model):
     date = models.DateTimeField(_('date'),
@@ -111,7 +152,8 @@ class PecuniaryTransaction(models.Model):
     initiator_role = models.ForeignKey(Role)
     participant = models.ForeignKey(Participant)
     label = models.CharField(_('label'),
-                             blank=False)
+                             blank=False,
+                            max_length=127)
     description = models.TextField(_('description'))
     amount = models.FloatField(_('amount'),
                                blank=False)
@@ -119,7 +161,8 @@ class PecuniaryTransaction(models.Model):
 #@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(_('name'),
-                            blank=False)
+                            blank=False,
+                            max_length=127)
     definition = models.TextField(_('definition'),
                                   blank=False)
     order = models.PositiveIntegerField(_('display order'),

@@ -159,7 +159,7 @@ class RoleClass(models.Model):
             applicable_groups = Group.objects.exclude(pk__in = self.group_exclude.all())
         return applicable_groups
 
-#@python_2_unicode_compatible
+@python_2_unicode_compatible
 class Role(models.Model):
     def uuid_generator():
         from uuid import uuid4
@@ -187,6 +187,8 @@ class Role(models.Model):
     # Fields that cannot be written to
     READONLY_FIELDS = ("id",)
 
-
+    
+    def __str__(self):
+        return "{} ({} @ {})".format(self.user.get_sortable_name, self.role_class, self.group)
 
 

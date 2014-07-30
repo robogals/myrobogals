@@ -160,14 +160,20 @@ h4 {
 
 h5 {
   font-size: 1.2em;
+  font-weight: 500;
 }
 
 h6 {
   font-size: 0.8em;
+  font-weight: 500;
 }
 
 a {
     color: inherit;
+}
+
+b, strong {
+    font-weight: 500;
 }
 
 textarea,
@@ -922,24 +928,6 @@ body {
             .translate(0);
         }
     }
-    
-    &.menu-open {
-        #header {
-            &:before {
-                opacity: 0.4;
-                .translate(-0.35em);
-            }
-        }
-        
-        #menu {
-            .menu-open;
-        }
-        
-        #menu-underlay {
-            bottom: 0;
-            opacity: 0.6;
-        }
-    }
         
     &.menu-enabled {
         #header {
@@ -959,6 +947,24 @@ body {
                 
                 .cubic-1-transition;
             }
+        }
+    }
+    
+    &.menu-open {
+        #header {
+            &:before {
+                opacity: 0.4;
+                .translate(-0.35em);
+            }
+        }
+        
+        #menu {
+            .menu-open;
+        }
+        
+        #menu-underlay {
+            bottom: 0;
+            opacity: 0.6;
         }
     }
     

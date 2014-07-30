@@ -25,6 +25,44 @@
 </style>
 <div id="content" tabindex="0">
     <div id="app-container">
+        <div id="hero">
+            <div class="blocks" style="width: auto;">
+                <h1>Dashboard</h1>
+            </div>
+            <!--<ul class="control-bar">
+            </ul>-->
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;">
+                <h4>Welcome to myRobogals beta</h4>
+                <p>We're still working on things, so parts are incomplete and there may be a few issues.</p>
+                <p>If you have problems or would like to ask a few questions regarding the new system, please contact <a href="http://support.robogals.org/" target="_blank">Robogals Support</a>.</p>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col bg-rg-dark-red" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
+                <h4>Here to respond to your SINE RSVP?</h4>
+                <p>Please tap "Activities" in the main menu.</p>
+                <p>On mobile devices, tap the top header bar to open the menu.</p>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col bg-rg-dark-green" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
+                <h4>What's the Dashboard?</h4>
+                <p>The Dashboard will soon fill with various cards containing an overview of your involvement in Robogals.</p>
+                <p>Cards will include items such as upcoming activities, goal progress of chapters, and new ideas for workshops.</p>
+                <p>If you have a suggestion for something you'd like to see on the Dashboard, please drop it by <a href="http://support.robogals.org/" target="_blank">Robogals Support</a>.</p>
+            </div>
+            <div class="col bg-rg-dark-blue" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
+                <h4>What's with the weird user image?</h4>
+                <p>We're now supporting <a href="https://www.gravatar.com/" target="_blank">Gravatars</a> on your primary email address.</p>
+                <p>To change your image, simply <a href="https://www.gravatar.com/" target="_blank">sign up for a Gravatar</a>, and your user image will change automatically on your next login to myRobogals beta.</p>
+            </div>
+            <div class="col bg-rg-dark-purple" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
+                <h4>Eh... How do I log out?</h4>
+                <p>Tap your name or user image in the main menu to reveal the accounts menu.</p>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -56,6 +94,8 @@
                 content: curr_state,
                 in_url: false
             }
-        }, appName);
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
     })();
 </script>

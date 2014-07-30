@@ -270,6 +270,10 @@
                         .always(function(){
                         })
                         .done(function(){
+                            u.set("WHOAMI_XHR",f.fetchWhoAmI()).done(function(data){
+                                f.updateUser(data);
+                            });
+                        
                             f.gotoApp(myRG.settings.get("INIT_DEFAULT_USER_APP"));
                         })
                         .fail(function(xhr){
@@ -422,6 +426,7 @@
             
             api_xhr
                 .done(function(){
+                    jq.menu.find(".menu-item").remove();
                     f.setTray("You've been successfully logged out.","success");
                 })
                 .fail(function(){
@@ -443,7 +448,8 @@
                 in_url: false
             }
         }, appName, true);
-    
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
     
         // Specific actions
         if (curr_state.ref_state){
