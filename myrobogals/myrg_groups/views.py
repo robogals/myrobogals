@@ -121,6 +121,7 @@ class ListGroups(RobogalsAPIView):
         query = query[pagination_start_index:pagination_end_index]
         
         
+        #import pdb; pdb.set_trace()
         # Serialize
         serializer.Meta.fields = fields
         serialized_query = serializer(query, many=True)
@@ -334,6 +335,9 @@ class CreateGroups(RobogalsAPIView):
                 return Response({"detail":"DATA_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
             
             serializer.Meta.model = group_model
+
+            # hack?
+            serializer.Meta.fields = []
         
             group_data.pop("type")
             for field,value in six.iteritems(group_data):
