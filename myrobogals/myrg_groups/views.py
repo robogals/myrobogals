@@ -23,6 +23,7 @@ PAGINATION_MAX_LENGTH = 1000
 ################################################################################
 class ListGroups(RobogalsAPIView):
     def post(self, request, format=None):
+        #import pdb; pdb.set_trace()
         # request.DATA
         try:
             requested_fields = list(request.DATA.get("query"))
@@ -294,6 +295,7 @@ class EditGroups(RobogalsAPIView):
 
 class CreateGroups(RobogalsAPIView):
     def post(self, request, format=None):
+        #import pdb; pdb.set_trace()
         # request.DATA
         try:
             supplied_groups = list(request.DATA.get("group"))
@@ -317,6 +319,23 @@ class CreateGroups(RobogalsAPIView):
             if (group_nonce is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
+            # Group model
+            serializer = GroupSerializer
+            
+            if group_data.get("type") == 'chapters':
+                group_model = Chapter
+            elif group_data.get("type") == 'schools':
+                group_model = School
+            elif group_data.get("type") == 'companies':
+                group_model = Company
+            elif group_data.get("type") == 'general':
+                group_model = Group
+            else:
+                return Response({"detail":"DATA_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.Meta.model = group_model
+        
+            group_data.pop("type")
             for field,value in six.iteritems(group_data):
                 field = str(field)
                 
@@ -329,7 +348,7 @@ class CreateGroups(RobogalsAPIView):
                 # Non-valid field names
                 # ! Uses _meta non-documented API
                 try:
-                    Group._meta.get_field_by_name(field)
+                    group_model._meta.get_field_by_name(field)
                 except FieldDoesNotExist:
                     failed_group_creations.update({group_nonce: "FIELD_IDENTIFIER_INVALID"})
                     skip_group = True
@@ -342,25 +361,9 @@ class CreateGroups(RobogalsAPIView):
             if skip_group:
                 continue
             
+            #import pdb; pdb.set_trace()
             # Creator is the requester
             group_create_dict.update({"creator": request.user.pk})
-        
-            # Group model
-            serializer = GroupSerializer
-            
-            if requested_group.get("type") == 'chapters':
-                group_model = Chapter
-            elif requested_group.get("type") == 'schools':
-                group_model = School
-            elif requested_group.get("type") == 'companies':
-                group_model = Company
-            elif requested_group.get("type") == 'general':
-                group_model = Group
-            else:
-                return Response({"detail":"DATA_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            serializer.Meta.model = group_model
-        
         
             # Serialise and save
             serialized_group = serializer(data=group_create_dict)
@@ -370,7 +373,7 @@ class CreateGroups(RobogalsAPIView):
                     with transaction.atomic():
                         group = serialized_group.save()
                         completed_group_creations.update({group_nonce: group.id})
-                except:
+                except Exception as e:
                     failed_group_creations.update({group_nonce: "OBJECT_NOT_MODIFIED"})
             else:
                 failed_group_creations.update({group_nonce: "DATA_VALIDATION_FAILED"})

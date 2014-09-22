@@ -1,0 +1,472 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+</style>
+<div id="content" tabindex="0">
+    <div id="app-container">
+        <div id="hero">
+            <div class="blocks" style="width: auto;">
+                <h1>Group</h1>
+            </div>
+            <!--<ul class="control-bar">
+            </ul>-->
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;" id="search_fields">
+                <h4>Search</h4>
+                <div class="querygeneral">
+                    <select id="queryType">
+                        <option value="general" selected="selected">General</option>
+                        <option value="chapters">Chapters</option>
+                        <option value="schools">Schools</option>
+                        <option value="companies">Companies</option>
+                    </select>
+                    <p>
+                        name:<br/>
+                        <input type="text" id="queryName" style="color: black;" >
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;" id="groupList">
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            <div class="col bg-rg-light-blue" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
+                <h4>Create Group</h4>
+                    <div class="newgeneral" hidden>
+                        <select id="newType" style="color: black;">
+                            <option value=".newgeneral" selected="selected">General</option>
+                            <option value=".newchapters">Chapter</option>
+                            <option value=".newschools">School</option>
+                            <option value=".newcompanies">Company</option>
+                        </select>
+                        <p>
+                            name:<br/>
+                            <input type="text" id="newName" style="color: black;" >
+                        </p>
+                        <p>
+                            parent:<br/>
+                            <select id="newParent" style="color: black;">
+                            </select>
+                        </p>
+                        <p>
+                            description:<br/>
+                            <textarea id="newDescription" style="color: black;" />
+                        </p>
+                        <p>
+                            status:<br/>
+                            <select id="newStatus" style="color: black;">
+                                <option value="0" selected="selected">Deleted</option>
+                                <option value="2">Active, Private, Non-joinable</option>
+                                <option value="3">Active, Private, Gated</option>
+                                <option value="4">Active, Private, Joinable</option>
+                                <option value="7">Active, Public, Non-joinable</option>
+                                <option value="8">Active, Public, Gated</option>
+                                <option value="9">Active, Public, Joinable</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="newlocatable" hidden>
+                        <p>
+                            address:<br/>
+                            <textarea id="newAddress" style="color: black;" />
+                        </p>
+                        <p>
+                            city:<br/>
+                            <input type="text" id="newCity" style="color: black;" >
+                        </p>
+                        <p>
+                            state:<br/>
+                            <input type="text" id="newState" style="color: black;" >
+                        </p>
+                        <p>
+                            postcode:<br/>
+                            <input type="text" id="newPostcode" style="color: black;" >
+                        </p>
+                        <p>
+                            country:<br/>
+                            <input type="text" id="newCountry" style="color: black;" >
+                        </p>
+                        <p>
+                            latitude:<br/>
+                            <input type="text" id="newLatitude" style="color: black;" >
+                        </p>
+                        <p>
+                            longitude:<br/>
+                            <input type="text" id="newLongitude" style="color: black;" >
+                        </p>
+                        <p>
+                            timezone:<br/>
+                            <input type="text" id="newTimezone" style="color: black;" >
+                        </p>
+                        <p>
+                            url:<br/>
+                            <input type="text" id="newUrl" style="color: black;" >
+                        </p>
+                    </div>
+                    <div class="newchapters" hidden>
+                        <p>
+                            university:<br/>
+                            <input type="text" id="newUniversity" style="color: black;" >
+                        </p>
+                    </div>
+                    <p class="newcompanies" hidden>
+                        legal name:<br/>
+                        <input type="text" id="newLegalName" style="color: black;" >
+                    </p>
+                    <button class="newback" hidden>back</button>
+                    <button id="createGroup">create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "groups";
+        var appName = "Groups";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+        var groupFilter = {
+            query: [
+                {
+                    field: "name",
+                    search: null,
+                    order: null,
+                    visibility: null,
+                },
+                {
+                    field: "description",
+                    search: null,
+                    order: null,
+                    visibility: null,
+                }
+            ],
+            group: {
+                type: $("#queryType").val()
+            },
+            pagination: {
+                page: 0,
+                length: 100
+            }
+        };
+
+        function fetchAndLoadGroups(groupFilter) {
+            a.set("GROUP_LIST_XHR",
+                        f.fetchAPI("/groups/list", groupFilter));
+            a.get("GROUP_LIST_XHR")
+                    .always(function(){
+                    })
+                    .done(function(groupListXhrArr){
+                        var outputText = "";
+                        for (var i = 0; i < groupListXhrArr.group.length; i++){
+                            outputText += '<p><a href="">' + groupListXhrArr.group[i].data["name"] + "</a><br/>" +
+                                            groupListXhrArr.group[i].data["description"] + "</p>";
+                        }
+                        $("#groupList").empty();
+                        $("#groupList").append(outputText);
+                    })
+                    .fail(function(){
+                    });
+        }
+
+        function fetchAndLoadParentGroups() {
+            var groupFilter = {
+                query: [
+                    {
+                        field: "name",
+                        search: null,
+                        order: null,
+                        visibility: null,
+                    }
+                ],
+                group: {
+                    type: "general"
+                },
+                pagination: {
+                    page: 0,
+                    length: 300
+                }
+            };
+            a.set("GROUP_FULL_LIST_XHR",
+                        f.fetchAPI("/groups/list", groupFilter));
+            a.get("GROUP_FULL_LIST_XHR")
+                .always(function() {
+                })
+                .done(function(groupFullListXhrArr){
+                    var optionList = "";
+                    for (var i = 0; i < groupFullListXhrArr.group.length; i++){
+                        optionList += '<option value="' + groupFullListXhrArr.group[i].id + '">' + groupFullListXhrArr.group[i].data["name"] + '</option>';
+                    }
+                    $("#newParent").empty();
+                    $("#newParent").append(optionList);
+                })
+                .fail(function(){
+                });
+        }
+
+        function checkForm(action) {
+            valid = true;
+            f.closeTray();
+            $("[id^=new]").css({
+                "background-color": "white",
+                "color": "black"
+            });
+            var new_group = {
+                group: [
+                    {
+                        nonce: "abc",
+                        data: {
+                            type: $("#"+ action +"Type").val(),
+                            name: $("#" + action + "Name").val().trim(),
+                            parent: $("#" + action + "Parent").val(),
+                            description: $("#" + action + "Description").val().trim(),
+                            status: $("#" + action + "Status").val()
+                        }
+                    }
+                ]
+            };
+
+            if (new_group.group[0].data.type !== ".newgeneral"
+                && new_group.group[0].data.type !== ".newchapters"
+                && new_group.group[0].data.type !== ".newschools"
+                && new_group.group[0].data.type !== ".newcompanies"
+                ) {
+                valid = false;
+                $("#" + action + "Type").css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: 'type field is empty!'
+                });
+            } else {
+                new_group.group[0].data.type = new_group.group[0].data.type.substring(4);
+            }
+
+            if (new_group.group[0].data.name.length === 0) {
+                valid = false;
+                $("#" + action + "Name").css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: 'name field is empty!'
+                });
+            }
+
+            if (new_group.group[0].data.parent == null) {
+                valid = false;
+                $("#" + action + "Parent").css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: 'parent field is empty!'
+                });
+            }
+
+            if (new_group.group[0].data.status == null) {
+                valid = false;
+                $("#" + action + "Status").css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: 'status field is empty!'
+                });
+            }
+
+            if (new_group.group[0].data.type !== "general") {
+                new_group.group[0].data.address = $("#" + action + "Address").val().trim();
+                new_group.group[0].data.city = $("#" + action + "City").val().trim();
+                new_group.group[0].data.state = $("#" + action + "State").val().trim();
+                new_group.group[0].data.postcode = $("#" + action + "Postcode").val().trim();
+                new_group.group[0].data.country = $("#" + action + "Country").val().trim();
+                new_group.group[0].data.latitude = $("#" + action + "Latitude").val().trim();
+                new_group.group[0].data.longitude = $("#" + action + "Longitude").val().trim();
+                new_group.group[0].data.timezone = $("#" + action + "Timezone").val().trim();
+                new_group.group[0].data.url = $("#" + action + "Url").val().trim();
+
+                if (new_group.group[0].data.address.length === 0) {
+                    valid = false;
+                    $("#" + action + "Address").css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: 'address field is empty!'
+                    });
+                } else if (new_group.group[0].data.country.length === 0) {
+                    valid = false;
+                    $("#" + action + "Country").css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: 'country field is empty!'
+                    });
+                } else if (new_group.group[0].data.timezone.length === 0) {
+                    valid = false;
+                    $("#" + action + "Timezone").css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: 'timezone field is empty!'
+                    });
+                }
+            }
+            if (new_group.group[0].data.type === "chapters") {
+                new_group.group[0].data.university = $("#" + action + "University").val().trim();
+            } else if (new_group.group[0].data.type === "schools") {
+
+            } else if (new_group.group[0].data.type === "companies") {
+                new_group.group[0].data.legal_name = $("#" + action + "LegalName").val().trim();
+            }
+
+            return { validity: valid, data: new_group };
+        }
+
+        $(function(){
+            fetchAndLoadGroups(groupFilter);
+
+            $("[id^=query]").change(function() {
+                f.closeTray();
+                groupFilter.group.type = $("#queryType").val();
+                query_name = $("#queryName").val().trim();
+                if (query_name.length === 0) {
+                    groupFilter.query[0].search = null;
+                } else {
+                    groupFilter.query[0].search = query_name;
+                }
+                fetchAndLoadGroups(groupFilter);
+            });
+
+            fetchAndLoadParentGroups();
+
+            $("#newType").change(function() {
+                $(".newchapters, .newcompanies, .newlocatable").hide();
+                typeSelected = $("#newType").val();
+                if (typeSelected !== ".newgeneral") {
+                    typeSelected += ", .newlocatable";
+                }
+                $(typeSelected).show();
+            });
+
+            $(".newback").click(function() {
+                $("[id^=new]").val("");
+                $("#groupList").show();
+                $("#search_fields").show();
+                $("[class^=new]").hide();
+                f.closeTray();
+                $("[id^=new]").css({
+                    "background-color": "white",
+                    "color": "black"
+                });
+            });
+
+            $("#createGroup").click(function() {
+                if ($(".newgeneral").is(":visible")) {
+                    var result = checkForm("new");
+                    if (result.validity) {
+                        a.set("CREATE_GROUP_XHR",
+                                    f.fetchAPI("/groups/create", result.data));
+                        a.get("CREATE_GROUP_XHR")
+                            .always(function() {
+                            })
+                            .done(function(createGroupXhr){
+                                $("#groupList").show();
+                                $("#search_fields").show();
+                                $("[class^=new]").hide();
+                                $("[id^=new]").val("");
+                                if (createGroupXhr.success.nonce_id.hasOwnProperty(result.data.group[0].nonce)) {
+                                    f.setTray("group created","success",true);
+                                    fetchAndLoadGroups(groupFilter);
+                                    fetchAndLoadParentGroups();
+                                } else {
+                                    f.throwError({
+                                        name: 'ERROR',
+                                        message: 'server rejected!'
+                                    });
+                                }
+                            })
+                            .fail(function(){
+                                $("[id^=new]").val("");
+                                $("#groupList").show();
+                                $("#search_fields").show();
+                                $("[class^=new]").hide();
+                                f.throwError({
+                                    name: 'ERROR',
+                                    message: 'server rejected!'
+                                });
+                            });
+                    }
+                } else {
+                    f.closeTray();
+                    $("#groupList").hide();
+                    $("#search_fields").hide();
+                    $(".newgeneral").show();
+                    $(".newback").show();
+                }
+            });
+
+        });
+
+    })();
+</script>
