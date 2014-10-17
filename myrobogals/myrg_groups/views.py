@@ -13,7 +13,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import Group, Chapter, School, Company, RoleClass, Role
-from .serializers import GroupSerializer, RoleClassSerializer, RoleSerializer
+from .serializers import GroupSerializer, ChapterSerializer, SchoolSerializer, CompanySerializer, RoleClassSerializer, RoleSerializer
 
 
 PAGINATION_MAX_LENGTH = 1000
@@ -54,20 +54,17 @@ class ListGroups(RobogalsAPIView):
         
         
         # Group model
-        serializer = GroupSerializer
         
         if requested_group.get("type") == 'chapters':
-            group_model = Chapter
+            serializer = ChapterSerializer
         elif requested_group.get("type") == 'schools':
-            group_model = School
+            serializer = SchoolSerializer
         elif requested_group.get("type") == 'companies':
-            group_model = Company
+            serializer = CompanySerializer
         elif requested_group.get("type") == 'general':
-            group_model = Group
+            serializer = GroupSerializer
         else:
             return Response({"detail":"DATA_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer.Meta.model = group_model
         
         # Filter
         filter_dict = {}
@@ -86,13 +83,13 @@ class ListGroups(RobogalsAPIView):
             field_name = str(field_name)
             
             # Block protected fields like passwords
-            if field_name in group_model.PROTECTED_FIELDS:
+            if field_name in serializer.Meta.model.PROTECTED_FIELDS:
                 return Response({"detail":"`{}` is a protected field.".format(field_name)}, status=status.HTTP_400_BAD_REQUEST)
             
             # Non-valid field names
             # ! Uses _meta non-documented API
             try:
-                group_model._meta.get_field_by_name(field_name)
+                serializer.Meta.model._meta.get_field_by_name(field_name)
             except FieldDoesNotExist:
                 return Response({"detail":"`{}` is not a valid field name.".format(field_name)}, status=status.HTTP_400_BAD_REQUEST)
                 
@@ -111,8 +108,9 @@ class ListGroups(RobogalsAPIView):
                 fields.append(field_name)
         
         
+        #import pdb; pdb.set_trace()
         # Build query
-        query = group_model.objects.filter(status__gt=0)
+        query = serializer.Meta.model.objects.filter(status__gt=0)
         query = query.filter(**filter_dict)
         query = query.order_by(*sort_fields)
         
@@ -123,8 +121,7 @@ class ListGroups(RobogalsAPIView):
         
         #import pdb; pdb.set_trace()
         # Serialize
-        serializer.Meta.fields = fields
-        serialized_query = serializer(query, many=True)
+        serialized_query = serializer(query, many=True, fields=fields)
         
         
         # Output
@@ -213,6 +210,7 @@ class EditGroups(RobogalsAPIView):
         except:
             return Response({"detail":"DATA_FORMAT_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
                 
+        #import pdb; pdb.set_trace()
         failed_group_updates = {}
         completed_group_updates = []
         
@@ -230,12 +228,23 @@ class EditGroups(RobogalsAPIView):
             
             if (group_id is None):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if (ChapterSerializer.Meta.model.objects.filter(id=group_id).count() == 1):
+                serializer = ChapterSerializer
+            elif (SchoolSerializer.Meta.model.objects.filter(id=group_id).count() == 1):
+                serializer = SchoolSerializer
+            elif (CompanySerializer.Meta.model.objects.filter(id=group_id).count() == 1):
+                serializer = CompanySerializer
+            elif (GroupSerializer.Meta.model.objects.filter(id=group_id).count() == 1):
+                serializer = GroupSerializer
+            else:
+                return Response({"detail":"GROUP_NOT_FOUND"}, status=status.HTTP_400_BAD_REQUEST)
             
             for field,value in six.iteritems(group_data):
                 field = str(field)
                 
                 # Read only fields
-                if field in Group.READONLY_FIELDS or field == "creator":
+                if field in serializer.Meta.model.READONLY_FIELDS or field == "creator":
                     failed_group_updates.update({group_id: "FIELD_READ_ONLY"})
                     skip_group = True
                     break
@@ -243,7 +252,7 @@ class EditGroups(RobogalsAPIView):
                 # Non-valid field names
                 # ! Uses _meta non-documented API
                 try:
-                    Group._meta.get_field_by_name(field)
+                    serializer.Meta.model._meta.get_field_by_name(field)
                 except FieldDoesNotExist:
                     failed_group_updates.update({group_id: "FIELD_IDENTIFIER_INVALID"})
                     skip_group = True
@@ -264,15 +273,14 @@ class EditGroups(RobogalsAPIView):
             if skip_group:
                 continue
             
-            
+            #import pdb; pdb.set_trace()
             # Fetch, serialise and save
             try:
-                group_query = Group.objects.get(status__gt=0, pk=group_id)
+                group_query = serializer.Meta.model.objects.get(status__gt=0, pk=group_id)
             except:
                 failed_group_updates.update({group_id: "OBJECT_NOT_FOUND"})
                 continue
                 
-            serializer = GroupSerializer
             serialized_group = serializer(group_query, data=group_update_dict, partial=True)
         
             if serialized_group.is_valid():
@@ -280,7 +288,7 @@ class EditGroups(RobogalsAPIView):
                     with transaction.atomic():
                         serialized_group.save()
                         completed_group_updates.append(group_id)
-                except:
+                except Exception as e:
                     failed_group_updates.update({group_id: "OBJECT_NOT_MODIFIED"})
             else:
                 failed_group_updates.update({group_id: "DATA_VALIDATION_FAILED"})
@@ -321,30 +329,26 @@ class CreateGroups(RobogalsAPIView):
                 return Response({"detail":"DATA_INSUFFICIENT"}, status=status.HTTP_400_BAD_REQUEST)
             
             # Group model
-            serializer = GroupSerializer
             
             if group_data.get("type") == 'chapters':
-                group_model = Chapter
+                serializer = ChapterSerializer
             elif group_data.get("type") == 'schools':
-                group_model = School
+                serializer = SchoolSerializer
             elif group_data.get("type") == 'companies':
-                group_model = Company
+                serializer = CompanySerializer
             elif group_data.get("type") == 'general':
-                group_model = Group
+                serializer = GroupSerializer
             else:
                 return Response({"detail":"DATA_INVALID"}, status=status.HTTP_400_BAD_REQUEST)
             
-            serializer.Meta.model = group_model
-
-            # hack?
-            serializer.Meta.fields = []
+            #import pdb; pdb.set_trace()
         
             group_data.pop("type")
             for field,value in six.iteritems(group_data):
                 field = str(field)
                 
                 # Read only fields
-                if field in Group.READONLY_FIELDS or field == "creator":
+                if field in serializer.Meta.model.READONLY_FIELDS or field == "creator":
                     failed_group_creations.update({group_nonce: "FIELD_READ_ONLY"})
                     skip_group = True
                     break
@@ -352,7 +356,7 @@ class CreateGroups(RobogalsAPIView):
                 # Non-valid field names
                 # ! Uses _meta non-documented API
                 try:
-                    group_model._meta.get_field_by_name(field)
+                    serializer.Meta.model._meta.get_field_by_name(field)
                 except FieldDoesNotExist:
                     failed_group_creations.update({group_nonce: "FIELD_IDENTIFIER_INVALID"})
                     skip_group = True
@@ -375,6 +379,7 @@ class CreateGroups(RobogalsAPIView):
             if serialized_group.is_valid():
                 try:
                     with transaction.atomic():
+                        #import pdb; pdb.set_trace()
                         group = serialized_group.save()
                         completed_group_creations.update({group_nonce: group.id})
                 except Exception as e:

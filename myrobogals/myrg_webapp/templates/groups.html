@@ -32,113 +32,62 @@
             <!--<ul class="control-bar">
             </ul>-->
         </div>
-        <div class="row" style="margin-top: 1.5rem;">
-            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;" id="search_fields">
-                <h4>Search</h4>
-                <div class="querygeneral">
-                    <select id="queryType">
-                        <option value="general" selected="selected">General</option>
-                        <option value="chapters">Chapters</option>
-                        <option value="schools">Schools</option>
-                        <option value="companies">Companies</option>
-                    </select>
-                    <p>
-                        name:<br/>
-                        <input type="text" id="queryName" style="color: black;" >
+        <div class="row" style="margin-top: 2rem;">
+            <div id="listGroup" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #FFFFFF">
+                List
+            </div>
+            <div id="newGroup" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #A8A8A8">
+                New
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.8rem;">
+            <div style="padding: 1.6rem; font-size: 1.25em; background-color: #FFFFFF; color: #484848">
+                <div class="general">
+                    <div class="searchField">
+                        <p>Type:
+                            <select id="groupType">
+                                <option value="general" selected="selected">General</option>
+                                <option value="chapters">Chapters</option>
+                                <option value="schools">Schools</option>
+                                <option value="companies">Companies</option>
+                            </select>
+                        </p>
+                        <p><input id="groupName" type="text" placeholder="Name" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    </div>
+                    <p>Parent: <select id="groupParent"/></p>
+                    <p><textarea id="groupDescription" rows="5" placeholder="Description"  style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p>Status:
+                        <select id="groupStatus">
+                            <option value="0" selected="selected">Deleted</option>
+                            <option value="2">Active, Private, Non-joinable</option>
+                            <option value="3">Active, Private, Gated</option>
+                            <option value="4">Active, Private, Joinable</option>
+                            <option value="7">Active, Public, Non-joinable</option>
+                            <option value="8">Active, Public, Gated</option>
+                            <option value="9">Active, Public, Joinable</option>
+                        </select>
                     </p>
                 </div>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 1.5rem;">
-            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;" id="groupList">
-            </div>
-        </div>
-        <div class="row" style="margin-top: 1.5rem;">
-            <div class="col bg-rg-light-blue" style="padding: 1.6rem; font-size: 1.25em; color: #fff;">
-                <h4>Create Group</h4>
-                    <div class="newgeneral" hidden>
-                        <select id="newType" style="color: black;">
-                            <option value=".newgeneral" selected="selected">General</option>
-                            <option value=".newchapters">Chapter</option>
-                            <option value=".newschools">School</option>
-                            <option value=".newcompanies">Company</option>
-                        </select>
-                        <p>
-                            name:<br/>
-                            <input type="text" id="newName" style="color: black;" >
-                        </p>
-                        <p>
-                            parent:<br/>
-                            <select id="newParent" style="color: black;">
-                            </select>
-                        </p>
-                        <p>
-                            description:<br/>
-                            <textarea id="newDescription" style="color: black;" />
-                        </p>
-                        <p>
-                            status:<br/>
-                            <select id="newStatus" style="color: black;">
-                                <option value="0" selected="selected">Deleted</option>
-                                <option value="2">Active, Private, Non-joinable</option>
-                                <option value="3">Active, Private, Gated</option>
-                                <option value="4">Active, Private, Joinable</option>
-                                <option value="7">Active, Public, Non-joinable</option>
-                                <option value="8">Active, Public, Gated</option>
-                                <option value="9">Active, Public, Joinable</option>
-                            </select>
-                        </p>
-                    </div>
-                    <div class="newlocatable" hidden>
-                        <p>
-                            address:<br/>
-                            <textarea id="newAddress" style="color: black;" />
-                        </p>
-                        <p>
-                            city:<br/>
-                            <input type="text" id="newCity" style="color: black;" >
-                        </p>
-                        <p>
-                            state:<br/>
-                            <input type="text" id="newState" style="color: black;" >
-                        </p>
-                        <p>
-                            postcode:<br/>
-                            <input type="text" id="newPostcode" style="color: black;" >
-                        </p>
-                        <p>
-                            country:<br/>
-                            <input type="text" id="newCountry" style="color: black;" >
-                        </p>
-                        <p>
-                            latitude:<br/>
-                            <input type="text" id="newLatitude" style="color: black;" >
-                        </p>
-                        <p>
-                            longitude:<br/>
-                            <input type="text" id="newLongitude" style="color: black;" >
-                        </p>
-                        <p>
-                            timezone:<br/>
-                            <input type="text" id="newTimezone" style="color: black;" >
-                        </p>
-                        <p>
-                            url:<br/>
-                            <input type="text" id="newUrl" style="color: black;" >
-                        </p>
-                    </div>
-                    <div class="newchapters" hidden>
-                        <p>
-                            university:<br/>
-                            <input type="text" id="newUniversity" style="color: black;" >
-                        </p>
-                    </div>
-                    <p class="newcompanies" hidden>
-                        legal name:<br/>
-                        <input type="text" id="newLegalName" style="color: black;" >
-                    </p>
-                    <button class="newback" hidden>back</button>
-                    <button id="createGroup">create</button>
+                <div class="locatable">
+                    <p><textarea id="groupAddress" rows="5" placeholder="Address" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="City" id="groupCity" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="State" id="groupState" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Postcode" id="groupPostcode" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Country" id="groupCountry" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Latitude" id="groupLatitude" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Longitude" id="groupLongitude" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Timezone" id="groupTimezone" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Url" id="groupUrl" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <div class="chapters">
+                    <p><input type="text" placeholder="University" id="groupUniversity" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <div class="companies">
+                    <p><input type="text" placeholder="LegalName" id="groupLegalName" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <input id="hideButton" type="submit" value="Hide" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>
+                <input id="submitButton" type="submit" value="Advanced Search" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" />
+                <div id="resultsList" style="margin-top: 2rem;" />
             </div>
         </div>
     </div>
@@ -175,47 +124,405 @@
         }, appName, true);
         myRG.jq.body.attr("data-app",resourceName);
         ga('send', 'pageview');
-        var groupFilter = {
-            query: [
+
+        a.set("search_fields", null);
+        a.set("new_fields", null);
+
+        function valueOrNullOrError(elem, errMsg) {
+            retVal = $(elem).val();
+            if (!retVal || retVal.trim().length == 0) {
+                if (errMsg === undefined) {
+                    return null;
+                } else {
+                    $(elem).css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: errMsg
+                    });
+                }
+            } else {
+                return retVal.trim();
+            }
+        }
+
+        function valueOrEmptyOrError(elem, errMsg) {
+            retVal = $(elem).val();
+            if (!retVal || retVal.trim().length == 0) {
+                if (errMsg === undefined) {
+                    return "";
+                } else {
+                    $(elem).css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: errMsg
+                    });
+                }
+            } else {
+                return retVal.trim();
+            }
+        }
+
+        function formInfo(action) {
+            var groupData = null;
+            if (action === "Search") {
+                groupData = {
+                    query: [
+                        {
+                            field: "name",
+                            search: valueOrNullOrError("#groupName"),
+                            order: null,
+                            visibility: null
+                        },
+                        {
+                            field: "description",
+                            search: null,
+                            order: null,
+                            visibility: null
+                        }
+                    ],
+                    group: {
+                        type: valueOrNullOrError("#groupType", "Type field is empty")
+                    },
+                    pagination: {
+                        page: 0,
+                        length: 100
+                    }
+                };
+                a.set("search_fields", {
+                    type: groupData.group.type,
+                    name: groupData.query[0].search
+                });
+            } else if (action === "New") {
+                $("[id^=group]").css({
+                    "background-color": "white",
+                    "color": "black"
+                });
+                groupData = {
+                    group: [
+                        {
+                            nonce: "abc",
+                            data: {
+                                type: valueOrEmptyOrError("#groupType", "Type field is empty"),
+                                name: valueOrEmptyOrError("#groupName", "Name field is empty"),
+                                parent: valueOrEmptyOrError("#groupParent"),
+                                description: valueOrEmptyOrError("#groupDescription"),
+                                status: valueOrEmptyOrError("#groupStatus", "Status field is empty")
+                            }
+                        }
+                    ]
+                };
+                if (groupData.group[0].data.type !== "general") {
+                    groupData.group[0].data.address = valueOrEmptyOrError("#groupAddress", "Address field is empty");
+                    groupData.group[0].data.city = valueOrEmptyOrError("#groupCity");
+                    groupData.group[0].data.state = valueOrEmptyOrError("#groupState");
+                    groupData.group[0].data.postcode = valueOrEmptyOrError("#groupPostcode");
+                    groupData.group[0].data.country = valueOrEmptyOrError("#groupCountry", "Country field is empty");
+                    groupData.group[0].data.latitude = valueOrEmptyOrError("#groupLatitude");
+                    groupData.group[0].data.longitude = valueOrEmptyOrError("#groupLongitude");
+                    groupData.group[0].data.timezone = valueOrEmptyOrError("#groupTimezone", "Timezone field is empty");
+                    groupData.group[0].data.url = valueOrEmptyOrError("#groupUrl");
+                }
+                if (groupData.group[0].data.type === "chapters") {
+                    groupData.group[0].data.university = valueOrEmptyOrError("#groupUniversity");
+                } else if (groupData.group[0].data.type === "schools") {
+
+                } else if (groupData.group[0].data.type === "companies") {
+                    groupData.group[0].data.legal_name = valueOrEmptyOrError("#groupLegalName");
+                }
+            } else {
+                
+            }
+            return groupData;
+        }
+
+        function fillInGroupDetails(group) {
+            var groupData = {
+                query: [
+                    {
+                        field: "id",
+                        search: $(group).attr("id"),
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "name",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "parent",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "description",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "status",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                group: {
+                    type: "general"
+                },
+                pagination: {
+                    page: 0,
+                    length: 100
+                }
+            };
+            a.set("GROUP_DETAILS_GENERAL_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.query.push(
                 {
-                    field: "name",
+                    field: "address",
                     search: null,
                     order: null,
-                    visibility: null,
+                    visibility: null
                 },
                 {
-                    field: "description",
+                    field: "city",
                     search: null,
                     order: null,
-                    visibility: null,
+                    visibility: null
+                },
+                {
+                    field: "state",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "postcode",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "country",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "latitude",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "longitude",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "timezone",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "url",
+                    search: null,
+                    order: null,
+                    visibility: null
                 }
-            ],
-            group: {
-                type: $("#queryType").val()
-            },
-            pagination: {
-                page: 0,
-                length: 100
+            );
+            groupData.group.type = "chapters";
+            groupData.query.push(
+                {
+                    field: "university",
+                    search: null,
+                    order: null,
+                    visibility: null
+                }
+            );
+            a.set("GROUP_DETAILS_CHAPTERS_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.query.pop();
+            groupData.group.type = "schools";
+            a.set("GROUP_DETAILS_SCHOOLS_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.group.type = "companies";
+            groupData.query.push(
+                {
+                    field: "legal_name",
+                    search: null,
+                    order: null,
+                    visibility: null
+                }
+            );
+            a.set("GROUP_DETAILS_COMPANIES_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            $.when(a.get("GROUP_DETAILS_GENERAL_XHR"),
+            a.get("GROUP_DETAILS_CHAPTERS_XHR"),
+            a.get("GROUP_DETAILS_SCHOOLS_XHR"),
+            a.get("GROUP_DETAILS_COMPANIES_XHR"))
+                    .always(function(){
+                    })
+                    .done(function(groupGeneralXhrArr, groupChaptersXhrArr,
+                        groupSchoolsXhrArr, groupCompaniesXhrArr){
+                        a.set("modifying_group_id", $(group).attr("id"));
+                        for (i = 0; i < groupChaptersXhrArr[0].group.length; i++) {
+                            if (groupChaptersXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupChaptersXhrArr[0].group[i].data.type = "chapters";
+                                fillInForm(groupChaptersXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .chapters", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupSchoolsXhrArr[0].group.length; i++) {
+                            if (groupSchoolsXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupSchoolsXhrArr[0].group[i].data.type = "schools";
+                                fillInForm(groupSchoolsXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .schools", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupCompaniesXhrArr[0].group.length; i++) {
+                            if (groupCompaniesXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupCompaniesXhrArr[0].group[i].data.type = "companies";
+                                fillInForm(groupCompaniesXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .companies", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupGeneralXhrArr[0].group.length; i++) {
+                            if (groupGeneralXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupGeneralXhrArr[0].group[i].data.type = "general";
+                                fillInForm(groupGeneralXhrArr[0].group[i].data);
+                                formElemVisibility(".general", "show");
+                                return;
+                            }
+                        }
+                    })
+                    .fail(function(){
+                    });
+        }
+
+        function fillInForm(groupData) {
+            if (groupData) {
+                $("#groupType").val(groupData.type);
+                $("#groupName").val(groupData.name);
+                $("#groupParent").val(groupData.parent);
+                $("#groupDescription").val(groupData.description);
+                $("#groupStatus").val(groupData.status);
+                $("#groupAddress").val(groupData.address);
+                $("#groupCity").val(groupData.city);
+                $("#groupState").val(groupData.state);
+                $("#groupPostcode").val(groupData.postcode);
+                $("#groupCountry").val(groupData.country);
+                $("#groupLatitude").val(groupData.latitude);
+                $("#groupLongitude").val(groupData.longitude);
+                $("#groupTimezone").val(groupData.timezone);
+                $("#groupUrl").val(groupData.url);
+                $("#groupUniversity").val(groupData.university);
+                $("#groupLegalName").val(groupData.legal_name);
             }
-        };
+        }
 
         function fetchAndLoadGroups(groupFilter) {
+//            debugger;
             a.set("GROUP_LIST_XHR",
                         f.fetchAPI("/groups/list", groupFilter));
             a.get("GROUP_LIST_XHR")
                     .always(function(){
                     })
                     .done(function(groupListXhrArr){
-                        var outputText = "";
+                        var outputText = '<table style="width: 100%; border-collapse: collapse; border: 1px solid black;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Title</th></tr>';
                         for (var i = 0; i < groupListXhrArr.group.length; i++){
-                            outputText += '<p><a href="">' + groupListXhrArr.group[i].data["name"] + "</a><br/>" +
-                                            groupListXhrArr.group[i].data["description"] + "</p>";
+                            outputText += '<tr><td style="border: 1px solid black;"><input class="detailsGroup" id="' + groupListXhrArr.group[i].id + '" type="submit" value="' + groupListXhrArr.group[i].data["name"] + '" style="background-color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" /></td></tr>';
                         }
-                        $("#groupList").empty();
-                        $("#groupList").append(outputText);
+                        outputText += "</table>";
+                        $("#resultsList").empty();
+                        $("#resultsList").append(outputText);
+                        $(".detailsGroup").click(function() {
+                            f.closeTray();
+                            resetForm();
+                            formElemVisibility(".general, .locatable, .chapters, .schools, .companies", "hide");
+                            $("#resultsList").hide();
+                            $("#submitButton").val("Modify");
+                            $("#hideButton").show();
+                            $("#hideButton").val("Back");
+                            $("#listGroup").css("background-color", "#FFFFFF");
+                            $("#newGroup").css("background-color", "#A8A8A8");
+                            $("[id^=group]").prop("disabled", true);
+                            var _this = this;
+                            a.get("GROUP_FULL_LIST_XHR")
+                                .done(function(groupFullListXhrArr){
+                                    fillInGroupDetails(_this);
+                                });
+                        });
                     })
                     .fail(function(){
                     });
+        }
+
+        function newGroup(groupData) {
+            a.set("CREATE_GROUP_XHR",
+                        f.fetchAPI("/groups/create", groupData));
+            a.get("CREATE_GROUP_XHR")
+                .always(function() {
+                })
+                .done(function(createGroupXhr) {
+                    a.store["new_fields"] = null;
+                    a.store["search_fields"] = null;
+                    resetForm();
+                    listGroupTab();
+                    if (createGroupXhr.success.nonce_id.hasOwnProperty(groupData.group[0].nonce)) {
+                        f.setTray("group created","success",true);
+                        fetchAndLoadGroups(formInfo("Search"));
+                        a.get("GROUP_FULL_LIST_XHR")
+                            .done(function(groupFullListXhrArr){
+                                fetchAndLoadGroups(formInfo("Search"));
+                            });
+                    } else {
+                        f.throwError({
+                            name: 'ERROR',
+                            message: 'server rejected!'
+                        });
+                    }
+                })
+                .fail(function() {
+                });
+        }
+
+        function updateGroup(groupData) {
+            a.set("UPDATE_GROUP_XHR",
+                        f.fetchAPI("/groups/edit", groupData));
+            a.get("UPDATE_GROUP_XHR")
+                .always(function() {
+                })
+                .done(function(updateGroupXhr) {
+                    listGroupTab();
+                    if (updateGroupXhr.success.id[0] == groupData.group[0].id) {
+                        f.setTray("group updated","success",true);
+                        a.get("GROUP_FULL_LIST_XHR")
+                            .done(function(groupFullListXhrArr){
+                                fetchAndLoadGroups(formInfo("Search"));
+                            });
+                    } else {
+                        f.throwError({
+                            name: 'ERROR',
+                            message: 'server rejected!'
+                        });
+                    }
+                })
+                .fail(function() {
+                });
         }
 
         function fetchAndLoadParentGroups() {
@@ -243,229 +550,175 @@
                 })
                 .done(function(groupFullListXhrArr){
                     var optionList = "";
+                    optionList += '<option value=""></option>';
                     for (var i = 0; i < groupFullListXhrArr.group.length; i++){
                         optionList += '<option value="' + groupFullListXhrArr.group[i].id + '">' + groupFullListXhrArr.group[i].data["name"] + '</option>';
                     }
-                    $("#newParent").empty();
-                    $("#newParent").append(optionList);
+                    $("#groupParent").empty();
+                    $("#groupParent").append(optionList);
                 })
                 .fail(function(){
                 });
         }
 
-        function checkForm(action) {
-            valid = true;
+        function formElemVisibility(elem, visibility) {
+            if (visibility === "show") {
+                $(elem).children().show();
+                $(elem).show();
+            } else if (visibility === "hide") {
+                $(elem).children().hide();
+                $(elem).hide();
+            } else {
+            }
+        }
+
+        function showFormSearchField() {
+            $(".general, .locatable, .chapters, .schools, .companies").show();
+            $(".general, .locatable, .chapters, .schools, .companies").children().hide();
+            $(".searchField").show();
+        }
+
+        function resetForm() {
             f.closeTray();
-            $("[id^=new]").css({
+            $("[id^=group]").css({
                 "background-color": "white",
                 "color": "black"
             });
-            var new_group = {
-                group: [
-                    {
-                        nonce: "abc",
-                        data: {
-                            type: $("#"+ action +"Type").val(),
-                            name: $("#" + action + "Name").val().trim(),
-                            parent: $("#" + action + "Parent").val(),
-                            description: $("#" + action + "Description").val().trim(),
-                            status: $("#" + action + "Status").val()
-                        }
-                    }
-                ]
-            };
+            $("[id^=group]").val("");
+            $("#groupType").val("general");
+            fetchAndLoadParentGroups();
+            $("#groupStatus").val("0");
+            $("[id^=group]").prop("disabled", false);
+        }
 
-            if (new_group.group[0].data.type !== ".newgeneral"
-                && new_group.group[0].data.type !== ".newchapters"
-                && new_group.group[0].data.type !== ".newschools"
-                && new_group.group[0].data.type !== ".newcompanies"
-                ) {
-                valid = false;
-                $("#" + action + "Type").css({
-                    "background-color": "#740000",
-                    "color": "white"
-                });
-                f.throwError({
-                    name: 'FORM_INVALID',
-                    message: 'type field is empty!'
-                });
-            } else {
-                new_group.group[0].data.type = new_group.group[0].data.type.substring(4);
+        function listGroupTab() {
+            f.closeTray();
+            a.store["modifying_group_id"] = null;
+            if ($("#submitButton").val() == "New") {
+                saveForm("new_fields");
             }
-
-            if (new_group.group[0].data.name.length === 0) {
-                valid = false;
-                $("#" + action + "Name").css({
-                    "background-color": "#740000",
-                    "color": "white"
+            resetForm();
+            formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+            $("#resultsList").show();
+            $("#submitButton").val("Advanced Search");
+            $("#hideButton").val("hide");
+            $("#listGroup").css("background-color", "#FFFFFF");
+            $("#newGroup").css("background-color", "#A8A8A8");
+            a.get("GROUP_FULL_LIST_XHR")
+                .done(function(groupFullListXhrArr){
+                    fillInForm(a.get("search_fields"));
                 });
-                f.throwError({
-                    name: 'FORM_INVALID',
-                    message: 'name field is empty!'
+        }
+
+        function saveForm(field) {
+            a.set(field, {
+                type: valueOrNullOrError("#groupType"),
+                name: valueOrNullOrError("#groupName"),
+                parent: valueOrNullOrError("#groupParent"),
+                description: valueOrNullOrError("#groupDescription"),
+                status: valueOrNullOrError("#groupStatus"),
+                address: valueOrNullOrError("#groupAddress"),
+                city: valueOrNullOrError("#groupCity"),
+                state: valueOrNullOrError("#groupState"),
+                postcode: valueOrNullOrError("#groupPostcode"),
+                country: valueOrNullOrError("#groupCountry"),
+                latitude: valueOrNullOrError("#groupLatitude"),
+                longitude: valueOrNullOrError("#groupLongitude"),
+                timezone: valueOrNullOrError("#groupTimezone"),
+                url: valueOrNullOrError("#groupUrl"),
+                university: valueOrNullOrError("#groupUniversity"),
+                legal_name: valueOrNullOrError("#groupLegalName")
+            });
+        }
+
+        function newGroupTab() {
+            f.closeTray();
+            a.store["modifying_group_id"] = null;
+            resetForm();
+            formElemVisibility(".locatable, .chapters, .schools, .companies", "hide");
+            formElemVisibility(".general", "show");
+            $("#resultsList").hide();
+            $("#submitButton").val("New");
+            $("#hideButton").val("Reset form").show();
+            $("#listGroup").css("background-color", "#A8A8A8");
+            $("#newGroup").css("background-color", "#FFFFFF");
+            a.get("GROUP_FULL_LIST_XHR")
+                .done(function(groupFullListXhrArr){
+                    fillInForm(a.get("new_fields"));
+                    $("#groupType").trigger("change");
                 });
-            }
-
-            if (new_group.group[0].data.parent == null) {
-                valid = false;
-                $("#" + action + "Parent").css({
-                    "background-color": "#740000",
-                    "color": "white"
-                });
-                f.throwError({
-                    name: 'FORM_INVALID',
-                    message: 'parent field is empty!'
-                });
-            }
-
-            if (new_group.group[0].data.status == null) {
-                valid = false;
-                $("#" + action + "Status").css({
-                    "background-color": "#740000",
-                    "color": "white"
-                });
-                f.throwError({
-                    name: 'FORM_INVALID',
-                    message: 'status field is empty!'
-                });
-            }
-
-            if (new_group.group[0].data.type !== "general") {
-                new_group.group[0].data.address = $("#" + action + "Address").val().trim();
-                new_group.group[0].data.city = $("#" + action + "City").val().trim();
-                new_group.group[0].data.state = $("#" + action + "State").val().trim();
-                new_group.group[0].data.postcode = $("#" + action + "Postcode").val().trim();
-                new_group.group[0].data.country = $("#" + action + "Country").val().trim();
-                new_group.group[0].data.latitude = $("#" + action + "Latitude").val().trim();
-                new_group.group[0].data.longitude = $("#" + action + "Longitude").val().trim();
-                new_group.group[0].data.timezone = $("#" + action + "Timezone").val().trim();
-                new_group.group[0].data.url = $("#" + action + "Url").val().trim();
-
-                if (new_group.group[0].data.address.length === 0) {
-                    valid = false;
-                    $("#" + action + "Address").css({
-                        "background-color": "#740000",
-                        "color": "white"
-                    });
-                    f.throwError({
-                        name: 'FORM_INVALID',
-                        message: 'address field is empty!'
-                    });
-                } else if (new_group.group[0].data.country.length === 0) {
-                    valid = false;
-                    $("#" + action + "Country").css({
-                        "background-color": "#740000",
-                        "color": "white"
-                    });
-                    f.throwError({
-                        name: 'FORM_INVALID',
-                        message: 'country field is empty!'
-                    });
-                } else if (new_group.group[0].data.timezone.length === 0) {
-                    valid = false;
-                    $("#" + action + "Timezone").css({
-                        "background-color": "#740000",
-                        "color": "white"
-                    });
-                    f.throwError({
-                        name: 'FORM_INVALID',
-                        message: 'timezone field is empty!'
-                    });
-                }
-            }
-            if (new_group.group[0].data.type === "chapters") {
-                new_group.group[0].data.university = $("#" + action + "University").val().trim();
-            } else if (new_group.group[0].data.type === "schools") {
-
-            } else if (new_group.group[0].data.type === "companies") {
-                new_group.group[0].data.legal_name = $("#" + action + "LegalName").val().trim();
-            }
-
-            return { validity: valid, data: new_group };
         }
 
         $(function(){
-            fetchAndLoadGroups(groupFilter);
-
-            $("[id^=query]").change(function() {
-                f.closeTray();
-                groupFilter.group.type = $("#queryType").val();
-                query_name = $("#queryName").val().trim();
-                if (query_name.length === 0) {
-                    groupFilter.query[0].search = null;
-                } else {
-                    groupFilter.query[0].search = query_name;
+            $("#hideButton, #submitButton").hover(
+                function() {
+                    $(this).css("background-color", "#00a2e6");
+                },
+                function() {
+                    $(this).css("background-color", "#006c99");
                 }
-                fetchAndLoadGroups(groupFilter);
-            });
+            );
 
+            formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+
+            fetchAndLoadGroups(formInfo("Search"));
             fetchAndLoadParentGroups();
 
-            $("#newType").change(function() {
-                $(".newchapters, .newcompanies, .newlocatable").hide();
-                typeSelected = $("#newType").val();
-                if (typeSelected !== ".newgeneral") {
-                    typeSelected += ", .newlocatable";
-                }
-                $(typeSelected).show();
+            $("#listGroup").click(function() {
+                listGroupTab();
             });
 
-            $(".newback").click(function() {
-                $("[id^=new]").val("");
-                $("#groupList").show();
-                $("#search_fields").show();
-                $("[class^=new]").hide();
-                f.closeTray();
-                $("[id^=new]").css({
-                    "background-color": "white",
-                    "color": "black"
-                });
+            $("#newGroup").click(function() {
+                newGroupTab();
             });
 
-            $("#createGroup").click(function() {
-                if ($(".newgeneral").is(":visible")) {
-                    var result = checkForm("new");
-                    if (result.validity) {
-                        a.set("CREATE_GROUP_XHR",
-                                    f.fetchAPI("/groups/create", result.data));
-                        a.get("CREATE_GROUP_XHR")
-                            .always(function() {
-                            })
-                            .done(function(createGroupXhr){
-                                $("#groupList").show();
-                                $("#search_fields").show();
-                                $("[class^=new]").hide();
-                                $("[id^=new]").val("");
-                                if (createGroupXhr.success.nonce_id.hasOwnProperty(result.data.group[0].nonce)) {
-                                    f.setTray("group created","success",true);
-                                    fetchAndLoadGroups(groupFilter);
-                                    fetchAndLoadParentGroups();
-                                } else {
-                                    f.throwError({
-                                        name: 'ERROR',
-                                        message: 'server rejected!'
-                                    });
-                                }
-                            })
-                            .fail(function(){
-                                $("[id^=new]").val("");
-                                $("#groupList").show();
-                                $("#search_fields").show();
-                                $("[class^=new]").hide();
-                                f.throwError({
-                                    name: 'ERROR',
-                                    message: 'server rejected!'
-                                });
-                            });
+            $("#groupType").change(function() {
+                if ($("#submitButton").val() != "Search") {
+                    formElemVisibility(".locatable, .chapters, .schools, .companies", "hide");
+                    var groupType = valueOrNullOrError("#groupType", "Type field is empty")
+                    groupType = "." + groupType;
+                    if (groupType !== ".general") {
+                        groupType = groupType + ", .locatable";
                     }
-                } else {
-                    f.closeTray();
-                    $("#groupList").hide();
-                    $("#search_fields").hide();
-                    $(".newgeneral").show();
-                    $(".newback").show();
+                    formElemVisibility(groupType, "show");
                 }
             });
 
+            $("#hideButton").click(function() {
+                if ($("#submitButton").val() == "Search") {
+                    f.closeTray();
+                    formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+                    $("#submitButton").val("Advanced Search");
+                } else if ($("#submitButton").val() == "Modify") {
+                    listGroupTab();
+                } else if ($("#submitButton").val() == "Update") {
+                    listGroupTab();
+                } else if ($("#submitButton").val() == "New") {
+                    resetForm();
+                }
+            });
+            $("#submitButton").click(function() {
+                f.closeTray();
+                if ($("#submitButton").val() == "Advanced Search") {
+                    showFormSearchField();
+                    $("#submitButton").val("Search");
+                    $("#hideButton").show();
+                } else if ($("#submitButton").val() == "Search") {
+                    fetchAndLoadGroups(formInfo("Search"));
+                } else if ($("#submitButton").val() == "Modify") {
+                    $("[id^=group]").prop("disabled", false);
+                    $("#groupType").prop("disabled", true);
+                    $("#submitButton").val("Update");
+                } else if ($("#submitButton").val() == "New") {
+                    newGroup(formInfo("New"));
+                } else if ($("#submitButton").val() == "Update") {
+                    var data = formInfo("New");
+                    delete data.group[0].nonce;
+                    delete data.group[0].data.type;
+                    data.group[0].id = a.get("modifying_group_id");
+                    updateGroup(data);
+                }
+            });
         });
 
     })();
