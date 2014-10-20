@@ -163,6 +163,33 @@
                         message: errMsg
                     });
                 }
+            } else if (elem === "#groupLatitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Latitude is not valid"
+                });
+            } else if (elem === "#groupLongitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Longitude is not valid"
+                });
+            } else if (elem === "#groupPostcode" && (retVal.trim().length > 15)) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Postcode is not valid"
+                });
             } else {
                 return retVal.trim();
             }
@@ -695,6 +722,7 @@
                     listGroupTab();
                 } else if ($("#submitButton").val() == "New") {
                     resetForm();
+                    $("#groupType").trigger("change");
                 }
             });
             $("#submitButton").click(function() {
