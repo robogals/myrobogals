@@ -471,7 +471,7 @@ class ListRoleClasses(RobogalsAPIView):
             if not (field_visibility == False):
                 fields.append(field_name)
         
-        
+        #import pdb; pdb.set_trace()
         # Build query
         query = RoleClass.objects.filter(is_active=True)
         query = query.filter(**filter_dict)

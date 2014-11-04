@@ -71,6 +71,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
     serializer = EmailDefinitionSerializer
     serialized_message_def = serializer(data=definition_dict_internal)
     
+    #import pdb; pdb.set_trace()
     if not serialized_message_def.is_valid():
         return return_status(False,"DATA_VALIDATION_FAILED")
 
@@ -92,6 +93,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
             else:
                 return return_status(False,"FIELD_IDENTIFIER_INVALID")
 
+    #import pdb; pdb.set_trace()
     # Remove duplicates
     user_list = list(OrderedDict.fromkeys(user_list))
                         
@@ -129,6 +131,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
         message_dict.update({"text": definition_dict_internal.get("body")})
 
     
+    #import pdb; pdb.set_trace()
     # Send
     try:
         with transaction.atomic():
@@ -136,7 +139,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
             
             mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
             mandrill_result = mandrill_client.messages.send(message=message_dict, async=False)
-    except:
+    except Exception as e:
         return return_status(False,"MESSAGE_DELIVERY_FAILED")
         
 

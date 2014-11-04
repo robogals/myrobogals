@@ -89,6 +89,7 @@ class SendMessage(RobogalsAPIView):
                     # Currently supports users only
                     supplied_recipients = list(email_data.get("recipients"))
                 
+                    #import pdb; pdb.set_trace()
                     # Send the thing
                     email_status = send_email(definition_dict,supplied_recipients)
                     

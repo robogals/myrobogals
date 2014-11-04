@@ -469,9 +469,9 @@
                     .always(function(){
                     })
                     .done(function(groupListXhrArr){
-                        var outputText = '<table style="width: 100%; border-collapse: collapse; border: 1px solid black;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Title</th></tr>';
+                        var outputText = '<table style="width: 100%; border-collapse: collapse; border: 1px solid black; font-size: 1.3em;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Title</th></tr>';
                         for (var i = 0; i < groupListXhrArr.group.length; i++){
-                            outputText += '<tr><td style="border: 1px solid black;"><input class="detailsGroup" id="' + groupListXhrArr.group[i].id + '" type="submit" value="' + groupListXhrArr.group[i].data["name"] + '" style="background-color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" /></td></tr>';
+                            outputText += '<tr><td style="border: 1px solid black;"><input class="detailsGroup" id="' + groupListXhrArr.group[i].id + '" type="submit" value="' + groupListXhrArr.group[i].data["name"] + '" style="background-color: #fff; font-weight: 300; border: 0;" /></td></tr>';
                         }
                         outputText += "</table>";
                         $("#resultsList").empty();
@@ -499,10 +499,12 @@
         }
 
         function newGroup(groupData) {
+            $("#submitButton").hide();
             a.set("CREATE_GROUP_XHR",
                         f.fetchAPI("/groups/create", groupData));
             a.get("CREATE_GROUP_XHR")
                 .always(function() {
+                    $("#submitButton").show();
                 })
                 .done(function(createGroupXhr) {
                     a.store["new_fields"] = null;
