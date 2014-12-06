@@ -141,7 +141,7 @@ class Participant(models.Model):
     READONLY_FIELDS = ("id",)
                                         
     def __str__(self):
-        return self.user_role
+        return str(self.user_role)
         
         
 #@python_2_unicode_compatible

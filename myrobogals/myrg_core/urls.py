@@ -35,14 +35,14 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/utils/pwdreset/initiate$', ResetUserPasswords.as_view()),
     url(r'^api/1.0/utils/pwdreset/complete', ResetUserPasswordsComplete.as_view()),
 
+    url(r'^api/1.0/self/whoami$', WhoAmI.as_view()),
+    url(r'^api/1.0/self/roles$', ListMyRoles.as_view()),
+    url(r'^api/1.0/self/killsessions$', KillSessions.as_view()),
+
     url(r'^api/1.0/users/list$', ListUsers.as_view()),
     url(r'^api/1.0/users/delete$', DeleteUsers.as_view()),
     url(r'^api/1.0/users/edit$', EditUsers.as_view()),
     url(r'^api/1.0/users/create$', CreateUsers.as_view()),
-
-    url(r'^api/1.0/self/whoami$', WhoAmI.as_view()),
-    url(r'^api/1.0/self/roles$', ListMyRoles.as_view()),
-    url(r'^api/1.0/self/killsessions$', KillSessions.as_view()),
 
     url(r'^api/1.0/groups/list$', ListGroups.as_view()),
     url(r'^api/1.0/groups/delete$', DeleteGroups.as_view()),
@@ -70,5 +70,6 @@ urlpatterns += patterns('',
     url(r'^app/logout$', 'myrg_webapp.views.logout', name='logout'),
     url(r'^app/set_role_id$', 'myrg_webapp.views.set_role_id'),
     url(r'^app/resource/(?P<resource_id>.+?)$', 'myrg_webapp.views.get_resource'),
+    
     url(r'^$', 'myrg_webapp.views.webapp', name='home'),
 )

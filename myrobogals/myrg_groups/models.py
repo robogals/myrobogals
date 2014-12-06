@@ -189,6 +189,6 @@ class Role(models.Model):
 
     
     def __str__(self):
-        return "{} ({} @ {})".format(self.user.get_sortable_name, self.role_class, self.group)
+        return "{} ({} @ {})".format(self.user.get_sortable_name, str(self.role_class), str(self.group))
 
 
