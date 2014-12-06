@@ -33,6 +33,9 @@
             </ul>-->
         </div>
         <div class="row" style="margin-top: 2rem;">
+            <div id="emailHistoryTab" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #A8A8A8">
+                Email Hist
+            </div>
             <div id="sendEmailTab" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #A8A8A8">
                 Send Email
             </div>
@@ -60,15 +63,30 @@
                         </select><br><br>
                         To: (click items below to deselect recipients)
                         <div id="selectionResult" />
+                        Global merge tags: <a id="globalMergeTagsShow" style="display: none; margin-left: 15px;"><i class="fa fa-level-down"></i> show<br></a>
+                        <div id="globalMergeTags" style="display: none;"/>
                         <p><div style="border-bottom: 1px solid  #08003C;" /></p>
                     </div>
                     <select id="roleList" />
-                    <p><input id="from" type="text" placeholder="From" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
-                    <p><input id="subject" type="text" placeholder="Subject" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
-                    <p><textarea id="messageBody" rows="5" placeholder="Compose email"  style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input id="from" type="text" placeholder="From" style="border:1px solid #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input id="subject" type="text" placeholder="Subject" style="border:1px solid #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><textarea id="messageBody" rows="5" placeholder="Compose email"  style="border:1px solid #ccc; border-width:0px 0px 1px 0px;"/></p>
                     <input id="sendButton" type="submit" value="Send" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>
                 </div>
-                <div id="messagesList" style="margin-top: 2rem;" />
+                <div id="messageHistory">
+                    <div id="notEmailDetail">
+                        <input id="messageSent" type="submit" value="Sent" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" hidden/>
+                        <input id="messageReceived" type="submit" value="Received" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" hidden/>
+                        <div id="messageList" /><br>
+                        <select id="emailsPerPage">
+                            <option value="5" selected="selected">5 results per page</option>
+                            <option value="10">10 results per page</option>
+                            <option value="15">15 results per page</option>
+                            <option value="20">20 results per page</option>
+                        </select>
+                    </div>
+                    <div id="emailDetail" style="font-size: 0.8em;" />
+                </div>
             </div>
         </div>
     </div>
@@ -107,6 +125,55 @@
         ga('send', 'pageview');
 
         a.set("selectedRecipients", []);
+        a.set("emailList", []);
+        a.set("mergeTags", []);
+
+        function valueOrEmptyOrError(elem, errMsg) {
+            retVal = $(elem).val();
+            if (!retVal || retVal.trim().length == 0) {
+                if (errMsg === undefined) {
+                    return "";
+                } else {
+                    $(elem).css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: errMsg
+                    });
+                }
+            } else if (elem === "#groupLatitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Latitude is not valid"
+                });
+            } else if (elem === "#groupLongitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Longitude is not valid"
+                });
+            } else if (elem === "#groupPostcode" && (retVal.trim().length > 15)) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Postcode is not valid"
+                });
+            } else {
+                return retVal.trim();
+            }
+        }
 
         function valueOrNullOrError(elem, errMsg) {
             retVal = $(elem).val();
@@ -129,14 +196,24 @@
         }
 
         function showSendEmailTab() {
-            $("#inboxTab").css("background-color", "#A8A8A8");
+            $("#emailHistoryTab").css("background-color", "#A8A8A8");
             $("#sendEmailTab").css("background-color", "#FFFFFF");
             resetForm();
+            $("#sendMessage").show();
+            $("#messageHistory").hide();
         }
 
-        function showInboxTab() {
-            $("#inboxTab").css("background-color", "#FFFFFF");
+        function showEmailHistoryTab() {
+            $("#emailDetail").empty().hide();
+            $("#notEmailDetail").show();
+            a.set("emailList", []);
+            $("#emailHistoryTab").css("background-color", "#FFFFFF");
             $("#sendEmailTab").css("background-color", "#A8A8A8");
+            $("#sendMessage").hide();
+            $("#messageHistory").show();
+            $("#messageSent").css("background-color", "rgb(0, 108, 153)").val("Email Sent");
+            $("#messageReceived").css("background-color", "#A8A8A8").val("Email Received");
+            $("#messageSent").trigger("click");
         }
 
 
@@ -226,7 +303,7 @@
                         }
                         recipientTable += "</table>";
                         $("#recipientList").empty().append(recipientTable);
-                        $(".pagination").click(function(){
+                        $("#recipientList .pagination").click(function(){
                             var pageCommand = $(this).val();
                             if (pageCommand == "home") {
                                 showTypeList(0);
@@ -246,22 +323,30 @@
                                     a.get("selectedRecipients").splice(position, 1);
                                 }
                                 $("#" + recipientCheckbox.val() + "SelectionDisplay").remove();
+                                $("#" + recipientCheckbox.val() + "MergeTags").remove();
+                                $("#" + recipientCheckbox.val() + "MergeTagsShow").remove();
                             } else {
                                 if ($.inArray(recipientCheckbox.val(), a.get("selectedRecipients")) < 0) {
                                     a.get("selectedRecipients").push(recipientCheckbox.val());
                                 }
                                 if ($("#" + recipientCheckbox.val() + 'SelectionDisplay').length <= 0) {
-                                    var selectionDisplay = '<input id="' + recipientCheckbox.val() + 'SelectionDisplay" type="submit" value="' + $("#" + recipientCheckbox.val()).val() + '" style="margin: 0.5em; background-color: rgb(153, 52, 0); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+                                    var selectionDisplay = '<input id="' + recipientCheckbox.val() + 'SelectionDisplay" type="submit" value="' + $("#" + recipientCheckbox.val()).val() + '" style="margin: 0.5em; background-color: rgb(153, 52, 0); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/><a id="' + recipientCheckbox.val() + 'MergeTagsShow" style="display: none; margin-left: 15px;"><i class="fa fa-level-down"></i> show<br></a><div id="' + recipientCheckbox.val() + 'MergeTags" style="display: none;" />';
                                     $("#selectionResult").append(selectionDisplay);
+                                    $("#from").trigger("keyup");
                                 }
+                                $("#" + recipientCheckbox.val() + "MergeTagsShow").click(function(e) {
+                                    e.preventDefault();
+                                    $("#" + recipientCheckbox.val() + "MergeTags").toggle();
+                                });
                                 $("#" + recipientCheckbox.val() + "SelectionDisplay").click(function() {
-//debugger;
                                     $("#" + recipientCheckbox.val() + "Checkbox").prop("checked", false);
                                     var position = $.inArray(recipientCheckbox.val(), a.get("selectedRecipients"));
                                     if (position >= 0) {
                                         a.get("selectedRecipients").splice(position, 1);
                                     }
                                     $(this).remove();
+                                    $("#" + recipientCheckbox.val() + "MergeTags").remove();
+                                    $("#" + recipientCheckbox.val() + "MergeTagsShow").remove();
                                 });
                             }
                         });
@@ -274,16 +359,23 @@
                                     a.get("selectedRecipients").splice(position, 1);
                                 }
                                 $("#" + $(this).attr("id") + "SelectionDisplay").remove();
+                                $("#" + $(this).attr("id") + "MergeTags").remove();
+                                $("#" + $(this).attr("id") + "MergeTagsShow").remove();
                             } else {
                                 recipientCheckbox.prop('checked', true);
                                 if ($.inArray($(this).attr("id"), a.get("selectedRecipients")) < 0) {
                                     a.get("selectedRecipients").push($(this).attr("id"));
                                 }
                                 if ($("#" + $(this).attr("id") + 'SelectionDisplay').length <= 0) {
-                                    var selectionDisplay = '<input id="' + $(this).attr("id") + 'SelectionDisplay" type="submit" value="' + $(this).val() + '" style="margin: 0.5em; background-color: rgb(153, 52, 0); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+                                    var selectionDisplay = '<input id="' + $(this).attr("id") + 'SelectionDisplay" type="submit" value="' + $(this).val() + '" style="margin: 0.5em; background-color: rgb(153, 52, 0); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/><a id="' + $(this).attr("id") + 'MergeTagsShow" style="display: none; margin-left: 15px;"><i class="fa fa-level-down"></i> show<br></a><div id="' + $(this).attr("id") + 'MergeTags" style="display: none;" />';
                                     $("#selectionResult").append(selectionDisplay);
+                                    $("#from").trigger("keyup");
                                 }
                                 var _this = this;
+                                $("#" + $(this).attr("id") + "MergeTagsShow").click(function(e) {
+                                    e.preventDefault();
+                                    $("#" + $(_this).attr("id") + "MergeTags").toggle();
+                                });
                                 $("#" + $(this).attr("id") + "SelectionDisplay").click(function() {
                                     $("#" + $(_this).attr("id") + "Checkbox").prop("checked", false);
                                     var position = $.inArray($(_this).attr("id"), a.get("selectedRecipients"));
@@ -291,6 +383,8 @@
                                         a.get("selectedRecipients").splice(position, 1);
                                     }
                                     $(this).remove();
+                                    $("#" + $(_this).attr("id") + "MergeTags").remove();
+                                    $("#" + $(_this).attr("id") + "MergeTagsShow").remove();
                                 });
                             }
                         });
@@ -315,7 +409,7 @@
                             {
                                 field: "id",
                                 search: null,
-                                order: null,
+                                order: "a",
                                 visibility: null
                             },
                             {
@@ -327,16 +421,20 @@
                         ],
                         pagination: {
                             page: 0,
-                            length: 1
+                            length: 1000
                         }
                     };
                     for (var i = 0; i < roleListXhrArr.role.length; i++) {
                         (function(index) {
                             data.query[0].search = roleListXhrArr.role[index].role_class;
                             (f.fetchAPI("/roleclasses/list", data)).done(function(roleClass) {
-//debugger;
-                                roleList = '<option value="'+ roleListXhrArr.role[index].id +'">'+ roleClass.role_class[0].data.name +'</option>';
-                                $("#roleList").append(roleList);
+                                for (var j = 0; j < roleClass.role_class.length; j++) {
+                                    if (roleListXhrArr.role[index].role_class == roleClass.role_class[j].id) {
+                                        roleList = '<option value="'+ roleListXhrArr.role[index].id +'">'+ roleClass.role_class[j].data.name +'</option>';
+                                        $("#roleList").append(roleList);
+                                        return;
+                                    }
+                                }
                             });
                         })(i);
                     }
@@ -353,18 +451,404 @@
             $("#recipientType").trigger("change");
         }
 
+        function paginationTable(totalMatchedItems,
+                pageLength, pageNumber) {
+            var totalPages = Math.ceil(totalMatchedItems/pageLength);
+            var currentPage = pageNumber;
+            var pagination = '<table style="width: 100%;">';
+            pagination += '<tr><td>';
+            if (currentPage > 0) {
+                pagination += '<input class="pagination" type="submit" value="home" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+            } else {
+                pagination += 'home';
+            }
+            pagination += '</td><td align="right">';
+            if (currentPage < (totalPages - 1)) {
+                pagination += '<input class="pagination" type="submit" value="last" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+            } else {
+                pagination += 'last';
+            }
+            pagination += '</td></tr><tr><td style="padding: 10px;" colspan="2" align="center">';
+            if (currentPage >= 1) {
+                pagination += '<input class="pagination" type="submit" value="previous" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/> | ';
+            } else {
+                pagination += 'previous | ';
+            }
+            pagination += currentPage + 1 + '/' + totalPages + ' | ';
+            if (currentPage <= (totalPages - 2)) {
+                pagination += '<input class="pagination" type="submit" value="next" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+            } else {
+                pagination += 'next';
+            }
+            pagination += "</td></tr></table>";
+            return pagination;
+        }
+
+        function registerCallbackForEmailDef(sentEmailList, outputTable, paginationData, index) {
+            if (sentEmailList.length == 0) {
+                $("#messageList").empty().append(outputTable);
+                $("#messageList .pagination").click(function(){
+                    var pageCommand = $(this).val();
+                    if (pageCommand == "home") {
+                        fetchEmailSentHistory(0);
+                    } else if (pageCommand == "last") {
+                        fetchEmailSentHistory(paginationData.totalPages - 1);
+                    } else if (pageCommand == "previous") {
+                        fetchEmailSentHistory(paginationData.currentPage - 1);
+                    } else if (pageCommand == "next") {
+                        fetchEmailSentHistory(paginationData.currentPage + 1);
+                    }
+                });
+                $("#messageList .detailsEmail").click(function(){
+                    var msg = a.get("emailList")[$(this).attr("id")];
+                    $("#notEmailDetail").hide();
+                    var appendText = "To: ";
+                    for (var i = 0; i < msg.message.length; i++) {
+                        appendText += msg.message[i].data.recipient_name + " | ";
+                    }
+                    appendText += "<br>" + msg.definition.data.date_created;
+                    appendText += "<br>" + msg.definition.data.subject;
+                    appendText += '<p><div style="border-bottom: 1px solid  #08003C;" /></p>';
+                    appendText += '<p>' + msg.definition.data.body + '</p>';
+                    appendText += '<input id="emailHistoryBack" type="submit" value="back" style="background-color: rgb(0, 108, 153); font-size: 1.25em; color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>';
+                    $("#emailDetail").empty().append(appendText).show();
+                    $("#emailHistoryBack").click(function() {
+                        $("#emailDetail").empty().hide();
+                        $("#notEmailDetail").show();
+                    });
+                });
+                return;
+            }
+            var data = {
+                query: [
+                    {
+                        field: "id",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "recipient_name",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "definition",
+                        search: sentEmailList[0].id,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                pagination: {
+                    page: 0,
+                    length: 1000
+                }
+            };
+            if (a.get("MESSAGE_HISTORY_LIST_XHR")) {
+                a.get("MESSAGE_HISTORY_LIST_XHR").abort();
+            }
+            a.set("MESSAGE_HISTORY_LIST_XHR",
+                    f.fetchAPI("/emailmessage/list", data));
+            a.get("MESSAGE_HISTORY_LIST_XHR")
+                .done(function(emailMessageXhrArr) {
+                    a.get("emailList")[index] = {definition: sentEmailList[0], message: []};
+                    outputTable += '<tr><td style="border: 1px solid black;"><input class="detailsEmail" id="' + index + '" type="submit" value="To: ';
+                    for (var i = 0; i < emailMessageXhrArr.emailMessage.length; i++) {
+                        if (sentEmailList[0].id == emailMessageXhrArr.emailMessage[i].data.definition) {
+                            outputTable += emailMessageXhrArr.emailMessage[i].data.recipient_name + " | ";
+                            a.get("emailList")[index].message.push(emailMessageXhrArr.emailMessage[i]);
+                        }
+                    }
+                    outputTable += "\n" + sentEmailList[0].data.date_created;
+                    outputTable += "\nSubject: " + sentEmailList[0].data.subject;
+                    outputTable += '" style="background-color: #fff; text-align: left; font-weight: 300; border: 0;" /></td></tr>';
+                    sentEmailList.splice(0, 1);
+                    registerCallbackForEmailDef(sentEmailList, outputTable, paginationData, index + 1);
+                    return;
+                });
+        }
+
+        function fetchEmailSentHistory(pageNumber) {
+            $("#messageList").empty();
+            var pageLength = parseInt($("#emailsPerPage").val());
+            var page = {
+                    page: pageNumber,
+                    length: pageLength
+            };
+            var data = {
+                query: [
+                    {
+                        field: "id",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "sender_address",
+                        search: u.get("WHOAMI_OBJ").user.data.primary_email,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "subject",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "body",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "date_created",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "sender_role",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                pagination: page
+            };
+            if (a.get("MESSAGE_HISTORY_LIST_XHR")) {
+                a.get("MESSAGE_HISTORY_LIST_XHR").abort();
+            }
+            a.set("MESSAGE_HISTORY_LIST_XHR",
+                    f.fetchAPI("/emaildefinitions/list", data));
+            a.get("MESSAGE_HISTORY_LIST_XHR")
+                .done(function(messageHistoryXhrArr) {
+                    var pagination = paginationTable(
+                                    messageHistoryXhrArr.meta.size,
+                                    pageLength,
+                                    pageNumber);
+                    var outputText = pagination;
+                    outputText += '<table style="width: 100%; border-collapse: collapse; border: 1px solid black; font-size: 0.8em;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Emails Sent</th></tr>';
+                    var sentEmailList = [];
+                    for (var i = 0; i < messageHistoryXhrArr.emailDefinition.length; i++){
+                        if (messageHistoryXhrArr.emailDefinition[i].data.sender_address == u.get("WHOAMI_OBJ").user.data.primary_email) {
+                            sentEmailList.push(messageHistoryXhrArr.emailDefinition[i]);
+                        }
+                    }
+                    var paginationData = {
+                        totalPages: Math.ceil(messageHistoryXhrArr.meta.size / pageLength),
+                        currentPage: pageNumber
+                    };
+                    registerCallbackForEmailDef(sentEmailList, outputText, paginationData, 0);
+                });
+        }
+
+        function registerCallback(msgArr, outputTable) {
+            if (msgArr.length == 0) {
+                $("#messageList").empty().append(outputTable);
+                return;
+            }
+            var data = {
+                query: [
+                    {
+                        field: "id",
+                        search: msgArr[0].data.definition,
+                        order: "a",
+                        visibility: null
+                    },
+                    {
+                        field: "sender_address",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "subject",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "body",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "sender_role",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                pagination: {
+                    page: 0,
+                    length: 1000
+                }
+            };
+            if (a.get("MESSAGE_HISTORY_LIST_XHR")) {
+                a.get("MESSAGE_HISTORY_LIST_XHR").abort();
+            }
+            a.set("MESSAGE_HISTORY_LIST_XHR",
+                    f.fetchAPI("/emaildefinitions/list", data));
+            a.get("MESSAGE_HISTORY_LIST_XHR")
+                .done(function(messageHistoryXhrArr) {
+                    for (var i = 0; i < messageHistoryXhrArr.emailDefinition.length; i++) {
+                        if (msgArr[0].data.definition == messageHistoryXhrArr.emailDefinition[i].id) {
+                            outputTable += '<tr><td style="border: 1px solid black;"><input class="detailsEmail" id="' + messageHistoryXhrArr.emailDefinition[i].id + '" type="submit" value="' + messageHistoryXhrArr.emailDefinition[i].data["subject"] + '" style="background-color: #fff; font-weight: 300; border: 0;" /></td></tr>';
+                            msgArr.splice(0, 1);
+                            registerCallback(msgArr, outputTable);
+                            return;
+                        }
+                    }
+                });
+        }
+
+        function fetchEmailReceivedHistory(pageNumber) {
+            $("#messageList").empty();
+            var pageLength = 5;
+            var page = {
+                    page: pageNumber,
+                    length: pageLength
+            };
+            var data = {
+                query: [
+                    {
+                        field: "id",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "recipient_address",
+                        search: u.get("WHOAMI_OBJ").user.data.primary_email,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "definition",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                pagination: page
+            };
+            if (a.get("MESSAGE_HISTORY_LIST_XHR")) {
+                a.get("MESSAGE_HISTORY_LIST_XHR").abort();
+            }
+            a.set("MESSAGE_HISTORY_LIST_XHR",
+                    f.fetchAPI("/emailmessage/list", data));
+            a.get("MESSAGE_HISTORY_LIST_XHR")
+                .done(function(messageHistoryXhrArr) {
+                    var pagination = paginationTable(
+                                    messageHistoryXhrArr.meta.size,
+                                    pageLength,
+                                    pageNumber);
+                    var outputTable = pagination;
+                    outputTable += '<table style="width: 100%; border-collapse: collapse; border: 1px solid black; font-size: 1.3em;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Subject</th></tr>';
+                    var receivedEmailList = [];
+                    for (var i = 0; i < messageHistoryXhrArr.emailMessage.length; i++) {
+                        if (messageHistoryXhrArr.emailMessage[i].data.recipient_address == u.get("WHOAMI_OBJ").user.data.primary_email) {
+                            receivedEmailList.push(messageHistoryXhrArr.emailMessage[i]);
+                        }
+                    }
+                    registerCallback(receivedEmailList, outputTable);
+                });
+        }
+
+        function extractMergeTag() {
+            var re = /\*\|[a-zA-Z]+\|\*/g;
+            var fromTags = $("#from").val().match(re) || [];
+            var subjectTags = $("#subject").val().match(re) || [];
+            var messageBodyTags = $("#messageBody").val().match(re) || [];
+            var tagTmpArr = $.unique(fromTags.concat(subjectTags).concat(messageBodyTags));
+            var tagOutArr = [];
+            for (var i = 0; i < tagTmpArr.length; i++) {
+                tagOutArr.push(tagTmpArr[i].substring(2,tagTmpArr[i].length-2));
+            }
+            a.set("mergeTags", tagOutArr);
+        }
+
+        function appendMergeTagField() {
+            if (a.get("mergeTags").length > 0) {
+                $("[id$=MergeTagsShow]").show();
+                $("[id$=MergeTags]").each(function(index) {
+                    $(this).children().each(function(index) {
+                        var tagName = $(this).attr("id").substring($(this).attr("id").indexOf("MergeTags")+9);
+                        var position = $.inArray(tagName, a.get("mergeTags"));
+                        if (position == -1) {
+                            $(this).remove();
+                        }
+                    });
+                    for (var i = 0; i < a.get("mergeTags").length; i++) {
+                        if ($("#" + $(this).attr("id") + a.get("mergeTags")[i]).length <= 0) {
+                            $(this).append(' <input id="' + $(this).attr("id") + a.get("mergeTags")[i] + '" type="text" placeholder="'+ a.get("mergeTags")[i] +'" style="border:1px solid #ccc; border-width:0px 0px 1px 0px;"/>');
+                        }
+                    }
+                });
+            } else {
+                $("[id$=MergeTags]").each(function(index) {
+                    $(this).children().each(function(index) {
+                        $(this).remove();
+                    });
+                });
+                $("[id$=MergeTags]").hide();
+                $("[id$=MergeTagsShow]").hide();
+            }
+        }
+
+        function extractTagValue(idPrefix) {
+            var res = [];
+            for (var i = 0; i < a.get("mergeTags").length; i++) {
+                if (valueOrEmptyOrError("#" + idPrefix + a.get("mergeTags")[i]) != "") {
+                    res.push({
+                        name: a.get("mergeTags")[i],
+                        content: valueOrEmptyOrError("#" + idPrefix + a.get("mergeTags")[i])
+                    });
+                }
+            }
+            return res;
+        }
+
         $(function() {
             fetchRoleList();
             showTypeList(0);
-            $("#inboxTab").click(function() {
-                showInboxTab();
+            $("#emailHistoryTab").click(function() {
+                showEmailHistoryTab();
             });
 
             $("#sendEmailTab").click(function() {
                 showSendEmailTab();
             });
 
-            $("#sendEmailTab").trigger("click");
+            $("#messageSent").click(function() {
+                $("#messageSent").css("background-color", "rgb(0, 108, 153)");
+                $("#messageReceived").css("background-color", "#A8A8A8");
+                if ($(this).val() === "Email Sent") {
+                    fetchEmailSentHistory(0);
+                } else {
+
+                }
+            });
+
+            $("#messageReceived").click(function() {
+                $("#messageSent").css("background-color", "#A8A8A8");
+                $("#messageReceived").css("background-color", "rgb(0, 108, 153)");
+                if ($(this).val() === "Email Received") {
+                    fetchEmailReceivedHistory(0);
+                } else {
+
+                }
+            });
+
+            $("#emailHistoryTab").trigger("click");
+
+            $("#globalMergeTagsShow").click(function(e) {
+                e.preventDefault();
+                $("#globalMergeTags").toggle();
+            });
 
             $("#sendButton").click(function() {
                 $("#roleList, #from, #subject, #messageBody").css({
@@ -378,8 +862,14 @@
                     });
                 }
                 var recipientList = [];
+                var tags = {};
+                tags.merge_vars = {};
+                tags.global_merge_vars = extractTagValue("globalMergeTags");
                 for (var i = 0; i < a.get("selectedRecipients").length; i++) {
-                    recipientList.push({user: a.get("selectedRecipients")[i]});
+                    recipientList.push({
+                        user: a.get("selectedRecipients")[i]
+                    });
+                    tags.merge_vars[a.get("selectedRecipients")[i]] = extractTagValue(a.get("selectedRecipients")[i] + "MergeTags");
                 }
                 var msg = {
                     role: valueOrNullOrError("#roleList", "role is invalid"),
@@ -392,7 +882,8 @@
                                     subject: valueOrNullOrError("#subject", "subject field is empty"),
                                     body: valueOrNullOrError("#messageBody", "no email text"),
                                     html: true,
-                                    recipients: recipientList
+                                    recipients: recipientList,
+                                    merge_tags: tags
                                 }
                             }
                         }
@@ -429,19 +920,27 @@
                 if ($(this).val() == "committeeMembers") {
                     $("#selectUserSearchFields").hide();
                     $("#selectionResult").empty();
+                    $("#globalMergeTags").empty();
                     a.set("selectedRecipients", []);
+                    a.set("mergeTags", []);
                 } else if ($(this).val() == "memberList") {
                     $("#selectUserSearchFields").hide();
                     $("#selectionResult").empty();
+                    $("#globalMergeTags").empty();
                     a.set("selectedRecipients", []);
+                    a.set("mergeTags", []);
                 } else if ($(this).val() == "user") {
                     $("#selectUserSearchFields").show();
                     $("#selectionResult").empty();
+                    $("#globalMergeTags").empty();
                     a.set("selectedRecipients", []);
+                    a.set("mergeTags", []);
                 } else if ($(this).val() == "newsletter") {
                     $("#selectUserSearchFields").hide();
                     $("#selectionResult").empty();
+                    $("#globalMergeTags").empty();
                     a.set("selectedRecipients", []);
+                    a.set("mergeTags", []);
                 }
                 showTypeList(0);
             });
@@ -465,6 +964,20 @@
                     clearTimeout(keyupTimer);
                 }
                 showTypeList(0);
+            });
+            $("#emailsPerPage").change(function() {
+                fetchEmailSentHistory(0);
+            });
+
+            var keyupTimerMergeTag = null;
+            $("#from, #subject, #messageBody").keyup(function(e) {
+                if (keyupTimerMergeTag) {
+                    clearTimeout(keyupTimerMergeTag);
+                }
+                keyupTimerMergeTag = setTimeout(function() {
+                    extractMergeTag();
+                    appendMergeTagField();
+                }, 500);
             });
         });
     })();

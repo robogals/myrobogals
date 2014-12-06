@@ -19,7 +19,7 @@ from collections import OrderedDict
 
 import mandrill
 
-def send_email(definition_dict,supplied_recipients,template_dict = None):
+def send_email(definition_dict,supplied_recipients,merge_tags,template_dict = None):
     def return_status(success,message):
         return { "success": success, "message": message }
     
@@ -43,6 +43,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
                     
                     'track_clicks': True,
                     'track_opens': True,
+                    'global_merge_vars': merge_tags["global_merge_vars"]
                    }
         
     if template_dict:
@@ -99,6 +100,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
                         
     user_query = RobogalsUser.objects.filter(is_active=True, pk__in=user_list)
     
+    merge_vars = []
     for user in user_query:
         email_user_dict.update({user.primary_email: user})
         
@@ -107,11 +109,15 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
                                     "name": user.get_preferred_name(),
                                     "type": "to",
                                 })
-                                
+        merge_vars.append({
+                            'rcpt': user.primary_email,
+                            'vars': merge_tags["merge_vars"][user.pk]
+                          })
         user_list.remove(user.pk)
+        del merge_tags["merge_vars"][user.pk]
     
     # If there are users not in the returned query
-    if len(user_list) > 0:
+    if len(user_list) > 0 or len(merge_tags["merge_vars"]) > 0:
         return return_status(False,"OBJECT_NOT_FOUND")
     
     
@@ -123,6 +129,7 @@ def send_email(definition_dict,supplied_recipients,template_dict = None):
                             "subject": definition_dict_internal.get("subject"),
                             "from_name": definition_dict_internal.get("sender_name"),
                             "from_email": definition_dict_internal.get("sender_address"),
+                            "merge_vars": merge_vars
                         })
     
     if definition_dict_internal.get("html"):

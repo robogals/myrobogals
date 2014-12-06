@@ -13,7 +13,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from myrg_core.views import Time
 from myrg_users.views import ListUsers, DeleteUsers, EditUsers, CreateUsers, ResetUserPasswords, ResetUserPasswordsComplete, WhoAmI, ListMyRoles, KillSessions
 from myrg_groups.views import ListGroups, DeleteGroups, EditGroups, CreateGroups, ListRoles, EditRoles, CreateRoles, ListRoleClasses, DeleteRoleClasses, EditRoleClasses, CreateRoleClasses
-from myrg_messages.views import SendMessage
+from myrg_messages.views import SendMessage, ListEmailDefinition, ListEmailMessage
 
 # Auto generate/collate Django admin panels
 admin.autodiscover()
@@ -58,6 +58,8 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/roleclasses/edit$', EditRoleClasses.as_view()),
     url(r'^api/1.0/roleclasses/create$', CreateRoleClasses.as_view()),
 
+    url(r'^api/1.0/emailmessage/list$', ListEmailMessage.as_view()),
+    url(r'^api/1.0/emaildefinitions/list$', ListEmailDefinition.as_view()),
     url(r'^api/1.0/messages/send$', SendMessage.as_view()),
 )
 
