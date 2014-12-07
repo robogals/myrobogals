@@ -54,10 +54,13 @@ INSTALLED_APPS = (
     'oauth2_provider',
     
     'myrg_core',
-    'myrg_users',
-    'myrg_groups',
+    
     'myrg_activities',
+    'myrg_groups',
+    'myrg_messages',
     'myrg_permissions',
+    'myrg_repo',
+    'myrg_users',
     
     'myrg_webapp',
 )
