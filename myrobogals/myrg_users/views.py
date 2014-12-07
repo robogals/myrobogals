@@ -93,7 +93,7 @@ class ListUsers(RobogalsAPIView):
             if not (field_visibility == False):
                 fields.append(field_name)
         
-        
+        #import pdb; pdb.set_trace()
         # Build query
         query = RobogalsUser.objects.filter(is_active=True)
         query = query.filter(**filter_dict)
@@ -496,6 +496,7 @@ class WhoAmI(RobogalsAPIView):
     def post(self, request, format=None):
         from myrg_groups.serializers import GroupSerializer, RoleClassSerializer
         
+        #import pdb; pdb.set_trace()
         role_id = self.role_id
         
         group_id = None
@@ -521,9 +522,9 @@ class WhoAmI(RobogalsAPIView):
             role_class = role_obj.role_class
             role_class_id = role_class.id
 
+            #import pdb; pdb.set_trace()
             group_serializer = GroupSerializer
-            group_serializer.Meta.fields = ("name",)
-            group_serialized_query = group_serializer(group)
+            group_serialized_query = group_serializer(group, fields=("name",))
             group_data = group_serialized_query.data
             
             role_class_serializer = RoleClassSerializer

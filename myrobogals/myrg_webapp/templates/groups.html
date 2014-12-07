@@ -1,0 +1,755 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+</style>
+<div id="content" tabindex="0">
+    <div id="app-container">
+        <div id="hero">
+            <div class="blocks" style="width: auto;">
+                <h1>Group</h1>
+            </div>
+            <!--<ul class="control-bar">
+            </ul>-->
+        </div>
+        <div class="row" style="margin-top: 2rem;">
+            <div id="listGroup" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #FFFFFF">
+                List
+            </div>
+            <div id="newGroup" style="display: inline; margin-right: 0.2rem; padding: 0.5rem; font-size: 1.25em; color: #000000; background-color: #A8A8A8">
+                New
+            </div>
+        </div>
+        <div class="row" style="margin-top: 0.8rem;">
+            <div style="padding: 1.6rem; font-size: 1.25em; background-color: #FFFFFF; color: #484848">
+                <div class="general">
+                    <div class="searchField">
+                        <p>Type:
+                            <select id="groupType">
+                                <option value="general" selected="selected">General</option>
+                                <option value="chapters">Chapters</option>
+                                <option value="schools">Schools</option>
+                                <option value="companies">Companies</option>
+                            </select>
+                        </p>
+                        <p><input id="groupName" type="text" placeholder="Name" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    </div>
+                    <p>Parent: <select id="groupParent"/></p>
+                    <p><textarea id="groupDescription" rows="5" placeholder="Description"  style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p>Status:
+                        <select id="groupStatus">
+                            <option value="0" selected="selected">Deleted</option>
+                            <option value="2">Active, Private, Non-joinable</option>
+                            <option value="3">Active, Private, Gated</option>
+                            <option value="4">Active, Private, Joinable</option>
+                            <option value="7">Active, Public, Non-joinable</option>
+                            <option value="8">Active, Public, Gated</option>
+                            <option value="9">Active, Public, Joinable</option>
+                        </select>
+                    </p>
+                </div>
+                <div class="locatable">
+                    <p><textarea id="groupAddress" rows="5" placeholder="Address" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="City" id="groupCity" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="State" id="groupState" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Postcode" id="groupPostcode" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Country" id="groupCountry" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Latitude" id="groupLatitude" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Longitude" id="groupLongitude" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Timezone" id="groupTimezone" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                    <p><input type="text" placeholder="Url" id="groupUrl" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <div class="chapters">
+                    <p><input type="text" placeholder="University" id="groupUniversity" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <div class="companies">
+                    <p><input type="text" placeholder="LegalName" id="groupLegalName" style="border:1px solid  #ccc; border-width:0px 0px 1px 0px;"/></p>
+                </div>
+                <input id="hideButton" type="submit" value="Hide" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;"/>
+                <input id="submitButton" type="submit" value="Advanced Search" style="background-color: rgb(0, 108, 153); color: #fff; font-weight: 300; border: 0; padding: 0.2em 0.5em;" />
+                <div id="resultsList" style="margin-top: 2rem;" />
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "groups";
+        var appName = "Groups";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+
+        a.set("search_fields", null);
+        a.set("new_fields", null);
+
+        function valueOrNullOrError(elem, errMsg) {
+            retVal = $(elem).val();
+            if (!retVal || retVal.trim().length == 0) {
+                if (errMsg === undefined) {
+                    return null;
+                } else {
+                    $(elem).css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: errMsg
+                    });
+                }
+            } else {
+                return retVal.trim();
+            }
+        }
+
+        function valueOrEmptyOrError(elem, errMsg) {
+            retVal = $(elem).val();
+            if (!retVal || retVal.trim().length == 0) {
+                if (errMsg === undefined) {
+                    return "";
+                } else {
+                    $(elem).css({
+                        "background-color": "#740000",
+                        "color": "white"
+                    });
+                    f.throwError({
+                        name: 'FORM_INVALID',
+                        message: errMsg
+                    });
+                }
+            } else if (elem === "#groupLatitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Latitude is not valid"
+                });
+            } else if (elem === "#groupLongitude" && !($.isNumeric(retVal.trim()))) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Longitude is not valid"
+                });
+            } else if (elem === "#groupPostcode" && (retVal.trim().length > 15)) {
+                $(elem).css({
+                    "background-color": "#740000",
+                    "color": "white"
+                });
+                f.throwError({
+                    name: 'FORM_INVALID',
+                    message: "Postcode is not valid"
+                });
+            } else {
+                return retVal.trim();
+            }
+        }
+
+        function formInfo(action) {
+            var groupData = null;
+            if (action === "Search") {
+                groupData = {
+                    query: [
+                        {
+                            field: "name",
+                            search: valueOrNullOrError("#groupName"),
+                            order: null,
+                            visibility: null
+                        },
+                        {
+                            field: "description",
+                            search: null,
+                            order: null,
+                            visibility: null
+                        }
+                    ],
+                    group: {
+                        type: valueOrNullOrError("#groupType", "Type field is empty")
+                    },
+                    pagination: {
+                        page: 0,
+                        length: 100
+                    }
+                };
+                a.set("search_fields", {
+                    type: groupData.group.type,
+                    name: groupData.query[0].search
+                });
+            } else if (action === "New") {
+                $("[id^=group]").css({
+                    "background-color": "white",
+                    "color": "black"
+                });
+                groupData = {
+                    group: [
+                        {
+                            nonce: "abc",
+                            data: {
+                                type: valueOrEmptyOrError("#groupType", "Type field is empty"),
+                                name: valueOrEmptyOrError("#groupName", "Name field is empty"),
+                                parent: valueOrEmptyOrError("#groupParent"),
+                                description: valueOrEmptyOrError("#groupDescription"),
+                                status: valueOrEmptyOrError("#groupStatus", "Status field is empty")
+                            }
+                        }
+                    ]
+                };
+                if (groupData.group[0].data.type !== "general") {
+                    groupData.group[0].data.address = valueOrEmptyOrError("#groupAddress", "Address field is empty");
+                    groupData.group[0].data.city = valueOrEmptyOrError("#groupCity");
+                    groupData.group[0].data.state = valueOrEmptyOrError("#groupState");
+                    groupData.group[0].data.postcode = valueOrEmptyOrError("#groupPostcode");
+                    groupData.group[0].data.country = valueOrEmptyOrError("#groupCountry", "Country field is empty");
+                    groupData.group[0].data.latitude = valueOrEmptyOrError("#groupLatitude");
+                    groupData.group[0].data.longitude = valueOrEmptyOrError("#groupLongitude");
+                    groupData.group[0].data.timezone = valueOrEmptyOrError("#groupTimezone", "Timezone field is empty");
+                    groupData.group[0].data.url = valueOrEmptyOrError("#groupUrl");
+                }
+                if (groupData.group[0].data.type === "chapters") {
+                    groupData.group[0].data.university = valueOrEmptyOrError("#groupUniversity");
+                } else if (groupData.group[0].data.type === "schools") {
+
+                } else if (groupData.group[0].data.type === "companies") {
+                    groupData.group[0].data.legal_name = valueOrEmptyOrError("#groupLegalName");
+                }
+            } else {
+                
+            }
+            return groupData;
+        }
+
+        function fillInGroupDetails(group) {
+            var groupData = {
+                query: [
+                    {
+                        field: "id",
+                        search: $(group).attr("id"),
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "name",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "parent",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "description",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    },
+                    {
+                        field: "status",
+                        search: null,
+                        order: null,
+                        visibility: null
+                    }
+                ],
+                group: {
+                    type: "general"
+                },
+                pagination: {
+                    page: 0,
+                    length: 100
+                }
+            };
+            a.set("GROUP_DETAILS_GENERAL_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.query.push(
+                {
+                    field: "address",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "city",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "state",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "postcode",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "country",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "latitude",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "longitude",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "timezone",
+                    search: null,
+                    order: null,
+                    visibility: null
+                },
+                {
+                    field: "url",
+                    search: null,
+                    order: null,
+                    visibility: null
+                }
+            );
+            groupData.group.type = "chapters";
+            groupData.query.push(
+                {
+                    field: "university",
+                    search: null,
+                    order: null,
+                    visibility: null
+                }
+            );
+            a.set("GROUP_DETAILS_CHAPTERS_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.query.pop();
+            groupData.group.type = "schools";
+            a.set("GROUP_DETAILS_SCHOOLS_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            groupData.group.type = "companies";
+            groupData.query.push(
+                {
+                    field: "legal_name",
+                    search: null,
+                    order: null,
+                    visibility: null
+                }
+            );
+            a.set("GROUP_DETAILS_COMPANIES_XHR",
+                        f.fetchAPI("/groups/list", groupData));
+            $.when(a.get("GROUP_DETAILS_GENERAL_XHR"),
+            a.get("GROUP_DETAILS_CHAPTERS_XHR"),
+            a.get("GROUP_DETAILS_SCHOOLS_XHR"),
+            a.get("GROUP_DETAILS_COMPANIES_XHR"))
+                    .always(function(){
+                    })
+                    .done(function(groupGeneralXhrArr, groupChaptersXhrArr,
+                        groupSchoolsXhrArr, groupCompaniesXhrArr){
+                        a.set("modifying_group_id", $(group).attr("id"));
+                        for (i = 0; i < groupChaptersXhrArr[0].group.length; i++) {
+                            if (groupChaptersXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupChaptersXhrArr[0].group[i].data.type = "chapters";
+                                fillInForm(groupChaptersXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .chapters", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupSchoolsXhrArr[0].group.length; i++) {
+                            if (groupSchoolsXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupSchoolsXhrArr[0].group[i].data.type = "schools";
+                                fillInForm(groupSchoolsXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .schools", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupCompaniesXhrArr[0].group.length; i++) {
+                            if (groupCompaniesXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupCompaniesXhrArr[0].group[i].data.type = "companies";
+                                fillInForm(groupCompaniesXhrArr[0].group[i].data);
+                                formElemVisibility(".general, .locatable, .companies", "show");
+                                return;
+                            }
+                        }
+                        for (i = 0; i < groupGeneralXhrArr[0].group.length; i++) {
+                            if (groupGeneralXhrArr[0].group[i].id == $(group).attr("id")) {
+                                groupGeneralXhrArr[0].group[i].data.type = "general";
+                                fillInForm(groupGeneralXhrArr[0].group[i].data);
+                                formElemVisibility(".general", "show");
+                                return;
+                            }
+                        }
+                    })
+                    .fail(function(){
+                    });
+        }
+
+        function fillInForm(groupData) {
+            if (groupData) {
+                $("#groupType").val(groupData.type);
+                $("#groupName").val(groupData.name);
+                $("#groupParent").val(groupData.parent);
+                $("#groupDescription").val(groupData.description);
+                $("#groupStatus").val(groupData.status);
+                $("#groupAddress").val(groupData.address);
+                $("#groupCity").val(groupData.city);
+                $("#groupState").val(groupData.state);
+                $("#groupPostcode").val(groupData.postcode);
+                $("#groupCountry").val(groupData.country);
+                $("#groupLatitude").val(groupData.latitude);
+                $("#groupLongitude").val(groupData.longitude);
+                $("#groupTimezone").val(groupData.timezone);
+                $("#groupUrl").val(groupData.url);
+                $("#groupUniversity").val(groupData.university);
+                $("#groupLegalName").val(groupData.legal_name);
+            }
+        }
+
+        function fetchAndLoadGroups(groupFilter) {
+//            debugger;
+            a.set("GROUP_LIST_XHR",
+                        f.fetchAPI("/groups/list", groupFilter));
+            a.get("GROUP_LIST_XHR")
+                    .always(function(){
+                    })
+                    .done(function(groupListXhrArr){
+                        var outputText = '<table style="width: 100%; border-collapse: collapse; border: 1px solid black; font-size: 1.3em;"><tr><th style="border: 1px solid black; background-color: #08003C; color: #FFF; font-weight: 300;">Title</th></tr>';
+                        for (var i = 0; i < groupListXhrArr.group.length; i++){
+                            outputText += '<tr><td style="border: 1px solid black;"><input class="detailsGroup" id="' + groupListXhrArr.group[i].id + '" type="submit" value="' + groupListXhrArr.group[i].data["name"] + '" style="background-color: #fff; font-weight: 300; border: 0;" /></td></tr>';
+                        }
+                        outputText += "</table>";
+                        $("#resultsList").empty();
+                        $("#resultsList").append(outputText);
+                        $(".detailsGroup").click(function() {
+                            f.closeTray();
+                            resetForm();
+                            formElemVisibility(".general, .locatable, .chapters, .schools, .companies", "hide");
+                            $("#resultsList").hide();
+                            $("#submitButton").val("Modify");
+                            $("#hideButton").show();
+                            $("#hideButton").val("Back");
+                            $("#listGroup").css("background-color", "#FFFFFF");
+                            $("#newGroup").css("background-color", "#A8A8A8");
+                            $("[id^=group]").prop("disabled", true);
+                            var _this = this;
+                            a.get("GROUP_FULL_LIST_XHR")
+                                .done(function(groupFullListXhrArr){
+                                    fillInGroupDetails(_this);
+                                });
+                        });
+                    })
+                    .fail(function(){
+                    });
+        }
+
+        function newGroup(groupData) {
+            $("#submitButton").hide();
+            a.set("CREATE_GROUP_XHR",
+                        f.fetchAPI("/groups/create", groupData));
+            a.get("CREATE_GROUP_XHR")
+                .always(function() {
+                    $("#submitButton").show();
+                })
+                .done(function(createGroupXhr) {
+                    a.store["new_fields"] = null;
+                    a.store["search_fields"] = null;
+                    resetForm();
+                    listGroupTab();
+                    if (createGroupXhr.success.nonce_id.hasOwnProperty(groupData.group[0].nonce)) {
+                        f.setTray("group created","success",true);
+                        fetchAndLoadGroups(formInfo("Search"));
+                        a.get("GROUP_FULL_LIST_XHR")
+                            .done(function(groupFullListXhrArr){
+                                fetchAndLoadGroups(formInfo("Search"));
+                            });
+                    } else {
+                        f.throwError({
+                            name: 'ERROR',
+                            message: 'server rejected!'
+                        });
+                    }
+                })
+                .fail(function() {
+                });
+        }
+
+        function updateGroup(groupData) {
+            a.set("UPDATE_GROUP_XHR",
+                        f.fetchAPI("/groups/edit", groupData));
+            a.get("UPDATE_GROUP_XHR")
+                .always(function() {
+                })
+                .done(function(updateGroupXhr) {
+                    listGroupTab();
+                    if (updateGroupXhr.success.id[0] == groupData.group[0].id) {
+                        f.setTray("group updated","success",true);
+                        a.get("GROUP_FULL_LIST_XHR")
+                            .done(function(groupFullListXhrArr){
+                                fetchAndLoadGroups(formInfo("Search"));
+                            });
+                    } else {
+                        f.throwError({
+                            name: 'ERROR',
+                            message: 'server rejected!'
+                        });
+                    }
+                })
+                .fail(function() {
+                });
+        }
+
+        function fetchAndLoadParentGroups() {
+            var groupFilter = {
+                query: [
+                    {
+                        field: "name",
+                        search: null,
+                        order: null,
+                        visibility: null,
+                    }
+                ],
+                group: {
+                    type: "general"
+                },
+                pagination: {
+                    page: 0,
+                    length: 300
+                }
+            };
+            a.set("GROUP_FULL_LIST_XHR",
+                        f.fetchAPI("/groups/list", groupFilter));
+            a.get("GROUP_FULL_LIST_XHR")
+                .always(function() {
+                })
+                .done(function(groupFullListXhrArr){
+                    var optionList = "";
+                    optionList += '<option value=""></option>';
+                    for (var i = 0; i < groupFullListXhrArr.group.length; i++){
+                        optionList += '<option value="' + groupFullListXhrArr.group[i].id + '">' + groupFullListXhrArr.group[i].data["name"] + '</option>';
+                    }
+                    $("#groupParent").empty();
+                    $("#groupParent").append(optionList);
+                })
+                .fail(function(){
+                });
+        }
+
+        function formElemVisibility(elem, visibility) {
+            if (visibility === "show") {
+                $(elem).children().show();
+                $(elem).show();
+            } else if (visibility === "hide") {
+                $(elem).children().hide();
+                $(elem).hide();
+            } else {
+            }
+        }
+
+        function showFormSearchField() {
+            $(".general, .locatable, .chapters, .schools, .companies").show();
+            $(".general, .locatable, .chapters, .schools, .companies").children().hide();
+            $(".searchField").show();
+        }
+
+        function resetForm() {
+            f.closeTray();
+            $("[id^=group]").css({
+                "background-color": "white",
+                "color": "black"
+            });
+            $("[id^=group]").val("");
+            $("#groupType").val("general");
+            fetchAndLoadParentGroups();
+            $("#groupStatus").val("0");
+            $("[id^=group]").prop("disabled", false);
+        }
+
+        function listGroupTab() {
+            f.closeTray();
+            a.store["modifying_group_id"] = null;
+            if ($("#submitButton").val() == "New") {
+                saveForm("new_fields");
+            }
+            resetForm();
+            formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+            $("#resultsList").show();
+            $("#submitButton").val("Advanced Search");
+            $("#hideButton").val("hide");
+            $("#listGroup").css("background-color", "#FFFFFF");
+            $("#newGroup").css("background-color", "#A8A8A8");
+            a.get("GROUP_FULL_LIST_XHR")
+                .done(function(groupFullListXhrArr){
+                    fillInForm(a.get("search_fields"));
+                });
+        }
+
+        function saveForm(field) {
+            a.set(field, {
+                type: valueOrNullOrError("#groupType"),
+                name: valueOrNullOrError("#groupName"),
+                parent: valueOrNullOrError("#groupParent"),
+                description: valueOrNullOrError("#groupDescription"),
+                status: valueOrNullOrError("#groupStatus"),
+                address: valueOrNullOrError("#groupAddress"),
+                city: valueOrNullOrError("#groupCity"),
+                state: valueOrNullOrError("#groupState"),
+                postcode: valueOrNullOrError("#groupPostcode"),
+                country: valueOrNullOrError("#groupCountry"),
+                latitude: valueOrNullOrError("#groupLatitude"),
+                longitude: valueOrNullOrError("#groupLongitude"),
+                timezone: valueOrNullOrError("#groupTimezone"),
+                url: valueOrNullOrError("#groupUrl"),
+                university: valueOrNullOrError("#groupUniversity"),
+                legal_name: valueOrNullOrError("#groupLegalName")
+            });
+        }
+
+        function newGroupTab() {
+            f.closeTray();
+            a.store["modifying_group_id"] = null;
+            resetForm();
+            formElemVisibility(".locatable, .chapters, .schools, .companies", "hide");
+            formElemVisibility(".general", "show");
+            $("#resultsList").hide();
+            $("#submitButton").val("New");
+            $("#hideButton").val("Reset form").show();
+            $("#listGroup").css("background-color", "#A8A8A8");
+            $("#newGroup").css("background-color", "#FFFFFF");
+            a.get("GROUP_FULL_LIST_XHR")
+                .done(function(groupFullListXhrArr){
+                    fillInForm(a.get("new_fields"));
+                    $("#groupType").trigger("change");
+                });
+        }
+
+        $(function(){
+            $("#hideButton, #submitButton").hover(
+                function() {
+                    $(this).css("background-color", "#00a2e6");
+                },
+                function() {
+                    $(this).css("background-color", "#006c99");
+                }
+            );
+
+            formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+
+            fetchAndLoadGroups(formInfo("Search"));
+            fetchAndLoadParentGroups();
+
+            $("#listGroup").click(function() {
+                listGroupTab();
+            });
+
+            $("#newGroup").click(function() {
+                newGroupTab();
+            });
+
+            $("#groupType").change(function() {
+                if ($("#submitButton").val() != "Search") {
+                    formElemVisibility(".locatable, .chapters, .schools, .companies", "hide");
+                    var groupType = valueOrNullOrError("#groupType", "Type field is empty")
+                    groupType = "." + groupType;
+                    if (groupType !== ".general") {
+                        groupType = groupType + ", .locatable";
+                    }
+                    formElemVisibility(groupType, "show");
+                }
+            });
+
+            $("#hideButton").click(function() {
+                if ($("#submitButton").val() == "Search") {
+                    f.closeTray();
+                    formElemVisibility(".general, .locatable, .chapters, .schools, .companies, #hideButton", "hide");
+                    $("#submitButton").val("Advanced Search");
+                } else if ($("#submitButton").val() == "Modify") {
+                    listGroupTab();
+                } else if ($("#submitButton").val() == "Update") {
+                    listGroupTab();
+                } else if ($("#submitButton").val() == "New") {
+                    resetForm();
+                    $("#groupType").trigger("change");
+                }
+            });
+            $("#submitButton").click(function() {
+                f.closeTray();
+                if ($("#submitButton").val() == "Advanced Search") {
+                    showFormSearchField();
+                    $("#submitButton").val("Search");
+                    $("#hideButton").show();
+                } else if ($("#submitButton").val() == "Search") {
+                    fetchAndLoadGroups(formInfo("Search"));
+                } else if ($("#submitButton").val() == "Modify") {
+                    $("[id^=group]").prop("disabled", false);
+                    $("#groupType").prop("disabled", true);
+                    $("#submitButton").val("Update");
+                } else if ($("#submitButton").val() == "New") {
+                    newGroup(formInfo("New"));
+                } else if ($("#submitButton").val() == "Update") {
+                    var data = formInfo("New");
+                    delete data.group[0].nonce;
+                    delete data.group[0].data.type;
+                    data.group[0].id = a.get("modifying_group_id");
+                    updateGroup(data);
+                }
+            });
+        });
+
+    })();
+</script>

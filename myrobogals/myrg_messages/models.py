@@ -90,6 +90,12 @@ class Message(models.Model):
     date_delivered = models.DateTimeField(_('date delivered'),
                                       null=True,
                                       blank=True)
+
+    # Fields that cannot be listed or filtered/sorted with
+    PROTECTED_FIELDS = ()
+    
+    # Fields that cannot be written to
+    READONLY_FIELDS = ("id","date_created",)
                                       
     class Meta:
         abstract = True

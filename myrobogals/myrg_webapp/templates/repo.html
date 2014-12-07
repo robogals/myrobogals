@@ -1,0 +1,939 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+    
+    #app-container {
+        text-align: left;
+        
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 30rem;
+        
+        color: #fff;
+        
+        font-size: 1.2rem;
+    }
+    
+    #app-container .container {
+        padding: 1rem;
+    }
+    
+    #app-container .container .row {
+        padding: 0.5rem;
+    }
+    
+    #app-container .container .col {
+        vertical-align: middle;
+    }
+    
+    #app-container .container .left.col {
+        width: 10rem;
+        font-weight: 500;
+    }
+    
+    #app-container select,
+    #app-container input,
+    #app-container textarea,
+    #app-container button {
+        border: 0;
+        background: #fff;
+        color: #000;
+        padding: 0.3rem;
+        
+        width: 100%;
+    }
+      
+    
+    /*----- Tabs -----*/
+	.tabs {
+		width:100%;
+		display:inline-block;
+	}
+ 
+    /*----- Tab Links -----*/
+    /* Clearfix */
+    .tab-links:after {
+        display:block;
+        clear:both;
+        content:'';
+    }
+ 
+    .tab-links li {
+        margin:-14px 5px;
+        float:left;
+        list-style:none;
+    }
+ 
+        .tab-links a {
+            padding:9px 15px;
+            display:inline-block;
+            border-radius:3px 3px 0px 0px;
+            background:#7FB5DA;
+            font-size:16px;
+            font-weight:600;
+            color:#4c4c4c;
+            transition:all linear 0.15s;
+        }
+ 
+        .tab-links a:hover {
+            background:#a7cce5;
+            text-decoration:none;
+        }
+ 
+    li.active a, li.active a:hover {
+        background:#fff;
+        color:#4c4c4c;
+    }
+ 
+    /*----- Content of Tabs -----*/
+    .tab-content {
+        padding:15px;
+        border-radius:3px;
+        box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
+        background:#fff;
+    }
+ 
+	.tab {
+		display:none;
+	}
+
+	.tab.active {
+		display:block;
+	}
+	
+	
+	/*------ search ------*/
+	#search {
+		width:96%;
+    	box-sizing:border-box;
+    	-moz-box-sizing:border-box;/* Firefox */ 
+	}
+	
+	/*-----tabel-----*/
+	.rcl-container{
+		display: table;
+		border-collapse: collapse;
+		-webkit-width: 100%; /* Chrome, Safari, Opera */
+    	-moz-width: 100%; /* Firefox */  
+    	width: 100%;
+    }
+	.rcl-heading{
+		 font-weight: bold;
+		 display:table-row;
+		 background-color:#000;
+		 text-align: center;
+		 line-height: 25px;
+		 font-size: 14px;
+		 font-family:georgia;
+		 color:#fff;
+	
+	}
+	.rcl-table-row{  
+		 display:table-row;
+		 text-align: center;
+	}
+	.rcl-col{
+		display:table-cell;
+		border: 1px solid #CCC;
+	}
+
+</style>
+<div id="content" tabindex="0">
+    <div id="hero">
+        <div class="blocks" style="width: auto;">
+            <h1>Repositories</h1>
+        </div>
+    </div>
+    
+    <div class="row" style="margin-top: 1.5rem;">
+    </div>
+    
+    <div class="tabs">
+		<ul class="tab-links">
+			<li class="active"><a id="tab1" href="#tab1">List</a></li>
+			<li><a id="tab2" href="#tab2">New/Update</a></li>
+			<li><a id="tab3" href="#tab3">Detail</a></li>
+		</ul>
+ 
+		<div class="tab-content">
+			<div id="tab1" class="tab active">
+				<table id="ListTable" width="100%">
+						<tr id="rc_toolbar">
+							<td><input id="search" type="text" name="search" placeholder="Search..."></td>
+							<td width="20" align="center"><a id='rc_first' href='#'> << </a></td> 
+							<td width="20" align="center"><a id='rc_previous' href='#'> < </a></td> 
+							<td width="60" align="center"><div id="currpage"></td> 
+							<td width="20" align="center"><a id='rc_next' href='#'> > </a></td>
+							<td width="20" align="center"><a id='rc_end' href='#'> >> </a></td>
+						</tr>
+						<tr><td colspan = "6"><p></p></td></tr>
+						<tr>
+							<td colspan = "6">
+								<div class="rcl-container">
+									<div id="rcl-list"></div>
+								</div>				
+							</td>
+						</tr>
+					</table>
+			</div>
+ 
+			<div id="tab2" class="tab">
+					<div id="app-container">
+						<div class="container bg-rg-dark-blue" >
+							<div id="message-container">
+								<div class="messages" id="neg-message"></div>
+								<div class="messages" id="pos-message"></div>
+							</div>
+							<form id="create-formRC" method="post">
+								<div class="row">
+									<div class="left col">
+										<label for="id_title">Title</label>
+									</div>
+									<div class="col">
+										<input id="id_title" type="text" name="title" placeholder="Title">
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_body">Body</label>
+									</div>
+									<div class="col">
+										<textarea id="id_body" type="text" name="body" placeholder="Body"></textarea>
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_tags">Tags</label>
+									</div>
+									<div class="col">
+										<input id="id_tags" type="text" name="tags" placeholder="Tags">
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_service">Service</label>
+									</div>
+									<div class="col">
+										<select id="id_service" name="service">
+											<option value="10">Managers of your Robogals chapter</option>
+											<option value="20">Everyone in your Robogals chapter</option>
+											<option value="50">All Robogals chapters</option>
+											<option value="99" selected >Public</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="right col">
+										<input id="rc_create" class="bg-rg-dark-green mobile-width-100" type="submit" value="Create">
+									</div>
+								</div>
+							</form>
+			
+							<form id="create-formRF" method="post" enctype="multipart/form-data">
+								{% csrf_token %}
+								<div class="row">
+									<div class="left col">
+										<label for="id_name">Name</label>
+									</div>
+									<div class="col">
+										<input id="id_name" type="text" name="name" placeholder="Name">
+										<input id="id_container" type="hidden" name="container" value="1">
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_file">File</label>
+									</div>
+									<div class="col">
+										<input id="id_file" type="file" name="file" placeholder="File">
+									</div>
+								</div>
+								<div class="row">
+									<div class="right col">
+										<input id="create" class="bg-rg-dark-green mobile-width-100" type="submit" value="Create">
+									</div>
+								</div>
+							</form>
+
+						</div>
+					</div>
+				
+			</div>
+			<div id="tab3" class="tab">
+				<div class="rcl-container">
+					<div id="rcl-detail">Please click a link on <i>Title's column</i> on <b>"List"</b> tab to see detail Repository</div>
+				</div>				
+							
+			</div>
+		</div>
+	</div>
+     
+    
+    <div class="row" id="links">
+        <div class="col"><a href="http://localhost:3000/?app=repo-files"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
+    </div>
+    
+</div>
+<script>
+    (function(){
+        var resourceName = "repo";
+        var appName = "Repo";
+    
+        var u = myRG.userStore;
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var jq = myRG.jq;
+        
+        //Set global variable for RC and RF
+        var rc_id = "";
+        var rc_length = "3"; //change this value to set total RC list per page
+        var rc_page = "0";
+        var rc_tot_list = rc_length;
+        var max_rc_page = 0;
+        var looping = rc_length;
+        var rc_title = "";
+        var rc_data = "";
+        var rf_id = "";
+        var statusRC = "created";
+        var RCusername = "";
+        var filter = "all";
+        var keyword = "";
+        var detail_tab = "";
+        
+        
+        // Grab jQuery objects from DOM elements
+        jq.rcllist = $("#rcl-list");
+        jq.rcldetail = $("#rcl-detail");
+        jq.rcbutton = $("#rc_create");
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+        
+        // Common elem
+        var el = a.set("JQELEM",{});
+		//RC Form
+		el.title = $("#id_title");
+        el.body = $("#id_body");
+        el.tags = $("#id_tags");
+        el.service = $("#id_service");
+        //RF Form
+        el.name = $("#id_name");
+        el.file = $("#id_file");
+        el.container = $("#id_container");
+
+        
+        function hideMessages() {
+            $(".messages").hide();
+        }
+        
+        function showMessage(html, type) {
+            hideMessages();
+            $("#"+type+"-message").html(html).show();
+        }
+        
+        //API
+        f.fetchMyRCL = function(rc_id,rc_length,rc_page, filter, keyword){
+        	var filter = filter || "all";
+        	var keyword = keyword || "";
+        	var key_title = "";
+        	var key_tags = "";
+        	
+        	if (filter == "all")
+        	{
+        		key_title = keyword;
+        		key_tags = keyword;
+        	}
+        	else if (filter == "title")
+        	{
+        		key_title = keyword;
+        		key_tags = "";
+        	}
+        	else if (filter == "tags")
+        	{
+        		key_title = "";
+        		key_tags = keyword;
+        	}
+        	//alert(key_title+" / "+key_tags);
+        	var api_data_rcl = {
+                    	"pagination": 
+                    		{
+    							"length": rc_length,
+    							"page": rc_page
+  							},
+  						"query": 
+  							[
+    							{
+      							"field": "id",
+      							"search": rc_id
+    							},
+    							{
+      							"field": "title",
+      							"search": key_title
+    							},
+    							{
+      							"field": "body"
+    							},
+    							{
+      							"field": "tags",
+      							"search": key_tags
+    							},
+    							{
+      							"field": "service"
+    							},
+    							{
+      							"field": "date_created"
+    							},
+    							{
+      							"field": "date_updated"
+    							}
+  							]
+                		} 
+            return f.fetchAPI("/api/1.0/repocontainers/list",api_data_rcl,"POST",true);
+    	}
+    	
+    	f.fetchCreateMyRC = function(api_data){
+            return f.fetchAPI("/api/1.0/repocontainers/create",api_data,"POST",true);
+    	}
+    	
+    	f.fetchUpdateMyRC = function(api_data){
+            return f.fetchAPI("/api/1.0/repocontainers/edit",api_data,"POST",true);
+    	}
+    	
+    	f.deleteMyRC = function(api_data){
+    		var del_api_data = {
+                    	"id": [ 
+                    			api_data
+  							]
+                		}
+                		//alert(JSON.stringify(del_api_data));
+            return f.fetchAPI("/api/1.0/repocontainers/delete",del_api_data,"POST",true);
+    	}
+    	
+    	f.fetchMyRFL = function(container_id){
+        	var api_data_rfl = {
+                    	"pagination": 
+                    		{
+    							"length": 10,
+    							"page": 0
+  							},
+  						"query": 
+  							[
+    							{
+      							"field": "container",
+      							"search": container_id
+    							},
+    							{
+      							"field": "name"
+    							},
+    							{
+      							"field": "file"
+    							}
+  							]
+                		}
+            return f.fetchAPI("/api/1.0/repofiles/list",api_data_rfl,"POST",true);
+    	}
+    	
+    	f.deleteMyRF = function(api_data){
+    		var del_api_data = {
+                    	"id": [ 
+                    			api_data
+  							]
+                		}
+                		//alert(JSON.stringify(del_api_data));
+            return f.fetchAPI("/api/1.0/repofiles/delete",del_api_data,"POST",true);
+    	}
+    
+        //function to set a link for tags and title
+        function givealink(data_in, div_class) {
+			var data = data_in.split(" ");
+			var data_out = [];
+			for (var i = 0; i < data.length; i++) {
+			   data_out[i] = "<a class='" + div_class + "' href='#" + data[i]  + "'>" + data[i] + "</a>"
+			}
+			return data_out.join(' ');
+		}
+        
+        //call listing function 
+        function setupRepo(rcid,rclength,rcpage,filter,keyword){
+        	
+        	//to set max and min page
+        	max_rc_page = Math.ceil(rc_tot_list/rclength)-1;
+        	if (rcpage > max_rc_page){rcpage = max_rc_page}
+        	if (rcpage < 0){rcpage = "0"}
+        	//alert(rclength+"|"+rcpage);
+        	//get the RC list
+        	var rcl = f.fetchMyRCL(rcid,rclength,rcpage,filter,keyword);
+        	$('#create-formRC').show();
+        	$('#create-formRF').hide();
+        	rcl 
+            	.done(function(rclistdata){
+            		rc_tot_list = rclistdata.meta.size;
+            		rc_length = rclength;
+                    rc_page = rcpage;
+                    
+                    //to set the lopping value to fix Uncaught TypeError: Cannot read property 'id' of undefined VM4627:178
+                    max_rc_page = Math.ceil(rc_tot_list/rc_length)-1;
+                    if (rc_page < max_rc_page){looping = rc_length;}
+                    else {looping = rc_tot_list % rc_length;if (looping == 0){looping = rc_length;}}
+                    
+                    $('#currpage').text((+rc_page+1).toString()+"/"+(max_rc_page+1).toString());
+                    jq.rcllist.text("");
+                    jq.rcllist.append("<div class='rcl-heading'>"
+										 + "<div class='rcl-col'>No</div>"
+										 + "<div class='rcl-col'>Title</div>"
+										 + "<div class='rcl-col'>Tags</div>"
+										 + "<div class='rcl-col'>Creator</div>"
+										 + "<div class='rcl-col'>Date</div>"
+										 + "<div class='rcl-col'>Action</div>"
+									+ "</div>");
+                	for (i = 0; i < looping; i++) { 
+                		var no = (rc_page*rc_length) + i + 1;
+                		jq.rcllist.append(
+    							"<div class='rcl-table-row'>"
+    							+ "<div class='rcl-col'>"+ no + "</div>"
+    							+ "<div class='rcl-col' style='text-align: left; width:600px;'><a class='rfl_link' href='#" + rclistdata.rcl[i].id + "_" + rclistdata.rcl[i].data.title + "'>" + rclistdata.rcl[i].data.title + "</a></div>"
+    							+ "<div class='rcl-col' style='width:400px;'>" + givealink(rclistdata.rcl[i].data.tags, 'search_tags') + "</div>"
+    							+ "<div class='rcl-col'>" + rclistdata.rcl[i].user[0].username + "</div>"
+    							+ "<div class='rcl-col' style='width:250px;'>" + rclistdata.rcl[i].data.date_created + "</div>"
+    							//if (rclistdata.rcl[i].user[0].username==u.get("WHOAMI_XHR").responseJSON.user.data.username){
+    							//jq.rcllist.append(
+    							+ "<div class='rcl-col' style='width:200px;'><a class='rcl_edit' href='#" + rclistdata.rcl[i].id + "'> update </a> | <a class='rcl_delete' href='#" + rclistdata.rcl[i].id + "'> delete </a> </div> "
+    							//}else{
+    							//jq.rcllist.append(
+    							//	"<div class='rcl-col'></div>"
+    							+ "</div>");
+    						
+    						
+					}
+            	})
+            }
+        
+        //call listing function for repo file based on container_id
+    	function getListFile(rcid, rcname){
+    		var rfl = f.fetchMyRFL(rcid);
+        
+    		rfl 
+            	.done(function(rflistdata){
+            		//alert(JSON.stringify(rflistdata));
+                	$('#create-formRC').hide();
+                	$('#create-formRF').show();
+                	
+                	//$('#rc_toolbar').hide();
+                	jq.rcldetail.text("");
+                	var getuserbasercid = f.fetchMyRCL(rcid,1,0,"all","");
+                	
+                	getuserbasercid
+                		.done(function(searchdata){
+                			//Show RC detail
+                				jq.rcldetail.text("");
+                				jq.rcldetail.append(
+                					"<h3>Repo Container Detail</h3>"
+                					+ "<strong>Title :" + searchdata.rcl[0].data.title + "</strong></br>"
+                					+ "<strong>Body :" + searchdata.rcl[0].data.body + "</strong></br>"
+                					+ "<strong>Tags :" + searchdata.rcl[0].data.tags + "</strong></br>"
+                					+ "<strong>Creator :" + searchdata.rcl[0].user[0].username + "</strong></br></br>"
+                					+ "<h4>list of Repo File :</h4>" 
+                					+ "Note: Use 'New/Update' Tab to add more file(s) into a Repo Container</br></br>");
+                				
+                			
+                			for (i = 0; i < rflistdata.meta.size; i++) { 
+                				jq.rcldetail.append(
+    								i+1 
+    								+ ". <a href='media/"+rflistdata.rfl[i].data.file+"' target='_blank'>" + rflistdata.rfl[i].data.name + "<a></br>"
+    								+ " location: " + rflistdata.rfl[i].data.file);
+    								if (u.get("WHOAMI_XHR").responseJSON.user.data.username == searchdata.rcl[0].user[0].username){
+    									jq.rcldetail.append(
+    									"</br><a class='rcf_delete' href='#"+rflistdata.rfl[i].id+"'>delete</a>"
+    									+ "</br></br>");
+    								}else{
+    									jq.rcldetail.append(
+    									"</br></br>");
+    								}
+							} 
+						})
+				
+            	})
+    	}
+    	
+    	//generate date with format YYYY-MM-DD
+    	function get_date(){
+    		var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+			var HH = today.getHours();
+			var MM = today.getMinutes();
+			var SS = today.getSeconds();
+
+			if(dd<10) {
+    			dd='0'+dd
+			} 
+
+			if(mm<10) {
+    			mm='0'+mm
+			} 
+			
+			//2014-11-15T23:22:56.483Z
+			today = yyyy+'-'+mm+'-'+dd+'T'+HH+':'+MM+':'+SS+'Z';
+			return today
+    	}
+
+        
+        //event to open RF based on RC id 
+        $(document.body).on('click', 'a.rfl_link', function(){
+  			hideMessages();
+  			rc_data = $(this).attr('href').slice(1, $(this).attr('href').length).split("_");	
+  			rc_id = rc_data[0];
+  			rc_title = rc_data[1];
+  			jQuery('.tabs ' + "#tab3").show().siblings().hide();
+  			$("#tab3").parent('li').addClass('active').siblings().removeClass('active');
+  			getListFile(rc_id, rc_title);
+  			if (detail_tab=="")detail_tab = "active";
+        });
+        
+        //event to trigger RC delete link
+        $(document.body).on('click', 'a.rcl_delete', function(){
+        	hideMessages();
+        	var result = confirm("want to delete?");
+			if (result==true) {
+    		//Logic to delete the item
+        		rc_data = $(this).attr('href').slice(1, $(this).attr('href').length).split("_");	
+  				rc_id = rc_data[0];
+        		var api_rcDelete = f.deleteMyRC(rc_id);
+        		api_rcDelete
+                	.done(function(deleteRC){
+                		if (deleteRC.commit) {showMessage("Repository Container deleted successfully","pos");}
+                    	else {showMessage("Repository Container deleted failed.<br><br>Please try again.","neg");}
+                    	rc_tot_list = rc_tot_list - 1;
+                    	if(rc_tot_list % rc_length == 0 && rc_page == max_rc_page){rc_page = rc_page - 1;}
+                    	setupRepo("",rc_length,rc_page,filter,keyword);
+                	})
+            
+			}
+        });
+        
+        //event to trigger RC edit link
+        $(document.body).on('click', 'a.rcl_edit', function(){
+        	// Show/Hide Tabs
+			jQuery('.tabs ' + "#tab2").show().siblings().hide();
+			$("#tab2").parent('li').addClass('active').siblings().removeClass('active');
+        	hideMessages();
+        	rc_data = $(this).attr('href').slice(1, $(this).attr('href').length).split("_");	
+  			rc_id = rc_data[0];
+        	var api_rcEdit = f.fetchMyRCL(rc_id,rc_length, "0","all","");
+        	api_rcEdit
+                .done(function(RCbasedID){
+                    //f.loadApp("repo");
+                    el.title.val(RCbasedID.rcl[0].data.title);
+        			el.body.val(RCbasedID.rcl[0].data.body);
+        			el.tags.val(RCbasedID.rcl[0].data.tags);
+        			el.service.val(RCbasedID.rcl[0].data.service);
+        			jq.rcbutton.val("Update");
+                })
+        });
+        
+        //Navigation page RC
+        $(document.body).on('click', 'a#rc_previous', function(){
+        	hideMessages();
+        	rc_id = "";
+        	rc_page = rc_page - 1;
+        	jq.rcllist.text("");
+        	hideMessages();
+        	//alert(rc_length+"|"+rc_page);
+        	setupRepo(rc_id,rc_length,rc_page,filter,keyword);
+        });
+        
+        $(document.body).on('click', 'a#rc_next', function(){
+        	hideMessages();
+        	rc_id = "";
+        	rc_page = +rc_page + 1;
+        	jq.rcllist.text("");
+        	hideMessages();
+        	//alert(rc_length+"|"+rc_page);
+        	setupRepo(rc_id,rc_length,rc_page,filter,keyword);
+        });
+        
+        $(document.body).on('click', 'a#rc_first', function(){
+        	hideMessages();
+        	rc_id = "";
+        	rc_page = 0;
+        	jq.rcllist.text("");
+        	hideMessages();
+        	//alert(rc_length+"|"+rc_page);
+        	setupRepo(rc_id,rc_length,rc_page,filter,keyword);
+        });
+        
+        $(document.body).on('click', 'a#rc_end', function(){
+        	hideMessages();
+        	rc_id = "";
+        	rc_page = +max_rc_page;
+        	jq.rcllist.text("");
+        	hideMessages();
+        	//alert(rc_length+"|"+rc_page);
+        	setupRepo(rc_id,rc_length,rc_page,filter,keyword);
+        });
+        
+        // Create and Update form for Repo container
+        $("#create-formRC").submit(function(e){
+            e.preventDefault();
+            f.setTray("Loading...","indeterminate",false);
+            hideMessages();
+            
+            if (jq.rcbutton.val() == "Create"){ 
+            	statusRC = "created";
+            	var api_data_createRC = {
+  					"rc": [
+    					{
+      					"data": {
+        					"user": u.get("WHOAMI_XHR").responseJSON.user.id,
+        					"role": u.get("MYROLES_XHR").responseJSON.role[0].id,
+        					"title": el.title.val(),
+        					"body": el.body.val(),
+        					"tags": el.tags.val(),
+        					"service": el.service.find(":selected").attr('value')
+      						},
+      					"nonce": "1"
+    					}
+  					]
+				}			              
+            	var api_rcCreate = f.fetchCreateMyRC(api_data_createRC);
+            } else {
+                statusRC = "updated";
+            	var today = Date.now();
+            	var api_data_createRC = {
+  					"rc": [
+    					{
+      					"data": {
+        					"user": u.get("WHOAMI_XHR").responseJSON.user.id,
+        					"role": u.get("MYROLES_XHR").responseJSON.role[0].id,
+        					"title": el.title.val(),
+        					"body": el.body.val(),
+        					"tags": el.tags.val(),
+        					"service": el.service.find(":selected").attr('value'),
+        					"date_updated": get_date()
+      						},
+      					"id": rc_id
+    					}
+  					]
+				}
+				alert(JSON.stringify(api_data_createRC));
+				var api_rcCreate = f.fetchUpdateMyRC(api_data_createRC);
+			}
+            
+            api_rcCreate
+                .done(function(createRC){
+                    f.closeTray();
+                    //show message for commit status
+                    if (createRC.commit) {
+                    	showMessage("Repository Container "+statusRC+" successfully","pos");
+                    	if (statusRC == "created"){rc_tot_list = rc_tot_list + 1;rc_page = max_rc_page + 1 }
+                    }
+                    else {
+                    	showMessage("Repository Container "+statusRC+" failed.<br><br>Title, Body and Tags can not be blank.","neg");
+                    }
+                    setupRepo("",rc_length,rc_page,filter,keyword); 
+                      
+                })
+                
+                .fail(function(xhr){
+                    f.closeTray();
+                    
+                    // 403 => Request_API fail
+                    if (xhr.status == 403){
+                        showMessage("You don't have permission to use this function.","neg");
+                        return;
+                    }
+                    
+                    // ... otherwise => server fail
+                    //showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");
+                });
+            
+        });
+        
+        // Repo-File Views
+        //event to trigger RF delete link
+        $(document.body).on('click', 'a.rcf_delete', function(){
+        	hideMessages();
+        	rf_id = $(this).attr('href').slice(1, $(this).attr('href').length);	
+        	var api_rfDelete = f.deleteMyRF(+rf_id);
+        	api_rfDelete
+                .done(function(deleteRF){
+                    if (deleteRF.commit) {showMessage("File deleted successfully","pos");}
+                    	else {showMessage("File deleted failed.<br><br>Please try again.","neg");}
+                    	getListFile(rc_id, rc_title);
+                })
+        });
+        
+        // upload file to RepoFile based container_id
+        $("#create-formRF").submit(function(e){
+        	f.setTray("Uploading...","indeterminate",false);
+            el.container.val(rc_id);
+        	http://portfolio.planetjon.ca/2014/01/26/submit-file-input-via-ajax-jquery-easy-way/
+        	$.ajax({
+            	type: "POST",
+            	url: "api/1.0/repofiles/create",
+            	data: new FormData(this),
+            	processData: false,
+      			contentType: false,
+            	success: function() {
+                 	showMessage("File uploaded successfully","pos");
+            	},
+            	error: function(data) {
+                 	showMessage("Uploading file failed.<br><br>Title, name and file can not be blank.","neg");
+            	}
+        	});
+        	e.preventDefault();
+        	setTimeout(function(){
+        		//alert(rc_id+" | "+ rc_title);
+        		f.closeTray();
+        		getListFile(rc_id, rc_title);
+        		el.name.val("");
+        		el.file.val("");
+        	}, 1000);
+        	
+        	
+        	
+        });
+
+		//search function
+		var $mySearch = $("#search").on("keyup",function(){
+			rc_page = "0";
+			var val = $.trim(this.value).toUpperCase();
+			if (val === "")
+			{
+				filter = "all";
+				keyword = val;
+			}
+			else 
+			{
+				var keywords = val.split(":");
+				//alert(keywords[0]);
+				if (keywords[0] == "TITLE")
+				{
+					filter = "title";
+					keyword = keywords[1];
+				}
+				else if (keywords[0] == "TAGS")
+				{
+					filter = "tags";
+					keyword = keywords[1];
+				}
+				else
+				{
+					filter = "all";
+					keyword = val;
+				}
+			}
+			setupRepo(rc_id,rc_length,rc_page,filter,keyword);
+		});
+		
+		//event to set search box with clicked title 
+        $(document.body).on('click', 'a.search_title', function(){
+  			$("#search").val("title:"+$(this).attr('href').slice(1, $(this).attr('href').length));
+  			$mySearch.trigger('keyup');	
+        });
+        
+        //event to set search box with clicked tags 
+        $(document.body).on('click', 'a.search_tags', function(){
+  			$("#search").val("tags:"+$(this).attr('href').slice(1, $(this).attr('href').length));
+  			$mySearch.trigger('keyup');	
+        });
+		
+		//set initial repo environment
+        setupRepo(rc_id,rc_length,rc_page,filter,keyword);   
+                
+        // Autofocus on content (rather than <input>, which brings virtual keyboards up)
+        $("#content").focus();
+        
+        // Hide messages and form-RF by default
+        hideMessages();
+        $('#create-formRC').show();
+        $('#create-formRF').hide();
+        
+        
+        // Update title, strip URL params by replacing state
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: false
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+    
+        //tabs manipulator
+        jQuery(document).ready(function() {
+			jQuery('.tabs .tab-links a').on('click', function(e)  {
+				var currentAttrValue = jQuery(this).attr('href');
+ 
+				// Show/Hide Tabs
+				jQuery('.tabs ' + currentAttrValue).show().siblings().hide();
+ 
+				// Change/remove current tab to active
+				jQuery(this).parent('li').addClass('active').siblings().removeClass('active');
+ 
+				e.preventDefault();
+			});
+		});
+		
+		//tab list
+		$(document.body).on('click', 'a#tab1', function(){
+        	//reseting RC-form to default
+        	hideMessages();
+        	document.getElementById("create-formRC").reset();
+        	jq.rcbutton.val("Create");
+        	$('#create-formRC').show();
+            $('#create-formRF').hide();
+        });
+        
+        //tab detail
+        $(document.body).on('click', 'a#tab3', function(){
+        	//reseting RC-form to default
+        	hideMessages();
+        	//alert(detail_tab);
+        	if (detail_tab == "active")
+        	{	
+        		$('#create-formRC').hide();
+            	$('#create-formRF').show();
+            	detail_tab == "";
+            }
+        });
+        
+        
+    })();
+</script>

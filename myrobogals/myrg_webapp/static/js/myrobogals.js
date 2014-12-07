@@ -356,7 +356,7 @@ var myRG = myRG || {};
                 }));
             }
             modalWindowElem.append($("<div>", {"class": "content"}).html(html));
-            modalWindowElem.append($("<div>", {"class": "buttons"}).html(buttons));
+            modalWindowElem.append($("<div>", {"class": "buttons"}).html(""));
             
             jq.overlay.append(modalWindowElem);
             
@@ -471,9 +471,7 @@ var myRG = myRG || {};
                     // Apply classes which the app requires
                     jq.body.addClass(a.get("BODY_CLASS").join(" "));
                     
-                    jq.stage.scrollTop(0);
-                    
-                    //f.closeTray();
+                    f.closeTray();
                 })
                 .fail(function(){
                     f.throwError({

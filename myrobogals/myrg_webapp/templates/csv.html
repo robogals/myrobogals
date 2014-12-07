@@ -1,0 +1,410 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+    
+    #app-container {
+        text-align: left;
+        
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 30rem;
+        
+        color: #fff;
+        
+        font-size: 1.2rem;
+    }
+    
+    #app-container .container {
+        padding: 1rem;
+    }
+    
+    #app-container .container .row {
+        padding: 0.5rem;
+    }
+    
+    #app-container .container .col {
+        vertical-align: middle;
+    }
+    
+    #app-container .container .left.col {
+        width: 10rem;
+        font-weight: 500;
+    }
+    
+    #app-container select,
+    #app-container input,
+    #app-container textarea,
+    #app-container button {
+        border: 0;
+        background: #fff;
+        color: #000;
+        padding: 0.3rem;
+        
+        width: 100%;
+    }
+      
+    
+    /*----- Tabs -----*/
+	.tabs {
+		width:100%;
+		display:inline-block;
+	}
+ 
+    /*----- Tab Links -----*/
+    /* Clearfix */
+    .tab-links:after {
+        display:block;
+        clear:both;
+        content:'';
+    }
+ 
+    .tab-links li {
+        margin:-14px 5px;
+        float:left;
+        list-style:none;
+    }
+ 
+        .tab-links a {
+            padding:9px 15px;
+            display:inline-block;
+            border-radius:3px 3px 0px 0px;
+            background:#7FB5DA;
+            font-size:16px;
+            font-weight:600;
+            color:#4c4c4c;
+            transition:all linear 0.15s;
+        }
+ 
+        .tab-links a:hover {
+            background:#a7cce5;
+            text-decoration:none;
+        }
+ 
+    li.active a, li.active a:hover {
+        background:#fff;
+        color:#4c4c4c;
+    }
+ 
+    /*----- Content of Tabs -----*/
+    .tab-content {
+        padding:15px;
+        border-radius:3px;
+        box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
+        background:#fff;
+    }
+ 
+	.tab {
+		display:none;
+	}
+
+	.tab.active {
+		display:block;
+	}
+	
+	
+	/*------ search ------*/
+	#search {
+		width:96%;
+    	box-sizing:border-box;
+    	-moz-box-sizing:border-box;/* Firefox */ 
+	}
+	
+	/*-----tabel-----*/
+	.rcl-container{
+		display: table;
+		border-collapse: collapse;
+		-webkit-width: 100%; /* Chrome, Safari, Opera */
+    	-moz-width: 100%; /* Firefox */  
+    	width: 100%;
+    }
+	.rcl-heading{
+		 font-weight: bold;
+		 display:table-row;
+		 background-color:#000;
+		 text-align: center;
+		 line-height: 25px;
+		 font-size: 14px;
+		 font-family:georgia;
+		 color:#fff;
+	
+	}
+	.rcl-table-row{  
+		 display:table-row;
+		 text-align: center;
+	}
+	.rcl-col{
+		display:table-cell;
+		border: 1px solid #CCC;
+	}
+
+</style>
+{{ response }}
+<div id="content" tabindex="0">
+    <div id="hero">
+        <div class="blocks" style="width: auto;">
+            <h1>Repositories</h1>
+        </div>
+    </div>
+    
+    <div class="row" style="margin-top: 1.5rem;">
+    </div>
+    
+    <div class="tabs">
+		<ul class="tab-links">
+			<li class="active"><a id="tab1" href="#tab1">Download CSV</a></li>
+			<li><a id="tab2" href="#tab2">tab2</a></li>
+			<li><a id="tab3" href="#tab3">tab3</a></li>
+		</ul>
+ 
+		<div class="tab-content">
+			<div id="tab1" class="tab active">
+				<div id="app-container">
+						<div class="container bg-rg-dark-blue" >
+							<div id="message-container">
+								<div class="messages" id="neg-message"></div>
+								<div class="messages" id="pos-message"></div>
+							</div>
+							<form id="generate_csv" method="post">
+							{% csrf_token %}
+								<div class="row">
+									<div class="left col">
+										<label for="id_model">Model</label>
+									</div>
+									<div class="col">
+										<select id="id_model" name="model">
+											<option value="robogalsuser">User</option>
+											<option value="group">Group</option>
+											<option value="repocontainer">Repository Container</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_field">Field(s)</label>
+									</div>
+									<div class="col">
+										<textarea id="id_field" type="text" name="field" placeholder="field(s)"></textarea>
+									</div>
+								</div>
+								<div class="row">
+									<div class="left col">
+										<label for="id_field">Create Date</label>
+									</div>
+									<div class="col">
+										<input id="id_startdate" type="text" name="startdate" placeholder="Start Date">
+									</div>
+									<div class="col">
+										<input id="id_enddate" type="text" name="enddate" placeholder="End Date">
+									</div>
+								</div>
+								<div class="row">
+									<div class="right col">
+										<input id="report_csv" class="bg-rg-dark-green mobile-width-100" type="submit" value="Download CSV File">
+									</div>
+								</div>
+							</form>
+
+						</div>
+					</div>
+			</div>
+ 
+			<div id="tab2" class="tab">
+				<p>tab 2 content goes here</p>
+			</div>
+			<div id="tab3" class="tab">
+				<p>tab 3 content goes here</p>							
+			</div>
+		</div>
+	</div>
+     
+    
+    <div class="row" id="links">
+        <div class="col"><a href="http://localhost:3000/?app=repo-files"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
+    </div>
+    
+</div>
+<script>
+    (function(){
+        var resourceName = "csv";
+        var appName = "CSV";
+    
+        var u = myRG.userStore;
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+        
+        // Common elem
+        var el = a.set("JQELEM",{});
+		//RC Form
+		el.model = $("#id_model");
+        el.field = $("#id_field");
+       
+
+        
+        function hideMessages() {
+            $(".messages").hide();
+        }
+        
+        function showMessage(html, type) {
+            hideMessages();
+            $("#"+type+"-message").html(html).show();
+        }
+        
+    
+        
+    	
+    	//generate date with format YYYY-MM-DD
+    	function get_date(){
+    		var today = new Date();
+			var dd = today.getDate();
+			var mm = today.getMonth()+1; //January is 0!
+			var yyyy = today.getFullYear();
+
+			if(dd<10) {
+    			dd='0'+dd
+			} 
+
+			if(mm<10) {
+    			mm='0'+mm
+			} 
+			today = yyyy+'-'+mm+'-'+dd;
+			return today
+    	}
+
+        
+        // set variable model and fields
+        $("#generate_csv").submit(function(e){
+        	f.setTray("Downloading...","Indeterminate",false);
+        	//http://portfolio.planetjon.ca/2014/01/26/submit-file-input-via-ajax-jquery-easy-way/
+        	//combined by using => http://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
+        	$.ajax({
+            	type: "POST",
+            	url: "app/csv",
+            	data: $("#generate_csv").serialize(),
+            	success: function(response, status, xhr) {
+					showMessage("CSV File Downloading successfully","pos");
+					//alert(data);
+					// check for a filename
+					var filename = "";
+					var disposition = xhr.getResponseHeader('Content-Disposition');
+					if (disposition && disposition.indexOf('attachment') !== -1) {
+						var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+						var matches = filenameRegex.exec(disposition);
+						if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+					}
+
+					var type = xhr.getResponseHeader('Content-Type');
+					var blob = new Blob([response], { type: type });
+
+					if (typeof window.navigator.msSaveBlob !== 'undefined') {
+						// IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+						window.navigator.msSaveBlob(blob, filename);
+					} else {
+						var URL = window.URL || window.webkitURL;
+						var downloadUrl = URL.createObjectURL(blob);
+
+						if (filename) {
+							// use HTML5 a[download] attribute to specify filename
+							var a = document.createElement("a");
+							// safari doesn't support this yet
+							if (typeof a.download === 'undefined') {
+								window.location = downloadUrl;
+							} else {
+								a.href = downloadUrl;
+								a.download = filename;
+								document.body.appendChild(a);
+								a.click();
+							}
+						} else {
+							window.location = downloadUrl;
+						}
+
+						setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100); // cleanup
+					}
+				},
+            	error: function(data) {
+                 	showMessage("Downloading CSV File Failed.","neg");
+                 	//alert(data);
+            	}
+        	});
+        	setTimeout(function(){	
+        		f.closeTray();
+        	}, 1000);
+        	e.preventDefault();
+        	//return false;
+        	
+        });
+
+		  
+                
+        // Autofocus on content (rather than <input>, which brings virtual keyboards up)
+        $("#content").focus();
+        
+        // Hide messages by default
+        hideMessages();
+        
+        // Update title, strip URL params by replacing state
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: false
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+    
+        //tabs manipulator
+        jQuery(document).ready(function() {
+			jQuery('.tabs .tab-links a').on('click', function(e)  {
+				var currentAttrValue = jQuery(this).attr('href');
+ 
+				// Show/Hide Tabs
+				jQuery('.tabs ' + currentAttrValue).show().siblings().hide();
+ 
+				// Change/remove current tab to active
+				jQuery(this).parent('li').addClass('active').siblings().removeClass('active');
+ 
+				e.preventDefault();
+			});
+		});
+        
+    })();
+</script>
