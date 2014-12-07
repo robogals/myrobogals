@@ -10,8 +10,7 @@ Use `pip` to install dependencies. We will probably push a req file later to aut
 
 * Python 2.7+
   * Python 3.3+ support should be built in, but we currently do not utilise it on live systems and hence do not give any guarantees.
-* Django 1.6
-  * Django 1.7 support is being phased in, however it is likely things will be broken.
+* [Django](https://www.djangoproject.com/) 1.7
 * [Django REST Framework](http://www.django-rest-framework.org/) 2.4
 * [Django OAuth Toolkit](https://github.com/evonove/django-oauth-toolkit) 0.7
 * [Mandrill for Python](https://pypi.python.org/pypi/mandrill/) 1.0
