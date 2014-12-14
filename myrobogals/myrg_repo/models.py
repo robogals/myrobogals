@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from myrg_users.models import RobogalsUser
 from myrg_groups.models import Role
+from myrg_permissions.custom_permissions import PermissionManager
 
 #@python_2_unicode_compatible
 class RepoContainer(models.Model):
@@ -56,6 +57,8 @@ class RepoContainer(models.Model):
     
     # Fields that cannot be written to
     READONLY_FIELDS = ("id","date_created",)
+    
+    objects = PermissionManager()
     
     def __str__(self):
         return self.title

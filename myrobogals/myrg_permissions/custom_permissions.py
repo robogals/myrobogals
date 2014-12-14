@@ -1,7 +1,14 @@
+from django.db import models
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework.permissions import BasePermission
 from rest_framework.views import APIView
+from myrg_core.classes import RobogalsAPIView
+from .models import PermissionList
+from .serializers import PermissionListSerializer
+from myrg_groups.models import Role
+from myrg_groups.serializers import RoleSerializer
+
 # import the logging library
 import logging
 
@@ -9,6 +16,53 @@ import logging
 logger = logging.getLogger(__name__)
 
         
+class PermissionManager(RobogalsAPIView):
+    def get_classes_list(data):
+        """
+        Get all roleclasses based on permission provided
+        """
+        
+        #logger.error(data)
+        query = PermissionList.objects.filter(permission=data)
+        #logger.error(query)
+        # Serialize
+        serializer = PermissionListSerializer
+        serializer.Meta.fields = ["role_classes"]
+        serialized_query = serializer(query, many=True)
+        #logger.error(serialized_query.data)
+        
+        # Output
+        output_list = [] 
+        
+        for roleclasses_object in serialized_query.data:
+            output_list = roleclasses_object.pop("role_classes")
+            #logger.error(output_list)
+            
+        return output_list
+    
+    def get_userclass_by_user(user_id):
+        """
+        Get roleclasses based on user_id
+        """
+        
+        #logger.error(user_id)
+        query = Role.objects.filter(user=user_id)
+        #logger.error(query)
+        # Serialize
+        serializer = RoleSerializer
+        serializer.Meta.fields = ["role_class"]
+        serialized_query = serializer(query, many=True)
+        #logger.error(serialized_query.data)
+        
+        # Output
+        output_list = [] 
+        
+        for userroleclass_object in serialized_query.data:
+            output_list = userroleclass_object.pop("role_class")
+            #logger.error(output_list)
+            
+        return output_list
+
 class AnyPermissions(BasePermission):
 
     def get_permissions(self, view):
