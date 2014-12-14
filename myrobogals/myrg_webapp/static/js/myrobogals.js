@@ -570,9 +570,10 @@ var myRG = myRG || {};
                     return;
                 }
                 
+                var selected_role_id = myrolesXhrArr[0].role[0].id;
                 
                 var api_data = {
-                    "role_id": myrolesXhrArr[0].role[0].id
+                    "role_id": selected_role_id
                 }
                 
                 var api_xhr = f.fetchAPI("/app/set_role_id",api_data,"POST",true);
@@ -581,6 +582,7 @@ var myRG = myRG || {};
                     .always(function(){
                     })
                     .done(function(){
+                        u.set("ROLE_ID", selected_role_id);
                         f.gotoApp(myRG.settings.get("INIT_DEFAULT_USER_APP"));
                     })
                     .fail(function(xhr){
