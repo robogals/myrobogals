@@ -1,0 +1,85 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+    #form-feedback {
+        border: 0;
+        padding: 0;
+        width: 100%;
+        height: 70em;
+        margin-top: -1em;
+    }
+</style>
+<div id="content" tabindex="0">
+    <div id="app-container">
+        <div id="hero">
+            <div class="blocks" style="width: auto;">
+                <h1>Feedback</h1>
+            </div>
+            <!--<ul class="control-bar">
+            </ul>-->
+        </div>
+        <div class="row" style="margin-top: 1.5rem;">
+            Please wait...
+            <iframe id="form-feedback" src=""></iframe>
+        </div>
+    </div>
+</div>
+<script>
+    (function(){
+        var resourceName = "feedback";
+        var appName = "Feedback";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+        
+        // Set feedback form address with prefilled user ID
+        $("#form-feedback").attr("src","https://docs.google.com/forms/d/12GUiBc0FgHsyI36oDPrjrEnmlN00jdq3lYIvK6-4BbE/viewform?entry.679019642="+u.get("ID"));
+    })();
+</script>
