@@ -1,0 +1,1 @@
+More information is available at the Flip4Mac™ download site: http://www.telestream.net/flip4mac/wmv.htm
