@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
-from myrg_permissions.custom_permissions import AnyPermissions, IsAdminRobogals, IsTeamMember, IsPublicUser
+from myrg_permissions.custom_permissions import AnyPermissions
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 
@@ -295,7 +295,7 @@ class EditPermissionLists(RobogalsAPIView):
 
 class CreatePermissionLists(RobogalsAPIView):
     permission_classes = [AnyPermissions]
-    any_permission_classes = [IsAdminRobogals, IsPublicUser]
+    #any_permission_classes = [IsAdminRobogals, IsPublicUser]
     def post(self, request, format=None):
         loggers.error(self)
         loggers.error(request)
