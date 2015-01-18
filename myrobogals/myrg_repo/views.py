@@ -25,7 +25,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
-from myrg_permissions.custom_permissions import AnyPermissions, IsAdminRobogals, IsTeamMember, IsPublicUser, PermissionManager
+from myrg_permissions.custom_permissions import AnyPermissions, PermissionManager
 from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 
@@ -43,38 +43,19 @@ MAX_REPOS = 1
 # Repo Container
 ################################################################################
 class ListRepoContainers(RobogalsAPIView):
-    #permission_classes = [AnyPermissions]
-    #any_permission_classes = [IsAdminRobogals,]
-    
-    
-    #def get_object(self):
-        #queryset = self.get_queryset()
-        #filter = {}
-        #for field in self.multiple_lookup_fields:
-        #    filter[field] = self.kwargs[field]
-
-        #obj = get_object_or_404(queryset, **filter)
-        #self.check_object_permissions(self.request, obj)
-        #return obj
-        
     def post(self, request, format=None):
         ################################################################
         # Permission restricted viewing to be implemented here
         #
-        # if not permission_allows_viewing_of_this_id:
-        #   failed_repocontainer_updates.update({pk: "PERMISSION_DENIED"})
-        #   skip_roleclass = True
-        #   break
-        ################################################################
-        PERMISSION_TO_VIEW = [int(i) for i in PermissionManager.get_classes_list("USER_SELF_VIEW").split(',')]
-        logger.error(PERMISSION_TO_VIEW)
-        USER_ROLECLASS = PermissionManager.get_userclass_by_user(request.user.id)
-        if USER_ROLECLASS in PERMISSION_TO_VIEW:
-            logger.error("user permission accepted")
-        else:
-            logger.error("permission denied")
-            return Response({"PERMISSION_DENIED"}, status=status.HTTP_400_BAD_REQUEST)
+        # format -> PermissionManager.permission_checked("id","name of permission", "user", "model")
+        # This permission can be combined with other type of permission with operator "or" or "and"
+        permited = PermissionManager.permission_checked(None, "REPOSITORY_SELF_VIEW",request.user, None) and PermissionManager.permission_checked(None, "REPOSITORY_PUBLIC_VIEW",request.user, None) or True 
+        # note: delete this "or True" to disable public permission to view repocontainer
         
+        if not permited:
+            logger.error("permission denied")
+            return Response({"PERMISSION_DENIED"}, status=status.HTTP_403_BAD_REQUEST)
+        ################################################################
         from myrg_users.serializers import RobogalsUserSerializer
         from myrg_users.models import RobogalsUser
 
@@ -234,6 +215,15 @@ class DeleteRepoContainers(RobogalsAPIView):
             #   ids_to_remove.append(idx)
             #   failed_ids.update({pk: "PERMISSION_DENIED"})
             ####################################################################
+            ################################################################
+            # Permission restricted viewing to be implemented here
+            #
+            # format -> PermissionManager.permission_checked("id","name of permission", "user", "model")
+            permited = PermissionManager.permission_checked(pk,"REPOSITORY_SELF_DELETE",request.user, RepoContainer)
+            if not permited:
+               return Response({"PERMISSION_DENIED"}, status=status.HTTP_403_FORBIDDEN)
+                   
+            ################################################################
         
         # Remove bad IDs
         requested_ids = [pk for idx,pk in enumerate(requested_ids) if idx not in ids_to_remove]
@@ -314,12 +304,17 @@ class EditRepoContainers(RobogalsAPIView):
                     break
                     
                 ################################################################
-                # Permission restricted editing to be implemented here
+                # Permission restricted viewing to be implemented here
                 #
-                # if not permission_allows_editing_of_this_id:
-                #   failed_repocontainer_updates.update({pk: "PERMISSION_DENIED"})
-                #   skip_roleclass = True
-                #   break
+                # format -> PermissionManager.permission_checked("id","name of permission", "user", "model")
+                permited = PermissionManager.permission_checked(repocontainer_id,"REPOSITORY_SELF_EDIT",request.user, RepoContainer)
+                if not permited:
+                   #logger.error("permission denied")
+                   #failed_repocontainer_updates.update({repocontainer_id: "PERMISSION_DENIED"})
+                   #skip_repocontainer = True
+                   #break
+                   return Response({"PERMISSION_DENIED"}, status=status.HTTP_403_FORBIDDEN)
+                   
                 ################################################################
             
                 # Add to update data dict
@@ -328,6 +323,7 @@ class EditRepoContainers(RobogalsAPIView):
             if skip_repocontainer:
                 continue
             
+                
             
             # Fetch, serialise and save
             try:
@@ -360,12 +356,7 @@ class EditRepoContainers(RobogalsAPIView):
         })
 
 class CreateRepoContainers(RobogalsAPIView):
-    #permission_classes = [AnyPermissions]
-    #any_permission_classes = [IsAdminRobogals, IsPublicUser]
     def post(self, request, format=None):
-        loggers.error(self)
-        loggers.error(request)
-        # request.DATA
         try:
             supplied_repocontainers = list(request.DATA.get("rc"))
         except:

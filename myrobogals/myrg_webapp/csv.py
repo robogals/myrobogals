@@ -18,7 +18,7 @@ import re
 
 def export(qs, fields=None):
     model = qs.model
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' % slugify(model.__name__)
     writer = csv.writer(response)
     # Write headers to CSV file
@@ -86,6 +86,8 @@ def convert_csv(request):
         app_label = "myrg_groups"
     elif model_name == "repocontainer":
         app_label = "myrg_repo"
+    elif model_name == "permissionlist":
+        app_label = "myrg_permissions"
                 
     model = get_model(app_label, model_name)
     

@@ -310,7 +310,7 @@
         
         //Set global variable for RC and RF
         var rc_id = "";
-        var rc_length = "3"; //change this value to set total RC list per page
+        var rc_length = "10"; //change this value to set total RC list per page
         var rc_page = "0";
         var rc_tot_list = rc_length;
         var max_rc_page = 0;
@@ -633,12 +633,28 @@
         		var api_rcDelete = f.deleteMyRC(rc_id);
         		api_rcDelete
                 	.done(function(deleteRC){
-                		if (deleteRC.commit) {showMessage("Repository Container deleted successfully","pos");}
-                    	else {showMessage("Repository Container deleted failed.<br><br>Please try again.","neg");}
-                    	rc_tot_list = rc_tot_list - 1;
-                    	if(rc_tot_list % rc_length == 0 && rc_page == max_rc_page){rc_page = rc_page - 1;}
-                    	setupRepo("",rc_length,rc_page,filter,keyword);
+                		
+                		f.setTray("Repository Container deleted successfully","indeterminate",false);
+                		
+                		setTimeout(function(){
+							f.closeTray();
+							rc_tot_list = rc_tot_list - 1;
+                    		if(rc_tot_list % rc_length == 0 && rc_page == max_rc_page){rc_page = rc_page - 1;}
+                    		setupRepo("",rc_length,rc_page,filter,keyword);
+						}, 1000);
+                    	
                 	})
+                	
+                	.fail(function(xhr){
+                        //f.setTray("Repository Container deleted failed","indeterminate",false);
+                    
+                        // 403 => Request_API fail because permission denied (403_FORBBIDEN)
+                        if (xhr.status == 403){
+                            f.setTray("Repository Container deleted failed, You don't have permission to use this function","indeterminate",false);
+                            
+                        }
+                        setTimeout(function(){f.closeTray();}, 5000);
+                    });
             
 			}
         });
@@ -735,7 +751,6 @@
   					"rc": [
     					{
       					"data": {
-        					"user": u.get("WHOAMI_XHR").responseJSON.user.id,
         					"role": u.get("MYROLES_XHR").responseJSON.role[0].id,
         					"title": el.title.val(),
         					"body": el.body.val(),
@@ -747,7 +762,7 @@
     					}
   					]
 				}
-				alert(JSON.stringify(api_data_createRC));
+				//alert(JSON.stringify(api_data_createRC));
 				var api_rcCreate = f.fetchUpdateMyRC(api_data_createRC);
 			}
             
