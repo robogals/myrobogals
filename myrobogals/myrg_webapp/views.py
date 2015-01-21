@@ -71,7 +71,7 @@ def set_role_id(request):
 def login(request):                                                                                                                         
     if request.is_ajax():
         if request.method == "POST":
-            post = json.loads(request.body.decode())
+            post = json.loads(request.body.decode('utf8'))
             post['username'] = post.pop("primary_email");
             
             form = AuthenticationForm(request, data=post)

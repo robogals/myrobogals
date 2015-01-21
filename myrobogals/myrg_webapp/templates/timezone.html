@@ -1,0 +1,404 @@
+<style>
+    #content {
+    }
+    
+    .messages {
+        font-size: 0.8em;
+        border: 1px solid;
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    #neg-message {
+        background: #ffbaba;
+        color: #d8000c;
+    }
+    
+    #pos-message {
+        background: #dff2bf;
+        color: #4f8a10;
+    }
+    
+    .row .col.right {
+        text-align: right;
+    }
+    
+    
+    #app-container {
+        text-align: left;
+        
+        display: inline-block;
+        vertical-align: middle;
+        
+        width: 100%;
+        max-width: 230rem;
+        
+        color: #fff;
+        
+        font-size: 1.2rem;
+    }
+    
+    #app-container .container {
+        padding: 1rem;
+    }
+    
+    #app-container .container .row {
+        padding: 0.5rem;
+    }
+    
+    #app-container .container .col {
+        vertical-align: middle;
+    }
+    
+    #app-container .container .left.col {
+        width: 15rem;
+        font-weight: 500;
+    }
+    
+    #app-container select,
+    #app-container input,
+    #app-container textarea,
+    #app-container button {
+        border: 0;
+        background: #fff;
+        color: #000;
+        padding: 0.3rem;
+        
+        
+    }
+      
+    
+    #links {
+        color: rgba(0,0,0,0.5);
+        margin: 1rem;
+    }
+    
+    #links a {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    
+    html.large #content:before {
+        content: '';
+        display: inline-block;
+        height: 90%;
+        vertical-align: middle;
+    }
+    
+	#img_tz {
+    	display: block;
+    
+    	background: url(https://sslimgs.xkcd.com/comics/now/23h15m.png) center center no-repeat;
+    	background-size: 102% 102%;
+    
+    	width: 100%;
+    	padding-top: 100%;
+    
+    	border-radius: 51%;
+    	
+    }
+    
+	#img_tz_b {
+		position: relative;
+		max-width: 690px;
+	}
+
+</style>
+
+<div id="content" tabindex="0">
+    <div id="hero">
+        <div class="blocks" style="width: auto;">
+            <h1>TimeZone Converter</h1>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 1.5rem;">
+    </div>
+     <div id="app-container">
+        <div class="container bg-rg-dark-blue" >
+            <div id="message-container">
+                <div class="messages" id="neg-message"></div>
+                <div class="messages" id="pos-message"></div>
+            </div>
+			<form id="id_tzconverter" method="post">
+				<div class="row">
+					<div class="left col">
+						<label for="time">DD/MD/YYYY - HH:mm : </label>
+					</div> 
+					<div class="date">
+						<select id="daydropdown"></select> / 
+						<select id="monthdropdown"></select> / 
+						<select id="yeardropdown"></select> - 
+						<select id="hourdropdown"></select> : 
+						<select id="minutedropdown"></select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="left col">
+						<label for="origin">Origin Location: </label>
+					</div> 
+					<div class="col">
+						<select id="id_origin" name="DropDownTimezone1">
+							  <option value="-1200">(GMT -12:00) Eniwetok, Kwajalein</option>
+							  <option value="-1100">(GMT -11:00) Midway Island, Samoa</option>
+							  <option value="-1000">(GMT -10:00) Hawaii</option>
+							  <option value="-0900">(GMT -9:00) Alaska</option>
+							  <option value="-0800">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+							  <option value="-0700">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+							  <option value="-0600">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+							  <option value="-0500">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+							  <option value="-0400">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+							  <option value="-0330">(GMT -3:30) Newfoundland</option>
+							  <option value="-0300">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+							  <option value="-0200">(GMT -2:00) Mid-Atlantic</option>
+							  <option value="-0100">(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+							  <option value="+0000">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+							  <option value="+0100">(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+							  <option value="+0200">(GMT +2:00) Kaliningrad, South Africa</option>
+							  <option value="+0300">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+							  <option value="+0330">(GMT +3:30) Tehran</option>
+							  <option value="+0400">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+							  <option value="+0430">(GMT +4:30) Kabul</option>
+							  <option value="+0500">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+							  <option value="+0530">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+							  <option value="+0545">(GMT +5:45) Kathmandu</option>
+							  <option value="+0600">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+							  <option value="+0700">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+							  <option value="+0800">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+							  <option value="+0900">(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+							  <option value="+0930">(GMT +9:30) Adelaide, Darwin</option>
+							  <option value="+1000">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+							  <option value="+1100">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+							  <option value="+1200">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="left col">
+						<label for="destination">Location to convert: </label>
+					</div> 
+					<div class="col">
+						<select id="id_destination" name="DropDownTimezone2">
+							  <option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
+							  <option value="-11:00">(GMT -11:00) Midway Island, Samoa</option>
+							  <option value="-10:00">(GMT -10:00) Hawaii</option>
+							  <option value="-09:00">(GMT -9:00) Alaska</option>
+							  <option value="-08:00">(GMT -8:00) Pacific Time (US &amp; Canada)</option>
+							  <option value="-07:00">(GMT -7:00) Mountain Time (US &amp; Canada)</option>
+							  <option value="-06:00">(GMT -6:00) Central Time (US &amp; Canada), Mexico City</option>
+							  <option value="-05:00">(GMT -5:00) Eastern Time (US &amp; Canada), Bogota, Lima</option>
+							  <option value="-04:00">(GMT -4:00) Atlantic Time (Canada), Caracas, La Paz</option>
+							  <option value="-03:30">(GMT -3:30) Newfoundland</option>
+							  <option value="-03:00">(GMT -3:00) Brazil, Buenos Aires, Georgetown</option>
+							  <option value="-02:00">(GMT -2:00) Mid-Atlantic</option>
+							  <option value="-01:00">(GMT -1:00 hour) Azores, Cape Verde Islands</option>
+							  <option value="+00:00">(GMT) Western Europe Time, London, Lisbon, Casablanca</option>
+							  <option value="+01:00">(GMT +1:00 hour) Brussels, Copenhagen, Madrid, Paris</option>
+							  <option value="+02:00">(GMT +2:00) Kaliningrad, South Africa</option>
+							  <option value="+03:00">(GMT +3:00) Baghdad, Riyadh, Moscow, St. Petersburg</option>
+							  <option value="+03:30">(GMT +3:30) Tehran</option>
+							  <option value="+04:00">(GMT +4:00) Abu Dhabi, Muscat, Baku, Tbilisi</option>
+							  <option value="+04:30">(GMT +4:30) Kabul</option>
+							  <option value="+05:00">(GMT +5:00) Ekaterinburg, Islamabad, Karachi, Tashkent</option>
+							  <option value="+05:30">(GMT +5:30) Bombay, Calcutta, Madras, New Delhi</option>
+							  <option value="+05:45">(GMT +5:45) Kathmandu</option>
+							  <option value="+06:00">(GMT +6:00) Almaty, Dhaka, Colombo</option>
+							  <option value="+07:00">(GMT +7:00) Bangkok, Hanoi, Jakarta</option>
+							  <option value="+08:00">(GMT +8:00) Beijing, Perth, Singapore, Hong Kong</option>
+							  <option value="+09:00">(GMT +9:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk</option>
+							  <option value="+09:30">(GMT +9:30) Adelaide, Darwin</option>
+							  <option value="+10:00">(GMT +10:00) Eastern Australia, Guam, Vladivostok</option>
+							  <option value="+11:00">(GMT +11:00) Magadan, Solomon Islands, New Caledonia</option>
+							  <option value="+12:00">(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka</option>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col">
+					</div>
+					<div class="right col">
+						<input id="login" class="bg-rg-dark-green mobile-width-100" type="submit" value="Convert Time">
+					</div>
+				</div>
+			</form>
+		</div>
+    </div>
+    <div class="row" style="margin-top: 1.5rem;">
+        <div class="col" id="result" style="background: #fff; padding: 1.6rem; font-size: 4em;"></div>
+    </div>
+    <div class="row" id="links">
+        <div class="tz" id="img_tz_b"><div class="tz" id="img_tz"></div></div></br>
+        Permanent link to this comic: http://xkcd.com/1335/</br>
+        Image URL (for hotlinking/embedding): http://imgs.xkcd.com/comics/now.png
+    </div>
+</div>
+
+
+<script>
+    (function(){
+        var resourceName = "timezone";
+        var appName = "Timezone";
+    
+        var a = myRG.appStore;
+        var f = myRG.functions;
+        var u = myRG.userStore;
+        var jq = myRG.jq;
+        
+        var curr_state = f.fetchStateData();
+        
+        // Grab jQuery objects from DOM elements
+        jq.result = $("#result");
+        
+        // Set body style classes
+        a.set("BODY_CLASS", 
+            [
+                "header-enabled",
+                "menu-enabled",
+                "stage-enabled"
+            ]);
+            
+        // Common elem
+        var el = a.set("JQELEM",{});
+		// Form
+		el.day = $("#daydropdown");
+        el.month = $("#monthdropdown");
+        el.year = $("#yeardropdown");
+        el.hour = $("#hourdropdown");
+        el.minute = $("#minutedropdown");
+        el.origin = $("#id_origin");
+        el.destination = $("#id_destination");
+            
+        function hideMessages() {
+            $(".messages").hide();
+        }
+        
+        function showMessage(html, type) {
+            hideMessages();
+            $("#"+type+"-message").html(html).show();
+        }
+            
+        //function to get current date and time
+		function populatedropdown(dayfield, monthfield, yearfield, hourfield, minutefield, offsetfield){
+			var today=new Date()
+	
+			var dayfield=document.getElementById(dayfield)
+			var monthfield=document.getElementById(monthfield)
+			var yearfield=document.getElementById(yearfield)
+			var hourfield=document.getElementById(hourfield)
+			var minutefield=document.getElementById(minutefield)
+			var offsetfield=document.getElementById(offsetfield)
+	
+			for (var i=1; i<32; i++) 
+			{
+				if (i < 10){var days = "0"+i.toString();}else{days = i;}
+				dayfield.options[i-1]=new Option(i, days)
+			}
+			var dates = today.getDate();
+			if (dates < 10) {var dates = "0"+dates.toString();}else{dates = dates;}
+			dayfield.options[dates-1]=new Option(dates, dates, true, true) //select today's day
+	
+			var monthtext=['0', 'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+			for (var mo=1; mo<13; mo++) 
+			{
+				if (mo < 10){var months = "0"+mo.toString();}else{months = mo;}
+				monthfield.options[mo]=new Option(monthtext[mo], months)
+			}
+			var months = today.getMonth() + 1;
+			if (months < 10) {months = "0"+months.toString();}else{months = months;}
+			monthfield.options[today.getMonth()+1]=new Option(monthtext[today.getMonth()+1], months, true, true) //select today's month
+	
+			var thisyear=today.getFullYear()
+			for (var y=0; y<20; y++){
+				yearfield.options[y]=new Option(thisyear, thisyear)
+				thisyear+=1
+			}
+			yearfield.options[0]=new Option(today.getFullYear(), today.getFullYear(), true, true) //select today's year
+	
+			for (var h=0; h<24; h++)
+			{
+				if (h < 10){var hours = "0"+h.toString();}else{hours = h;}
+				hourfield.options[h]=new Option(hours, hours)
+			}
+			if (today.getHours() < 10) {var hours = "0"+today.getHours().toString();}else{hours = today.getHours();} 
+			hourfield.options[today.getHours()]=new Option(hours, hours, true, true ) //select current's hour
+	
+			for (var mt=0; mt<60; mt++) 
+			{
+				if (mt < 10){var minutes = "0"+mt.toString();}else{minutes = mt;}
+				minutefield.options[mt]=new Option(minutes, minutes)
+			}
+			if (today.getMinutes() < 10) {var minutes = "0"+today.getMinutes().toString();}else{minutes = today.getMinutes();} 
+			minutefield.options[today.getMinutes()]=new Option(minutes, minutes, true, true ) //select current's getMinute
+	
+			var offsetUTC = today.toString().match(/([-\+][0-9]+)\s/)[1].substr(0, 3);
+			//alert(offsetUTC);
+			document.getElementById("id_origin").value = offsetUTC+"00";
+			document.getElementById("id_destination").value = offsetUTC+":00";
+			
+			var currentTimeRounded = (15*Math.round(minutes/15));
+			if (currentTimeRounded < 10) {currentTimeRounded = "0"+currentTimeRounded.toString();}else{currentTimeRounded = currentTimeRounded;} 
+			var currtime = hours+"h"+currentTimeRounded+"m";
+			//alert(currtime);
+			document.getElementById("img_tz").style.background = "url(https://sslimgs.xkcd.com/comics/now/"+currtime+".png) center center no-repeat";
+		}
+
+		
+		// Create and Update form for Repo container
+        $("#id_tzconverter").submit(function(e){
+            e.preventDefault();
+            f.setTray("Loading...","indeterminate",false);
+            hideMessages();
+            //get the value from the form
+            
+            			 
+			var zone_ori = el.origin.find(":selected").attr("value");
+			var zone_dest = el.destination.find(":selected").attr("value");
+			var time_ori  = el.year.val()+"-"+el.month.val()+"-"+el.day.val()+" "+el.hour.val()+":"+el.minute.val()+" "+zone_ori;
+			//alert(time_ori+"-"+zone_dest);
+			
+			var fieldtimeRounded = (15*Math.round(el.minute.val()/15));
+			if (fieldtimeRounded < 10) {fieldtimeRounded = "0"+fieldtimeRounded.toString();}else{fieldtimeRounded = fieldtimeRounded;} 
+			var fieldtime = el.hour.val()+"h"+fieldtimeRounded+"m";
+			//alert(fieldtime);
+			document.getElementById("img_tz").style.background = "";
+			document.getElementById("img_tz").style.background = "url(https://sslimgs.xkcd.com/comics/now/"+fieldtime+".png) center center no-repeat";
+			
+			jq.result.text("");
+			f.closeTray();
+			
+			// the date we're converting for use
+			var startDateTime = time_ori;
+
+			// the moment-ified date (notice the Z)
+			var startMoment = moment(startDateTime, "YYYY-MM-DD HH:mm Z");
+
+			// the "nice" display date
+			var converting_result = startMoment.zone(zone_dest).format("dddd, DD/MMM/YYYY - HH:mm");
+			jq.result.text(converting_result);
+			
+			
+		});
+		
+		
+		//init load
+		populatedropdown("daydropdown", "monthdropdown", "yeardropdown", "hourdropdown", "minutedropdown", "offsetfield")
+
+		// Hide messages by default
+        hideMessages();
+        
+        // Update title
+        f.pushState({
+            app: {
+                content: resourceName,
+                in_url: true
+            },
+            ref_state: {
+                content: curr_state,
+                in_url: false
+            }
+        }, appName, true);
+        myRG.jq.body.attr("data-app",resourceName);
+        ga('send', 'pageview');
+    })();
+</script>
+

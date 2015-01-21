@@ -130,7 +130,7 @@
         height: 90%;
         vertical-align: middle;
     }
-}
+
 </style>
 <div id="content" tabindex="0"
    ><div id="app-container">
@@ -362,7 +362,7 @@
                     f.closeTray();
                 })
                 .done(function(){
-                    showMessage("Password reset instructions have been sent to your email.<br><br>Please look in your inbox or spam folder for the message.","pos");
+                    showMessage("Password reset instructions have been sent to your email, if your email is tied to an account.<br><br>Please look in your inbox or spam folder for the message.<br><br>If it doesn't appear, check that the email is correct.","pos");
                 })
                 .fail(function(){
                     showMessage("Something went wrong.<br><br>Reload the page, and try again in a few minutes.","neg");

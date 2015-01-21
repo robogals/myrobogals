@@ -5,6 +5,7 @@
 *.sqlite3
 myrobogals/myrg_core/settings.py
 myrobogals/static_root
+myrobogals/media_root
 #__init__.py
 #wsgi.py
 *.orig

@@ -23,53 +23,33 @@
         text-align: right;
     }
     
-    .row.activity > .col {
-        padding: 0.7rem 1rem 0.5rem;
-        vertical-align: middle;
-    }
-    
-    html.large .row.activity > .col {
-        padding: 1rem;
-        vertical-align: middle;
-    }
-    
-    .large {
-        font-size: 1.5em;
-    }
-    
-    #respond-button {
+    #form-feedback {
         border: 0;
-        font-weight: 500;
-        padding: 0.5rem 2rem;
-        width: auto;
-        font-size: 1.2em;
+        padding: 0;
+        width: 100%;
+        height: 70em;
+        margin-top: -1em;
     }
 </style>
 <div id="content" tabindex="0">
     <div id="app-container">
         <div id="hero">
             <div class="blocks" style="width: auto;">
-                <h1>Activities</h1>
+                <h1>Feedback</h1>
             </div>
             <!--<ul class="control-bar">
             </ul>-->
         </div>
         <div class="row" style="margin-top: 1.5rem;">
-            <div class="col" style="background: #fff; padding: 1.6rem; font-size: 1.25em;">
-                <h4>How do I use Activities?</h4>
-                <p>Select an Activity you would like to respond to, and enter information as requested.</p>
-                <p>Please note that you will <b>not</b> be able to modify responses after submission.</p>
-                <p>If you have problems or would like to ask a few questions regarding the new system, please contact <a href="http://support.robogals.org/" target="_blank">Robogals Support</a>.</p>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 1.5rem;">
+            Please wait...
+            <iframe id="form-feedback" src=""></iframe>
         </div>
     </div>
 </div>
 <script>
     (function(){
-        var resourceName = "activities";
-        var appName = "Activities";
+        var resourceName = "feedback";
+        var appName = "Feedback";
     
         var a = myRG.appStore;
         var f = myRG.functions;
@@ -84,7 +64,7 @@
                 "menu-enabled",
                 "stage-enabled"
             ]);
-          
+            
         // Update title
         f.pushState({
             app: {
@@ -98,5 +78,8 @@
         }, appName, true);
         myRG.jq.body.attr("data-app",resourceName);
         ga('send', 'pageview');
+        
+        // Set feedback form address with prefilled user ID
+        $("#form-feedback").attr("src","https://docs.google.com/forms/d/12GUiBc0FgHsyI36oDPrjrEnmlN00jdq3lYIvK6-4BbE/viewform?entry.679019642="+u.get("ID"));
     })();
 </script>
