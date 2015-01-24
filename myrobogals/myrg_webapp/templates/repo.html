@@ -293,10 +293,6 @@
 	</div>
      
     
-    <div class="row" id="links">
-        <div class="col"><a href="http://localhost:3000/?app=repo-files"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
-    </div>
-    
 </div>
 <script>
     (function(){
@@ -524,7 +520,7 @@
     							+ "<div class='rcl-col'>"+ no + "</div>"
     							+ "<div class='rcl-col' style='text-align: left; width:600px;'><a class='rfl_link' href='#" + rclistdata.rcl[i].id + "_" + rclistdata.rcl[i].data.title + "'>" + rclistdata.rcl[i].data.title + "</a></div>"
     							+ "<div class='rcl-col' style='width:400px;'>" + givealink(rclistdata.rcl[i].data.tags, 'search_tags') + "</div>"
-    							+ "<div class='rcl-col'>" + rclistdata.rcl[i].user[0].username + "</div>"
+    							+ "<div class='rcl-col'>" + rclistdata.rcl[i].user[0].given_name + "</div>"
     							+ "<div class='rcl-col' style='width:250px;'>" + rclistdata.rcl[i].data.date_created + "</div>"
     							//if (rclistdata.rcl[i].user[0].username==u.get("WHOAMI_XHR").responseJSON.user.data.username){
     							//jq.rcllist.append(

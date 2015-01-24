@@ -169,7 +169,7 @@ class ListRepoContainers(RobogalsAPIView):
                 user_id = repocontainer_object.pop("user")
                 user = RobogalsUser.objects.filter(id = user_id)
                 user_serializer = RobogalsUserSerializer
-                user_serializer.Meta.fields = ("username",)
+                user_serializer.Meta.fields = ("given_name",)
                 user_serializer_query = user_serializer(user, many=True)
                 user_data = user_serializer_query.data
                 new_dict.update({"user": user_data})
