@@ -566,13 +566,17 @@ class DeleteRepoFiles(RobogalsAPIView):
                 failed_ids.update({pk: "DATA_FORMAT_INVALID"})
                 continue
                     
-            ####################################################################
-            # Permission restricted deletion to be implemented here
+            ################################################################
+            # Permission restricted viewing to be implemented here
             #
-            # if not permission_allows_deletion_of_this_id:
-            #   ids_to_remove.append(idx)
-            #   failed_ids.update({pk: "PERMISSION_DENIED"})
-            ####################################################################
+            #get repocontainer_id based on repofile_id
+            rc_id = RepoFile.objects.filter(id=pk)
+            # format -> PermissionManager.permission_checked("id","name of permission", "user", "model")
+            permited = PermissionManager.permission_checked(rc_id[0].container_id,"REPOSITORY_SELF_DELETE",request.user, RepoContainer)
+            if not permited:
+               return Response({"PERMISSION_DENIED"}, status=status.HTTP_403_FORBIDDEN)
+                   
+            ################################################################
         
         # Remove bad IDs
         requested_ids = [pk for idx,pk in enumerate(requested_ids) if idx not in ids_to_remove]

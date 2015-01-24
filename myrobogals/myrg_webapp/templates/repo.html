@@ -522,12 +522,7 @@
     							+ "<div class='rcl-col' style='width:400px;'>" + givealink(rclistdata.rcl[i].data.tags, 'search_tags') + "</div>"
     							+ "<div class='rcl-col'>" + rclistdata.rcl[i].user[0].given_name + "</div>"
     							+ "<div class='rcl-col' style='width:250px;'>" + rclistdata.rcl[i].data.date_created + "</div>"
-    							//if (rclistdata.rcl[i].user[0].username==u.get("WHOAMI_XHR").responseJSON.user.data.username){
-    							//jq.rcllist.append(
     							+ "<div class='rcl-col' style='width:200px;'><a class='rcl_edit' href='#" + rclistdata.rcl[i].id + "'> update </a> | <a class='rcl_delete' href='#" + rclistdata.rcl[i].id + "'> delete </a> </div> "
-    							//}else{
-    							//jq.rcllist.append(
-    							//	"<div class='rcl-col'></div>"
     							+ "</div>");
     						
     						
@@ -554,28 +549,22 @@
                 			//Show RC detail
                 				jq.rcldetail.text("");
                 				jq.rcldetail.append(
-                					"<h3>Repo Container Detail</h3>"
+                					"<h3>Repository Detail</h3>"
                 					+ "<strong>Title :" + searchdata.rcl[0].data.title + "</strong></br>"
                 					+ "<strong>Body :" + searchdata.rcl[0].data.body + "</strong></br>"
                 					+ "<strong>Tags :" + searchdata.rcl[0].data.tags + "</strong></br>"
-                					+ "<strong>Creator :" + searchdata.rcl[0].user[0].username + "</strong></br></br>"
-                					+ "<h4>list of Repo File :</h4>" 
-                					+ "Note: Use 'New/Update' Tab to add more file(s) into a Repo Container</br></br>");
+                					+ "<strong>Creator :" + searchdata.rcl[0].user[0].given_name + "</strong></br></br>"
+                					+ "<h4>list of Repo File(s) :</h4>" 
+                					+ "Note: Use 'New/Update' Tab to add more file(s) into this Repository</br></br>");
                 				
                 			
                 			for (i = 0; i < rflistdata.meta.size; i++) { 
                 				jq.rcldetail.append(
     								i+1 
     								+ ". <a href='media/"+rflistdata.rfl[i].data.file+"' target='_blank'>" + rflistdata.rfl[i].data.name + "<a></br>"
-    								+ " location: " + rflistdata.rfl[i].data.file);
-    								if (u.get("WHOAMI_XHR").responseJSON.user.data.username == searchdata.rcl[0].user[0].username){
-    									jq.rcldetail.append(
-    									"</br><a class='rcf_delete' href='#"+rflistdata.rfl[i].id+"'>delete</a>"
-    									+ "</br></br>");
-    								}else{
-    									jq.rcldetail.append(
-    									"</br></br>");
-    								}
+    								+ " location: " + rflistdata.rfl[i].data.file
+    								+"</br><a class='rcf_delete' href='#"+rflistdata.rfl[i].id+"'>delete</a>"
+    								+ "</br></br>");
 							} 
 						})
 				
@@ -800,10 +789,20 @@
         	var api_rfDelete = f.deleteMyRF(+rf_id);
         	api_rfDelete
                 .done(function(deleteRF){
-                    if (deleteRF.commit) {showMessage("File deleted successfully","pos");}
-                    	else {showMessage("File deleted failed.<br><br>Please try again.","neg");}
+                        f.setTray("File deleted successfully","indeterminate",false);
                     	getListFile(rc_id, rc_title);
+                    	setTimeout(function(){f.closeTray();}, 5000);
                 })
+                
+                .fail(function(xhr){
+                    
+                        // 403 => Request_API fail because permission denied (403_FORBBIDEN)
+                        if (xhr.status == 403){
+                            f.setTray("File deleted failed, You don't have permission to use this function","indeterminate",false);
+                            
+                        }
+                        setTimeout(function(){f.closeTray();}, 5000);
+                    });
         });
         
         // upload file to RepoFile based container_id
