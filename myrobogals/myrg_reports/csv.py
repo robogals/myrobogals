@@ -15,6 +15,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 import re
 
+# import the logging library
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def export(qs, fields=None):
     model = qs.model
@@ -88,11 +93,14 @@ def convert_csv(request):
         app_label = "myrg_repo"
     elif model_name == "permissionlist":
         app_label = "myrg_permissions"
+    elif model_name == "activity":
+        app_label = "myrg_permissions" #need to be updated with activities
                 
     model = get_model(app_label, model_name)
     
     
-    fields_request = request.POST['field']
+    fields_request = ""#request.POST['field']
+    logger.error(fields_request)
     if fields_request != "":
         fieldlist = re.sub(r'\s+', '', fields_request).split(",")
     else:

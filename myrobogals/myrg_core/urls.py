@@ -92,7 +92,8 @@ urlpatterns += patterns('',
     url(r'^app/resource/(?P<resource_id>.+?)$', 'myrg_webapp.views.get_resource'),
     
     url(r'^$', 'myrg_webapp.views.webapp', name='home'),
-    url(r'^app/url/csv', 'myrg_webapp.csv.convert_csv_direct', name='csv_direct'),
-    url(r'^app/csv', 'myrg_webapp.csv.convert_csv', name='csv')
+    url(r'^app/url/csv', 'myrg_reports.csv.convert_csv_direct', name='csv_direct'),
+    url(r'^app/csv', 'myrg_reports.csv.convert_csv', name='csv'),
+    #url(r'^app/report', 'myrg_reports.views.my_report', name='report')
     #url(r'^/(?P<app_label>[\d\w]+)/(?P<model_name>[\d\w]+)/csv/', 'myrg_repo.views.convert_csv')
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

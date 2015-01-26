@@ -31,9 +31,9 @@
         vertical-align: middle;
         
         width: 100%;
-        max-width: 30rem;
         
-        color: #fff;
+        
+        color: #000;
         
         font-size: 1.2rem;
     }
@@ -55,11 +55,17 @@
         font-weight: 500;
     }
     
+    #app-container .container .datefield {
+        vertical-align: middle;
+        width: 10rem;
+        font-weight: 11;
+    }
+    
     #app-container select,
     #app-container input,
     #app-container textarea,
     #app-container button {
-        border: 0;
+        border: 1;
         background: #fff;
         color: #000;
         padding: 0.3rem;
@@ -166,7 +172,7 @@
 <div id="content" tabindex="0">
     <div id="hero">
         <div class="blocks" style="width: auto;">
-            <h1>Repositories</h1>
+            <h1>Reports</h1>
         </div>
     </div>
     
@@ -175,15 +181,23 @@
     
     <div class="tabs">
 		<ul class="tab-links">
-			<li class="active"><a id="tab1" href="#tab1">Download CSV</a></li>
-			<li><a id="tab2" href="#tab2">tab2</a></li>
-			<li><a id="tab3" href="#tab3">tab3</a></li>
+		    <li class="active"><a id="tab1" href="#tab1">Statistics</a></li>
+			<li><a id="tab2" href="#tab2">Download CSV</a></li>
+			
 		</ul>
  
 		<div class="tab-content">
 			<div id="tab1" class="tab active">
+				<h1 class="chart-header">{{ report.pie_chart.title }}</h1>
+
+				<div class="chart-container">
+					{{ report.pie_chart }}
+				</div>
+			</div>
+			
+			<div id="tab2" class="tab">
 				<div id="app-container">
-						<div class="container bg-rg-dark-blue" >
+						<div class="container" >
 							<div id="message-container">
 								<div class="messages" id="neg-message"></div>
 								<div class="messages" id="pos-message"></div>
@@ -192,33 +206,33 @@
 							{% csrf_token %}
 								<div class="row">
 									<div class="left col">
-										<label for="id_model">Model</label>
+										<label for="id_model">Date Type</label>
 									</div>
 									<div class="col">
 										<select id="id_model" name="model">
-											<option value="robogalsuser">User</option>
+											<option value="activity">Activity</option>
 											<option value="group">Group</option>
+											<option value="robogalsuser">User</option>
 											<option value="repocontainer">Repository Container</option>
 											<option value="permissionlist">Permission List</option>
 										</select>
 									</div>
 								</div>
-								<div class="row">
+								<!--<div class="row">
 									<div class="left col">
 										<label for="id_field">Field(s)</label>
 									</div>
 									<div class="col">
 										<textarea id="id_field" type="text" name="field" placeholder="field(s)"></textarea>
 									</div>
-								</div>
+								</div>-->
 								<div class="row">
 									<div class="left col">
-										<label for="id_field">Create Date</label>
+										<label for="id_field">Date Range</label>
 									</div>
-									<div class="col">
+									<div class="datefield">
 										<input id="id_startdate" type="text" name="startdate" placeholder="Start Date">
-									</div>
-									<div class="col">
+						
 										<input id="id_enddate" type="text" name="enddate" placeholder="End Date">
 									</div>
 								</div>
@@ -233,19 +247,11 @@
 					</div>
 			</div>
  
-			<div id="tab2" class="tab">
-				<p>tab 2 content goes here</p>
-			</div>
-			<div id="tab3" class="tab">
-				<p>tab 3 content goes here</p>							
-			</div>
+			
+			
 		</div>
 	</div>
      
-    
-    <div class="row" id="links">
-        <div class="col"><a href="http://localhost:3000/?app=repo-files"><i class="fa fa-reply"></i> Return to robogals.org</a></div>
-    </div>
     
 </div>
 <script>
