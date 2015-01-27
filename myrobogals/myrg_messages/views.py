@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from future.builtins import *
 import six
 
-
+import django
 from myrg_core.classes import RobogalsAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated

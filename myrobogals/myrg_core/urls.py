@@ -78,6 +78,8 @@ api_urlpatterns = patterns('',
     url(r'^api/1.0/permissions/edit$', EditPermissionLists.as_view()),
     url(r'^api/1.0/permissions/create$', CreatePermissionLists.as_view()),
 
+    url(r'^api/1.0/emailmessage/list$', ListEmailMessage.as_view()),
+    url(r'^api/1.0/emaildefinitions/list$', ListEmailDefinition.as_view()),
     url(r'^api/1.0/messages/send$', SendMessage.as_view()),
 )
 
