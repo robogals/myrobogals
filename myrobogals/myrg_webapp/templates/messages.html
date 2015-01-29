@@ -157,6 +157,43 @@
         color: #aaa !important;
         background: #888 !important;
     }
+
+    #tags-div {
+        overflow: auto;
+        width: 100%;
+        position: relative;
+        vertical-align: baseline;
+        line-height: 1.5em;
+        box-sizing: border-box;
+        display: block;
+    }
+
+    #tags-div table {
+        margin: 0 0 12px -10px;
+        padding-right: 800px;
+        border-spacing: 10px 0;
+        border-collapse: separate;
+    }
+
+    #tags-div table th {
+        border: 2px solid #ccc;
+        color: #484848;
+        text-align: left;
+        height: 80px;
+        min-width: 250px;
+        vertical-align: middle;
+        padding: 6px 10px;
+    }
+
+    #tags-div table td {
+        min-width: 100px;
+        border-top: none;
+        border: 2px solid #ccc;
+        border-top: none;
+        color: #484848;
+        text-align: left;
+        padding: 6px 10px;
+    }
     
 </style>
 <div id="content" tabindex="0">
@@ -215,6 +252,16 @@
                         <textarea id="message-body" rows="5" placeholder="Compose email"  style="border: 1px solid #ccc;"/>
                         <i style="font-size: 0.8em; opacity: 0.8;">Save yourself the effort of clicking! Try <b>CTRL</b>+<b>ENTER</b> or <b>CMD</b>+<b>ENTER</b> to send your message.</i>
                     </div>
+                </div>
+                <div id="tags-div" class="row">
+                    <table>
+                        <thead>
+                            <tr id="tags-thead">
+                            </tr>
+                        </thead>
+                        <tbody id="tags-tbody">
+                        </tbody>
+                    </table>
                 </div>
                 <div class="row">
                     <div class="col right">
@@ -340,7 +387,7 @@
                 setTimeout(function(){
                     $("#message-recipient-search-result").empty();
                     $(this).val("");
-                }, 100);
+                }, 1000);
                 
             })
             .keydown(function(e){
@@ -360,7 +407,7 @@
                         if ($("#message-recipient-search-result ul li.active").length){
                             recipientListInsert();
                         }
-                    
+
                         break;
                     
                     case 38:    // Up (38) and Down (40) = up/down recipient list
@@ -394,6 +441,8 @@
                             
                             // Delete previous recipient
                             $("#message-recipient-field span:last-of-type").remove();
+
+                            $("#message-body").trigger("keyup");
                             
                             // Don't fall through to default behaviour.
                             break;
@@ -501,6 +550,7 @@
                       });
             
             $("#message-recipient-search-field").before(recipientBox);
+            $("#message-body").trigger("keyup");
         }
         
         
@@ -522,6 +572,7 @@
         // Deletion
         $("#message-recipient-field").on("click", "span", function(e){
             $(this).remove();
+            $("#message-body").trigger("keyup");
         });
         
         
@@ -530,6 +581,101 @@
         $("#app-main-box").on('keydown', '#message-body', function(e) {
             if(e.keyCode == 13 && (e.metaKey || e.ctrlKey)) {
                 $(this).parents('form').submit();
+            }
+        });
+        
+        var mergeTagDetectionTimer = null;
+        $("#app-main-box").on('keyup', '#message-body, #message-subject', function(e) {
+            if (!(e.keyCode == 13 && (e.metaKey || e.ctrlKey))) {
+                if (mergeTagDetectionTimer) {
+                    clearTimeout(mergeTagDetectionTimer);
+                }
+                mergeTagDetectionTimer = setTimeout(function() {
+                    var re = /\*\|[a-zA-Z]+\|\*/g;
+                    var subjectTags = $("#message-subject").val().match(re) || [];
+                    var messageBodyTags = $("#message-body").val().match(re) || [];
+                    var tagTmpArr = $.unique(subjectTags.concat(messageBodyTags));
+                    var recipientList = $("#message-recipient-field > span");
+                    if (tagTmpArr.length > 0 && recipientList.length > 0) {
+                        var tagOutArr = [];
+                        for (var i = 0; i < tagTmpArr.length; i++) {
+                            tagOutArr.push(tagTmpArr[i].substring(2,tagTmpArr[i].length-2));
+                        }
+
+                        var tagsThead = $("#tags-thead");
+                        var tagsTbody = $("#tags-tbody");
+
+                        for (var i=0; i < tagsTbody.children().length; i++) {
+                            var tagsName = $(tagsTbody.children()[i]).children().find("input").attr("placeholder");
+                            if ($.inArray(tagsName, tagOutArr) < 0) {
+                                tagsTbody.children()[i].remove();
+                                i--;
+                            }
+                        }
+                        for (var i=1; i < tagsThead.children().length; i++) {
+                            notFound = true;
+                            for (var j=0; j < recipientList.length; j++) {
+                                if ($(tagsThead.children()[i]).data("userId") ==
+                                  $(recipientList[j]).data("user").id) {
+                                    notFound = false;
+                                    break;
+                                }
+                            }
+                            if (notFound) {
+                                tagsThead.children()[i].remove();
+                                for (var k=0; k < tagsTbody.children().length; k++) {
+                                    $(tagsTbody.children()[k]).children()[i].remove();
+                                }
+                                i--;
+                            }
+                        }
+                        if (tagsThead.children().length == 0) {
+                            $('<th>').text("Global merge tags").appendTo(tagsThead);
+                        }
+                        for (var i=0; i < recipientList.length; i++) {
+                            var familyName = $(recipientList[i]).data("user").data.family_name;
+                            var givenName = $(recipientList[i]).data("user").data.given_name;
+                            var userId = $(recipientList[i]).data("user").id;
+                            notFound = true;
+                            for (var j=1; j < tagsThead.children().length; j++) {
+                                if (userId == $(tagsThead.children()[j]).data("userId")) {
+                                    notFound = false;
+                                    break;
+                                }
+                            }
+                            if (notFound) {
+                                $('<th>').text(givenName + " " + familyName).data("userId",userId).appendTo(tagsThead);
+                            }
+                        }
+
+                        for (var i=0; i < tagOutArr.length; i++) {
+                            notFound = true;
+                            for (var j=0; j < tagsTbody.children().length; j++) {
+                                var tagsName = $(tagsTbody.children()[j]).children().find("input").attr("placeholder");
+                                if (tagsName == tagOutArr[i]) {
+                                    for (var k=0;
+                                      k < tagsThead.children().length - $(tagsTbody.children()[j]).children().length;
+                                      k++){
+                                        $('<td>').html('<label><div><input type="text" placeholder="'+ tagOutArr[i] +'" /></div></label>').appendTo($(tagsTbody.children()[j]));
+                                    }
+                                    notFound = false;
+                                    break;
+                                }
+                            }
+                            if (notFound) {
+                                var tableRow = $('<tr>');
+                                $('<td>').html('<label><div><input type="text" placeholder="'+ tagOutArr[i] +'" /></div></label>').appendTo(tableRow);
+                                for (var j=0; j < recipientList.length; j++) {
+                                    $('<td>').html('<label><div><input type="text" placeholder="'+ tagOutArr[i] +'" /></div></label>').appendTo(tableRow);
+                                }
+                                tableRow.appendTo(tagsTbody);
+                            }
+                        }
+                    } else {
+                        $("#tags-thead").empty();
+                        $("#tags-tbody").empty();
+                    }
+                }, 500);
             }
         });
         
@@ -576,7 +722,36 @@
                 a.set("LOCK_EMAIL_SUBMISSION", false);
                 return false;
             }
-            
+
+            var mergeTags = {};
+            if ($("#tags-tbody").children().length > 0) {
+                mergeTags.merge_vars = {};
+                mergeTags.global_merge_vars = [];
+                var tagsList = $("#tags-tbody").children();
+                var recipients = $("#tags-thead").children();
+                for (var j=1; j < recipients.length; j++) {
+                    mergeTags.merge_vars[$(recipients[j]).data("userId")] = [];
+                }
+                for (var i=0; i < tagsList.length; i++) {
+                    var tagsName = $(tagsList[i]).children().find("input").attr("placeholder");
+                    if ($.trim($($(tagsList[i]).children()[0]).find("input").val()) != "") {
+                        mergeTags.global_merge_vars.push({
+                            name: tagsName,
+                            content: $.trim($($(tagsList[i]).children()[0]).find("input").val())
+                        });
+                    }
+                    for (var j=1; j < recipients.length; j++) {
+                        if ($.trim($($(tagsList[i]).children()[j]).find("input").val()) != "") {
+                            mergeTags.merge_vars[$(recipients[j]).data("userId")].push({
+                                name: tagsName,
+                                content: $.trim($($(tagsList[i]).children()[j]).find("input").val())
+                            });
+                        }
+                    }
+                }
+                
+            }
+
             var msg = {
                 role: u.get("ROLE_ID"),
                 message: [
@@ -589,7 +764,7 @@
                                 body: $("#message-body").val(),
                                 html: false,
                                 recipients: recipientArr,
-                                merge_tags: {}
+                                merge_tags: mergeTags
                             }
                         }
                     }
