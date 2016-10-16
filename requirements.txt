@@ -1,0 +1,4 @@
+django==1.5.12
+mysql-python
+#django-extensions==1.1.1
+pytz
