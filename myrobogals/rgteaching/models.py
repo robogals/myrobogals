@@ -1,12 +1,13 @@
 from django.db import models
-from myrobogals.auth.models import Group, User
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country, Subdivision
 from datetime import datetime
 import json, urllib, urllib2
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 	address_street = models.CharField(max_length=128,blank=True)
 	address_city = models.CharField('City/Suburb',max_length=64,blank=True)
 	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
@@ -88,7 +89,7 @@ class DirectorySchool(models.Model):
 
 class StarSchoolDirectory(models.Model):
 	school = models.ForeignKey(DirectorySchool)
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 
 class Event(models.Model):
 	STATUS_CHOICES = (
@@ -102,7 +103,7 @@ class Event(models.Model):
 		(2, 'Do not allow anyone to RSVP'),
 	)
 
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 	creator = models.ForeignKey(User)
 	visit_start = models.DateTimeField("Start")
 	visit_end = models.DateTimeField("End")

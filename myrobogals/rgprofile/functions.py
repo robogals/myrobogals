@@ -1,4 +1,4 @@
-from myrobogals.auth.models import User, Group, MemberStatus
+from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgmain.models import MobileRegex, University
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date

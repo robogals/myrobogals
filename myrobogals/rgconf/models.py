@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime
-from myrobogals.auth.models import User, Group, Timezone
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
+from myrobogals.rgmain.models import Timezone
 from myrobogals.rgchapter.models import ShirtSize
 from pytz import utc
 
@@ -24,7 +26,7 @@ class Conference(models.Model):
 	end_date = models.DateField()
 	details = models.TextField(blank=True)
 	url = models.CharField(max_length=128, help_text="URL to page with information")
-	host = models.ForeignKey(Group, blank=True, null=True)
+	host = models.ForeignKey(Chapter, blank=True, null=True)
 	committee_year = models.IntegerField(default=0, help_text="The committee year for the purposes of the relevant question in the RSVP form. Put 0 to remove this question from the form.")
 	early_rsvp_close = models.DateTimeField(help_text="Time in conference timezone when benefits for registering early should close (not implemented)")
 	rsvp_close = models.DateTimeField(help_text="Time in conference timezone when registration will close; set policy below. Publicly viewable.")

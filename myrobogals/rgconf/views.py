@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from myrobogals.rgchapter.models import ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from myrobogals.rgteaching.views import EmailModelMultipleChoiceField
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 import re
 from datetime import datetime, timedelta

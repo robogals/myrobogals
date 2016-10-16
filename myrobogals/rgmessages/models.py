@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.forms import ModelForm
-from myrobogals.auth.models import User, Group
+from myrobogals.rgprofile.models import User
 from myrobogals.rgmain.models import Country
 from django.db.models.fields import PositiveIntegerField
 import datetime

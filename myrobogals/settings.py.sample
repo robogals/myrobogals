@@ -144,4 +144,6 @@ INSTALLED_APPS = (
 	'myrobogals.rgconf',
 )
 
+AUTH_USER_MODEL = 'rgprofile.User'
+
 API_SECRET = 'k290gj2apoz0'

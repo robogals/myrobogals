@@ -10,12 +10,12 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgteaching.models import School, DirectorySchool, StarSchoolDirectory, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats, VISIT_TYPES_BASE, VISIT_TYPES_REPORT
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
-#from myrobogals.auth.models import Group
 import datetime
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from myrobogals.auth.decorators import login_required
-from myrobogals.auth.models import User, Group, MemberStatus
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from myrobogals.rgprofile.models import User, MemberStatus
+from myrobogals.rgchapter.models import Chapter
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 from time import time, sleep
 from pytz import utc
@@ -215,7 +215,7 @@ def viewvisit(request, visit_id):
 	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
 class ChapterSelector(forms.Form):
-	chapter = forms.ModelChoiceField(queryset=Group.objects.filter(status__in=[0,2]), required=False)
+	chapter = forms.ModelChoiceField(queryset=Chapter.objects.filter(status__in=[0,2]), required=False)
 
 @login_required
 def listvisits(request):
@@ -592,7 +592,7 @@ def filllatlngschdir(request):
 
 @login_required
 def schoolsdirectory(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
 		raise Http404
 	schools_list = DirectorySchool.objects.all()
@@ -684,7 +684,7 @@ def schoolsdirectory(request, chapterurl):
 def starschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
 		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
-		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		c = get_object_or_404(Chapter, myrobogals_url__exact=request.GET['chapterurl'])
 		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
 			raise Http404
 		if StarSchoolDirectory.objects.filter(school=s, chapter=c):
@@ -709,7 +709,7 @@ def starschool(request):
 def unstarschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
 		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
-		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		c = get_object_or_404(Chapter, myrobogals_url__exact=request.GET['chapterurl'])
 		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
 			raise Http404
 		starschools = StarSchoolDirectory.objects.filter(school=s, chapter=c)
@@ -733,7 +733,7 @@ def unstarschool(request):
 def copyschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
 		s = get_object_or_404(DirectorySchool, pk=request.GET['school_id'])
-		c = get_object_or_404(Group, myrobogals_url__exact=request.GET['chapterurl'])
+		c = get_object_or_404(Chapter, myrobogals_url__exact=request.GET['chapterurl'])
 		if not request.user.is_superuser and (not request.user.is_staff or request.user.chapter != c):
 			raise Http404
 		if School.objects.filter(chapter=c, name=s.name).count() > 0:
@@ -1338,7 +1338,7 @@ def report_global(request):
 			request.session['globalReportVisitType'] = formdata['visit_type']
 			if formdata['start_date'] < datetime.date(2011, 2, 11):
 				warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
-			chapters = Group.objects.filter(exclude_in_reports=False)
+			chapters = Chapter.objects.filter(exclude_in_reports=False)
 			for chapter in chapters:
 				chapter_totals[chapter.short_en] = {}
 				chapter_totals[chapter.short_en]['workshops'] = 0
@@ -1401,9 +1401,9 @@ def report_global(request):
 		region_totals = {}
 		global_totals = {}
 	if request.user.is_superuser or request.user.chapter.id == 1:
-		user_chapter_children = Group.objects.filter(exclude_in_reports=False).values_list('short_en', flat=True)
+		user_chapter_children = Chapter.objects.filter(exclude_in_reports=False).values_list('short_en', flat=True)
 	else:
-		user_chapter_children = Group.objects.filter(parent__pk=request.user.chapter.pk, exclude_in_reports=False).values_list('short_en', flat=True)
+		user_chapter_children = Chapter.objects.filter(parent__pk=request.user.chapter.pk, exclude_in_reports=False).values_list('short_en', flat=True)
 	if printview:
 		return render_to_response('print_report.html',{'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning},context_instance=RequestContext(request))
 	else:
@@ -1411,7 +1411,7 @@ def report_global(request):
 
 @login_required
 def report_global_breakdown(request, chaptershorten):
-	chapter = get_object_or_404(Group, short_en=chaptershorten)
+	chapter = get_object_or_404(Chapter, short_en=chaptershorten)
 	if (not request.user.is_staff) and (not request.user.is_superuser):
 		raise Http404
 	if (not chapter.parent) or (not chapter.parent.parent):

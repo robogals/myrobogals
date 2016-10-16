@@ -5,10 +5,11 @@ from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.auth.models import User, Group, MemberStatusType
+from myrobogals.rgprofile.models import User, MemberStatusType
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException, EmailHeader
 from myrobogals.rgprofile.models import UserList
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
 from django.core.validators import email_re
 from hashlib import md5
@@ -67,8 +68,8 @@ class WriteEmailForm(forms.Form):
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
-	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
-	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	newsletters = forms.ModelChoiceField(queryset=Newsletter.objects.all(), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
@@ -298,8 +299,8 @@ class WriteSMSForm(forms.Form):
 	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("Put your message here.  To opt-out reply 'stop'"))
 	from_type = forms.ChoiceField(choices=((0,"+61429558100 (myRobogals)"),), help_text=_('You can send SMSes from your own number if you <a href="%s">verify your number</a>') % '/profile/mobverify/')
 	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
-	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
-	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
 	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)

@@ -9,7 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from myrobogals.auth.decorators import login_required
-from myrobogals.auth.models import Group, User
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offense, ForumSettings, PostFile
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from django.utils.http import urlquote, base36_to_int
@@ -66,7 +67,7 @@ def newcategory(request):
 				if request.GET['visibility']:
 					if not global_user and request.user.chapter.pk != int(request.GET['visibility']):
 						raise Http404  # Don't allow non-Global exec to create a category in another chapter
-					newCategory.chapter = Group.objects.get(pk=request.GET['visibility'])
+					newCategory.chapter = Chapter.objects.get(pk=request.GET['visibility'])
 				elif not global_user:
 					raise Http404  # Don't allow non-Global exec to create an international category
 				if request.GET['availability'] == 'public':
@@ -1242,7 +1243,7 @@ def deletefile(request, post_id, file_id):
 def search(request, chapterurl):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	search = ''
 	forums = None
 	topics = None

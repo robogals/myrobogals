@@ -29,7 +29,8 @@ OF SUCH DAMAGE.
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from myrobogals.auth.models import Group, User
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 from django.db.models import Avg
@@ -37,7 +38,7 @@ import os.path
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
-	chapter = models.ForeignKey(Group, blank=True, null=True)
+	chapter = models.ForeignKey(Chapter, blank=True, null=True)
 	exec_only = models.BooleanField("For executives only", default=False)
 	created_on = models.DateTimeField(default=datetime.utcnow)
 

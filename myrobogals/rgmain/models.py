@@ -67,3 +67,12 @@ class MobileRegex(models.Model):
 	
 	class Meta:
 		verbose_name_plural = 'Mobile regexes'
+
+class Timezone(models.Model):
+	description = models.CharField(max_length=64)
+
+	def __unicode__(self):
+		return self.description
+
+	def tz_obj(self):
+		return timezone(self.description)

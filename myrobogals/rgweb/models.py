@@ -1,10 +1,10 @@
 from django.db import models
-from myrobogals.auth.models import Group
+from myrobogals.rgchapter.models import Chapter
 
 class Website(models.Model):
 	site_name = models.CharField(max_length=64)
 	site_url = models.CharField(max_length=64)
-	site_chapter = models.ForeignKey(Group)
+	site_chapter = models.ForeignKey(Chapter)
 	ftp_host = models.CharField(max_length=64, blank=True)
 	ftp_user = models.CharField(max_length=64, blank=True)
 	ftp_pass = models.CharField(max_length=64, blank=True)
