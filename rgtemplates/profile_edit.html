@@ -70,7 +70,7 @@
     <td>{% trans "Confirm new password" %}{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
-{% if request.user.is_staff and not adduser %}
+{% if user.is_staff and not adduser %}
   <tr>
     <td width="150">&nbsp;</td>
     <td><a href="/profile/{{u.username}}/genpw/">{% trans "Generate and email new password" %}</a></td>

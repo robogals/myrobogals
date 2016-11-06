@@ -3,7 +3,7 @@
 
 from django import template
 from django.template.loader import render_to_string
-import tinymce.settings
+import myrobogals.tinymce.settings
 
 register = template.Library()
 

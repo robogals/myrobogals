@@ -20,12 +20,12 @@
 <div style="text-align: center">{% trans "Current members:" %} <strong>{% thous chapter.membercount_student %}</strong>
 <br>{% trans "All-time members:" %} <strong>{% thous chapter.membercount %}</strong></div>
 </div>
-{% if request.user.is_staff %}{% ifequal request.user.chapter chapter %}
+{% if user.is_staff %}{% ifequal user.chapter chapter %}
 <div style="background: #CCCCCC; padding: 10px; width: 220px; margin-left: 15px">
 <div style="text-align: center"><a href="edit/">{% trans "Edit this chapter" %}</a><br /><a href="edit/users/">{% trans "Manage members" %}</a></div>
 </div>
 {% else %}
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
 <div style="background: #CCCCCC; padding: 10px; width: 220px; margin-left: 15px">
 <div style="text-align: center"><a href="edit/">{% trans "Edit this chapter" %}</a><br /><a href="edit/users/">{% trans "Manage members" %}</a></div>
 </div>
@@ -63,7 +63,7 @@
 {% endautoescape %}
 {% endif %}
 
-{% if not request.user.id and chapter.is_joinable %}<a href="/join/{{chapter.myrobogals_url}}/">{% blocktrans %}Join {{chapter}}{% endblocktrans %}</a><br />{% endif %}
+{% if not user.id and chapter.is_joinable %}<a href="/join/{{chapter.myrobogals_url}}/">{% blocktrans %}Join {{chapter}}{% endblocktrans %}</a><br />{% endif %}
 {% if chapter.website_url %}<a href="{{chapter.website_url}}">{% blocktrans %}Visit {{chapter}}'s website{% endblocktrans %}</a><br />{% endif %}
 {% if chapter.facebook_url %}<a href="{{chapter.facebook_url}}">{% blocktrans %}Visit {{chapter}} on Facebook{% endblocktrans %}</a>{% endif %}
 {% endblock %}

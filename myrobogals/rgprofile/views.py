@@ -11,14 +11,15 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from myrobogals.auth import authenticate, login
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus, MemberStatusType
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgmain.models import University, MobileRegex
+from myrobogals.rgmain.models import University
+from myrobogals.rgmessages.models_mobileregex import MobileRegex
 from myrobogals.rgmain.utils import SelectDateWidget
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
@@ -164,11 +165,11 @@ def editusers(request, chapterurl):
 			status = '1'   # Default to student members
 
 		if (status != '0'):
-			users = User.objects.raw('SELECT u.* FROM auth_user AS u, auth_memberstatus AS ms WHERE u.chapter_id ' +
+			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u, rgprofile_memberstatus AS ms WHERE u.chapter_id ' +
 					'= '+ str(c.pk) +' AND u.id = ms.user_id AND ms.statusType_id = '+ status +' AND ms.status_date_end IS NULL ' +
 					searchsql + ' ORDER BY last_name, first_name')
 		else:
-			users = User.objects.raw('SELECT u.* FROM auth_user AS u WHERE u.chapter_id ' +
+			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u WHERE u.chapter_id ' +
 					'= '+ str(c.pk) + ' ' +
 					searchsql + ' ORDER BY last_name, first_name')
 		display_columns = c.display_columns.all()

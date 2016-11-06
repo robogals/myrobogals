@@ -17,7 +17,7 @@ from django.utils import simplejson
 from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, ugettext as _
-import tinymce.settings
+import myrobogals.tinymce.settings
 
 
 class TinyMCE(forms.Textarea):

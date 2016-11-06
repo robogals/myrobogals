@@ -1,5 +1,6 @@
 from myrobogals.rgprofile.models import User, MemberStatus
-from myrobogals.rgmain.models import MobileRegex, University
+from myrobogals.rgmain.models import University
+from myrobogals.rgmessages.models_mobileregex import MobileRegex
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
 from django.utils.translation import ugettext_lazy as _
@@ -464,7 +465,7 @@ def any_exec_attr(u):
 
 def subtonews(first_name, last_name, email, chapter_id):
         cursor = connection.cursor()
-        cursor.execute('SELECT u.id, u.email_chapter_optin FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
+        cursor.execute('SELECT u.id, u.email_chapter_optin FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
         user = cursor.fetchone()
         if user:
         	if int(user[1]) == 1:
@@ -496,7 +497,7 @@ def subtonews(first_name, last_name, email, chapter_id):
 
 def unsubtonews(email, chapter_id):
         cursor = connection.cursor()
-        cursor.execute('SELECT u.id FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
+        cursor.execute('SELECT u.id FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
         user = cursor.fetchone()
         if user:
         	user = User.objects.get(pk=user[0])

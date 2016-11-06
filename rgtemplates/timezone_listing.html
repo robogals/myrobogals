@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load tz %}
 
 {% block title %}{% trans "Current local times" %}{% endblock %}
 
@@ -7,6 +8,7 @@
 
 {% block content %}
 {% blocktrans %}This page shows the local time for each Robogals chapter and regional body, taking into account both <strong>timezone differences</strong> and <strong>daylight savings</strong>. It can be very beneficial when scheduling a Skype meeting or phone call with other Robogals chapters. {% endblocktrans %}
+{% localtime off %}
 <ul>
     <li style="margin: .5em">
         <strong style="color: #1366A3">{% trans "Global" %}</strong> - <em>{{globalchapter.local_time|date:_("DATETIME_FORMAT_SPECIAL")}} {% trans "in" %} {{globalchapter.location}}</em>
@@ -24,4 +26,5 @@
         </ul>
     </li>
 </ul>
+{% endlocaltime %}
 {% endblock %}

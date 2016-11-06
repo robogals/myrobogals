@@ -1,7 +1,7 @@
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from myrobogals.rgchapter.models import Chapter
 
 from myrobogals.rgweb.models import Website

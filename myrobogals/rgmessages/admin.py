@@ -1,5 +1,6 @@
 from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, NewsletterSubscriber, PendingNewsletterSubscriber, Newsletter, SubscriberType, EmailHeader
-from myrobogals import admin
+from myrobogals.rgmessages.models_mobileregex import MobileRegex, MobileRegexCollection
+from django.contrib import admin
 
 class EmailRecipientAdmin(admin.TabularInline):
 	model = EmailRecipient
@@ -56,6 +57,14 @@ class NewsletterAdmin(admin.ModelAdmin):
 		('Confirmation email', {'fields': ('confirm_email', 'confirm_subject', 'confirm_url', 'confirm_from_name', 'confirm_from_email', 'confirm_from_user', 'confirm_html')})
 	)
 
+class MobileRegexInline(admin.TabularInline):
+	model = MobileRegex
+	extra = 5
+
+class MobileRegexCollectionAdmin(admin.ModelAdmin):
+	inlines = [MobileRegexInline]
+
+admin.site.register(MobileRegexCollection, MobileRegexCollectionAdmin)
 admin.site.register(SubscriberType, SubscriberTypeAdmin)
 admin.site.register(NewsletterSubscriber, NewsletterSubscriberAdmin)
 admin.site.register(Newsletter, NewsletterAdmin)

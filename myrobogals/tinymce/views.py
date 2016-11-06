@@ -8,8 +8,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext, loader
 from django.utils import simplejson
 from django.utils.translation import ugettext as _
-from tinymce.compressor import gzip_compressor
-from tinymce.widgets import get_language_config
+from myrobogals.tinymce.compressor import gzip_compressor
+from myrobogals.tinymce.widgets import get_language_config
 
 def textareas_js(request, name, lang=None):
     """

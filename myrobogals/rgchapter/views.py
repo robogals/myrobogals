@@ -5,7 +5,7 @@ from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect, Http404

@@ -3,8 +3,6 @@ from django.template import RequestContext
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.template import Context, loader
-from django.db import connection
-connection.queries
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from myrobogals.rgteaching.models import School, DirectorySchool, StarSchoolDirectory, SchoolVisit, EventAttendee, Event, EventMessage, SchoolVisitStats, VISIT_TYPES_BASE, VISIT_TYPES_REPORT
@@ -12,11 +10,11 @@ from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 import datetime
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgchapter.models import Chapter
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from tinymce.widgets import TinyMCE
+from myrobogals.tinymce.widgets import TinyMCE
 from time import time, sleep
 from pytz import utc
 from myrobogals.rgmain.models import Country

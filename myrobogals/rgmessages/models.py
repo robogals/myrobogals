@@ -3,6 +3,7 @@
 from django.db import models
 from django.forms import ModelForm
 from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.db.models.fields import PositiveIntegerField
 import datetime
@@ -203,7 +204,7 @@ class SMSMessage(models.Model):
 	body = models.TextField("Message body")
 	senderid = models.CharField("Sender ID", max_length=32)
 	sender = models.ForeignKey(User)
-	chapter = models.ForeignKey(Group, null=True, blank=True)
+	chapter = models.ForeignKey(Chapter, null=True, blank=True)
 	status = models.IntegerField("Status code", choices=SMS_STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Date set (in UTC)")
 	unicode = models.BooleanField("Unicode", blank=True)
@@ -361,7 +362,7 @@ class SMSRecipient(models.Model):
 					local_tz = self.user.tz_obj()
 				else:
 					# Use Robogals Global's timezone as default
-					local_tz = Group.objects.get(pk=1).tz_obj()
+					local_tz = Chapter.objects.get(pk=1).tz_obj()
 			# Interpret the user-entered time as being in local time
 			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
 			# Convert this time into UTC

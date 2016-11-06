@@ -1,45 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from datetime import date
-from myrobogals.rgchapter.models import Chapter, DisplayColumn
-
-class PositionType(models.Model):
-	description = models.CharField(max_length=64)
-	chapter = models.ForeignKey(Chapter, null=True, blank=True)
-	rank = models.IntegerField()
-
-	def __unicode__(self):
-		return self.description
-
-	class Meta:
-		verbose_name = "position type"
-		ordering = ('rank',)
-
-class Position(models.Model):
-	user = models.ForeignKey(User)
-	positionType = models.ForeignKey(PositionType)
-	positionChapter = models.ForeignKey(Chapter)
-	position_date_start = models.DateField(default=date.today)
-	position_date_end = models.DateField(null=True, blank=True)
-
-	def __unicode__(self):
-		if (self.position_date_end):
-			return self.positionType.description + ", " + self.positionChapter.name + " (" + self.position_date_start.strftime("%b %Y") + " - " + self.position_date_end.strftime("%b %Y") + ")"
-		else:
-			return self.positionType.description + ", " + self.positionChapter.name + " (" + self.position_date_start.strftime("%b %Y") + " - present)"
-
-	class Meta:
-		ordering = ('-position_date_end', '-position_date_start')
-
-class UserList(models.Model):
-	name = models.CharField(max_length=128)
-	chapter = models.ForeignKey(Chapter)
-	users = models.ManyToManyField(User)
-	display_columns = models.ManyToManyField(DisplayColumn)
-	notes = models.TextField(blank=True)
-	
-	def __unicode__(self):
-		return self.name
+from myrobogals.rgchapter.models import Chapter, DisplayColumn, ShirtSize, NAME_DISPLAYS
+from myrobogals.rgmain.models import University, Timezone
+from django.db import connection
 
 class MemberStatusType(models.Model):
 	PERSONTYPES = (
@@ -75,6 +39,34 @@ class MemberStatus(models.Model):
 
 	class Meta:
 		ordering = ('-status_date_end', '-status_date_start')
+
+class PositionType(models.Model):
+	description = models.CharField(max_length=64)
+	chapter = models.ForeignKey(Chapter, null=True, blank=True)
+	rank = models.IntegerField()
+
+	def __unicode__(self):
+		return self.description
+
+	class Meta:
+		verbose_name = "position type"
+		ordering = ('rank',)
+
+class Position(models.Model):
+	user = models.ForeignKey('rgprofile.User')
+	positionType = models.ForeignKey(PositionType)
+	positionChapter = models.ForeignKey(Chapter)
+	position_date_start = models.DateField(default=date.today)
+	position_date_end = models.DateField(null=True, blank=True)
+
+	def __unicode__(self):
+		if (self.position_date_end):
+			return self.positionType.description + ", " + self.positionChapter.name + " (" + self.position_date_start.strftime("%b %Y") + " - " + self.position_date_end.strftime("%b %Y") + ")"
+		else:
+			return self.positionType.description + ", " + self.positionChapter.name + " (" + self.position_date_start.strftime("%b %Y") + " - present)"
+
+	class Meta:
+		ordering = ('-position_date_end', '-position_date_start')
 
 class User(AbstractUser):
 	GENDERS = (
@@ -137,7 +129,7 @@ class User(AbstractUser):
 	trained = models.BooleanField(default=False)
 	security_check = models.BooleanField(default=False)
 	name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
-	forum_last_act = models.DateTimeField('Forum last activity', default=datetime.datetime.now)
+	forum_last_act = models.DateTimeField('Forum last activity', auto_now_add=True)
 	aliases = models.ManyToManyField('User', blank=True, null=True, related_name='user_aliases')
 	email_careers_newsletter_AU_optin = models.BooleanField("Subscribe to Robogals Careers Newsletter - Australia", default=False)
 
@@ -219,7 +211,45 @@ class User(AbstractUser):
 			return ""
 
 	def date_joined_local(self):
-		return self.tz_obj().fromutc(self.date_joined)
+		return self.date_joined.astimezone(self.tz_obj())
 
 	def get_absolute_url(self):
 		return "/profile/%s/" % urllib.quote(smart_str(self.username))
+	
+	def get_full_name(self):
+		if self.get_name_display() == 0:
+			full_name = u'%s %s' % (self.first_name, self.last_name)
+		elif self.get_name_display() == 1:
+			full_name = u'%s %s' % (self.last_name, self.first_name)
+		elif self.get_name_display() == 2:
+			full_name = u'%s%s' % (self.last_name, self.first_name)
+		return full_name.strip()
+	
+	def has_cur_pos(self):
+		cursor = connection.cursor()
+		cursor.execute('SELECT COUNT(user_id) FROM `rgprofile_position` WHERE user_id = ' + str(self.pk) + ' AND position_date_end IS NULL')
+		ms = cursor.fetchone()
+		if ms[0] > 0:
+		   return True
+		else:
+		   return False
+
+	def cur_positions(self):
+		return Position.objects.filter(user=self, position_date_end__isnull=True)
+
+	def has_robogals_email(self):
+		try:
+			domain = self.email.split('@', 1)[1]
+			return domain == 'robogals.org'
+		except IndexError:
+			return False
+
+class UserList(models.Model):
+	name = models.CharField(max_length=128)
+	chapter = models.ForeignKey(Chapter)
+	users = models.ManyToManyField(User)
+	display_columns = models.ManyToManyField(DisplayColumn)
+	notes = models.TextField(blank=True)
+	
+	def __unicode__(self):
+		return self.name

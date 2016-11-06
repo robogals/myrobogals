@@ -1,5 +1,10 @@
 from django.db import models
 from django.utils import translation
+from myrobogals.rgmain.models import University, Country, Timezone
+from myrobogals.rgmessages.models_mobileregex import MobileRegexCollection
+from django.db import connection
+import datetime
+from pytz import utc
 
 class DisplayColumn(models.Model):
 	field_name = models.CharField(max_length=64)
@@ -18,48 +23,10 @@ class DisplayColumn(models.Model):
 		ordering = ('order','field_name')
 		verbose_name = "Column display name"
 
-class Award(models.Model):
-	AWARD_TYPE_CHOICES = (
-		(0, 'Major'),
-		(1, 'Minor')
-	)
-	
-	award_name = models.CharField(max_length=64)
-	award_type = models.IntegerField(choices=AWARD_TYPE_CHOICES, default=0)
-	award_description = models.TextField(blank=True)
-	
-	def __unicode__(self):
-		return self.award_name
-		
-	class Meta:
-		ordering = ('award_type', 'award_name')
-		verbose_name = "Award"
-		
-REGION_CHOICES = (
-	(0, 'Australia & New Zealand'),
-	(1, 'UK & Europe'),
-	(2, 'Asia Pacific'),
-	(3, 'North America'),
-)
-
-class AwardRecipient(models.Model):
-	award = models.ForeignKey(Award)
-	chapter = models.ForeignKey('auth.Group')
-	year = models.IntegerField(default=2000)
-	region = models.IntegerField(choices=REGION_CHOICES, default=0)
-	description = models.TextField(blank=True)
-	
-	def __unicode__(self):
-		return self.award.award_name
-		
-	class Meta:
-		ordering = ('-year', 'award', 'region', 'chapter')
-		verbose_name = "Award recipient"
-
 NAME_DISPLAYS = (
-    (0, 'First Last (e.g. English)'),
-    (1, 'Last First (e.g. East Asian names in English characters)'),
-    (2, 'LastFirst (e.g. East Asian names in characters)')
+	(0, 'First Last (e.g. English)'),
+	(1, 'Last First (e.g. East Asian names in English characters)'),
+	(2, 'LastFirst (e.g. East Asian names in characters)')
 )
 
 class Chapter(models.Model):
@@ -118,13 +85,13 @@ class Chapter(models.Model):
 	welcome_page = models.TextField('Welcome page HTML', blank=True, default="Congratulations on becoming a member of {chapter.name}, and welcome to the international network of Robogals members - students around the world committed to increasing female participation in engineering!<br>\n<br>\nYour member account has been created - simply log in using the form to the left.")
 	join_page = models.TextField('Join page HTML', blank=True, help_text='This page is shown if the chapter is not joinable via myRobogals. It should explain how to join this chapter, e.g. who to contact.')
 	notify_enable = models.BooleanField('Notify when a new member signs up online')
-	notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True)
+	notify_list = models.ForeignKey('rgprofile.UserList', verbose_name='Who to notify', blank=True, null=True, related_name='chapter_notify_list')
 	sms_limit = models.IntegerField('Monthly SMS limit', default=1000)
-	display_columns = models.ManyToManyField(DisplayColumn, help_text='Default values: get_full_name, email, mobile.')
+	display_columns = models.ManyToManyField(DisplayColumn, help_text='When creating a new chapter, you MUST populate this! Recommendation: get_full_name, email, mobile.')
 	tshirt_enable = models.BooleanField('Enable T-shirt drop-down')
 	tshirt_required = models.BooleanField('Require T-shirt drop-down')
 	tshirt_label = models.CharField('Label for T-shirt drop-down', max_length=64, blank=True)
-	name_display = models.IntegerField("Name display", choices=NAME_DISPLAYS, default=0, help_text='Most Asian chapters have used English names in myRobogals despite this option being available. Check with the chapter before modifying.')
+	name_display = models.IntegerField("Name display", choices=NAME_DISPLAYS, default=0, help_text='Most Asian chapters have used English names in myRobogals, despite this option being available. Check with the chapter before modifying.')
 	goal = models.IntegerField("Goal", default=0, blank=True, null=True)
 	goal_start = models.DateField("Goal start date", blank=True, null=True, help_text='Our convention is to use the first day of the SINE at which they set their current-year goal')
 	exclude_in_reports = models.BooleanField('Exclude this chapter in global reports')
@@ -154,9 +121,9 @@ class Chapter(models.Model):
 				else:
 					break
 		if type == 0:
-			cursor.execute('SELECT COUNT(id) FROM rgchapter_user WHERE is_active = 1 AND chapter_id IN (' + str(self.pk) + ids_csv + ')')
+			cursor.execute('SELECT COUNT(id) FROM rgprofile_user WHERE is_active = 1 AND chapter_id IN (' + str(self.pk) + ids_csv + ')')
 		else:
-			cursor.execute('SELECT COUNT(u.id) FROM rgchapter_user AS u, rgchapter_memberstatus AS ms WHERE u.is_active = 1 AND u.chapter_id IN (' + str(self.pk) + ids_csv + ') AND u.id = ms.user_id AND ms.statusType_id = ' + str(type) + ' AND ms.status_date_end IS NULL')
+			cursor.execute('SELECT COUNT(u.id) FROM rgprofile_user AS u, rgprofile_memberstatus AS ms WHERE u.is_active = 1 AND u.chapter_id IN (' + str(self.pk) + ids_csv + ') AND u.id = ms.user_id AND ms.statusType_id = ' + str(type) + ' AND ms.status_date_end IS NULL')
 		count = cursor.fetchone()
 		if count:
 			return int(count[0])
@@ -205,3 +172,42 @@ class ShirtSize(models.Model):
 	class Meta:
 		ordering = ('chapter', 'order', 'size_long')
 		verbose_name = "T-shirt size"
+
+class Award(models.Model):
+	AWARD_TYPE_CHOICES = (
+		(0, 'Major'),
+		(1, 'Minor')
+	)
+	
+	award_name = models.CharField(max_length=64)
+	award_type = models.IntegerField(choices=AWARD_TYPE_CHOICES, default=0)
+	award_description = models.TextField(blank=True)
+	
+	def __unicode__(self):
+		return self.award_name
+		
+	class Meta:
+		ordering = ('award_type', 'award_name')
+		verbose_name = "Award"
+		
+REGION_CHOICES = (
+	(0, 'Australia & New Zealand'),
+	(1, 'UK & Europe'),
+	(2, 'Asia Pacific'),
+	(3, 'North America'),
+	(4, 'EMEA'),
+)
+
+class AwardRecipient(models.Model):
+	award = models.ForeignKey(Award)
+	chapter = models.ForeignKey(Chapter)
+	year = models.IntegerField(default=2000)
+	region = models.IntegerField(choices=REGION_CHOICES, default=0)
+	description = models.TextField(blank=True)
+	
+	def __unicode__(self):
+		return self.award.award_name
+		
+	class Meta:
+		ordering = ('-year', 'award', 'region', 'chapter')
+		verbose_name = "Award recipient"

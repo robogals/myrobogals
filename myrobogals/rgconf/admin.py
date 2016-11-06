@@ -1,5 +1,5 @@
 from myrobogals.rgconf.models import Conference, ConferencePart, ConferenceAttendee, ConferencePayment, ConferenceCurrency
-from myrobogals import admin
+from django.contrib import admin
 
 class ConferenceAdmin(admin.ModelAdmin):
 	list_display = ('name', 'start_date', 'end_date')

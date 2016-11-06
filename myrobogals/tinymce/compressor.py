@@ -19,7 +19,7 @@ from django.template.loader import render_to_string
 from django.utils.text import compress_string
 from django.utils.cache import patch_vary_headers, patch_response_headers
 
-import tinymce.settings
+import myrobogals.tinymce.settings
 
 
 def get_file_contents(filename):

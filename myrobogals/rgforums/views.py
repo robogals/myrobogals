@@ -1,6 +1,6 @@
 from django.conf import settings
 import datetime
-from tinymce.widgets import TinyMCE
+from myrobogals.tinymce.widgets import TinyMCE
 from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils.translation import ugettext_lazy as _
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgforums.models import Category, Forum, Topic, Post, Vote, Offense, ForumSettings, PostFile

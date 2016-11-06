@@ -55,7 +55,7 @@
 		<br /><em>{{post.1.posted_by.chapter}}</em>
 		{% endfor %}
 		<br />{{post.3}}<br />{% trans "Posts:" %} {{ post.2 }}</td>
-		<td style="border-bottom: solid 1px grey;">{{post.1.created_on|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.1.updated_on %} | {% trans "Last edit:" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
+		<td style="border-bottom: solid 1px grey;">{{post.1.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.1.updated_on %} | {% trans "Last edit:" %} {{ post.1.edited_by.get_full_name }} ({{ post.1.updated_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
 	</tr>
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td>{{ post.1.message|linebreaksbr }}</td>
@@ -64,7 +64,7 @@
 		<td>{% if post.1.upload_files.all %}
 		{% for file in post.1.upload_files.all %}
 			<a href="/forums/downloadpostfile/{{post.1.pk}}/{{file.pk}}/?return={{return|urlencode}}">{{file.filename}} ({{file.filesize|filesizeformat}})</a>
-			{% if canDelete or post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
+			{% if canDelete or post.1.posted_by.pk == user.pk or user.is_superuser %}
 			<a href="/forums/deletefile/{{post.1.pk}}/{{file.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a><br/>
 			{% else %}
 			<br/>
@@ -90,9 +90,9 @@
 		</div>
 		<div style="display: inline-block; float: right;">
 		<a href="/forums/topic/{{topic.pk}}/?quotePostId={{post.1.pk}}&page={{posts.number}}&forumpage={{forumpage}}&forumsort={{forumsort}}#end" style="margin-left: 15px;">{% trans "quote" %}</a>
-		{% if post.1.posted_by.pk == request.user.pk or request.user.is_superuser or canEdit %}
+		{% if post.1.posted_by.pk == user.pk or user.is_superuser or canEdit %}
 		<a href="/forums/topic/{{topic.pk}}/?editPostId={{post.1.pk}}&page={{posts.number}}&forumpage={{forumpage}}&forumsort={{forumsort}}#{{post.1.pk}}" style="margin-left: 15px;">{% trans "edit" %}</a>
-		{% if canDelete or post.1.posted_by.pk == request.user.pk or request.user.is_superuser %}
+		{% if canDelete or post.1.posted_by.pk == user.pk or user.is_superuser %}
 			{% if forloop.counter == 1 and posts.number == 1 %}
 		<a href="/forums/topic/delete/{{topic.pk}}/?return=/forums/forum/{{forum.pk}}/%3Fsort%3D{{forumsort}}%26page%3D{{forumpage}}" style="margin-left: 15px;">delete topic</a>
 			{% else %}

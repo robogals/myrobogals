@@ -1,5 +1,5 @@
 from myrobogals.rgteaching.models import School, DirectorySchool, SchoolVisit, SchoolVisitStats, TrainingSession, EventAttendee
-from myrobogals import admin
+from django.contrib import admin
 
 class EventAttendeeAdmin(admin.TabularInline):
 	model = EventAttendee

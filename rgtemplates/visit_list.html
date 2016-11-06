@@ -11,7 +11,7 @@
 <input type="submit" value="{% trans "Go" %}">
 </form>
 {% endif %}
-{% if request.user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
+{% if user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "School" %}</strong></td>

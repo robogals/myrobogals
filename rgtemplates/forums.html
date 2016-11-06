@@ -13,7 +13,7 @@
 <a href="/forums/watchmytopics/?return={{return|urlencode}}">{% trans "Watch all topics I've posted in" %}</a>
 |
 <a href="/forums/unwatchalltopics/?return={{return|urlencode}}">{% trans "Unwatch all" %}</a>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
 |
 <a href="/forums/setmaxuploadfilesize/?return={{return|urlencode}}">{% trans "Set max upload file size" %}</a>
 {% endif %}
@@ -26,43 +26,43 @@
 		<td>{% trans "Topics" %}</td>
 		<td>{% trans "Posts" %}</td>
 		<td width="100">{% trans "Last Post" %}</td>
-		{% if request.user.is_superuser %}
+		{% if user.is_superuser %}
 		<td><a style="color:white" href="/forums/category/delete/{{globExecCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
 		{% else %}
 			{% if canDeleteGlobal %}
 				<td>{% trans "Delete" %}</td>
 			{% else %}
-				{% if request.user.is_staff %}
+				{% if user.is_staff %}
 					<td></td>
 				{% endif %}
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% for forum in globExecCategory.forum_set.all %}
-	{% if forum not in request.user.forum_blacklist.all %}
+	{% if forum not in user.forum_blacklist.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a name="{{forum.pk}}"></a><a href="/forums/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{% autoescape off %}{{ forum.description }}{% endautoescape %}<br />
 		<span style="font-size: 9pt">
-		{% if request.user in forum.watchers.all %}
+		{% if user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
-		{% if request.user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
+		{% if user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
-		{% if request.user.is_superuser or canDeleteGlobal %}
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser or canDeleteGlobal %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% else %}
-			{% if request.user.is_staff %}
+			{% if user.is_staff %}
 				<td></td>
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="{% if request.user.is_superuser or request.user.is_staff %}5{% else %}4{% endif %}">
+	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>
@@ -83,7 +83,7 @@
 	{% endifequal %}
 	{% endif %}
 	{% endfor %}
-	{% if request.user.is_staff  %}
+	{% if user.is_staff  %}
 	<tr><td colspan="5"></td></tr>
 	{% else %}
 	<tr><td colspan="4"></td></tr>
@@ -95,43 +95,43 @@
 		<td>{% trans "Topics" %}</td>
 		<td>{% trans "Posts" %}</td>
 		<td width="100">{% trans "Last Post" %}</td>
-		{% if request.user.is_superuser %}
+		{% if user.is_superuser %}
 		<td><a style="color:white" href="/forums/category/delete/{{globPubCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
 		{% else %}
 			{% if canDeleteGlobal %}
 				<td>{% trans "Delete" %}</td>
 			{% else %}
-				{% if request.user.is_staff %}
+				{% if user.is_staff %}
 					<td></td>
 				{% endif %}
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% for forum in globPubCategory.forum_set.all %}
-	{% if forum not in request.user.forum_blacklist.all %}
+	{% if forum not in user.forum_blacklist.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a name="{{forum.pk}}"></a><a href="/forums/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{% autoescape off %}{{ forum.description }}{% endautoescape %}<br />
 		<span style="font-size: 8pt">
-		{% if request.user in forum.watchers.all %}
+		{% if user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
-		{% if request.user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
+		{% if user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
-		{% if request.user.is_superuser or canDeleteGlobal %}
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if user.is_superuser or canDeleteGlobal %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% else %}
-			{% if request.user.is_staff %}
+			{% if user.is_staff %}
 				<td></td>
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="{% if request.user.is_superuser or request.user.is_staff %}5{% else %}4{% endif %}">
+	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>
@@ -152,7 +152,7 @@
 	{% endifequal %}
 	{% endif %}
 	{% endfor %}
-	{% if request.user.is_staff %}
+	{% if user.is_staff %}
 	<tr><td colspan="5"></td></tr>
 	{% else %}
 	<tr><td colspan="4"></td></tr>
@@ -164,35 +164,35 @@
 		<td>{% trans "Topics" %}</td>
 		<td>{% trans "Posts" %}</td>
 		<td>{% trans "Last Post" %}</td>
-		{% if request.user.is_superuser %}
+		{% if user.is_superuser %}
 		<td><a style="color:white" href="/forums/category/delete/{{localExecCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
 		{% else %}
-			{% if request.user.is_staff %}
+			{% if user.is_staff %}
 				<td>{% trans "Delete" %}</td>
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% for forum in localExecCategory.forum_set.all %}
-	{% if forum not in request.user.forum_blacklist.all %}
+	{% if forum not in user.forum_blacklist.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a name="{{forum.pk}}"></a><a href="/forums/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{% autoescape off %}{{ forum.description }}{% endautoescape %}<br />
 		<span style="font-size: 8pt">
-		{% if request.user in forum.watchers.all %}
+		{% if user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
-		{% if request.user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit"%}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
+		{% if user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit"%}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
-		{% if canDeleteGlobal or request.user.is_staff %}
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if canDeleteGlobal or user.is_staff %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="{% if request.user.is_superuser or request.user.is_staff %}5{% else %}4{% endif %}">
+	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>
@@ -213,7 +213,7 @@
 	{% endifequal %}
 	{% endif %}
 	{% endfor %}
-	{% if request.user.is_staff %}
+	{% if user.is_staff %}
 	<tr><td colspan="5"></td></tr>
 	{% else %}
 	<tr><td colspan="4"></td></tr>
@@ -225,35 +225,35 @@
 		<td>{% trans "Topics" %}</td>
 		<td>{% trans "Posts" %}</td>
 		<td>{% trans "Last Post" %}</td>
-		{% if request.user.is_superuser %}
+		{% if user.is_superuser %}
 		<td><a style="color:white" href="/forums/category/delete/{{localPubCategory.pk}}/?return={{return|urlencode}}">{% trans "Delete" %}</a></td>
 		{% else %}
-			{% if request.user.is_staff %}
+			{% if user.is_staff %}
 				<td>{% trans "Delete" %}</td>
 			{% endif %}
 		{% endif %}
 	</tr>
 	{% for forum in localPubCategory.forum_set.all %}
-	{% if forum not in request.user.forum_blacklist.all %}
+	{% if forum not in user.forum_blacklist.all %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a name="{{forum.pk}}"></a><a href="/forums/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />{% autoescape off %}{{ forum.description }}{% endautoescape %}<br />
 		<span style="font-size: 8pt">
-		{% if request.user in forum.watchers.all %}
+		{% if user in forum.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
 		<a href="/forums/watchforum/{{forum.pk}}/?return={{return|urlencode}}">{% trans "Watch" %}</a> | {% trans "Un-watch" %}
 		{% endif %}
-		{% if request.user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
+		{% if user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:request.user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
-		{% if canDeleteGlobal or request.user.is_staff %}
+		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		{% if canDeleteGlobal or user.is_staff %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-	<td colspan="{% if request.user.is_staff %}5{% else %}4{% endif %}">
+	<td colspan="{% if user.is_staff %}5{% else %}4{% endif %}">
 	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
 	<table>
 	<tr>
@@ -274,14 +274,14 @@
 	{% endifequal %}
 	{% endif %}
 	{% endfor %}
-	{% if request.user.is_staff %}
+	{% if user.is_staff %}
 	<tr><td colspan="5"></td></tr>
 	{% else %}
 	<tr><td colspan="4"></td></tr>
 	{% endif %}
 {% endfor %}
 </table>
-{% if request.user.is_staff %}
+{% if user.is_staff %}
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
@@ -295,10 +295,10 @@
 		<td>{% trans "Visibility:" %}</td>
 		<td>
 <select name="visibility">
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
 <option value="">{% trans "International" %}</option>
 {% endif %}
-<option value="{{request.user.chapter.pk}}">{% trans "My chapter only" %}</option>
+<option value="{{user.chapter.pk}}">{% trans "My chapter only" %}</option>
 </select>
 </td>
 	</tr>
@@ -320,7 +320,7 @@
 </div></div></div></div>
 {% endif %}
 
-{% if request.user.is_staff %}
+{% if user.is_staff %}
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
@@ -339,7 +339,7 @@
 <td>{% trans "Category:" %}</td>
 <td>
 <select name="category">
-{% if request.user.is_superuser or canAddGlobal %}
+{% if user.is_superuser or canAddGlobal %}
 {% for globExecCategory in globExecCategories %}
 <option value="{{globExecCategory.pk}}">{{globExecCategory.get_full_name}}</option>
 {% endfor %}

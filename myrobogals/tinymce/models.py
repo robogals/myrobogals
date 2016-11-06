@@ -3,7 +3,7 @@
 
 from django.db import models
 from django.contrib.admin import widgets as admin_widgets
-from tinymce import widgets as tinymce_widgets
+from myrobogals.tinymce import widgets as tinymce_widgets
 
 class HTMLField(models.TextField):
     """

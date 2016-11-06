@@ -1,5 +1,5 @@
 from myrobogals.rgforums.models import Category, Forum, Topic, Post
-from myrobogals import admin
+from django.contrib import admin
 
 class CategoryAdmin(admin.ModelAdmin):
 	list_display = ('name', 'chapter', 'created_on')

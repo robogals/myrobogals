@@ -7,7 +7,7 @@
 {% block pagetitle %}{% trans "Mobile verification" %}{% endblock %}
 
 {% block content %}
-<p>A verification code has been sent to your mobile number, +{{request.user.mobile}} (<a href="/profile/edit/">edit</a>)</p>
+<p>A verification code has been sent to your mobile number, +{{user.mobile}} (<a href="/profile/edit/">edit</a>)</p>
 <p>Please enter the code below when you receive it:</p>
 <form action="/profile/mobverify/" method="POST">
 <p style="clear: both; font-size: 200%;">
