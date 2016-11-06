@@ -15,7 +15,7 @@ from django.core.validators import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime, date
-from myrobogals.tinymce.widgets import TinyMCE
+from tinymce.widgets import TinyMCE
 from myrobogals.rgmain.models import Country
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required

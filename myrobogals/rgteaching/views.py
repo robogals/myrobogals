@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgchapter.models import Chapter
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from myrobogals.tinymce.widgets import TinyMCE
+from tinymce.widgets import TinyMCE
 from time import time, sleep
 from pytz import utc
 from myrobogals.rgmain.models import Country

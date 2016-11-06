@@ -133,10 +133,6 @@ class User(AbstractUser):
 	aliases = models.ManyToManyField('User', blank=True, null=True, related_name='user_aliases')
 	email_careers_newsletter_AU_optin = models.BooleanField("Subscribe to Robogals Careers Newsletter - Australia", default=False)
 
-	class Meta:
-		verbose_name = 'member'
-		ordering = ['username']
-
 	def __unicode__(self):
 		return self.username
 	

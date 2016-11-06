@@ -93,6 +93,7 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.middleware.locale.LocaleMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -134,11 +135,11 @@ FIXTURE_DIRS = (
 )
 
 INSTALLED_APPS = (
-	'django_extensions',
 	'django.contrib.auth',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
+	'django.contrib.staticfiles',
 	'myrobogals.rgmain',
 	'myrobogals.rgprofile',
 	'myrobogals.rgchapter',
@@ -148,6 +149,7 @@ INSTALLED_APPS = (
 	'myrobogals.filters',
 	'myrobogals.rgforums',
 	'myrobogals.rgconf',
+	'tinymce',
 )
 
 AUTH_USER_MODEL = 'rgprofile.User'

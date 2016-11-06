@@ -12,7 +12,7 @@ from myrobogals.rgchapter.models import ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from myrobogals.rgteaching.views import EmailModelMultipleChoiceField
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from myrobogals.tinymce.widgets import TinyMCE
+from tinymce.widgets import TinyMCE
 import re
 from datetime import datetime, timedelta
 

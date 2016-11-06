@@ -1,6 +1,6 @@
 from django.conf import settings
 import datetime
-from myrobogals.tinymce.widgets import TinyMCE
+from tinymce.widgets import TinyMCE
 from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
