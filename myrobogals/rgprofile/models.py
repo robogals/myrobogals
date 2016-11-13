@@ -4,6 +4,7 @@ from datetime import date
 from myrobogals.rgchapter.models import Chapter, DisplayColumn, ShirtSize, NAME_DISPLAYS
 from myrobogals.rgmain.models import University, Timezone
 from django.db import connection
+from myrobogals.settings import GENDERS
 
 class MemberStatusType(models.Model):
 	PERSONTYPES = (
@@ -69,13 +70,6 @@ class Position(models.Model):
 		ordering = ('-position_date_end', '-position_date_start')
 
 class User(AbstractUser):
-	GENDERS = (
-		(0, 'No answer'),
-		(1, 'Male'),
-		(2, 'Female'),
-		(3, 'Other'),
-	)
-	
 	PRIVACY_CHOICES = (
 		(20, 'Public'),
 		(10, 'Only Robogals members can see'),

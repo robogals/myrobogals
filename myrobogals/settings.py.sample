@@ -155,3 +155,10 @@ INSTALLED_APPS = (
 AUTH_USER_MODEL = 'rgprofile.User'
 
 API_SECRET = 'k290gj2apoz0'
+
+GENDERS = (
+	(0, 'No answer'),
+	(1, 'Male'),
+	(2, 'Female'),
+	(3, 'Other'),
+)

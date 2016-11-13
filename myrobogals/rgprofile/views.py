@@ -23,7 +23,7 @@ from myrobogals.rgmessages.models_mobileregex import MobileRegex
 from myrobogals.rgmain.utils import SelectDateWidget
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
-from myrobogals.settings import MEDIA_ROOT, MEDIA_URL
+from myrobogals.settings import MEDIA_ROOT, MEDIA_URL, GENDERS
 import datetime
 from time import time
 import re
@@ -591,12 +591,6 @@ class FormPartOne(forms.Form):
 			self.fields['tshirt'].queryset = ShirtSize.objects.filter(chapter=chapter)
 		else:
 			del self.fields['tshirt']
-
-	GENDERS = (
-		(0, '---'),
-		(1, 'Male'),
-		(2, 'Female'),
-	)
 
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
