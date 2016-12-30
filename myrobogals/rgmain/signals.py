@@ -36,6 +36,8 @@ def update_timezones():
 	
 	print(" ")
 	print("*** IMPORTANT ***")
-	print("To update MySQL's timezone tables, enter the following command in a shell. You will need the MySQL root password.")
+	print("Remember to periodically update the pytz package to get the latest timezone definitions")
+	print(" ")
+	print("Also periodically update MySQL's timezones using the following command. You will need the MySQL root password.")
 	print("mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql")
 	print(" ")

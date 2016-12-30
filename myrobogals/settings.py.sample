@@ -162,3 +162,5 @@ GENDERS = (
 	(2, 'Female'),
 	(3, 'Other'),
 )
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
