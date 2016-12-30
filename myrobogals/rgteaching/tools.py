@@ -1,3 +1,4 @@
+'''
 from myrobogals.rgteaching.models import Event
 from pytz import timezone
 
@@ -13,3 +14,4 @@ def convert_times():
 			meeting_time = tz.localize(e.meeting_time.replace(tzinfo=None))
 			e.meeting_time = meeting_time
 		e.save()
+'''
