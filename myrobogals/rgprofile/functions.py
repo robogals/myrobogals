@@ -1,10 +1,12 @@
-from myrobogals.auth.models import User, Group, MemberStatus
-from myrobogals.rgmain.models import MobileRegex, University
+from myrobogals.rgprofile.models import User, MemberStatus
+from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import connection, transaction
 import re
+from pytz import utc
 
 class RgImportCsvException(Exception):
 	def __init__(self, errmsg):
@@ -35,7 +37,7 @@ def stringval(colname, cell, newuser, defaults):
 def dateval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	try:
-		date = datetime.strptime(data, "%Y-%m-%d")
+		date = datetime.strptime(data, "%Y-%m-%d").replace(tzinfo=utc)
 		setattr(newuser, colname, date)
 	except ValueError:
 		if colname in defaults:
@@ -165,9 +167,9 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 	user_already_exists=False
 	msg=""
 	if 'date_joined' not in defaults:
-		defaults['date_joined'] = datetime.now()
+		defaults['date_joined'] = timezone.now()
 	elif defaults['date_joined'] == None:
-		defaults['date_joined'] = datetime.now()
+		defaults['date_joined'] = timezone.now()
 	for row in filerows:
 		if any(row):
 			# Create new user
@@ -464,7 +466,7 @@ def any_exec_attr(u):
 
 def subtonews(first_name, last_name, email, chapter_id):
         cursor = connection.cursor()
-        cursor.execute('SELECT u.id, u.email_chapter_optin FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
+        cursor.execute('SELECT u.id, u.email_chapter_optin FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
         user = cursor.fetchone()
         if user:
         	if int(user[1]) == 1:
@@ -486,7 +488,7 @@ def subtonews(first_name, last_name, email, chapter_id):
         	user.email = email
         	user.chapter_id = chapter_id
         	user.email_chapter_optin = True
-        	user.date_joined = datetime.now()
+        	user.date_joined = timezone.now()
 		user.save()
 
 		# Must be called after save() because the primary key
@@ -496,7 +498,7 @@ def subtonews(first_name, last_name, email, chapter_id):
 
 def unsubtonews(email, chapter_id):
         cursor = connection.cursor()
-        cursor.execute('SELECT u.id FROM auth_user as u, auth_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
+        cursor.execute('SELECT u.id FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
         user = cursor.fetchone()
         if user:
         	user = User.objects.get(pk=user[0])

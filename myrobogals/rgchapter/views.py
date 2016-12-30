@@ -1,28 +1,31 @@
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgteaching.models import SchoolVisitStats
-from myrobogals.auth.models import Group, User
+from myrobogals.rgteaching.models import SchoolVisitStats, SchoolVisit
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
 from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
 from django.db.models import Q
+from django.utils import timezone
 import datetime
 import StringIO
 
 def list(request):
 	listing = []
-	superchapters = Group.objects.filter(parent=1).exclude(myrobogals_url='special').order_by('short','name')
+	superchapters = Chapter.objects.filter(parent=1).exclude(myrobogals_url='special').order_by('short','name')
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
 			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter or request.user.is_superuser or request.user.chapter.parent == superchapter)):
-				chapters_all = Group.objects.filter(parent=superchapter).order_by('short','name')
+				chapters_all = Chapter.objects.filter(parent=superchapter).order_by('short','name')
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status != 1:
@@ -30,21 +33,21 @@ def list(request):
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
 			if superchapter.status == 0:
-				chapters_all = Group.objects.filter(parent=superchapter).order_by('short','name')
+				chapters_all = Chapter.objects.filter(parent=superchapter).order_by('short','name')
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status == 0:
 						chapters_display.append(chapter)
 				listing.append({'super': superchapter, 'chapters': chapters_display})
-		specialch = Group.objects.filter(parent__myrobogals_url='special', status=0).order_by('short','name')
+		specialch = Chapter.objects.filter(parent__myrobogals_url='special', status=0).order_by('short','name')
 	return render_to_response('chapter_listing.html', {'listing': listing, 'specialch': specialch}, context_instance=RequestContext(request))
 
 def joinlist(request):
 	listing = []
-	superchapters = Group.objects.filter(parent=1)		
+	superchapters = Chapter.objects.filter(parent=1)		
 	for superchapter in superchapters:
 		if superchapter.status == 0:
-			chapters_all = Group.objects.filter(parent=superchapter)
+			chapters_all = Chapter.objects.filter(parent=superchapter)
 			chapters_display = []
 			for chapter in chapters_all:
 				if chapter.status == 0:
@@ -54,12 +57,12 @@ def joinlist(request):
 
 def localtimes(request):
 	listing = []
-	globalchapter = Group.objects.get(pk=1)
-	superchapters = Group.objects.filter(parent=1)		
+	globalchapter = Chapter.objects.get(pk=1)
+	superchapters = Chapter.objects.filter(parent=1)		
 	for superchapter in superchapters:
 		if request.user.is_authenticated():
 			if superchapter.status == 0 or (superchapter.status == 2 and (superchapter == request.user.chapter or request.user.is_superuser or request.user.chapter.parent == superchapter)):
-				chapters_all = Group.objects.filter(parent=superchapter)
+				chapters_all = Chapter.objects.filter(parent=superchapter)
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status == 0 or (chapter.status == 2 and (chapter == request.user.chapter or request.user.is_superuser)):
@@ -67,7 +70,7 @@ def localtimes(request):
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 		else:
 			if superchapter.status == 0:
-				chapters_all = Group.objects.filter(parent=superchapter)
+				chapters_all = Chapter.objects.filter(parent=superchapter)
 				chapters_display = []
 				for chapter in chapters_all:
 					if chapter.status == 0:
@@ -76,7 +79,7 @@ def localtimes(request):
 	return render_to_response('timezone_listing.html', {'listing': listing, 'globalchapter': globalchapter}, context_instance=RequestContext(request))
 
 def detail(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')
 	recipients = AwardRecipient.objects.filter(chapter=c)
 	return render_to_response('chapter_detail.html', {'chapter': c, 'officers': officers, 'recipients': recipients}, context_instance=RequestContext(request))
@@ -109,7 +112,7 @@ class FormPartOne(forms.Form):
 	goal = forms.CharField(max_length=32, label=_("Goal"), help_text=_("Number of students"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("The goal will be compared against girls taught since this date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	notify_enable = forms.BooleanField(required=False, help_text=_("Notify when a new member signs up online"))
-	notify_list = forms.ModelChoiceField(label=_(), queryset=UserList.objects.none(), required=False)
+	notify_list = forms.ModelChoiceField(label=_("Who to notify"), queryset=UserList.objects.none(), required=False)
 
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
@@ -164,7 +167,7 @@ class WelcomeEmailMsgField(forms.CharField):
 	def clean(self, value):
 		try:
 			formatted = value.format(
-				chapter=Group.objects.get(pk=1),
+				chapter=Chapter.objects.get(pk=1),
 				user=User.objects.get(username='edit'),
 				plaintext_password='abc123')
 		except Exception:
@@ -177,9 +180,19 @@ class FormPartFive(forms.Form):
 	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
 	welcome_email_html = forms.BooleanField(required=False)
 
+class InviteEmailMsgField(forms.CharField):
+	def clean(self, value):
+		try:
+			formatted = value.format(
+				visit=SchoolVisit.objects.all()[0],
+				user=User.objects.get(username='edit'))
+		except Exception:
+			raise forms.ValidationError("Invitation email contains invalid field names")
+		return value
+
 class FormPartSix(forms.Form):
 	invite_email_subject = forms.CharField(required=False, max_length=256)
-	invite_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
+	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea)
 	invite_email_html = forms.BooleanField(required=False)
 
 @login_required
@@ -193,7 +206,7 @@ def progresschapter(request):
 	careertalkview = False
 
 	if request.user.is_superuser or request.user.is_staff:
-		c = Group.objects.get(pk=1)
+		c = Chapter.objects.get(pk=1)
 	else:
 		raise Http404
 	
@@ -203,38 +216,39 @@ def progresschapter(request):
 		careertalkview = True
 		displaycats = [1,]
 	
-	children = Group.objects.filter(parent=c).filter(goal__gt=0)
+	children = Chapter.objects.filter(parent=c).filter(goal__gt=0)
 	for child in children:
-		grandchildren = Group.objects.filter(parent=child).filter(goal__gt=0)
+		grandchildren = Chapter.objects.filter(parent=child).filter(goal__gt=0)
 		for grandchild in grandchildren:
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				chapter_sum = chapter_sum + school_visit.num_girls_weighted()
 			grandchildren_display.append((grandchild, chapter_sum))
 			chapter_sum = 0.0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				child_sum = child_sum + school_visit.num_girls_weighted()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				root_sum = root_sum + school_visit.num_girls_weighted()
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 		for school_visit in school_visits:
 			child_sum = child_sum + school_visit.num_girls_weighted()
+
 		listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
 		grandchildren_display = []
 		child_sum = 0
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 		for school_visit in school_visits:
 			root_sum = root_sum + school_visit.num_girls_weighted()
-	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 	for school_visit in school_visits:
 		root_sum = root_sum + school_visit.num_girls_weighted()
 	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300, 'careertalkview': careertalkview}, context_instance=RequestContext(request))
 
 @login_required
 def editchapter(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if (request.user.is_staff and request.user.chapter == c) or request.user.is_superuser:
 		if request.method == 'POST':
 			formpart1 = FormPartOne(request.POST, chapter=c)
@@ -288,7 +302,7 @@ def editchapter(request, chapterurl):
 				c.invite_email_msg = data['invite_email_msg']
 				c.invite_email_html = data['invite_email_html']
 				c.save()
-				request.user.message_set.create(message=unicode(_("Chapter info updated")))
+				messages.success(request, message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
 		else:
 			display_columns = []
@@ -362,7 +376,7 @@ def chaptermap(request):
 	chaptmap.write('      <coordinates>144.961807,-37.798481,0.000000</coordinates>\n')
 	chaptmap.write('    </Point>\n')
 	chaptmap.write('  </Placemark>\n')
-	for g in Group.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).exclude(pk=3).filter(status=0):
+	for g in Chapter.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).exclude(pk=3).filter(status=0):
 		chaptmap.write('  <Style id="style' + g.myrobogals_url + '">\n')
 		chaptmap.write('    <IconStyle>\n')
 		chaptmap.write('      <Icon>\n')

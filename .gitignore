@@ -1,8 +1,5 @@
 myrobogals/settings.py
-myrobogals/myrobogals
-scichal/settings.py
 daemons/smsglobal.h
-daemons/smsglobal.c
 daemons/rgsmsd.h
 daemons/rgsmsd
 rgmedia/unipics
@@ -11,7 +8,7 @@ rgmedia/email_uploads
 scripts/send_email_mandrill.php
 core
 tags
+static
 *.swp
 *.pyc
 *.o
-*.wsgi

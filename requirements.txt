@@ -1,0 +1,4 @@
+django==1.7.11
+mysql-python
+pytz
+django-tinymce

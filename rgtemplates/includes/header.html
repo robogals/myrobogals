@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load emailpendingerror %}
     <!--Begin Header-->
-	{% if request.user.is_superuser %}
+	{% if user.is_superuser %}
 	{% emailpendingerror "header-bg" "emailpendingerror" %}
 	{% else %}
     <div id="header-bg">
@@ -56,8 +56,8 @@
         
         
 </li>   
-{% if request.user.is_authenticated %}
-{% if request.user.is_staff %}
+{% if user.is_authenticated %}
+{% if user.is_staff %}
                     <li class="item146" >
             <a class="orphan item bullet" href="/profile/contactdirectory/"  >
             <span>
@@ -83,12 +83,12 @@
                
             </span>
         </a>
-{% if request.user.is_authenticated %}
+{% if user.is_authenticated %}
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
                 <li class="item158">
-                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/">
+                    <a class="orphan item bullet" href="/chapters/{{ user.chapter.myrobogals_url }}/">
                         <span>{% trans "View my chapter" %}</span>
                     </a>
                 </li>
@@ -98,19 +98,19 @@
                         <span>{% trans "List all chapters" %}</span>
                     <a>
                 </li>
-{% if request.user.is_staff %}
+{% if user.is_staff %}
                 <li class="item147">
-                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/">
+                    <a class="orphan item bullet" href="/chapters/{{ user.chapter.myrobogals_url }}/edit/">
                         <span>{% trans "Edit my chapter" %}</span>
                     <a>
                 </li>
                 <li class="item147">
-                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/edit/users/">
+                    <a class="orphan item bullet" href="/chapters/{{ user.chapter.myrobogals_url }}/edit/users/">
                         <span>{% trans "Manage members" %}</span>
                     <a>
                 </li>
                 <li class="item147">
-                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/lists/">
+                    <a class="orphan item bullet" href="/chapters/{{ user.chapter.myrobogals_url }}/lists/">
                         <span>{% trans "Manage lists" %}</span>
                     <a>
                 </li>
@@ -120,7 +120,7 @@
                     <a>
                 </li>
                 <li class="item147">
-                    <a class="orphan item bullet" href="/chapters/{{ request.user.chapter.myrobogals_url }}/websitedetails/">
+                    <a class="orphan item bullet" href="/chapters/{{ user.chapter.myrobogals_url }}/websitedetails/">
                         <span>{% trans "View website details" %}</span>
                     <a>
                 </li>
@@ -148,7 +148,7 @@
                
             </span>
         </a>
-{% if request.user.is_authenticated %}
+{% if user.is_authenticated %}
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
@@ -186,7 +186,7 @@
         </a>
 </li>   
 
-{% if request.user.is_staff %}
+{% if user.is_staff %}
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/printlist/"  >
             <span>
@@ -219,7 +219,7 @@
         
 </li>   
                     <li class="item71" >
-            <a class="orphan item bullet" href="/teaching/schoolsdirectory/{{request.user.chapter.myrobogals_url}}/"  >
+            <a class="orphan item bullet" href="/teaching/schoolsdirectory/{{user.chapter.myrobogals_url}}/"  >
             <span>
                         {% trans "Schools directory" %}              
             </span>
@@ -233,15 +233,15 @@
                         <span>{% trans "Progress towards goals" %}</span>
                     <a>
                 </li>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/globalreports/">
                         <span>{% trans "Reporting" %}</span>
                     <a>
                 </li>
 {% else %}
-		{% if request.user.is_staff %}
-				{% ifequal request.user.chapter.pk 1 %}
+		{% if user.is_staff %}
+				{% ifequal user.chapter.pk 1 %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/globalreports/">
                         <span>{% trans "Reporting" %}</span>
@@ -269,11 +269,11 @@
             </span>
 
         </a>
-{% if request.user.is_authenticated %}        
+{% if user.is_authenticated %}        
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
-{% if request.user.is_staff %}
+{% if user.is_staff %}
                             
                     <li class="item82" >
             <a class="orphan item bullet" href="/messages/email/write/"  >
@@ -303,7 +303,7 @@
         
         
 </li>   
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
 
                     <li class="item83" >
             <a class="orphan item bullet" href="/messages/newsletters/1/"  >

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% load showstarrating %}
 
 {% block title %}Confirm deletion of post{% endblock %}
@@ -21,7 +20,7 @@
 		<br />({{cur_position.positionType}})
 		{% endfor %}
 		</td>
-		<td style="border-bottom: solid 1px grey;">{{post.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}{% if post.updated_on %} | {% trans "Last edit:" %} {{ post.edited_by.get_full_name }} ({{ post.updated_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}){% endif %}</td>
+		<td style="border-bottom: solid 1px grey;">{{post.created_on|date:_("DATETIME_FORMAT")}}{% if post.updated_on %} | {% trans "Last edit:" %} {{ post.edited_by.get_full_name }} ({{ post.updated_on|date:_("DATETIME_FORMAT")}}){% endif %}</td>
 	</tr>
 	<tr class="odd">
 		<td>{{ post.message|linebreaksbr }}</td>

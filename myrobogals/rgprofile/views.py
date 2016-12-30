@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import email_re
 from django.db import connection
 from django.db.models import Q
 from django.forms.widgets import Widget, Select, TextInput
@@ -9,19 +8,21 @@ from django.template import RequestContext, Context, loader
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from myrobogals.admin.models import LogEntry
-from myrobogals.admin.widgets import FilteredSelectMultiple
-from myrobogals.auth import authenticate, login
-from myrobogals.auth.decorators import login_required
-from myrobogals.auth.models import User, Group, MemberStatus, MemberStatusType
+from django.contrib import messages
+from django.contrib.admin.models import LogEntry
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from myrobogals.rgprofile.models import User, MemberStatus, MemberStatusType
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University, MobileRegex
-from myrobogals.rgmain.utils import SelectDateWidget
+from myrobogals.rgmain.utils import SelectDateWidget, email_re
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
-from myrobogals.settings import MEDIA_ROOT, MEDIA_URL
+from myrobogals.settings import MEDIA_ROOT, MEDIA_URL, GENDERS
 import datetime
 from time import time
 import re
@@ -29,7 +30,7 @@ import csv
 import operator
 
 def joinchapter(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if chapter.is_joinable:
 		if request.user.is_authenticated():
 			return render_to_response('join_already_logged_in.html', {}, context_instance=RequestContext(request))
@@ -41,7 +42,7 @@ def joinchapter(request, chapterurl):
 
 @login_required
 def viewlist(request, chapterurl, list_id):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		l = get_object_or_404(UserList, pk=list_id, chapter=c)
 		users = l.users
@@ -93,7 +94,7 @@ class EditStatusForm(forms.Form):
 
 @login_required
 def listuserlists(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	uls = UserList.objects.filter(chapter=c)
 	return render_to_response('list_user_lists.html', {'uls': uls, 'chapter': c}, context_instance=RequestContext(request))
 
@@ -107,7 +108,7 @@ def edituserlist(request, chapterurl, list_id):
 		new = True
 	else:
 		new = False
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		if new:
 			l = UserList()
@@ -125,7 +126,7 @@ def edituserlist(request, chapterurl, list_id):
 				l.users = data['users']
 				l.display_columns = data['display_columns']
 				l.save()
-				request.user.message_set.create(message=unicode(_("User list \"%(listname)s\" has been updated") % {'listname': l.name}))
+				messages.success(request, message=unicode(_("User list \"%(listname)s\" has been updated") % {'listname': l.name}))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:
@@ -146,7 +147,7 @@ def edituserlist(request, chapterurl, list_id):
 
 @login_required
 def editusers(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	memberstatustypes = MemberStatusType.objects.all()
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		search = ''
@@ -163,11 +164,11 @@ def editusers(request, chapterurl):
 			status = '1'   # Default to student members
 
 		if (status != '0'):
-			users = User.objects.raw('SELECT u.* FROM auth_user AS u, auth_memberstatus AS ms WHERE u.chapter_id ' +
+			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u, rgprofile_memberstatus AS ms WHERE u.chapter_id ' +
 					'= '+ str(c.pk) +' AND u.id = ms.user_id AND ms.statusType_id = '+ status +' AND ms.status_date_end IS NULL ' +
 					searchsql + ' ORDER BY last_name, first_name')
 		else:
-			users = User.objects.raw('SELECT u.* FROM auth_user AS u WHERE u.chapter_id ' +
+			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u WHERE u.chapter_id ' +
 					'= '+ str(c.pk) + ' ' +
 					searchsql + ' ORDER BY last_name, first_name')
 		display_columns = c.display_columns.all()
@@ -223,9 +224,9 @@ def deleteuser(request, userpk):
 				else:
 					raise Http404
 		if canNotDelete:
-			request.user.message_set.create(message=unicode(_('- Cannot delete member. Reason(s): %s<br>Consider marking this member as alumni instead.') % msg))
+			messages.success(request, message=unicode(_('- Cannot delete member. Reason(s): %s<br>Consider marking this member as alumni instead.') % msg))
 		else:
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		else:
@@ -235,7 +236,7 @@ def deleteuser(request, userpk):
 
 @login_required
 def editexecs(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		users = User.objects.filter(chapter=c)
 		search = ''
@@ -250,7 +251,7 @@ def editexecs(request, chapterurl):
 
 @login_required
 def editstatus(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	memberstatustypes = MemberStatusType.objects.all()
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		users = []
@@ -262,6 +263,7 @@ def editstatus(request, chapterurl):
 				users = data['users'] #l:queryset
 				users_already = ""
 				users_changed = ""
+
 				for user in users:
 					u = User.objects.get(username__exact = user.username)
 					old_status = u.memberstatus_set.get(status_date_end__isnull=True)
@@ -283,18 +285,23 @@ def editstatus(request, chapterurl):
 							users_changed = users_changed + ", " + u.username
 						else:
 							users_changed = u.username
+
 				if(users_already):
-					request.user.message_set.create(message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
+					messages.success(request, message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
+				
 				if(users_changed):
-					request.user.message_set.create(message=unicode(_("%(usernames)s have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
+					messages.success(request, message=unicode(_("%(usernames)s has/have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
+				
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/users/')
+			else:
+				return render_to_response('edit_user_status.html', {'ulform': ulform, 'chapter': c, 'memberstatustypes': memberstatustypes}, context_instance=RequestContext(request))
 		else:
 			ulform = EditStatusForm(None, user=request.user)
 			return render_to_response('edit_user_status.html', {'ulform': ulform, 'chapter': c, 'memberstatustypes': memberstatustypes}, context_instance=RequestContext(request))
 
 @login_required
 def adduser(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	return edituser(request, '', chapter)
 
 @login_required
@@ -306,7 +313,7 @@ def mobverify(request):
 	if not request.user.is_staff:
 		raise Http404
 	if request.user.mobile_verified:
-		request.user.message_set.create(message=unicode(_('Your mobile number is already verified')))
+		messages.success(request, message=unicode(_('Your mobile number is already verified')))
 		return HttpResponseRedirect('/profile/')
 	if request.method == 'POST':
 		if not request.session.get('verif_code', False):
@@ -322,7 +329,7 @@ def mobverify(request):
 			msg = _('- Verification failed: invalid verification code')
 		del request.session['verif_code']
 		del request.session['mobile']
-		request.user.message_set.create(message=unicode(msg))
+		messages.success(request, message=unicode(msg))
 		return HttpResponseRedirect('/messages/sms/write/')
 	else:
 		if request.user.mobile:
@@ -331,7 +338,7 @@ def mobverify(request):
 			message.body = 'Robogals verification code: ' + verif_code
 			message.senderid = '61429558100'
 			message.sender = User.objects.get(username='edit')
-			message.chapter = Group.objects.get(pk=1)
+			message.chapter = Chapter.objects.get(pk=1)
 			message.validate()
 			message.sms_type = 1
 			message.status = -1
@@ -349,11 +356,11 @@ def mobverify(request):
 			for obj in sms_this_month_obj:
 				sms_this_month += obj.credits_used()
 			sms_this_month += message.credits_used()
-			if sms_this_month > Group.objects.get(pk=1).sms_limit:
+			if sms_this_month > Chapter.objects.get(pk=1).sms_limit:
 				message.status = 3
 				message.save()
 				msg = _('- Verification failed: system problem please try again later')
-				request.user.message_set.create(message=unicode(msg))
+				messages.success(request, message=unicode(msg))
 				return HttpResponseRedirect('/profile/')
 
 			message.status = 0
@@ -362,7 +369,7 @@ def mobverify(request):
 			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
 		else:
 			msg = _('- Verification failed: no mobile number entered. (Profile -> Edit Profile)')
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			return HttpResponseRedirect('/messages/sms/write/')
 
 @login_required
@@ -590,12 +597,6 @@ class FormPartOne(forms.Form):
 		else:
 			del self.fields['tshirt']
 
-	GENDERS = (
-		(0, '---'),
-		(1, 'Male'),
-		(2, 'Female'),
-	)
-
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
 	username = forms.CharField(label=_('Username'), max_length=30)
@@ -804,7 +805,7 @@ def edituser(request, username, chapter=None):
 						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
-						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
+						messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						if chapter.welcome_email_enable:
@@ -863,7 +864,7 @@ def edituser(request, username, chapter=None):
 							message.save()
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
-						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
+						messages.success(request, message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
@@ -1000,12 +1001,6 @@ class WelcomeEmailForm(forms.Form):
 	html = forms.BooleanField(required=False)
 
 class DefaultsFormOne(forms.Form):
-	GENDERS = (
-		(0, '---'),
-		(1, 'Male'),
-		(2, 'Female'),
-	)
-
 	COURSE_TYPE_CHOICES = (
 		(0, '---'),
 		(1, 'Undergraduate'),
@@ -1039,7 +1034,7 @@ def importusers(request, chapterurl):
     # initial value to match the default value
 	updateuser=False  
 	ignore_email=True 
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	errmsg = None
@@ -1102,7 +1097,7 @@ def importusers(request, chapterurl):
 						msg = _('%d users imported and emailed.<br>%d rows were ignored due to members with those email addresses already existing.<br>%s') % (users_imported, existing_emails, error_msg)
 				else :
 						msg = _('%d users imported and emailed.<br>%s') % (users_imported, error_msg)
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			del request.session['updateuser']
@@ -1117,7 +1112,7 @@ def importusers(request, chapterurl):
 
 @login_required
 def exportusers(request, chapterurl):
-	c = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
 		if 'status' in request.GET:
 			status = request.GET['status']
@@ -1167,14 +1162,14 @@ BASIC_FIELDS = (
 	('mobile', 'Mobile number, in correct local format, OR correct local format with the leading 0 missing (as Excel is prone to do), OR international format without a leading +. Examples: 61429558100 (Aus) or 447553333111 (UK)'),
 	('date_joined', 'Date when this member joined Robogals. If blank, today\'s date is used'),
 	('dob', 'Date of birth, in format 1988-10-26'),
-	('gender', '0 = No answer; 1 = Male; 2 = Female'),
+	('gender', '0 = No answer; 1 = Male; 2 = Female; 3 = Other'),
 )
 
 EXTRA_FIELDS = (
 	('course', 'Name of course/degree'),
 	('uni_start', 'Date when they commenced university, in format 2007-02-28'),
 	('uni_end', 'Date when they expect to complete university, in format 2011-11-30'),
-	('university_id', 'University they attend. Enter -1 to use the host university of this Robogals chapter. For a full list of IDs see https://my.robogals.org/chapters/<chapter>/edit/users/import/help/unis/'),
+	('university_id', 'ID of the university they attend. Enter -1 to use the host university of this Robogals chapter. <a href="unis/">Full list of university IDs</a>'),
 	('course_type', '1 = Undergraduate; 2 = Postgraduate'),
 	('student_type', '1 = Domestic student; 2 = International student'),
 	('student_number', 'Student number, a.k.a. enrolment number, candidate number, etc.'),
@@ -1202,7 +1197,7 @@ HELPINFO = (
 
 @login_required
 def importusershelp(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO}, context_instance=RequestContext(request))
@@ -1239,7 +1234,7 @@ def genpw(request, username):
 			welcomeemail = welcomeform.cleaned_data
 			try:
 				genandsendpw(user, welcomeemail, chapter)
-				request.user.message_set.create(message=unicode(_("Password generated and emailed")))
+				messages.success(request, message=unicode(_("Password generated and emailed")))
 				if return_url == '':
 					return_url = '/profile/' + username + '/edit/'
 				return HttpResponseRedirect(return_url)
@@ -1251,7 +1246,7 @@ def genpw(request, username):
 
 @login_required
 def unilist(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
 		raise Http404
 	unis = University.objects.all()
@@ -1266,7 +1261,7 @@ class NewsletterUnForm(forms.Form):
 	email = forms.EmailField(label=_('Email'), max_length=64)
 
 def newslettersub(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	errmsg = ''
 	if request.method == 'POST':
 		newsletterform = NewsletterForm(request.POST)
@@ -1285,11 +1280,11 @@ def newslettersub(request, chapterurl):
 	return render_to_response('newslettersub.html', {'newsletterform': newsletterform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 
 def newslettersubdone(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	return render_to_response('newslettersubdone.html', {'c': chapter}, context_instance=RequestContext(request))
 
 def newsletterunsub(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	errmsg = ''
 	if request.method == 'POST':
 		newsletterunform = NewsletterUnForm(request.POST)
@@ -1308,5 +1303,5 @@ def newsletterunsub(request, chapterurl):
 	return render_to_response('newsletterunsub.html', {'newsletterunform': newsletterunform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 
 def newsletterunsubdone(request, chapterurl):
-	chapter = get_object_or_404(Group, myrobogals_url__exact=chapterurl)
+	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	return render_to_response('newsletterunsubdone.html', {'c': chapter}, context_instance=RequestContext(request))

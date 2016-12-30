@@ -11,7 +11,34 @@
 <input type="submit" value="{% trans "Go" %}">
 </form>
 {% endif %}
-{% if request.user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
+{% if user.is_staff %}<p><a href="/teaching/new/">{% trans "Create new workshop" %}</a></p>{% endif %}
+
+<p><b>
+{% if visits.number == 1 %}
+  {% trans "home" %} |
+{% else %}
+  <a href="?page=1">{% trans "home" %}</a> |
+{% endif %}
+
+{% if visits.has_previous %}
+  <a href="?page={{visits.previous_page_number}}">{% trans "previous" %}</a> |
+{% else %}
+  {% trans "previous" %} |
+{% endif %}
+
+{% trans "Page" %} {{visits.number}} {% trans "of" %} {{visits.paginator.num_pages}}
+
+{% if visits.has_next %}
+  | <a href="?page={{visits.next_page_number}}">{% trans "next" %}</a>
+{% else %}
+  | {% trans "next" %}
+{% endif %}
+
+{% if visits.number == visits.paginator.num_pages %}
+  | {% trans "last" %}
+{% else %}
+  | <a href="?page={{visits.paginator.num_pages}}">{% trans "last" %}</a>
+{% endif %}</b></p>
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
   <tr class="even">
     <td><strong>{% trans "School" %}</strong></td>

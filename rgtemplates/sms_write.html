@@ -26,7 +26,7 @@
     <td>
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
         <tr>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="1" id="type1" disabled="disabled" /></td>
           <td style="vertical-align: top"><label for="type1"><span style="text-decoration: line-through">{% trans "All members who have opted to receive SMS from the following chapters" %}</span></label></td>
 {% else %}
@@ -34,7 +34,7 @@
           <td style="vertical-align: top"><label for="type1">{% blocktrans %}All members of {{ chapter }} who have opted to receive SMS{% endblocktrans %}</label></td>
 {% endif %}
         </tr>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_chapters">
         <tr>
@@ -45,7 +45,7 @@
       <table border="0" width="100%" cellpadding="0" cellspacing="0">
 {% endif %}
         <tr>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
           <td style="vertical-align: top" width="30"><input name="type" type="radio" value="2" id="type2" {% ifequal typesel '2' %}checked="checked"{% endifequal %} /></td>
           <td style="vertical-align: top"><label for="type2">{% trans "Executive committee members of the following chapters" %}</label></td>
 {% else %}
@@ -53,7 +53,7 @@
           <td style="vertical-align: top"><label for="type2">{% blocktrans %}Executive committee members of {{ chapter }}{% endblocktrans %}</label></td>
 {% endif %}
         </tr>
-{% if request.user.is_superuser %}
+{% if user.is_superuser %}
       </table>
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_exec">
         <tr>
@@ -143,7 +143,7 @@
       <table border="0" width="100%" cellpadding="0" cellspacing="0" id="form_table_scheduling">
         <tr>
           <td style="vertical-align: top" width="30">&nbsp;</td>
-          <td style="vertical-align: top">{% trans "at" %} {{ smsform.schedule_time }} {% trans "on" %} {{ smsform.schedule_date }}{% if request.user.is_superuser %}<br>{% trans "in" %} {{ smsform.schedule_zone }}{% endif %}</td>
+          <td style="vertical-align: top">{% trans "at" %} {{ smsform.schedule_time }} {% trans "on" %} {{ smsform.schedule_date }}{% if user.is_superuser %}<br>{% trans "in" %} {{ smsform.schedule_zone }}{% endif %}</td>
         </tr>
       </table>
     </td>

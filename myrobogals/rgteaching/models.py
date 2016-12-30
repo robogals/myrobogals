@@ -1,12 +1,14 @@
 from django.db import models
-from myrobogals.auth.models import Group, User
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country, Subdivision
 from datetime import datetime
 import json, urllib, urllib2
+from django.utils.timezone import localtime
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 	address_street = models.CharField(max_length=128,blank=True)
 	address_city = models.CharField('City/Suburb',max_length=64,blank=True)
 	address_state = models.CharField('State/Province',max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
@@ -53,7 +55,7 @@ class DirectorySchool(models.Model):
 	gender = models.IntegerField(choices=GENDER_CHOICES, blank=True, null=True)
 	religion = models.CharField(max_length=32, blank=True)
 	asd_id = models.IntegerField(blank=True, null=True)
-	asd_feature = models.BooleanField()
+	asd_feature = models.BooleanField(default=False)
 	notes = models.TextField(blank=True)
 	latitude = models.FloatField(blank=True, null=True)
 	longitude = models.FloatField(blank=True, null=True)
@@ -88,7 +90,7 @@ class DirectorySchool(models.Model):
 
 class StarSchoolDirectory(models.Model):
 	school = models.ForeignKey(DirectorySchool)
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 
 class Event(models.Model):
 	STATUS_CHOICES = (
@@ -102,7 +104,7 @@ class Event(models.Model):
 		(2, 'Do not allow anyone to RSVP'),
 	)
 
-	chapter = models.ForeignKey(Group)
+	chapter = models.ForeignKey(Chapter)
 	creator = models.ForeignKey(User)
 	visit_start = models.DateTimeField("Start")
 	visit_end = models.DateTimeField("End")
@@ -115,6 +117,12 @@ class Event(models.Model):
 	notes = models.TextField(blank=True)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=0)
 	allow_rsvp = models.IntegerField(choices=ALLOW_RSVP_CHOICES, default=0)
+	
+	@property
+	def visit_time(self):
+		start_time_local = localtime(self.visit_start, timezone=self.chapter.tz_obj())
+		end_time_local = localtime(self.visit_end, timezone=self.chapter.tz_obj())
+		return start_time_local.strftime('%B %d, %Y, %I:%M %p') + ' to ' + end_time_local.strftime('%I:%M %p')
 
 class SchoolVisit(Event):
 	school = models.ForeignKey(School)

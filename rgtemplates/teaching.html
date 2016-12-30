@@ -8,7 +8,7 @@
 {% block content %}
 <ul>
     <li><a href="list/">{% trans "View upcoming and past school visits" %}</a></li>
-    {% if request.user.is_staff %}
+    {% if user.is_staff %}
     <li><a href="new/">{% trans "Create new school visit" %}</a></li>
     <li><a href="schools/">{% trans "View schools list" %}</a></li>
     <li><a href="schools/new/">{% trans "Add school" %}</a></li>

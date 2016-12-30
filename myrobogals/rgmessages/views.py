@@ -5,19 +5,21 @@ from django import forms
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from myrobogals.auth.models import User, Group, MemberStatusType
+from myrobogals.rgprofile.models import User, MemberStatusType
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipient, EmailFile, EmailMessage, EmailRecipient, Newsletter, NewsletterSubscriber, PendingNewsletterSubscriber, SubscriberType, SMSLengthException, EmailHeader
 from myrobogals.rgprofile.models import UserList
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
-from django.core.validators import email_re
+from myrobogals.rgmain.utils import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime, date
 from tinymce.widgets import TinyMCE
 from myrobogals.rgmain.models import Country
+from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from myrobogals.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from time import time
 from myrobogals.rgmessages.functions import importcsv, RgImportCsvException
 import csv
@@ -25,6 +27,7 @@ from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from pytz import utc
 from decimal import *
 from operator import itemgetter
+from django.utils import timezone
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -47,7 +50,7 @@ def setmaxuploadfilesize(request):
 				return HttpResponseRedirect('/messages/email/write/')
 			except:
 				msg = '- Maximum file size must be an integer'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': '', 'apps': 'messages'}, context_instance=RequestContext(request))
 	else:
 		raise Http404
@@ -67,8 +70,8 @@ class WriteEmailForm(forms.Form):
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}))
 	from_type = forms.ChoiceField(choices=((0,"Robogals"),(1,_("Chapter name")),(2,_("Your name"))), initial=1)
 	recipients = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
-	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
-	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple(_("Chapters"), False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	newsletters = forms.ModelChoiceField(queryset=Newsletter.objects.all(), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
@@ -136,7 +139,7 @@ def writeemail(request):
 				if warning:
 					del request.session['emailform']
 					del request.session['emailid']
-					request.user.message_set.create(message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
+					messages.success(request, message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
 					return HttpResponseRedirect('/messages/email/write/')
 				emailform = request.session['emailform']
 				del request.session['emailform']
@@ -162,7 +165,7 @@ def writeemail(request):
 
 				if request.POST['scheduling'] == '1':
 					message.scheduled = True
-					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time']).replace(tzinfo=utc)
 					try:
 						message.scheduled_date_type = int(data['schedule_zone'])
 					except Exception:
@@ -298,8 +301,8 @@ class WriteSMSForm(forms.Form):
 	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("Put your message here.  To opt-out reply 'stop'"))
 	from_type = forms.ChoiceField(choices=((0,"+61429558100 (myRobogals)"),), help_text=_('You can send SMSes from your own number if you <a href="%s">verify your number</a>') % '/profile/mobverify/')
 	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
-	chapters = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
-	chapters_exec = forms.ModelMultipleChoiceField(queryset=Group.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	chapters = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
+	chapters_exec = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	schedule_time = forms.TimeField(widget=SelectTimeWidget(), initial=datetime.now(), required=False)
 	schedule_date = forms.DateField(widget=SelectDateWidget(years=range(datetime.now().year, datetime.now().year + 2)), initial=datetime.now(), required=False)
@@ -538,10 +541,10 @@ def downloademailfile(request, email_id, file_name):
 			response['Content-Length'] = f[0].filesize()
 			return response
 		except:
-			request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % f[0].filename())))
+			messages.success(request, message=unicode(_('File: "%s" does not exist' % f[0].filename())))
 			return HttpResponseRedirect('/messages/history/')
 	else:
-		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
+		messages.success(request, message=unicode(_('Email does not contain file: "%s"' % file_name)))
 		return HttpResponseRedirect('/messages/history/')
 
 @login_required
@@ -682,7 +685,7 @@ def careersapi(request):
 						return HttpResponse("B")  # Not subscribed
 					except User.DoesNotExist:
 						return HttpResponse("B")  # Not subscribed
-				ns.unsubscribed_date = datetime.now()
+				ns.unsubscribed_date = timezone.now()
 				ns.active = False
 				ns.save()
 				if n.pk == 5:
@@ -797,7 +800,7 @@ def api(request):
 						return HttpResponse("B")  # Not subscribed
 					except User.DoesNotExist:
 						return HttpResponse("B")  # Not subscribed
-				ns.unsubscribed_date = datetime.now()
+				ns.unsubscribed_date = timezone.now()
 				ns.active = False
 				ns.save()
 				if n.pk == 1:
@@ -901,7 +904,7 @@ def importsubscribers(request, newsletter_id):
 				errmsg = e.errmsg
 				return render_to_response('import_subscribers_2.html', {'tmppath': tmppath, 'filerows': filerows, 'newsletter': newsletter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 			msg = _('%d subscribers imported!') % users_imported
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/")
