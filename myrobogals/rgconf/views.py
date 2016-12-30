@@ -58,9 +58,9 @@ class ConfRSVPForm(forms.Form):
 		attendee_type = int(cleaned_data.get('attendee_type'))
 		outgoing_position = cleaned_data.get('outgoing_position')
 		incoming_position = cleaned_data.get('incoming_position')
-		print attendee_type
-		print outgoing_position
-		print incoming_position
+		#print attendee_type
+		#print outgoing_position
+		#print incoming_position
 		if attendee_type == 0:
 			if not outgoing_position:
 				raise forms.ValidationError(_('You have indicated that you are outgoing from your chapter committee, but did not specify your outgoing position. Please state the position from which you are outgoing, e.g. "Schools Manager". If your chapter does not assign specific roles, you can simply put "General Committee"'))
