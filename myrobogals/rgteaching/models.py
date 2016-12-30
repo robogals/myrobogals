@@ -54,7 +54,7 @@ class DirectorySchool(models.Model):
 	gender = models.IntegerField(choices=GENDER_CHOICES, blank=True, null=True)
 	religion = models.CharField(max_length=32, blank=True)
 	asd_id = models.IntegerField(blank=True, null=True)
-	asd_feature = models.BooleanField()
+	asd_feature = models.BooleanField(default=False)
 	notes = models.TextField(blank=True)
 	latitude = models.FloatField(blank=True, null=True)
 	longitude = models.FloatField(blank=True, null=True)

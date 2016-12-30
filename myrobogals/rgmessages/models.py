@@ -74,8 +74,8 @@ class EmailMessage(models.Model):
 	sender = models.ForeignKey(User)
 	status = models.IntegerField("Status Code", choices=STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Time Sent (in UTC)")
-	html = models.BooleanField("HTML", blank=True)
-	scheduled = models.BooleanField("Scheduled", blank=True)
+	html = models.BooleanField("HTML", blank=True, default=False)
+	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	email_type = models.IntegerField("Email type", choices=TYPE, default=0)
@@ -207,7 +207,7 @@ class SMSMessage(models.Model):
 	chapter = models.ForeignKey(Chapter, null=True, blank=True)
 	status = models.IntegerField("Status code", choices=SMS_STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Date set (in UTC)")
-	unicode = models.BooleanField("Unicode", blank=True)
+	unicode = models.BooleanField("Unicode", blank=True, default=False)
 	split = models.IntegerField("Split", default=1)
 	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
@@ -401,7 +401,7 @@ class Newsletter(models.Model):
 	confirm_from_name = models.CharField(max_length=128, blank=True)
 	confirm_from_email = models.CharField(max_length=128, blank=True)
 	confirm_from_user = models.ForeignKey(User, related_name="+")
-	confirm_html = models.BooleanField(blank=True)
+	confirm_html = models.BooleanField(blank=True, default=False)
 	
 	def __unicode__(self):
 		return self.name

@@ -35,7 +35,7 @@ class Conference(models.Model):
 	timezone_desc = models.CharField(max_length=128, help_text="Description of timezone, e.g. 'Melbourne time' or 'Pacific Time'")
 	policy = models.IntegerField(choices=POLICY_CHOICES, default=1)
 	closed_msg = models.CharField(max_length=128, blank=True, help_text="Message to be shown when registration is closed", default="This form is now closed. To add/modify/remove RSVPs please email ______________")
-	enable_invoicing = models.BooleanField()
+	enable_invoicing = models.BooleanField(default=False)
 	custom1_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
 	custom1_label = models.CharField(max_length=32, blank=True)
 	custom2_setting = models.IntegerField(choices=CUSTOM_CHECKBOX_SETTINGS, default=0)
@@ -162,11 +162,11 @@ class ConferenceAttendee(models.Model):
 	check_in = models.DateField(null=True, blank=True)
 	check_out = models.DateField(null=True, blank=True)
 	gender = models.IntegerField(choices=GENDERS, default=0)
-	custom1 = models.BooleanField()
-	custom2 = models.BooleanField()
-	custom3 = models.BooleanField()
-	custom4 = models.BooleanField()
-	custom5 = models.BooleanField()
+	custom1 = models.BooleanField(default=False)
+	custom2 = models.BooleanField(default=False)
+	custom3 = models.BooleanField(default=False)
+	custom4 = models.BooleanField(default=False)
+	custom5 = models.BooleanField(default=False)
 
 	def get_position(self):
 		if self.attendee_type == 0:
