@@ -174,7 +174,11 @@ while($msg = mysql_fetch_assoc($result)) {
     
     $async = true;
     
-
+	// No mail to send if blank
+	if (empty($recipients)){
+		continue;
+	}
+		
     try {
         $mandrill = new Mandrill($mandrill_api_key);
         $mandrill_result = $mandrill->messages->send($message, $async);
