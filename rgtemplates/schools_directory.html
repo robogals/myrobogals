@@ -223,9 +223,11 @@ google.maps.event.addDomListener(window, 'load', initialize);
 	{% else %}
 	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% endif %}
+
 	{% if sch_list %}
 	<td>{{forloop.counter|chr}}</td>
 	{% endif %}
+	
     <td>{{s.name}}</td>
     <td>{{s.address_city}}</td>
     <td>{{s.state_code}}</td>
@@ -234,6 +236,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 	<td>{{s.get_type_display}}</td>
 	<td>{{s.get_level_display}}</td>
 	<td>{{s.get_gender_display}}</td>
+
 	{% if sch_list %}
 		{% if s.pk in sch_list.keys %}
 			{% for key, value in sch_list.items %}
@@ -245,6 +248,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 			<td></td>
 		{% endif %}
 	{% endif %}
+
 	{% if s.name in copied_schools %}
 	<td></td>
 	{% else %}

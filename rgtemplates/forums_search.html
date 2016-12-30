@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% block title %}{{chapter.name}}{% endblock %}
 
 {% block pagetitle %}{{chapter.name}}{% endblock %}
@@ -28,12 +27,12 @@
 <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td><a href="/forums/{% if forum.category.chapter %}{{ forum.category.chapter.myrobogals_url }}{% else %}{{ chapter.myrobogals_url }}{% endif %}/forum/{{ forum.pk }}/">{{ forum.name }}</a><br />
 	{{ forum.description }}<br />
-	{% trans "Started" %} {{forum.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}<br />
+	{% trans "Started" %} {{forum.created_on|date:_("DATETIME_FORMAT")}}<br />
 	{% trans "by" %} {{ forum.created_by.get_full_name }}<br />
 	{{ forum.category.get_full_name }}</td>
 	<td>{{ forum.number_of_topics }}</td>
 	<td>{{ forum.number_of_posts }}</td>
-	<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
+	<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %}{{ forum.last_post_user.get_full_name }}{% endif %}</td>
 </tr>
 {% endfor %}
 <tr><td colspan="4"></td></tr>
@@ -46,13 +45,13 @@
 	{% for topic in topics %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td><a href="/forums/{% if topic.forum.category.chapter %}{{ topic.forum.category.chapter.myrobogals_url }}{% else %}{{ chapter.myrobogals_url }}{% endif %}/topic/{{ topic.pk }}/">{{ topic.subject }}</a><br />
-		{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />
+		{% trans "Started" %} {{ topic.created_on|date:_("DATETIME_FORMAT") }}<br />
 		{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		{{topic.forum.name}}<br />
 		{{topic.forum.category.get_full_name}}</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_time|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 	</tr>
 	{% endfor %}
 	<tr><td colspan="4"></td></tr>

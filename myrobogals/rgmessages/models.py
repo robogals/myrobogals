@@ -2,7 +2,8 @@
 
 from django.db import models
 from django.forms import ModelForm
-from myrobogals.auth.models import User, Group
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.db.models.fields import PositiveIntegerField
 import datetime
@@ -11,6 +12,7 @@ import re
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 import os.path
+from django.utils import timezone
 
 class MessagesSettings(models.Model):
 	key = models.CharField('key', unique=True, max_length=255)
@@ -73,8 +75,8 @@ class EmailMessage(models.Model):
 	sender = models.ForeignKey(User)
 	status = models.IntegerField("Status Code", choices=STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Time Sent (in UTC)")
-	html = models.BooleanField("HTML", blank=True)
-	scheduled = models.BooleanField("Scheduled", blank=True)
+	html = models.BooleanField("HTML", blank=True, default=False)
+	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
 	scheduled_date_type = models.IntegerField("Scheduled date type", choices=SCHEDULED_DATE_TYPES, default=1)
 	email_type = models.IntegerField("Email type", choices=TYPE, default=0)
@@ -97,7 +99,7 @@ class EmailMessage(models.Model):
 
 	def save(self, *args, **kwargs):
 		if self.date == None:
-			self.date = datetime.datetime.now()
+			self.date = timezone.now()
 		super(EmailMessage, self).save(*args, **kwargs)
 
 @receiver(pre_delete, sender=EmailMessage)
@@ -130,20 +132,18 @@ class EmailRecipient(models.Model):
 
 	def set_scheduled_date(self):
 		if not self.message.scheduled:
-			self.scheduled_date = datetime.datetime.utcnow()
+			self.scheduled_date = timezone.now()
 		else:
 			if self.message.scheduled_date_type == 1:
 				# Use sender's timezone
 				local_tz = self.message.sender.tz_obj()
 			else:
-				# Use recipient's timezone
+				# Use recipient's timezone, or Melbourne time if user timezone unknown
 				if self.user:
 					local_tz = self.user.tz_obj()
 				else:
-					local_tz = utc
-			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
-			scheduled_date_utc = scheduled_date_local.astimezone(utc)
-			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+					local_tz = timezone('Australia/Melbourne')
+			self.scheduled_date = local_tz.localize(self.message.scheduled_date.replace(tzinfo=None))
 
 	def status_description(self):
 		for status_code in self.STATUS_CODES_RECIPIENT:
@@ -203,10 +203,10 @@ class SMSMessage(models.Model):
 	body = models.TextField("Message body")
 	senderid = models.CharField("Sender ID", max_length=32)
 	sender = models.ForeignKey(User)
-	chapter = models.ForeignKey(Group, null=True, blank=True)
+	chapter = models.ForeignKey(Chapter, null=True, blank=True)
 	status = models.IntegerField("Status code", choices=SMS_STATUS_CODES_MSG, default=0)
 	date = models.DateTimeField("Date set (in UTC)")
-	unicode = models.BooleanField("Unicode", blank=True)
+	unicode = models.BooleanField("Unicode", blank=True, default=False)
 	split = models.IntegerField("Split", default=1)
 	scheduled = models.BooleanField("Scheduled", blank=True, default=False)
 	scheduled_date = models.DateTimeField("Scheduled date (as entered)", null=True, blank=True)
@@ -274,7 +274,7 @@ class SMSMessage(models.Model):
 
 	def save(self, *args, **kwargs):
 		if self.date == None:
-			self.date = datetime.datetime.now()
+			self.date = timezone.now()
 		super(SMSMessage, self).save(*args, **kwargs)
 	
 	class Meta:
@@ -350,24 +350,18 @@ class SMSRecipient(models.Model):
 
 	def set_scheduled_date(self):
 		if not self.message.scheduled:
-			self.scheduled_date = datetime.datetime.utcnow()
+			self.scheduled_date = timezone.now()
 		else:
 			if self.message.scheduled_date_type == 1:
 				# Use sender's timezone
 				local_tz = self.message.sender.tz_obj()
 			else:
-				# Use recipient's timezone
+				# Use recipient's timezone, or Melbourne time if user timezone unknown
 				if self.user:
 					local_tz = self.user.tz_obj()
 				else:
-					# Use Robogals Global's timezone as default
-					local_tz = Group.objects.get(pk=1).tz_obj()
-			# Interpret the user-entered time as being in local time
-			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
-			# Convert this time into UTC
-			scheduled_date_utc = scheduled_date_local.astimezone(utc)
-			# Convert to a naive datetime to keep MySQL happy
-			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+					local_tz = timezone('Australia/Melbourne')
+			self.scheduled_date = local_tz.localize(self.message.scheduled_date.replace(tzinfo=None))
 
 	def gateway_description(self):
 		for gateway in self.SMS_GATEWAYS:
@@ -400,7 +394,7 @@ class Newsletter(models.Model):
 	confirm_from_name = models.CharField(max_length=128, blank=True)
 	confirm_from_email = models.CharField(max_length=128, blank=True)
 	confirm_from_user = models.ForeignKey(User, related_name="+")
-	confirm_html = models.BooleanField(blank=True)
+	confirm_html = models.BooleanField(blank=True, default=False)
 	
 	def __unicode__(self):
 		return self.name
@@ -433,7 +427,7 @@ class NewsletterSubscriber(models.Model):
 	subscriber_type = models.ForeignKey(SubscriberType, blank=True, null=True)
 	country = models.ForeignKey(Country, blank=True, null=True)
 	details_verified = models.BooleanField(blank=True, default=True)
-	subscribed_date = models.DateTimeField(default=datetime.datetime.now)
+	subscribed_date = models.DateTimeField(auto_now_add=True)
 	unsubscribed_date = models.DateTimeField(blank=True, null=True)
 	active = models.BooleanField(blank=True, default=True)
 
@@ -444,7 +438,7 @@ class PendingNewsletterSubscriber(models.Model):
 	email = models.CharField(max_length=128)
 	uniqid = models.CharField(max_length=64)
 	newsletter = models.ForeignKey(Newsletter)
-	pending_since = models.DateTimeField(default=datetime.datetime.now)
+	pending_since = models.DateTimeField(auto_now_add=True)
 	
 	def __unicode__(self):
 		return self.email

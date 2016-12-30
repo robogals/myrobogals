@@ -1,17 +1,18 @@
 from django.shortcuts import render_to_response, get_object_or_404
-from myrobogals.auth.models import User
-from myrobogals.auth.decorators import login_required
+from myrobogals.rgprofile.models import User
+from django.contrib.auth.decorators import login_required
 from django.template import RequestContext, Context, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 from myrobogals.rgmain.utils import SelectDateWidget
 from myrobogals.rgconf.models import Conference, ConferenceAttendee, ConferencePart
 from django.core.urlresolvers import reverse
 from myrobogals.rgchapter.models import ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from myrobogals.rgteaching.views import EmailModelMultipleChoiceField
-from myrobogals.admin.widgets import FilteredSelectMultiple
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 import re
 from datetime import datetime, timedelta
@@ -58,9 +59,9 @@ class ConfRSVPForm(forms.Form):
 		attendee_type = int(cleaned_data.get('attendee_type'))
 		outgoing_position = cleaned_data.get('outgoing_position')
 		incoming_position = cleaned_data.get('incoming_position')
-		print attendee_type
-		print outgoing_position
-		print incoming_position
+		#print attendee_type
+		#print outgoing_position
+		#print incoming_position
 		if attendee_type == 0:
 			if not outgoing_position:
 				raise forms.ValidationError(_('You have indicated that you are outgoing from your chapter committee, but did not specify your outgoing position. Please state the position from which you are outgoing, e.g. "Schools Manager". If your chapter does not assign specific roles, you can simply put "General Committee"'))
@@ -153,14 +154,14 @@ def editrsvp(request, conf_id, username):
 						except ConferencePart.DoesNotExist:
 							pass
 			ca.save()
-			request.user.message_set.create(message=unicode(_("Conference RSVP saved")))
+			messages.success(request, message=unicode(_("Conference RSVP saved")))
 			if data['update_account']:
 				u.email = data['email']
 				u.dob = data['dob']
 				u.mobile = data['mobile']
 				u.gender = data['gender']
 				u.save()
-				request.user.message_set.create(message=unicode(_("Member account updated with new details")))
+				messages.success(request, message=unicode(_("Member account updated with new details")))
 			if request.user.is_staff:
 				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/')
 			elif ca.balance_owing()[1] == None:
@@ -212,7 +213,7 @@ def rsvplist(request, conf_id):
 			else:
 				raise User.DoesNotExist
 		except User.DoesNotExist:
-			request.user.message_set.create(message=unicode(_("- No such username exists in your chapter")))
+			messages.success(request, message=unicode(_("- No such username exists in your chapter")))
 	if request.user.is_superuser:
 		cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
 	else:
@@ -356,7 +357,7 @@ def rsvpemail(request, conf_id):
 			message.status = 0
 			message.save()
 			
-			request.user.message_set.create(message=unicode(_("Email sent successfully")))
+			messages.success(request, message=unicode(_("Email sent successfully")))
 			return HttpResponseRedirect('/conferences/' + str(conf.pk) + '/')
 	else:
 		emailform = EmailAttendeesForm(None, conference=conf, user=request.user)
@@ -390,7 +391,7 @@ def nametagscsv(request, conf_id):
 		raise Http404
 	conf = get_object_or_404(Conference, pk=conf_id)
 	cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
-	response = HttpResponse(mimetype='text/csv')
+	response = HttpResponse(content_type='text/csv')
 	filename = 'robogals-sine-nametags-' + str(datetime.now().date()) + '.csv'
 	response['Content-Disposition'] = 'attachment; filename=' + filename
 	t = loader.get_template('conf_nametags_csv.txt')

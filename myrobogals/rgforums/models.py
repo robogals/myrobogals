@@ -29,7 +29,8 @@ OF SUCH DAMAGE.
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from myrobogals.auth.models import Group, User
+from myrobogals.rgprofile.models import User
+from myrobogals.rgchapter.models import Chapter
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 from django.db.models import Avg
@@ -37,9 +38,9 @@ import os.path
 
 class Category(models.Model):
 	name = models.CharField('Name', max_length=80)
-	chapter = models.ForeignKey(Group, blank=True, null=True)
+	chapter = models.ForeignKey(Chapter, blank=True, null=True)
 	exec_only = models.BooleanField("For executives only", default=False)
-	created_on = models.DateTimeField(default=datetime.utcnow)
+	created_on = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		verbose_name = _('category')
@@ -64,7 +65,7 @@ class Forum(models.Model):
 	name = models.CharField('Name', max_length=80)
 	description = models.TextField(default = '')
 	category = models.ForeignKey(Category)
-	created_on = models.DateTimeField(default=datetime.utcnow)
+	created_on = models.DateTimeField(auto_now_add=True)
 	created_by = models.ForeignKey(User, related_name='forum_created_by')
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='forum_last_post_user')
@@ -90,7 +91,7 @@ class Topic(models.Model):
 	posted_by = models.ForeignKey(User, related_name='topic_posted_by')
 	subject = models.CharField(max_length=80)
 	num_views = models.IntegerField("Number of views", default=0)
-	created_on = models.DateTimeField(default=datetime.utcnow)
+	created_on = models.DateTimeField(auto_now_add=True)
 	last_post_time = models.DateTimeField(blank=True, null=True)
 	last_post_user = models.ForeignKey(User, blank=True, null=True, related_name='topic_last_post_user')
 	sticky = models.BooleanField("Set sticky", default=False)
@@ -134,7 +135,7 @@ class Post(models.Model):
 	topic = models.ForeignKey(Topic)
 	posted_by = models.ForeignKey(User, related_name='post_posted_by')
 	message = models.TextField()
-	created_on = models.DateTimeField(default=datetime.utcnow)
+	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(blank=True, null=True)
 	edited_by = models.ForeignKey(User, blank=True, null=True, related_name='post_edited_by')
 	upload_files = models.ManyToManyField(PostFile, related_name='post_upload_files')

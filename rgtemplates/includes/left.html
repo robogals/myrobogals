@@ -11,16 +11,16 @@
                 <div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
                 <div class="module-inner">
                                         
-                {% if request.user.id %}
-                	<h4 class="module-title">{% blocktrans with request.user.first_name as first_name %}Welcome, {{first_name}}{% endblocktrans %}</h4>
-                    <a href="/profile/{{request.user.username}}/">{% trans "View profile" %}</a><br />
-                    <a href="/profile/{{request.user.username}}/edit/">{% trans "Edit profile and settings" %}</a><br />
+                {% if user.id %}
+                	<h4 class="module-title">{% blocktrans with user.first_name as first_name %}Welcome, {{first_name}}{% endblocktrans %}</h4>
+                    <a href="/profile/{{user.username}}/">{% trans "View profile" %}</a><br />
+                    <a href="/profile/{{user.username}}/edit/">{% trans "Edit profile and settings" %}</a><br />
                     <a href="/chpass/">{% trans "Change password" %}</a><br />
-                    {% if request.user.is_superuser %}
+                    {% if user.is_superuser %}
                     <a href="/topsecretarea/">{% trans "Admin panel" %}</a><br />
                     {% else %}
-                      {% if request.user.is_staff %}
-                        {% ifnotequal request.user.user_permissions.count 0 %}
+                      {% if user.is_staff %}
+                        {% ifnotequal user.user_permissions.count 0 %}
                     <a href="/topsecretarea/">{% trans "Admin panel" %}</a><br />
                         {% endifnotequal %}
                       {% endif %}
