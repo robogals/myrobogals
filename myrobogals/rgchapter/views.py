@@ -234,6 +234,7 @@ def progresschapter(request):
 		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 		for school_visit in school_visits:
 			child_sum = child_sum + school_visit.num_girls_weighted()
+
 		listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
 		grandchildren_display = []
 		child_sum = 0
