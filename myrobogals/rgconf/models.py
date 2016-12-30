@@ -153,7 +153,7 @@ class ConferenceAttendee(models.Model):
 	dietary_reqs = models.CharField(max_length=64, blank=True)
 	comments = models.CharField(max_length=128, blank=True)
 	parts_attending = models.ManyToManyField(ConferencePart, blank=True, null=True)
-	rsvp_time = models.DateTimeField(default=datetime.now(), help_text="Time in conference timezone when this person registered (does not change if RSVP edited)")
+	rsvp_time = models.DateTimeField(auto_now_add=True, help_text="Time in conference timezone when this person registered (does not change if RSVP edited)")
 	check_in = models.DateField(null=True, blank=True)
 	check_out = models.DateField(null=True, blank=True)
 	gender = models.IntegerField(choices=GENDERS, default=0)
@@ -282,7 +282,7 @@ class ConferencePayment(models.Model):
 	)
 
 	attendee = models.ForeignKey(ConferenceAttendee)
-	date = models.DateField(default=datetime.now())
+	date = models.DateField(auto_now_add=True)
 	amount = models.DecimalField(max_digits=9, decimal_places=2)
 	payment_method = models.IntegerField(choices=PAYMENT_METHOD_CHOICES, default=1)
 	currency = models.ForeignKey(ConferenceCurrency)

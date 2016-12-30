@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import translation
-from myrobogals.rgmain.models import University, Country, Timezone
-from myrobogals.rgmessages.models_mobileregex import MobileRegexCollection
+from myrobogals.rgmain.models import University, Country, Timezone, MobileRegexCollection
 from django.db import connection
 import datetime
 from pytz import utc

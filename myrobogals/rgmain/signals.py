@@ -1,11 +1,10 @@
-#from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from myrobogals.rgmain.models import Timezone
 from pytz import all_timezones
+from django.apps import AppConfig
 
-#@receiver(post_migrate)
-#def update_timezones(sender, **kwargs):
-def update_timezones():
+def update_timezones(sender, **kwargs):
 	installed_timezones = []
 	timezones_to_add = []
 	timezones_to_remove = []
@@ -39,5 +38,10 @@ def update_timezones():
 	print("Remember to periodically update the pytz package to get the latest timezone definitions")
 	print(" ")
 	print("Also periodically update MySQL's timezones using the following command. You will need the MySQL root password.")
-	print("mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql")
+	print("   mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql")
 	print(" ")
+
+class RgMainAppConfig(AppConfig):
+	name = 'myrobogals.rgmain'
+	def ready(self):
+		post_migrate.connect(update_timezones, sender=self, weak=False)

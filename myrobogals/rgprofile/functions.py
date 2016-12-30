@@ -1,6 +1,5 @@
 from myrobogals.rgprofile.models import User, MemberStatus
-from myrobogals.rgmain.models import University
-from myrobogals.rgmessages.models_mobileregex import MobileRegex
+from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
 from django.utils import timezone

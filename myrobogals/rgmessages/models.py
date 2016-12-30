@@ -427,7 +427,7 @@ class NewsletterSubscriber(models.Model):
 	subscriber_type = models.ForeignKey(SubscriberType, blank=True, null=True)
 	country = models.ForeignKey(Country, blank=True, null=True)
 	details_verified = models.BooleanField(blank=True, default=True)
-	subscribed_date = models.DateTimeField(default=datetime.datetime.now)
+	subscribed_date = models.DateTimeField(auto_now_add=True)
 	unsubscribed_date = models.DateTimeField(blank=True, null=True)
 	active = models.BooleanField(blank=True, default=True)
 
@@ -438,7 +438,7 @@ class PendingNewsletterSubscriber(models.Model):
 	email = models.CharField(max_length=128)
 	uniqid = models.CharField(max_length=64)
 	newsletter = models.ForeignKey(Newsletter)
-	pending_since = models.DateTimeField(default=datetime.datetime.now)
+	pending_since = models.DateTimeField(auto_now_add=True)
 	
 	def __unicode__(self):
 		return self.email

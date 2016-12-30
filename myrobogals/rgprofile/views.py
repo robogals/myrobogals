@@ -18,8 +18,7 @@ from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgmain.models import University
-from myrobogals.rgmessages.models_mobileregex import MobileRegex
+from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.rgmain.utils import SelectDateWidget, email_re
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event

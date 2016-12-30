@@ -1,5 +1,5 @@
 from myrobogals.rgmessages.models import SMSMessage, SMSRecipient, EmailMessage, EmailRecipient, NewsletterSubscriber, PendingNewsletterSubscriber, Newsletter, SubscriberType, EmailHeader
-from myrobogals.rgmessages.models_mobileregex import MobileRegex, MobileRegexCollection
+from myrobogals.rgmain.models import MobileRegex, MobileRegexCollection
 from django.contrib import admin
 
 class EmailRecipientAdmin(admin.TabularInline):
