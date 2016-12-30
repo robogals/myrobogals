@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% block title %}{% trans "Robogals forums" %}{% endblock %}
 
 {% block pagetitle %}{% trans "Robogals forums" %}{% endblock %}
@@ -51,7 +50,7 @@
 		{% if user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser or canDeleteGlobal %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% else %}
@@ -120,7 +119,7 @@
 		{% if user.is_superuser or canEditGlobal %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser or canDeleteGlobal %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% else %}
@@ -185,7 +184,7 @@
 		{% if user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit"%}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if canDeleteGlobal or user.is_staff %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% endif %}
@@ -246,7 +245,7 @@
 		{% if user.is_staff %} | <a href="/forums/?editForumId={{forum.pk}}#{{forum.pk}}">{% trans "edit" %}</a> | <a href="/forums/showforumoffenses/{{forum.pk}}/">{% trans "offences" %}</a>{% endif %}</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if canDeleteGlobal or user.is_staff %}
 		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		{% endif %}

@@ -15,6 +15,7 @@ from myrobogals.rgchapter.models import DisplayColumn, AwardRecipient
 from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
 from django.db.models import Q
+from django.utils import timezone
 import datetime
 import StringIO
 
@@ -219,27 +220,27 @@ def progresschapter(request):
 	for child in children:
 		grandchildren = Chapter.objects.filter(parent=child).filter(goal__gt=0)
 		for grandchild in grandchildren:
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				chapter_sum = chapter_sum + school_visit.num_girls_weighted()
 			grandchildren_display.append((grandchild, chapter_sum))
 			chapter_sum = 0.0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				child_sum = child_sum + school_visit.num_girls_weighted()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 			for school_visit in school_visits:
 				root_sum = root_sum + school_visit.num_girls_weighted()
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 		for school_visit in school_visits:
 			child_sum = child_sum + school_visit.num_girls_weighted()
 		listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
 		grandchildren_display = []
 		child_sum = 0
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 		for school_visit in school_visits:
 			root_sum = root_sum + school_visit.num_girls_weighted()
-	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start, datetime.datetime.now()], visit_type__in=displaycats)
+	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
 	for school_visit in school_visits:
 		root_sum = root_sum + school_visit.num_girls_weighted()
 	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300, 'careertalkview': careertalkview}, context_instance=RequestContext(request))

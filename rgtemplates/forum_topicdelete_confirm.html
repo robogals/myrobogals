@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% load showstarrating %}
 
 {% block title %}Confirm deletion of topic{% endblock %}
@@ -18,11 +17,11 @@
 		<td>{% trans "Last Post" %}</td>
 	</tr>
 	<tr class="odd">
-		<td>{{ topic.subject }}<br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
+		<td>{{ topic.subject }}<br />{% trans "Started" %} {{ topic.created_on|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_time|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 	</tr>
 </table>
 <p style="clear: both; font-size: 200%;">

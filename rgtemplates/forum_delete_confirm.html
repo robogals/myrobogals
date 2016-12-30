@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% load showstarrating %}
 
 {% block title %}Confirm deletion of forum{% endblock %}
@@ -29,7 +28,7 @@
 		</td>
 		<td>{{ forum.number_of_topics }}</td>
 		<td>{{ forum.number_of_posts }}</td>
-		<td>{{ forum.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
+		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 	</tr>
 </table>
 <p style="clear: both; font-size: 200%;">

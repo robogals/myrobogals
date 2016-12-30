@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
 {% block title %}{{forum.name}}{% endblock %}
 
 {% block pagetitle %}{{forum.name}}{% endblock %}
@@ -143,7 +142,7 @@
 	{% for topic in topics.object_list %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td align="center">{{ topic.number_of_upvotes }}</td>
-		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/topic/{{ topic.pk }}/?forumpage={{topics.number}}&forumsort={{sort}}">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
+		<td>{% if topic.sticky %}<strong>({% trans "Sticky" %}) </strong>{% endif %}<a href="/forums/topic/{{ topic.pk }}/?forumpage={{topics.number}}&forumsort={{sort}}">{{ topic.subject }}</a><br />{% trans "Started" %} {{ topic.created_on|date:_("DATETIME_FORMAT") }}<br />{% trans "by" %} {{ topic.posted_by.get_full_name }}<br />
 		{% if user in topic.forum.watchers.all or user in topic.watchers.all %}
 		{% trans "Watch" %} | <a href="/forums/unwatchtopic/{{topic.pk}}/?return={{return|urlencode}}">{% trans "Un-watch" %}</a>
 		{% else %}
@@ -152,7 +151,7 @@
 		</td>
 		<td>{{ topic.number_of_replies }}</td>
 		<td>{{ topic.num_views }}</td>
-		<td>{{ topic.last_post_time|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
+		<td>{{ topic.last_post_time|date:_("DATETIME_FORMAT") }}<br/>{% trans "by" %} {{ topic.last_post_user.get_full_name }}</td>
 		{% if can_delete %}
 		<td><a href="/forums/topic/delete/{{topic.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
 		<td><input type="checkbox" name="{{topic.pk}}" /></td>

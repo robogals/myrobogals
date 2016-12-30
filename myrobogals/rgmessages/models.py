@@ -12,6 +12,7 @@ import re
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 import os.path
+from django.utils import timezone
 
 class MessagesSettings(models.Model):
 	key = models.CharField('key', unique=True, max_length=255)
@@ -98,7 +99,7 @@ class EmailMessage(models.Model):
 
 	def save(self, *args, **kwargs):
 		if self.date == None:
-			self.date = datetime.datetime.now()
+			self.date = timezone.now()
 		super(EmailMessage, self).save(*args, **kwargs)
 
 @receiver(pre_delete, sender=EmailMessage)
@@ -131,20 +132,18 @@ class EmailRecipient(models.Model):
 
 	def set_scheduled_date(self):
 		if not self.message.scheduled:
-			self.scheduled_date = datetime.datetime.utcnow()
+			self.scheduled_date = timezone.now()
 		else:
 			if self.message.scheduled_date_type == 1:
 				# Use sender's timezone
 				local_tz = self.message.sender.tz_obj()
 			else:
-				# Use recipient's timezone
+				# Use recipient's timezone, or Melbourne time if user timezone unknown
 				if self.user:
 					local_tz = self.user.tz_obj()
 				else:
-					local_tz = utc
-			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
-			scheduled_date_utc = scheduled_date_local.astimezone(utc)
-			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+					local_tz = timezone('Australia/Melbourne')
+			self.scheduled_date = local_tz.localize(self.message.scheduled_date.replace(tzinfo=None))
 
 	def status_description(self):
 		for status_code in self.STATUS_CODES_RECIPIENT:
@@ -275,7 +274,7 @@ class SMSMessage(models.Model):
 
 	def save(self, *args, **kwargs):
 		if self.date == None:
-			self.date = datetime.datetime.now()
+			self.date = timezone.now()
 		super(SMSMessage, self).save(*args, **kwargs)
 	
 	class Meta:
@@ -351,24 +350,18 @@ class SMSRecipient(models.Model):
 
 	def set_scheduled_date(self):
 		if not self.message.scheduled:
-			self.scheduled_date = datetime.datetime.utcnow()
+			self.scheduled_date = timezone.now()
 		else:
 			if self.message.scheduled_date_type == 1:
 				# Use sender's timezone
 				local_tz = self.message.sender.tz_obj()
 			else:
-				# Use recipient's timezone
+				# Use recipient's timezone, or Melbourne time if user timezone unknown
 				if self.user:
 					local_tz = self.user.tz_obj()
 				else:
-					# Use Robogals Global's timezone as default
-					local_tz = Chapter.objects.get(pk=1).tz_obj()
-			# Interpret the user-entered time as being in local time
-			scheduled_date_local = local_tz.localize(self.message.scheduled_date)
-			# Convert this time into UTC
-			scheduled_date_utc = scheduled_date_local.astimezone(utc)
-			# Convert to a naive datetime to keep MySQL happy
-			self.scheduled_date = scheduled_date_utc.replace(tzinfo=None)
+					local_tz = timezone('Australia/Melbourne')
+			self.scheduled_date = local_tz.localize(self.message.scheduled_date.replace(tzinfo=None))
 
 	def gateway_description(self):
 		for gateway in self.SMS_GATEWAYS:
