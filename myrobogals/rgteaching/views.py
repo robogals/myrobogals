@@ -216,19 +216,37 @@ def viewvisit(request, visit_id):
 class ChapterSelector(forms.Form):
 	chapter = forms.ModelChoiceField(queryset=Chapter.objects.filter(status__in=[0,2]), required=False)
 
+# Creates paginator for tables greater than size 'sizeOfList'
+def paginatorRender(request, listOfObjects, sizeOfList):
+	visits = {}
+	paginator = Paginator(listOfObjects, sizeOfList)
+	page = request.GET.get('page')
+	try:
+		visits = paginator.page(page)
+	except EmptyPage:
+		visits = paginator.page(paginator.num_pages)
+	except:
+		visits = paginator.page(1)
+
+	return visits
+
 @login_required
 def listvisits(request):
 	chapter = request.user.chapter
 	if request.user.is_superuser:
-		visits = SchoolVisit.objects.all()
+		schoolvisits = SchoolVisit.objects.all()
 		showall = True
 		chapterform = ChapterSelector(request.GET)
+		visits = paginatorRender(request, schoolvisits, 75);
+
 		if chapterform.is_valid():
 			chapter_filter = chapterform.cleaned_data['chapter']
 			if chapter_filter:
-				visits = visits.filter(chapter=chapter_filter)
+				schoolvisits = schoolvisits.filter(chapter=chapter_filter)
+				visits = paginatorRender(request, schoolvisits, 75);
 	else:
-		visits = SchoolVisit.objects.filter(chapter=chapter)
+		schoolvisits = SchoolVisit.objects.filter(chapter=chapter)
+		visits = paginatorRender(request, schoolvisits, 75);
 		showall = False
 		chapterform = None
 	return render_to_response('visit_list.html', {'chapterform': chapterform, 'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
@@ -668,14 +686,7 @@ def schoolsdirectory(request, chapterurl):
 			schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
 			messages.success(request, message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed')))
 
-	paginator = Paginator(schools_list, 26)
-	page = request.GET.get('page')
-	try:
-		schools = paginator.page(page)
-	except EmptyPage:
-		schools = paginator.page(paginator.num_pages)
-	except:
-		schools = paginator.page(1)
+	schools = paginatorRender(request, schools_list, 26)
 	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
 	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'sch_list': sch_list, 'L1': L1, 'G1': G1}, context_instance=RequestContext(request))
 
