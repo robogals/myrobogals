@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
+{% load tz %}
 {% block title %}{% trans "Message recipients" %}{% endblock %}
 
 {% block pagetitle %}{% trans "Message recipients" %}{% endblock %}
@@ -22,9 +22,9 @@
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td {% if recipients %}colspan="3"{% endif %}>{{email.status_description}}
 	{% if email.scheduled %}
-		&#40;{% trans "Scheduled date" %}: {{email.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{email.scheduled_date_type_description}}&#41;
+		&#40;{% trans "Scheduled date" %}: {{email.scheduled_date|timezone:"Etc/UTC"|date:_("DATETIME_FORMAT")}}&#44; {{email.scheduled_date_type_description}}&#41;
 	{% else %}
-		&#40;{% trans "Time Sent" %}: {{email.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		&#40;{% trans "Time sent" %}: {{email.date|date:_("DATETIME_FORMAT")}}&#41;
 	{% endif %}
 		</td>
 	</tr>
@@ -33,14 +33,14 @@
 		<td>{% trans "User" %}</td>
 		<td>{% trans "Address" %}</td>
 		<td>{% trans "Status" %}</td>
-		<td>{% trans "Scheduled date" %}</td>
+		<td>{% trans "Scheduled date (in my timezone)" %}</td>
 	</tr>
 	{% for recipient in recipients %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td>{{recipient.to_name}}</td>
 		<td>{{recipient.to_address}}</td>
 		<td>{{recipient.status_description}}</td>
-		<td>{{recipient.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}</td>
+		<td>{{recipient.scheduled_date|date:_("DATETIME_FORMAT")}}</td>
 	</tr>
 	{% endfor %}
 {% endif %}
@@ -58,7 +58,7 @@
 	{% if sms.scheduled %}
 		&#40;{% trans "Scheduled date" %}: {{sms.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{sms.scheduled_date_type_description}}&#41;
 	{% else %}
-		&#40;{% trans "Time Set" %}: {{sms.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		&#40;{% trans "Time Set" %}: {{sms.date|date:_("DATETIME_FORMAT")}}&#41;
 	{% endif %}
 		</td>
 	</tr>
@@ -76,7 +76,7 @@
 		<td>{{recipient.to_number}}</td>
 		<td>{{recipient.status_description}}</td>
 		<td>{{recipient.gateway_description}}</td>
-		<td>{{recipient.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}</td>
+		<td>{{recipient.scheduled_date|date:_("DATETIME_FORMAT")}}</td>
 	</tr>
 	{% endfor %}
 {% endif %}

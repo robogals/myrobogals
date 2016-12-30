@@ -24,6 +24,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from myrobogals.rgmain.models import Subdivision
 import json, urllib, urllib2, math
+from django.utils.timezone import make_aware, localtime, now
 
 @login_required
 def teachhome(request):
@@ -108,15 +109,15 @@ def editvisit(request, visit_id):
 					v.creator = request.user
 				data = formpart1.cleaned_data
 				v.school = data['school']
-				v.visit_start = datetime.datetime.combine(data['date'], data['start_time'])
-				v.visit_end = datetime.datetime.combine(data['date'], data['end_time'])
+				v.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']), timezone=chapter.tz_obj())
+				v.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']), timezone=chapter.tz_obj())
 				v.location = data['location']
 				v.allow_rsvp = data['allow_rsvp']
 				date = data['date']
 				data = formpart2.cleaned_data
 				v.meeting_location = data['meeting_location']
 				if data['meeting_time']:
-					v.meeting_time = datetime.datetime.combine(date, data['meeting_time'])
+					v.meeting_time = make_aware(datetime.datetime.combine(date, data['meeting_time']), timezone=chapter.tz_obj())
 				else:
 					v.meeting_time = None
 				v.contact = data['contact']
@@ -146,15 +147,15 @@ def editvisit(request, visit_id):
 			else:
 				formpart1 = SchoolVisitFormOne({
 					'school': v.school,
-					'date': v.visit_start.date(),
-					'start_time': v.visit_start.time(),
-					'end_time': v.visit_end.time(),
+					'date': localtime(v.visit_start, timezone=chapter.tz_obj()).date(),
+					'start_time': localtime(v.visit_start, timezone=chapter.tz_obj()).time(),
+					'end_time': localtime(v.visit_end, timezone=chapter.tz_obj()).time(),
 					'location': v.location,
 					'school': v.school_id,
 					'allow_rsvp': v.allow_rsvp}, chapter=formchapter)
 				formpart2 = SchoolVisitFormTwo({
 					'meeting_location': v.meeting_location,
-					'meeting_time': v.meeting_time,
+					'meeting_time': localtime(v.meeting_time, timezone=chapter.tz_obj()).time(),
 					'contact': v.contact,
 					'contact_email': v.contact_email,
 					'contact_phone': v.contact_phone})
@@ -279,7 +280,7 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class InviteForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False)
-	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False, initial=_("Hello,<br>\n<br>\nThere will be an upcoming Robogals school visit:<br>\nWhen: {visit.visit_start.year}-{visit.visit_start.month}-{visit.visit_start.day}, {visit.visit_start.hour}:{visit.visit_start.minute} to {visit.visit_end.hour}:{visit.visit_end.minute}<br>\nLocation: {visit.location}<br>\nSchool: {visit.school.name}<br>\n<br>\nTo accept or decline this invitation, please visit https://my.robogals.org/teaching/{visit.pk}/<br>\n<br>\nThanks,<br>\n<br>\n{user.chapter.name}"))
+	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	action = forms.ChoiceField(choices=((1,_('Invite members')),(2,_('Add members as attending'))),initial=1)
@@ -295,7 +296,10 @@ class InviteForm(forms.Form):
 		if visit.chapter.invite_email_subject:
 			self.fields['subject'].initial = visit.chapter.invite_email_subject
 		if visit.chapter.invite_email_msg:
-			self.fields['body'].initial = visit.chapter.invite_email_msg
+			try:
+				self.fields['body'].initial = visit.chapter.invite_email_msg.format(visit=visit, user=user)
+			except Exception:
+				self.fields['body'].initial = ""
 
 @login_required
 def invitetovisit(request, visit_id):
@@ -314,13 +318,7 @@ def invitetovisit(request, visit_id):
 				if data['action'] == '1':
 					message = EmailMessage()
 					message.subject = data['subject']
-					try:
-						message.body = data['body'].format(
-							visit=v,
-							user=request.user
-						)
-					except Exception:
-						raise Exception(_('Email body contains invalid fields'))
+					message.body = data['body']
 					message.from_address = request.user.email
 					message.reply_address = request.user.email
 					message.sender = request.user
@@ -547,7 +545,7 @@ def deleteschool(request, school_id):
 	if request.method == 'POST':
 		deleteform = DeleteForm(request.POST, user=request.user, school=s)
 		if SchoolVisit.objects.filter(school=s):
-			messages.success(request, message=unicode(_("You cannot delete this school as it has a visit in the database.")))
+			messages.success(request, message=unicode(_("You cannot delete this school as it has a workshop in the database.")))
 			return HttpResponseRedirect('/teaching/schools/')
 		else:
 			School.objects.filter(id = s.id).delete()
@@ -951,10 +949,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage = EventMessage()
 				rsvpmessage.event = e
 				rsvpmessage.user = request.user
-				utc_dt = utc.localize(datetime.datetime.now())
-				user_tz = request.user.tz_obj()
-				user_dt = user_tz.normalize(utc_dt.astimezone(user_tz))
-				rsvpmessage.date = user_dt.replace(tzinfo=None)
+				rsvpmessage.date = now()
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
 			messages.success(request, message=unicode(rsvp_string))

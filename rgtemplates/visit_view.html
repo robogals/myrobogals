@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load tz %}
 {% block title %}{{v.school}} on {{v.visit_start|date:_("DATE_FORMAT")}}{% endblock %}
 
 {% block pagetitle %}{{v.school}} on {{v.visit_start|date:_("DATE_FORMAT")}}{% endblock %}
@@ -60,11 +61,11 @@
 {% endif %}
   <tr>
     <td style="vertical-align: top">{% trans "Date" %}</td>
-    <td>{{v.visit_start|date:_("DATE_FORMAT_LONG")}}</td>
+    <td>{{v.visit_start|timezone:v.chapter.tz_obj|date:_("DATE_FORMAT_LONG")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Time" %}</td>
-    <td>{{v.visit_start|date:_("TIME_FORMAT")}} - {{v.visit_end|date:_("TIME_FORMAT")}}</td>
+    <td>{{v.visit_start|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT")}} - {{v.visit_end|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Location" %}</td>
@@ -83,7 +84,7 @@
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Meeting time" %}</td>
-    <td>{{v.meeting_time|date:_("TIME_FORMAT")}}</td>
+    <td>{{v.meeting_time|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT")}}</td>
   </tr>
   <tr>
     <td style="vertical-align: top">{% trans "Contact person" %}</td>

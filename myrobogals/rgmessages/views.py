@@ -27,6 +27,7 @@ from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from pytz import utc
 from decimal import *
 from operator import itemgetter
+from django.utils import timezone
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -164,7 +165,7 @@ def writeemail(request):
 
 				if request.POST['scheduling'] == '1':
 					message.scheduled = True
-					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
+					message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time']).replace(tzinfo=utc)
 					try:
 						message.scheduled_date_type = int(data['schedule_zone'])
 					except Exception:
@@ -684,7 +685,7 @@ def careersapi(request):
 						return HttpResponse("B")  # Not subscribed
 					except User.DoesNotExist:
 						return HttpResponse("B")  # Not subscribed
-				ns.unsubscribed_date = datetime.now()
+				ns.unsubscribed_date = timezone.now()
 				ns.active = False
 				ns.save()
 				if n.pk == 5:
@@ -799,7 +800,7 @@ def api(request):
 						return HttpResponse("B")  # Not subscribed
 					except User.DoesNotExist:
 						return HttpResponse("B")  # Not subscribed
-				ns.unsubscribed_date = datetime.now()
+				ns.unsubscribed_date = timezone.now()
 				ns.active = False
 				ns.save()
 				if n.pk == 1:

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load thous %}
-{% load showlocaltime %}
+{% load tz %}
 {% block title %}{% trans "Message history" %}{% endblock %}
 
 {% block pagetitle %}{% trans "Message history" %}{% endblock %}
@@ -48,9 +48,9 @@
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{emailMsgSent.status_description}}
 	{% if emailMsgSent.scheduled %}
-		&#40;{% trans "Scheduled date" %}: {{emailMsgSent.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{emailMsgSent.scheduled_date_type_description}}&#41;
+		&#40;{% trans "Scheduled date" %}: {{emailMsgSent.scheduled_date|timezone:"Etc/UTC"|date:_("DATETIME_FORMAT")}}&#44; {{emailMsgSent.scheduled_date_type_description}}&#41;
 	{% else %}
-		&#40;{% trans "Time Sent" %}: {{emailMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		&#40;{% trans "Time Sent" %}: {{emailMsgSent.date|date:_("DATETIME_FORMAT")}}&#41;
 	{% endif %}
 		<br /><a href="/messages/emailrecipients/{{emailMsgSent.pk}}/">{% trans "Recipients" %}</a>
 		</td>
@@ -72,7 +72,7 @@
 	{% if SMSMsgSent.scheduled %}
 		&#40;{% trans "Scheduled date" %}: {{SMSMsgSent.scheduled_date|date:_("DATETIME_FORMAT")}}&#44; {{SMSMsgSent.scheduled_date_type_description}}&#41;
 	{% else %}
-		&#40;{% trans "Time Set" %}: {{SMSMsgSent.date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+		&#40;{% trans "Time Set" %}: {{SMSMsgSent.date|date:_("DATETIME_FORMAT")}}&#41;
 	{% endif %}
 	{% if SMSMsgSent.senderid %}
 	&#40;{% trans "From" %}: {{SMSMsgSent.senderid}}&#41;
@@ -99,7 +99,7 @@
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top" style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{emailMsgReceived.status_description}}
-			&#40;{% trans "Scheduled date" %}: {{emailMsgReceived.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+			&#40;{% trans "Scheduled date" %}: {{emailMsgReceived.scheduled_date|date:_("DATETIME_FORMAT")}}&#41;
 		</td>
 	</tr>
 	{% endfor %}
@@ -116,7 +116,7 @@
 	<tr style="border-bottom: solid 1px grey;" class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 		<td valign="top"  style="border-right: solid 1px grey;">{% trans "Status" %}</td>
 		<td>{{SMSMsgReceived.status_description}}
-			&#40;{% trans "Scheduled date" %}: {{SMSMsgReceived.scheduled_date|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT")}}&#41;
+			&#40;{% trans "Scheduled date" %}: {{SMSMsgReceived.scheduled_date|date:_("DATETIME_FORMAT")}}&#41;
 		{% if SMSMsgReceived.message.senderid %}
 		&#40;{% trans "From" %}: {{SMSMsgReceived.message.senderid}}&#41;
 		{% endif %}

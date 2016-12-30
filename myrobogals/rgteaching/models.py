@@ -4,6 +4,7 @@ from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country, Subdivision
 from datetime import datetime
 import json, urllib, urllib2
+from django.utils.timezone import localtime
 
 class School(models.Model):
 	name = models.CharField(max_length=64)
@@ -116,6 +117,12 @@ class Event(models.Model):
 	notes = models.TextField(blank=True)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=0)
 	allow_rsvp = models.IntegerField(choices=ALLOW_RSVP_CHOICES, default=0)
+	
+	@property
+	def visit_time(self):
+		start_time_local = localtime(self.visit_start, timezone=self.chapter.tz_obj())
+		end_time_local = localtime(self.visit_end, timezone=self.chapter.tz_obj())
+		return start_time_local.strftime('%B %d, %Y, %I:%M %p') + ' to ' + end_time_local.strftime('%I:%M %p')
 
 class SchoolVisit(Event):
 	school = models.ForeignKey(School)

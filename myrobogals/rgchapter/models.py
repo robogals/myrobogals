@@ -5,6 +5,7 @@ from myrobogals.rgmessages.models_mobileregex import MobileRegexCollection
 from django.db import connection
 import datetime
 from pytz import utc
+from django.utils.timezone import make_aware
 
 class DisplayColumn(models.Model):
 	field_name = models.CharField(max_length=64)
@@ -50,7 +51,7 @@ class Chapter(models.Model):
 	state = models.CharField('State/Province', max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'", blank=True)
 	postcode = models.CharField('Postcode', max_length=16, blank=True)
 	country = models.ForeignKey(Country, verbose_name="Country", default="AU", blank=True, null=True)
-	timezone = models.ForeignKey(Timezone)
+	timezone = models.ForeignKey(Timezone, help_text="Timezones are ordered by continent/city. If the chapter's city is not listed, select a city in the same timezone with the same daylight saving rules. Do NOT select an exact offset like GMT+10, as this will not take daylight saving time into account. Note that the UK is not on GMT during summer - select Europe/London to get the correct daylight saving rules for the UK.")
 	faculty_contact = models.CharField('Name', max_length=64, blank=True, help_text="e.g. Professor John Doe")
 	faculty_position = models.CharField('Position', max_length=64, blank=True, help_text="e.g. Associate Dean")
 	faculty_department = models.CharField('Department', max_length=64, blank=True, help_text="e.g. Faculty of Engineering")
@@ -80,7 +81,7 @@ class Chapter(models.Model):
 	welcome_email_msg = models.TextField('Message', blank=True, default="Dear {user.first_name},\n\nThankyou for joining {chapter.name}!\n\nYour username and password for myRobogals can be found below:\n\nUsername: {user.username}\nPassword: {plaintext_password}\nLogin at https://my.robogals.org\n\nRegards,\n\n{chapter.name}\n")
 	welcome_email_html = models.BooleanField('HTML', default=False)
 	invite_email_subject = models.CharField('Subject', max_length=128, blank=True, default="Upcoming Robogals workshop")
-	invite_email_msg = models.TextField('Message', blank=True, default="Hello,\n\n{user.chapter.name} will be conducting a workshop soon:\nWhen: {visit.visit_start.year}-{visit.visit_start.month}-{visit.visit_start.day}, {visit.visit_start.hour}:{visit.visit_start.minute} to {visit.visit_end.hour}:{visit.visit_end.minute}\nLocation: {visit.location}\nSchool: {visit.school.name}\n\nTo accept or decline this invitation to volunteer at this workshop, please visit https://my.robogals.org/teaching/{visit.pk}/\n\nThanks,\n\n{user.first_name}")
+	invite_email_msg = models.TextField('Message', blank=True, default="Hello,\n\n{visit.chapter.name} will be conducting a workshop soon:\nWhen: {visit.visit_time}\nLocation: {visit.location}\nSchool: {visit.school.name}\n\nFor more information, and to accept or decline this invitation to volunteer at this workshop, please visit https://my.robogals.org/teaching/{visit.pk}/\n\nThanks,\n\n{user.first_name}")
 	invite_email_html = models.BooleanField('HTML', default=False)
 	welcome_page = models.TextField('Welcome page HTML', blank=True, default="Congratulations on becoming a member of {chapter.name}, and welcome to the international network of Robogals members - students around the world committed to increasing female participation in engineering!<br>\n<br>\nYour member account has been created - simply log in using the form to the left.")
 	join_page = models.TextField('Join page HTML', blank=True, help_text='This page is shown if the chapter is not joinable via myRobogals. It should explain how to join this chapter, e.g. who to contact.')
@@ -97,7 +98,12 @@ class Chapter(models.Model):
 	exclude_in_reports = models.BooleanField('Exclude this chapter in global reports', default=False)
 	latitude = models.FloatField(blank=True, null=True, help_text='If blank, will be automatically filled in by Google Maps API when this chapter is made active. Value can be entered here manually if necessary.')
 	longitude = models.FloatField(blank=True, null=True, help_text='If blank, will be automatically filled in by Google Maps API when this chapter is made active. Value can be entered here manually if necessary.')
-
+	
+	@property
+	def goal_start_tzaware(self):
+		# Return a timezone-aware datetime equal to midnight on goal_start in the chapter's local time
+		return make_aware(datetime.datetime.combine(self.goal_start, datetime.time.min), timezone=self.tz_obj())
+	
 	def __unicode__(self):
 		return self.name
 	
@@ -138,6 +144,9 @@ class Chapter(models.Model):
 
 	def local_time(self):
 		return datetime.datetime.utcnow().replace(tzinfo=utc).astimezone(self.timezone.tz_obj())
+	
+	def tz_obj(self):
+		return self.timezone.tz_obj()
 	
 	def get_absolute_url(self):
 		return "/chapters/%s/" % self.myrobogals_url
