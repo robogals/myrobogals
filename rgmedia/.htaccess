@@ -1,0 +1,33 @@
+# 2013-09-30
+# Caching
+
+# Turn on Expires and set default to 0
+ExpiresActive On
+ExpiresDefault A0
+ 
+<FilesMatch "\.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav)$">
+ExpiresDefault A29030400
+Header append Cache-Control "public"
+</FilesMatch>
+ 
+<FilesMatch "\.(gif|jpg|jpeg|png|swf)$">
+ExpiresDefault A604800
+Header append Cache-Control "public"
+</FilesMatch>
+ 
+<FilesMatch "\.(txt|js|css)$">
+ExpiresDefault A604800
+Header append Cache-Control "proxy-revalidate"
+</FilesMatch>
+ 
+# Force no caching for dynamic files
+<FilesMatch "\.(php|cgi|pl|htm|html)$">
+ExpiresActive Off
+Header set Cache-Control "private, no-cache, no-store, proxy-revalidate, no-transform"
+Header set Pragma "no-cache"
+</FilesMatch>
+
+
+# DEFLATE compression
+AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript
+

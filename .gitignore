@@ -7,6 +7,7 @@ daemons/rgsmsd.h
 daemons/rgsmsd
 rgmedia/unipics
 rgmedia/forum_uploads
+scripts/send_email_mandrill.php
 core
 tags
 *.swp
