@@ -111,7 +111,7 @@ class FormPartOne(forms.Form):
 	goal = forms.CharField(max_length=32, label=_("Goal"), help_text=_("Number of students"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	goal_start = forms.CharField(max_length=32, label=_("Goal start date"), help_text=_("The goal will be compared against girls taught since this date"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
 	notify_enable = forms.BooleanField(required=False, help_text=_("Notify when a new member signs up online"))
-	notify_list = forms.ModelChoiceField(label=_(), queryset=UserList.objects.none(), required=False)
+	notify_list = forms.ModelChoiceField(label=_("Who to notify"), queryset=UserList.objects.none(), required=False)
 
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']

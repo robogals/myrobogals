@@ -806,7 +806,7 @@ def edituser(request, username, chapter=None):
 						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
-						messages.success(request, message=unicode(_("Profile and settings updated!")))
+						messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						if chapter.welcome_email_enable:
