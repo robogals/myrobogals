@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import email_re
 from django.db import connection
 from django.db.models import Q
 from django.forms.widgets import Widget, Select, TextInput
@@ -20,7 +19,7 @@ from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_att
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models_mobileregex import MobileRegex
-from myrobogals.rgmain.utils import SelectDateWidget
+from myrobogals.rgmain.utils import SelectDateWidget, email_re
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
 from myrobogals.settings import MEDIA_ROOT, MEDIA_URL, GENDERS
