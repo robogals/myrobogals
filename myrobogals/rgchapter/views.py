@@ -1,11 +1,12 @@
 from myrobogals.rgprofile.models import Position, UserList
-from myrobogals.rgteaching.models import SchoolVisitStats
+from myrobogals.rgteaching.models import SchoolVisitStats, SchoolVisit
 from myrobogals.rgprofile.models import User
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -178,9 +179,19 @@ class FormPartFive(forms.Form):
 	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
 	welcome_email_html = forms.BooleanField(required=False)
 
+class InviteEmailMsgField(forms.CharField):
+	def clean(self, value):
+		try:
+			formatted = value.format(
+				visit=SchoolVisit.objects.all()[0],
+				user=User.objects.get(username='edit'))
+		except Exception:
+			raise forms.ValidationError("Invitation email contains invalid field names")
+		return value
+
 class FormPartSix(forms.Form):
 	invite_email_subject = forms.CharField(required=False, max_length=256)
-	invite_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
+	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea)
 	invite_email_html = forms.BooleanField(required=False)
 
 @login_required
