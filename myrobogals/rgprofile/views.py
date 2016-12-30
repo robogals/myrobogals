@@ -265,6 +265,7 @@ def editstatus(request, chapterurl):
 				users = data['users'] #l:queryset
 				users_already = ""
 				users_changed = ""
+
 				for user in users:
 					u = User.objects.get(username__exact = user.username)
 					old_status = u.memberstatus_set.get(status_date_end__isnull=True)
@@ -286,11 +287,16 @@ def editstatus(request, chapterurl):
 							users_changed = users_changed + ", " + u.username
 						else:
 							users_changed = u.username
+
 				if(users_already):
 					messages.success(request, message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
+				
 				if(users_changed):
-					messages.success(request, message=unicode(_("%(usernames)s have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
+					messages.success(request, message=unicode(_("%(usernames)s has/have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
+				
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/users/')
+			else:
+				return render_to_response('edit_user_status.html', {'ulform': ulform, 'chapter': c, 'memberstatustypes': memberstatustypes}, context_instance=RequestContext(request))
 		else:
 			ulform = EditStatusForm(None, user=request.user)
 			return render_to_response('edit_user_status.html', {'ulform': ulform, 'chapter': c, 'memberstatustypes': memberstatustypes}, context_instance=RequestContext(request))
