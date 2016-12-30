@@ -5,6 +5,7 @@ from django.template import RequestContext, Context, loader
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 from myrobogals.rgmain.utils import SelectDateWidget
 from myrobogals.rgconf.models import Conference, ConferenceAttendee, ConferencePart
 from django.core.urlresolvers import reverse
@@ -153,14 +154,14 @@ def editrsvp(request, conf_id, username):
 						except ConferencePart.DoesNotExist:
 							pass
 			ca.save()
-			request.user.message_set.create(message=unicode(_("Conference RSVP saved")))
+			messages.success(request, message=unicode(_("Conference RSVP saved")))
 			if data['update_account']:
 				u.email = data['email']
 				u.dob = data['dob']
 				u.mobile = data['mobile']
 				u.gender = data['gender']
 				u.save()
-				request.user.message_set.create(message=unicode(_("Member account updated with new details")))
+				messages.success(request, message=unicode(_("Member account updated with new details")))
 			if request.user.is_staff:
 				return HttpResponseRedirect('/conferences/' + str(conf_id) + '/')
 			elif ca.balance_owing()[1] == None:
@@ -212,7 +213,7 @@ def rsvplist(request, conf_id):
 			else:
 				raise User.DoesNotExist
 		except User.DoesNotExist:
-			request.user.message_set.create(message=unicode(_("- No such username exists in your chapter")))
+			messages.success(request, message=unicode(_("- No such username exists in your chapter")))
 	if request.user.is_superuser:
 		cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
 	else:
@@ -356,7 +357,7 @@ def rsvpemail(request, conf_id):
 			message.status = 0
 			message.save()
 			
-			request.user.message_set.create(message=unicode(_("Email sent successfully")))
+			messages.success(request, message=unicode(_("Email sent successfully")))
 			return HttpResponseRedirect('/conferences/' + str(conf.pk) + '/')
 	else:
 		emailform = EmailAttendeesForm(None, conference=conf, user=request.user)
