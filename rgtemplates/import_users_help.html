@@ -14,7 +14,7 @@
 {% for field_name, field_info in section_info %}
   <tr>
     <td style="vertical-align: top">{{ field_name }}</td>
-    <td style="vertical-align: top">{{ field_info }}</td>
+    <td style="vertical-align: top">{% autoescape off %}{{ field_info }}{% endautoescape %}</td>
   </tr>
 {% endfor %}
 </table>

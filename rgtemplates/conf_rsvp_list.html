@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load showlocaltime %}
+{% load tz %}
 {% block title %}RSVPs for {{conf.name}}{% endblock %}
 
 {% block pagetitle %}RSVPs for {{conf.name}}{% endblock %}
@@ -8,7 +8,7 @@
 {% block content %}
 
 {% if conf.is_open %}
-{% blocktrans with time=conf.rsvp_close|date:_("DATETIME_FORMAT") timezone=conf.timezone_desc local_time=conf.rsvp_close_utc|showlocaltime:user.tz_obj|date:_("DATETIME_FORMAT") %}<strong>Registration closes at:</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;{{time}} ({{timezone}})<br><strong>Which in your local time is:</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;{{local_time}}{% endblocktrans %}<br>&nbsp;
+{% blocktrans with time=conf.rsvp_close|timezone:conf.timezone.description|date:_("DATETIME_FORMAT") timezone=conf.timezone_desc local_time=conf.rsvp_close|localtime|date:_("DATETIME_FORMAT") %}<strong>Registration closes at:</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;{{time}} ({{timezone}})<br><strong>Which in your local time is:</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;{{local_time}}{% endblocktrans %}<br>&nbsp;
 {% else %}
 <span class="alert">{{conf.closed_msg}}</span>
 {% endif %}

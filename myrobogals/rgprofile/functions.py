@@ -3,9 +3,11 @@ from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models_mobileregex import MobileRegex
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from datetime import datetime, date
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import connection, transaction
 import re
+from pytz import utc
 
 class RgImportCsvException(Exception):
 	def __init__(self, errmsg):
@@ -36,7 +38,7 @@ def stringval(colname, cell, newuser, defaults):
 def dateval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	try:
-		date = datetime.strptime(data, "%Y-%m-%d")
+		date = datetime.strptime(data, "%Y-%m-%d").replace(tzinfo=utc)
 		setattr(newuser, colname, date)
 	except ValueError:
 		if colname in defaults:
@@ -166,9 +168,9 @@ def importcsv(filerows, welcomeemail, defaults, chapter, updateuser, ignore_emai
 	user_already_exists=False
 	msg=""
 	if 'date_joined' not in defaults:
-		defaults['date_joined'] = datetime.now()
+		defaults['date_joined'] = timezone.now()
 	elif defaults['date_joined'] == None:
-		defaults['date_joined'] = datetime.now()
+		defaults['date_joined'] = timezone.now()
 	for row in filerows:
 		if any(row):
 			# Create new user
@@ -487,7 +489,7 @@ def subtonews(first_name, last_name, email, chapter_id):
         	user.email = email
         	user.chapter_id = chapter_id
         	user.email_chapter_optin = True
-        	user.date_joined = datetime.now()
+        	user.date_joined = timezone.now()
 		user.save()
 
 		# Must be called after save() because the primary key
