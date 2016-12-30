@@ -73,8 +73,8 @@ PROFILE_IMAGE_DEFAULT = 'profilepics/default.png'
 SECRET_KEY = 'kl;h45yrfgu;y;08op2534mj23kjjljk4ilk'
 
 TEMPLATE_LOADERS = (
-	'django.template.loaders.filesystem.load_template_source',
-	'django.template.loaders.app_directories.load_template_source',
+	'django.template.loaders.filesystem.Loader',
+	'django.template.loaders.app_directories.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -157,7 +157,7 @@ AUTH_USER_MODEL = 'rgprofile.User'
 API_SECRET = 'k290gj2apoz0'
 
 GENDERS = (
-	(0, 'No answer'),
+	(0, '---'),
 	(1, 'Male'),
 	(2, 'Female'),
 	(3, 'Other'),
