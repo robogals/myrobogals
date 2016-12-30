@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import email_re
 from django.db import connection
 from django.db.models import Q
 from django.forms.widgets import Widget, Select, TextInput
@@ -21,7 +20,7 @@ from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_att
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models_mobileregex import MobileRegex
-from myrobogals.rgmain.utils import SelectDateWidget
+from myrobogals.rgmain.utils import SelectDateWidget, email_re
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
 from myrobogals.settings import MEDIA_ROOT, MEDIA_URL, GENDERS
@@ -1003,12 +1002,6 @@ class WelcomeEmailForm(forms.Form):
 	html = forms.BooleanField(required=False)
 
 class DefaultsFormOne(forms.Form):
-	GENDERS = (
-		(0, '---'),
-		(1, 'Male'),
-		(2, 'Female'),
-	)
-
 	COURSE_TYPE_CHOICES = (
 		(0, '---'),
 		(1, 'Undergraduate'),
@@ -1170,14 +1163,14 @@ BASIC_FIELDS = (
 	('mobile', 'Mobile number, in correct local format, OR correct local format with the leading 0 missing (as Excel is prone to do), OR international format without a leading +. Examples: 61429558100 (Aus) or 447553333111 (UK)'),
 	('date_joined', 'Date when this member joined Robogals. If blank, today\'s date is used'),
 	('dob', 'Date of birth, in format 1988-10-26'),
-	('gender', '0 = No answer; 1 = Male; 2 = Female'),
+	('gender', '0 = No answer; 1 = Male; 2 = Female; 3 = Other'),
 )
 
 EXTRA_FIELDS = (
 	('course', 'Name of course/degree'),
 	('uni_start', 'Date when they commenced university, in format 2007-02-28'),
 	('uni_end', 'Date when they expect to complete university, in format 2011-11-30'),
-	('university_id', 'University they attend. Enter -1 to use the host university of this Robogals chapter. For a full list of IDs see https://my.robogals.org/chapters/<chapter>/edit/users/import/help/unis/'),
+	('university_id', 'ID of the university they attend. Enter -1 to use the host university of this Robogals chapter. <a href="unis/">Full list of university IDs</a>'),
 	('course_type', '1 = Undergraduate; 2 = Postgraduate'),
 	('student_type', '1 = Domestic student; 2 = International student'),
 	('student_number', 'Student number, a.k.a. enrolment number, candidate number, etc.'),

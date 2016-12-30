@@ -11,7 +11,7 @@ from myrobogals.rgmessages.models import MessagesSettings, SMSMessage, SMSRecipi
 from myrobogals.rgprofile.models import UserList
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from myrobogals.settings import API_SECRET, SECRET_KEY, MEDIA_ROOT
-from django.core.validators import email_re
+from myrobogals.rgmain.utils import email_re
 from hashlib import md5
 from urllib import unquote_plus
 from datetime import datetime, date

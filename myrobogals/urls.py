@@ -1,8 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns, url, include
 from myrobogals import settings
 from django.contrib import admin
-
-admin.autodiscover()
 
 urlpatterns = patterns('',
 	# Home

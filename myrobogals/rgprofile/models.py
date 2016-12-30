@@ -1,10 +1,11 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
-from datetime import date
+from django.utils.encoding import smart_str
+from django.db import models, connection
 from myrobogals.rgchapter.models import Chapter, DisplayColumn, ShirtSize, NAME_DISPLAYS
 from myrobogals.rgmain.models import University, Timezone
-from django.db import connection
 from myrobogals.settings import GENDERS
+from datetime import date
+from urllib import quote
 
 class MemberStatusType(models.Model):
 	PERSONTYPES = (
@@ -204,7 +205,7 @@ class User(AbstractUser):
 		return self.date_joined.astimezone(self.tz_obj())
 
 	def get_absolute_url(self):
-		return "/profile/%s/" % urllib.quote(smart_str(self.username))
+		return "/profile/%s/" % quote(smart_str(self.username))
 	
 	def get_full_name(self):
 		if self.get_name_display() == 0:

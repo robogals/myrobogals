@@ -391,7 +391,7 @@ def nametagscsv(request, conf_id):
 		raise Http404
 	conf = get_object_or_404(Conference, pk=conf_id)
 	cas = ConferenceAttendee.objects.filter(conference=conf).order_by('user__chapter', 'last_name')
-	response = HttpResponse(mimetype='text/csv')
+	response = HttpResponse(content_type='text/csv')
 	filename = 'robogals-sine-nametags-' + str(datetime.now().date()) + '.csv'
 	response['Content-Disposition'] = 'attachment; filename=' + filename
 	t = loader.get_template('conf_nametags_csv.txt')

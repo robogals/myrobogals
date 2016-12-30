@@ -5,6 +5,7 @@ from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Timezone
 from myrobogals.rgchapter.models import ShirtSize
 from pytz import utc
+from django.utils import timezone
 
 class Conference(models.Model):
 	POLICY_CHOICES = (
@@ -28,9 +29,9 @@ class Conference(models.Model):
 	url = models.CharField(max_length=128, help_text="URL to page with information")
 	host = models.ForeignKey(Chapter, blank=True, null=True)
 	committee_year = models.IntegerField(default=0, help_text="The committee year for the purposes of the relevant question in the RSVP form. Put 0 to remove this question from the form.")
-	early_rsvp_close = models.DateTimeField(help_text="Time in conference timezone when benefits for registering early should close (not implemented)")
-	rsvp_close = models.DateTimeField(help_text="Time in conference timezone when registration will close; set policy below. Publicly viewable.")
-	late_rsvp_close = models.DateTimeField(help_text="Time in conference timezone when late registration will close; set policy below. Not publicly viewable, so can be used to silently allow late RSVPs.")
+	early_rsvp_close = models.DateTimeField(help_text="Time in UTC when benefits for registering early should close (not implemented)")
+	rsvp_close = models.DateTimeField(help_text="Time in UTC when registration will close; set policy below. Publicly viewable.")
+	late_rsvp_close = models.DateTimeField(help_text="Time in UTC when late registration will close; set policy below. Not publicly viewable, so can be used to silently allow late RSVPs.")
 	timezone = models.ForeignKey(Timezone, help_text="Timezone of the place where the conference is taking place. Used for RSVP deadlines")
 	timezone_desc = models.CharField(max_length=128, help_text="Description of timezone, e.g. 'Melbourne time' or 'Pacific Time'")
 	policy = models.IntegerField(choices=POLICY_CHOICES, default=1)
@@ -50,12 +51,6 @@ class Conference(models.Model):
 	def __unicode__(self):
 		return self.name
 	
-	def rsvp_close_utc(self):
-		return self.timezone.tz_obj().localize(self.rsvp_close).astimezone(utc).replace(tzinfo=None)
-
-	def late_rsvp_close_utc(self):
-		return self.timezone.tz_obj().localize(self.late_rsvp_close).astimezone(utc).replace(tzinfo=None)
-
 	def is_open(self):
 		if self.policy == 3:
 			# Always closed
@@ -68,13 +63,13 @@ class Conference(models.Model):
 			return True
 		elif self.policy == 0:
 			# Closed after deadline
-			if datetime.utcnow() > self.rsvp_close_utc():
+			if timezone.now() > self.rsvp_close:
 				return False
 			else:
 				return True
 		elif self.policy == 1:
 			# Closed after late deadline
-			if datetime.utcnow() > self.late_rsvp_close_utc():
+			if timezone.now() > self.late_rsvp_close:
 				return False
 			else:
 				return True
