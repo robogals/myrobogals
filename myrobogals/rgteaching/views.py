@@ -9,6 +9,7 @@ from myrobogals.rgteaching.models import School, DirectorySchool, StarSchoolDire
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 import datetime
+from django.contrib import messages
 from myrobogals.rgmain.utils import SelectDateWidget, SelectTimeWidget
 from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus
@@ -131,7 +132,7 @@ def editvisit(request, visit_id):
 				v.otherprep = data['otherprep']
 				v.notes = data['notes']
 				v.save()
-				request.user.message_set.create(message=unicode(_("School visit info updated")))
+				messages.success(request, message=unicode(_("School visit info updated")))
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 		else:
 			if request.user.is_superuser:
@@ -353,9 +354,9 @@ def invitetovisit(request, visit_id):
 					message.save()
 				
 				if data['action'] == '1':
-					request.user.message_set.create(message=unicode(_("Invitations have been sent to the selected volunteers")))
+					messages.success(request, message=unicode(_("Invitations have been sent to the selected volunteers")))
 				if data['action'] == '2':
-					request.user.message_set.create(message=unicode(_("Selected volunteers have been added as attending")))
+					messages.success(request, message=unicode(_("Selected volunteers have been added as attending")))
 				return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 			except Exception as e:
 				error = e.args[0]
@@ -441,7 +442,7 @@ def emailvisitattendees(request, visit_id):
 			message.status = 0
 			message.save()
 			
-			request.user.message_set.create(message=unicode(_("Email sent succesfully")))
+			messages.success(request, message=unicode(_("Email sent succesfully")))
 			return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		emailform = EmailAttendeesForm(None, user=request.user, visit=v)
@@ -503,7 +504,7 @@ def cancelvisit(request, visit_id):
 			message.status = 0
 			message.save()
 			Event.objects.filter(id = v.id).delete()
-			request.user.message_set.create(message=unicode(_("Visit cancelled successfully")))
+			messages.success(request, message=unicode(_("Visit cancelled successfully")))
 			return HttpResponseRedirect('/teaching/list/')
 	else:
 		cancelform = CancelForm(None, user=request.user, visit=v)
@@ -528,11 +529,11 @@ def deleteschool(request, school_id):
 	if request.method == 'POST':
 		deleteform = DeleteForm(request.POST, user=request.user, school=s)
 		if SchoolVisit.objects.filter(school=s):
-			request.user.message_set.create(message=unicode(_("You cannot delete this school as it has a visit in the database.")))
+			messages.success(request, message=unicode(_("You cannot delete this school as it has a visit in the database.")))
 			return HttpResponseRedirect('/teaching/schools/')
 		else:
 			School.objects.filter(id = s.id).delete()
-			request.user.message_set.create(message=unicode(_("School sucessfully deleted.")))
+			messages.success(request, message=unicode(_("School sucessfully deleted.")))
 			return HttpResponseRedirect('/teaching/schools/')
 	else:
 		deleteform = DeleteForm(None, user=request.user, school=s)
@@ -585,7 +586,7 @@ def filllatlngschdir(request):
 			msg = 'Operation successful!'
 	else:
 		msg = '- You can not do this!'
-	request.user.message_set.create(message=unicode(msg))
+	messages.success(request, message=unicode(msg))
 	return render_to_response('response.html', {}, context_instance=RequestContext(request))
 
 @login_required
@@ -662,10 +663,10 @@ def schoolsdirectory(request, chapterurl):
 				schools_list = l
 			else:
 				schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
-				request.user.message_set.create(message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed.')))
+				messages.success(request, message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed.')))
 		except:
 			schools_list = schools_list.filter(address_state=subdiv, address_city__iexact=origin)
-			request.user.message_set.create(message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed')))
+			messages.success(request, message=unicode(_('- Sorry, suburb coordinate cannot be retrieved! Instead, schools within the same suburb are displayed')))
 
 	paginator = Paginator(schools_list, 26)
 	page = request.GET.get('page')
@@ -693,7 +694,7 @@ def starschool(request):
 			starSchool.chapter = c
 			starSchool.save()
 			msg = 'The school "' + s.name + '" is starred'
-		request.user.message_set.create(message=unicode(_(msg)))
+		messages.success(request, message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		elif 'return' in request.POST:
@@ -717,7 +718,7 @@ def unstarschool(request):
 			msg = 'The school "' + s.name + '" is unstarred'
 		else:
 			msg = '- The school "' + s.name + '" is not starred'
-		request.user.message_set.create(message=unicode(_(msg)))
+		messages.success(request, message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		elif 'return' in request.POST:
@@ -749,7 +750,7 @@ def copyschool(request):
 			school.contact_phone = s.phone
 			school.save()
 			msg = 'The school "' + s.name + '" has been added to your schools list. You can now create a workshop at this school.'
-		request.user.message_set.create(message=unicode(_(msg)))
+		messages.success(request, message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		elif 'return' in request.POST:
@@ -848,7 +849,7 @@ def editschool(request, school_id):
 				data = formpart3.cleaned_data
 				s.notes = data['notes']
 				s.save()
-				request.user.message_set.create(message=unicode(_("School info updated")))
+				messages.success(request, message=unicode(_("School info updated")))
 				return HttpResponseRedirect('/teaching/schools/')
 		else:
 			if school_id == 0:
@@ -945,7 +946,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 				rsvpmessage.date = user_dt.replace(tzinfo=None)
 				rsvpmessage.message = data['message']
 				rsvpmessage.save()
-			request.user.message_set.create(message=unicode(rsvp_string))
+			messages.success(request, message=unicode(rsvp_string))
 			return dorsvp(request, event_id, user_id, rsvp_id)
 	else:
 		rsvpform = RSVPForm(None, user=request.user, event=e)
@@ -962,7 +963,7 @@ def deletemessage(request, visit_id, message_id):
 		raise Http404
 	if request.user.is_staff:	
 		m.delete()
-		request.user.message_set.create(message=unicode(_("Message deleted")))
+		messages.success(request, message=unicode(_("Message deleted")))
 	else:
 		raise Http404
 	return HttpResponseRedirect('/teaching/'+ str(v.pk) + '/')
@@ -1010,7 +1011,7 @@ def stats(request, visit_id):
 	if not request.user.is_staff:
 		raise Http404
 	if v.status != 0:
-		request.user.message_set.create(message=unicode(_("- This workshop is already closed")))
+		messages.success(request, message=unicode(_("- This workshop is already closed")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if not request.session.get('hoursPerPersonStage', False):
 		request.session['hoursPerPersonStage'] = 1
@@ -1083,22 +1084,22 @@ def reopenvisit(request, visit_id):
 	if not request.user.is_staff:
 		raise Http404
 	if v.status != 1:
-		request.user.message_set.create(message=unicode(_("- This workshop is already open!")))
+		messages.success(request, message=unicode(_("- This workshop is already open!")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of RRR stats - too many people have access
 	if v.school.chapter.pk == 20 and not request.user.is_superuser:
-		request.user.message_set.create(message=unicode(_("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
+		messages.success(request, message=unicode(_("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of stats more than 6 months old - too risky
 	if (datetime.datetime.now() - v.visit_start) > datetime.timedelta(days=180):
-		request.user.message_set.create(message=unicode(_("- To protect against accidental deletion of old stats, workshops more than six months old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
+		messages.success(request, message=unicode(_("- To protect against accidental deletion of old stats, workshops more than six months old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if 'confirm' in request.GET:
 		if request.GET['confirm'] == '1':
 			v.schoolvisitstats_set.all().delete()
 			v.status = 0
 			v.save()
-			request.user.message_set.create(message=unicode(_("Stats deleted and workshop re-opened.")))
+			messages.success(request, message=unicode(_("Stats deleted and workshop re-opened.")))
 			return HttpResponseRedirect('/teaching/' + str(visit_id) + '/')
 		else:
 			# Someone has set a random value for &confirm=
@@ -1128,7 +1129,7 @@ def statsHoursPerPerson(request, visit_id):
 				person.save()
 		v.status = 1
 		v.save()
-		request.user.message_set.create(message=unicode(_("Stats saved successfully, visit closed.")))
+		messages.success(request, message=unicode(_("Stats saved successfully, visit closed.")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	else:
 		raise Http404

@@ -289,7 +289,7 @@ def editchapter(request, chapterurl):
 				c.invite_email_msg = data['invite_email_msg']
 				c.invite_email_html = data['invite_email_html']
 				c.save()
-				request.user.message_set.create(message=unicode(_("Chapter info updated")))
+				messages.success(request, message=unicode(_("Chapter info updated")))
 				return HttpResponseRedirect("/chapters/" + c.myrobogals_url + "/")
 		else:
 			display_columns = []

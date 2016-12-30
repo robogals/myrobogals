@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils.translation import ugettext_lazy as _
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User
 from myrobogals.rgchapter.models import Chapter
@@ -45,7 +46,7 @@ def setmaxuploadfilesize(request):
 					return HttpResponseRedirect('/forums/')
 			except:
 				msg = '- Maximum file size must be an integer'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': request.GET['return'], 'apps': 'forums'}, context_instance=RequestContext(request))
 	else:
 		raise Http404
@@ -78,12 +79,12 @@ def newcategory(request):
 					raise Http404
 				if Category.objects.filter(name=newCategory.name, chapter=newCategory.chapter, exec_only=newCategory.exec_only):
 					msg = _('- A similar category already exists')
-					request.user.message_set.create(message=unicode(msg))
+					messages.success(request, message=unicode(msg))
 				else:
 					newCategory.save()
 			else:
 				msg = '- The field "Category name" can not be empty.'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			elif 'return' in request.POST:
@@ -105,7 +106,7 @@ def deletecategory(request, category_id):
 			return render_to_response('forum_categorydelete_confirm.html', {'category': c, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = c.chapter
-			request.user.message_set.create(message=unicode(_('Category "%s" deleted') % cgi.escape(c.name)))
+			messages.success(request, message=unicode(_('Category "%s" deleted') % cgi.escape(c.name)))
 			c.delete()
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -133,12 +134,12 @@ def newforum(request):
 				newForum.created_by = user
 				if Forum.objects.filter(category=newForum.category, name=newForum.name):
 					msg = '- A similar forum already exists'
-					request.user.message_set.create(message=unicode(_(msg)))
+					messages.success(request, message=unicode(_(msg)))
 				else:
 					newForum.save()
 			else:
 				msg = '- The fields "Forum name" and "Description" can not be empty.'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			elif 'return' in request.POST:
@@ -165,7 +166,7 @@ def editforum(request, forum_id):
 			edit.save()
 		else:
 			msg = '- The fields "new forum name" and "new description" can not be empty.'
-			request.user.message_set.create(message=unicode(_(msg)))
+			messages.success(request, message=unicode(_(msg)))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		elif 'return' in request.POST:
@@ -333,7 +334,7 @@ def newtopic(request, forum_id):
 					alreadyExistWarning = True
 					msg += 'A similar topic already exists.'
 				if alreadyExistWarning or fileWarning:
-					request.user.message_set.create(message=unicode(_(msg)))
+					messages.success(request, message=unicode(_(msg)))
 				else:
 					newTopic.save()
 					newTopicPk = newTopic.pk
@@ -395,7 +396,7 @@ def newtopic(request, forum_id):
 						message.status = 0
 						message.save()
 			else:
-				request.user.message_set.create(message=unicode(_('- The fields "New Topic" and "Message" can not be empty.')))
+				messages.success(request, message=unicode(_('- The fields "New Topic" and "Message" can not be empty.')))
 		else:
 			raise Http404
 		if 'return' in request.GET:
@@ -429,13 +430,13 @@ def downloadpostfile(request, post_id, file_id):
 				response['Content-Length'] = postfile.filesize()
 				return response
 			except:
-				request.user.message_set.create(message=unicode(_('- File: "%s" does not exist' % cgi.escape(postfile.filename()))))
+				messages.success(request, message=unicode(_('- File: "%s" does not exist' % cgi.escape(postfile.filename()))))
 				if 'return' in request.GET:
 					return HttpResponseRedirect(request.GET['return'])
 				else:
 					return HttpResponseRedirect('/forums/topic/' + str(t.pk) + '/')
 		else:
-			request.user.message_set.create(message=unicode(_('- File does not exist')))
+			messages.success(request, message=unicode(_('- File does not exist')))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			else:
@@ -529,7 +530,7 @@ def unwatchalltopics(request):
 		f.watchers.remove(request.user)
 	for t in request.user.topic_watchers.all():
 		t.watchers.remove(request.user)
-	request.user.message_set.create(message=unicode(_('Your watch list is emptied')))
+	messages.success(request, message=unicode(_('Your watch list is emptied')))
 	if 'return' in request.GET:
 		return HttpResponseRedirect(request.GET['return'])
 	elif 'return' in request.POST:
@@ -551,7 +552,7 @@ def watchtopicwithmyposts(request):
 		if (user.is_superuser) or (user.is_staff and ((c == user.chapter) or (c == None))) or ((c == user.chapter) and (g.exec_only == False)) or ((c == None) and (g.exec_only == False)):
 			if (not f.watchers.filter(pk=user.pk)) and (user not in f.blacklist.filter(pk=user.pk)):
 				t.watchers.add(user)
-	request.user.message_set.create(message=unicode(_('Topics with your posts have been added to your watch list')))
+	messages.success(request, message=unicode(_('Topics with your posts have been added to your watch list')))
 	if 'return' in request.GET:
 		return HttpResponseRedirect(request.GET['return'])
 	elif 'return' in request.POST:
@@ -601,7 +602,7 @@ def deleteforum(request, forum_id):
 			return render_to_response('forum_delete_confirm.html', {'forum': f, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = c
-			request.user.message_set.create(message=unicode(_('Forum "' + cgi.escape(f.name) + '" deleted')))
+			messages.success(request, message=unicode(_('Forum "' + cgi.escape(f.name) + '" deleted')))
 			f.delete()
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
@@ -712,7 +713,7 @@ def deletepost(request, post_id):
 			f.last_post_time = last_post_forum.created_on
 			f.last_post_user = last_post_forum.posted_by
 			f.save()
-			request.user.message_set.create(message=unicode(_('Post deleted')))
+			messages.success(request, message=unicode(_('Post deleted')))
 			if 'return' in request.GET:
 				return HttpResponseRedirect(request.GET['return'])
 			elif 'return' in request.POST:
@@ -773,7 +774,7 @@ def topicupvote(request, post_id):
 		raise Http404
 	exist_vote = Vote.objects.filter(topic=t, voter=user)
 	if exist_vote:
-		request.user.message_set.create(message=unicode(_('- You have already voted for this topic')))
+		messages.success(request, message=unicode(_('- You have already voted for this topic')))
 	else:
 		vote = Vote()
 		vote.topic = t
@@ -845,7 +846,7 @@ def editpost(request, post_id):
 			else:
 				if not postform.is_valid():
 					msg += 'The field "Message" can not be empty.'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 				warning = True
 			if 'return' in request.GET:
 				if warning:
@@ -877,7 +878,7 @@ def blacklistuser(request, forum_id, user_id):
 	c = g.chapter
 	if perpetrator.is_staff:
 		msg = _('- Warning: %s is a staff, therefore can not be blacklisted!') % perpetrator.get_full_name()
-		request.user.message_set.create(message=unicode(msg))
+		messages.success(request, message=unicode(msg))
 		return HttpResponseRedirect('/forums/showforumoffenses/' + str(f.pk) + '/')
 	if (user.is_superuser) or (user.is_staff and c == user.chapter) or (user.is_staff and user.chapter.pk == 1 and c == None):
 		f.blacklist.add(perpetrator)
@@ -979,7 +980,7 @@ def fileoffenses(request, post_id):
 								topic.watchers.remove(p.posted_by)
 						else:
 							msg = _('- Warning: %s is a staff, therefore can not be blacklisted!') % offen.perpetrator.get_full_name()
-							request.user.message_set.create(message=unicode(msg))
+							messages.success(request, message=unicode(msg))
 							warning = True
 				if 'deletePost' in request.POST:
 					if request.POST['deletePost'] == '1':
@@ -1081,7 +1082,7 @@ def newpost(request, topic_id):
 					message.status = 0
 					message.save()
 			else:
-				request.user.message_set.create(message=unicode(_('- The field "Message" can not be empty.')))
+				messages.success(request, message=unicode(_('- The field "Message" can not be empty.')))
 		else:
 			raise Http404
 		if 'return' in request.GET:
@@ -1107,7 +1108,7 @@ def deletetopic(request, topic_id):
 			return render_to_response('forum_topicdelete_confirm.html', {'topic': t, 'return': request.GET['return']}, context_instance=RequestContext(request))
 		else:
 			chapter = f.category.chapter
-			request.user.message_set.create(message=unicode(_('Topic "%s" deleted') % cgi.escape(t.subject)))
+			messages.success(request, message=unicode(_('Topic "%s" deleted') % cgi.escape(t.subject)))
 			t.delete()
 			all_posts = Post.objects.filter(topic__forum=f)
 			if all_posts:

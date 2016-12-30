@@ -8,6 +8,7 @@ from django.template import RequestContext, Context, loader
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import authenticate, login
@@ -126,7 +127,7 @@ def edituserlist(request, chapterurl, list_id):
 				l.users = data['users']
 				l.display_columns = data['display_columns']
 				l.save()
-				request.user.message_set.create(message=unicode(_("User list \"%(listname)s\" has been updated") % {'listname': l.name}))
+				messages.success(request, message=unicode(_("User list \"%(listname)s\" has been updated") % {'listname': l.name}))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/lists/' + str(l.pk) + '/')
 		else:
 			if new:
@@ -224,9 +225,9 @@ def deleteuser(request, userpk):
 				else:
 					raise Http404
 		if canNotDelete:
-			request.user.message_set.create(message=unicode(_('- Cannot delete member. Reason(s): %s<br>Consider marking this member as alumni instead.') % msg))
+			messages.success(request, message=unicode(_('- Cannot delete member. Reason(s): %s<br>Consider marking this member as alumni instead.') % msg))
 		else:
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 		if 'return' in request.GET:
 			return HttpResponseRedirect(request.GET['return'])
 		else:
@@ -285,9 +286,9 @@ def editstatus(request, chapterurl):
 						else:
 							users_changed = u.username
 				if(users_already):
-					request.user.message_set.create(message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
+					messages.success(request, message=unicode(_("%(usernames)s are already marked as %(type)s") % {'usernames': users_already, 'type': MemberStatusType.objects.get(pk=int(status)).description}))
 				if(users_changed):
-					request.user.message_set.create(message=unicode(_("%(usernames)s have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
+					messages.success(request, message=unicode(_("%(usernames)s have been marked as %(type)s") % {'usernames': users_changed, 'type': new_status.statusType.description}))
 				return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/users/')
 		else:
 			ulform = EditStatusForm(None, user=request.user)
@@ -307,7 +308,7 @@ def mobverify(request):
 	if not request.user.is_staff:
 		raise Http404
 	if request.user.mobile_verified:
-		request.user.message_set.create(message=unicode(_('Your mobile number is already verified')))
+		messages.success(request, message=unicode(_('Your mobile number is already verified')))
 		return HttpResponseRedirect('/profile/')
 	if request.method == 'POST':
 		if not request.session.get('verif_code', False):
@@ -323,7 +324,7 @@ def mobverify(request):
 			msg = _('- Verification failed: invalid verification code')
 		del request.session['verif_code']
 		del request.session['mobile']
-		request.user.message_set.create(message=unicode(msg))
+		messages.success(request, message=unicode(msg))
 		return HttpResponseRedirect('/messages/sms/write/')
 	else:
 		if request.user.mobile:
@@ -354,7 +355,7 @@ def mobverify(request):
 				message.status = 3
 				message.save()
 				msg = _('- Verification failed: system problem please try again later')
-				request.user.message_set.create(message=unicode(msg))
+				messages.success(request, message=unicode(msg))
 				return HttpResponseRedirect('/profile/')
 
 			message.status = 0
@@ -363,7 +364,7 @@ def mobverify(request):
 			return render_to_response('profile_mobverify.html', {}, context_instance=RequestContext(request))
 		else:
 			msg = _('- Verification failed: no mobile number entered. (Profile -> Edit Profile)')
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			return HttpResponseRedirect('/messages/sms/write/')
 
 @login_required
@@ -799,7 +800,7 @@ def edituser(request, username, chapter=None):
 						u.security_check = data['security_check']
 					u.save()
 					if 'return' in request.POST:
-						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
+						messages.success(request, message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect(request.POST['return'])
 					elif join:
 						if chapter.welcome_email_enable:
@@ -858,7 +859,7 @@ def edituser(request, username, chapter=None):
 							message.save()
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
-						request.user.message_set.create(message=unicode(_("Profile and settings updated!")))
+						messages.success(request, message=unicode(_("Profile and settings updated!")))
 						return HttpResponseRedirect("/profile/" + username + "/")
 		else:
 			if join:
@@ -1097,7 +1098,7 @@ def importusers(request, chapterurl):
 						msg = _('%d users imported and emailed.<br>%d rows were ignored due to members with those email addresses already existing.<br>%s') % (users_imported, existing_emails, error_msg)
 				else :
 						msg = _('%d users imported and emailed.<br>%s') % (users_imported, error_msg)
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			del request.session['updateuser']
@@ -1234,7 +1235,7 @@ def genpw(request, username):
 			welcomeemail = welcomeform.cleaned_data
 			try:
 				genandsendpw(user, welcomeemail, chapter)
-				request.user.message_set.create(message=unicode(_("Password generated and emailed")))
+				messages.success(request, message=unicode(_("Password generated and emailed")))
 				if return_url == '':
 					return_url = '/profile/' + username + '/edit/'
 				return HttpResponseRedirect(return_url)

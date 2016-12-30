@@ -17,6 +17,7 @@ from urllib import unquote_plus
 from datetime import datetime, date
 from tinymce.widgets import TinyMCE
 from myrobogals.rgmain.models import Country
+from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import login_required
 from time import time
@@ -48,7 +49,7 @@ def setmaxuploadfilesize(request):
 				return HttpResponseRedirect('/messages/email/write/')
 			except:
 				msg = '- Maximum file size must be an integer'
-				request.user.message_set.create(message=unicode(_(msg)))
+				messages.success(request, message=unicode(_(msg)))
 		return render_to_response('forum_max_upload_file_size.html', {'max_size': max_size, 'return': '', 'apps': 'messages'}, context_instance=RequestContext(request))
 	else:
 		raise Http404
@@ -137,7 +138,7 @@ def writeemail(request):
 				if warning:
 					del request.session['emailform']
 					del request.session['emailid']
-					request.user.message_set.create(message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
+					messages.success(request, message=unicode(_('- Can not upload files. Reason(s): %s' % msg)))
 					return HttpResponseRedirect('/messages/email/write/')
 				emailform = request.session['emailform']
 				del request.session['emailform']
@@ -539,10 +540,10 @@ def downloademailfile(request, email_id, file_name):
 			response['Content-Length'] = f[0].filesize()
 			return response
 		except:
-			request.user.message_set.create(message=unicode(_('File: "%s" does not exist' % f[0].filename())))
+			messages.success(request, message=unicode(_('File: "%s" does not exist' % f[0].filename())))
 			return HttpResponseRedirect('/messages/history/')
 	else:
-		request.user.message_set.create(message=unicode(_('Email does not contain file: "%s"' % file_name)))
+		messages.success(request, message=unicode(_('Email does not contain file: "%s"' % file_name)))
 		return HttpResponseRedirect('/messages/history/')
 
 @login_required
@@ -902,7 +903,7 @@ def importsubscribers(request, newsletter_id):
 				errmsg = e.errmsg
 				return render_to_response('import_subscribers_2.html', {'tmppath': tmppath, 'filerows': filerows, 'newsletter': newsletter, 'errmsg': errmsg}, context_instance=RequestContext(request))
 			msg = _('%d subscribers imported!') % users_imported
-			request.user.message_set.create(message=unicode(msg))
+			messages.success(request, message=unicode(msg))
 			del request.session['welcomeemail']
 			del request.session['defaults']
 			return HttpResponseRedirect("/messages/newsletters/" + str(newsletter.pk) + "/")
