@@ -47,7 +47,7 @@
 {% endif %}
 
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
-<form action="/forums/stickytopic/?return={{return|urlencode}}" method="POST">
+<form action="/forums/stickytopic/?return={{return|urlencode}}" method="POST"> {% csrf_token %}
 	<tr style="color:white; background-color:#1366A3">
 		<td>
 			<table>
@@ -159,7 +159,7 @@
 	</tr>
 	{% endfor %}
 </form>
-<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnFromNewTopic|urlencode}}" method="POST" enctype="multipart/form-data">
+<form action="/forums/newtopic/{{ forum.pk }}/?return={{returnFromNewTopic|urlencode}}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
   <tr style="border-top:solid 1px grey;">
     <td valign="top"><strong>{{topicform.subject.label_tag}}</strong></td>
     <td {% if can_delete %} colspan="6" {% else %} colspan="4" {% endif %}>{{ topicform.subject }}</td>

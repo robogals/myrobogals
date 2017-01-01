@@ -17,7 +17,7 @@
   </tr>
 {% endfor %}
 </table>
-<form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post">
+<form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post"> {% csrf_token %}
 <input type="hidden" name="tmppath" value="{{tmppath}}">
 <input type="hidden" name="step" value="2">
 <input type="submit" value={% trans "Add subscribers" %}>

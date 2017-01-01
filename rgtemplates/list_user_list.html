@@ -15,7 +15,7 @@
 {{userlist.notes}}
 </p>
 {% endif %}
-<form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/" method="GET">
+<form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/" method="GET"> {% csrf_token %}
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
 <p align="right"><b>{% trans "Members in list:" %} {{ users|length }}</b></p>

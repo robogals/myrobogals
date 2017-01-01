@@ -8,7 +8,7 @@
 <div class ="error">
 <strong>{% trans "Only schools that have never had a visit assigned to them can be deleted.<br><br> Deleted schools cannot be retrived.<strong>" %}
 </div>
-<form action="/teaching/schools/{{school.pk}}/delete/" method="POST">
+<form action="/teaching/schools/{{school.pk}}/delete/" method="POST"> {% csrf_token %}
 {% if deleteform.errors %}
 <div class="error">
 {% for error in deleteform.errors %}

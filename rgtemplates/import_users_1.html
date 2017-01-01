@@ -10,7 +10,7 @@
 <br>
 {% trans "<strong>The compulsory fields of first_name, last_name and email must always be included. All other fields are optional.</strong> Fields with an unrecognised name will be ignored." %}<br>
 <br>
-<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data">
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/import/" method="post" enctype="multipart/form-data"> {% csrf_token %}
 {% if form.csvfile.errors %}
 <div class="error">{% for error in form.csvfile.errors %}{% blocktrans with error as error%}{{error}} {% endblocktrans %}{% endfor %}</div>
 {% endif %}

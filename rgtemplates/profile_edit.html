@@ -7,12 +7,12 @@
 {% block content %}
 <!-- form for editing profile information -->
 {% if adduser %}
-<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/add/" method="POST">
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/add/" method="POST"> {% csrf_token %}
 {% else %}
  {% if join %}
- <form action="/join/{{chapter.myrobogals_url}}/" method="POST">
+ <form action="/join/{{chapter.myrobogals_url}}/" method="POST"> {% csrf_token %}
  {% else %}
- <form action="/profile/{{u.username}}/edit/" method="POST">
+ <form action="/profile/{{u.username}}/edit/" method="POST"> {% csrf_token %}
  {% endif %}
 {% endif %}
 <div class="round5"><div class="moduletable"><div class="module-surround">

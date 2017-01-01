@@ -147,7 +147,7 @@
 To RSVP for yourself ({{user.get_full_name}}), please <a href="/conferences/{{conf.pk}}/{{user.username}}/rsvp/">click here</a>
 </p>
 <p>
-<form action="/conferences/{{conf.pk}}/" method="GET">
+<form action="/conferences/{{conf.pk}}/" method="GET"> {% csrf_token %}
 To RSVP for someone else, enter that person's myRobogals username: <input type="text" name="username"> <input type="submit" value="Submit">
 </form>
 </p>

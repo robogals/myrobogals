@@ -6,9 +6,9 @@
 
 {% block content %}
 {% if new %}
-<form action="/chapters/{{chapter.myrobogals_url}}/lists/add/" method="POST">
+<form action="/chapters/{{chapter.myrobogals_url}}/lists/add/" method="POST"> {% csrf_token %}
 {% else %}
-<form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/" method="POST">
+<form action="/chapters/{{chapter.myrobogals_url}}/lists/{{list_id}}/edit/" method="POST"> {% csrf_token %}
 {% endif %}
 <table>
 {% if ulform.name.errors %}

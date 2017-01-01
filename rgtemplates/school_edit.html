@@ -7,9 +7,9 @@
 {% block content %}
 <p><a href="/teaching/schools/">{% trans "Return to school list" %}</a></p>
 {% if new %}
-<form action="/teaching/schools/new/" method="POST">
+<form action="/teaching/schools/new/" method="POST"> {% csrf_token %}
 {% else %}
-<form action="/teaching/schools/{{school_id}}/" method="POST">
+<form action="/teaching/schools/{{school_id}}/" method="POST"> {% csrf_token %}
 {% endif %}
 <table>
   <tr>

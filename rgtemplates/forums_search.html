@@ -10,7 +10,7 @@
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
 <h4 class="module-title">{% trans "Search" %}</h4>
-<form action="/forums/search/{{chapter.myrobogals_url}}/" method="GET">
+<form action="/forums/search/{{chapter.myrobogals_url}}/" method="GET"> {% csrf_token %}
 {% trans "Forum name, topic subject:" %} <input type="text" name="search" size="50" value="{{search}}">
 <input type="submit" value="{% trans "submit" %}">
 </form>

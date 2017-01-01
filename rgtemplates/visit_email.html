@@ -6,7 +6,7 @@
 {% block pagetitle %}{% trans "Email invitees of a school visit" %}{% endblock %}
 
 {% block content %}
-<form action="/teaching/{{visit_id}}/email/" method="POST">
+<form action="/teaching/{{visit_id}}/email/" method="POST"> {% csrf_token %}
 {% if emailform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s):" %}<br>

@@ -10,7 +10,7 @@
 <br>
 {% trans "The email field must always be included. All other fields are optional. Fields with an unrecognised name will be ignored. <strong>Invalid values will not return an error, they will simply be ignored.</strong> This is to prevent an error interrupting the middle of the batch when some have already been processed and others haven't." %}<br>
 <br>
-<form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post" enctype="multipart/form-data">
+<form action="/messages/newsletters/{{newsletter.pk}}/import/" method="post" enctype="multipart/form-data"> {% csrf_token %}
 {% if form.csvfile.errors %}
 <div class="error">{% for error in form.csvfile.errors %}{{error}}{% endfor %}</div>
 {% endif %}

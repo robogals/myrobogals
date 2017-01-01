@@ -6,7 +6,7 @@
 
 {% block content %}
 <p><a href="/conferences/{{conf_id}}/">{% trans "Return to RSVP list" %}</a></p>
-<form action="/conferences/{{conf_id}}/{{username}}/rsvp/" method="POST">
+<form action="/conferences/{{conf_id}}/{{username}}/rsvp/" method="POST"> {% csrf_token %}
 <table>
   <tr>
     <td colspan="2"><strong>{% trans "Conference attendance info" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>

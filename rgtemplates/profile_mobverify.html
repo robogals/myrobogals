@@ -8,7 +8,7 @@
 {% block content %}
 <p>A verification code has been sent to your mobile number, +{{user.mobile}} (<a href="/profile/edit/">edit</a>)</p>
 <p>Please enter the code below when you receive it:</p>
-<form action="/profile/mobverify/" method="POST">
+<form action="/profile/mobverify/" method="POST"> {% csrf_token %}
 <p style="clear: both; font-size: 200%;">
 <input type="text" name="verif_code" size="34" maxlength="80">
 <input type="submit" value="{% trans "Submit" %}">

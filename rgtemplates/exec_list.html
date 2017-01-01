@@ -7,7 +7,7 @@
 {% block pagetitle %}{% blocktrans with chapter.name as chapter %}Exec listing: {{chapter}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET">
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET"> {% csrf_token %}
 {% trans "Search:" %} <input type="text" name="search" value="{{search}}"> <input type="submit" value="Go">
 </form>
 <p>

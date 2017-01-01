@@ -5,7 +5,7 @@
 {% block pagetitle %}{% if new %}Create new{% else %}Edit{% endif %} school visit{% endblock %}
 
 {% block content %}
-<form action="/teaching/schoolvisit/new/" method="POST">
+<form action="/teaching/schoolvisit/new/" method="POST"> {% csrf_token %}
 <table>
   <tr>
     <td colspan="2"><strong>{% trans "Basic information" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
