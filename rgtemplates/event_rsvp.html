@@ -7,7 +7,7 @@
 
 {% block content %}
 <h4>{{ title_string }}</h4>
-<form action="/teaching/{{event_id}}/rsvp/{{user_id}}/{{ rsvp_type }}/" method="POST">
+<form action="/teaching/{{event_id}}/rsvp/{{user_id}}/{{ rsvp_type }}/" method="POST"> {% csrf_token %}
 {% if rsvpform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s)" %}:<br>

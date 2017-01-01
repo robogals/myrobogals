@@ -107,7 +107,7 @@
 		</div>
 		</td>
 	</tr>
-			<form action="/forums/editpost/{{ post.1.pk }}/?return={{return|urlencode}}%23{{post.1.pk}}" method="POST" enctype="multipart/form-data">
+			<form action="/forums/editpost/{{ post.1.pk }}/?return={{return|urlencode}}%23{{post.1.pk}}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
 			  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 				<td valign="top" style="border-right: solid 1px grey; border-top: solid 1px grey;"><strong>{% trans "Message:" %}</strong></td>
 				<td style="border-top: solid 1px grey;">{{ postform.message }}</td>
@@ -128,7 +128,7 @@
 	{% endif %}
 	{% endfor %}
 {% if not editPost %}
-<form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST" enctype="multipart/form-data">
+<form action="/forums/newpost/{{ topic.pk }}/?return={{returnLastPage|urlencode}}" method="POST" enctype="multipart/form-data"> {% csrf_token %}
   <tr class="{% if posts.object_list|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="border-top:solid 1px grey;">
     <td valign="top"><a name="end"></a><strong>{% trans "Message:" %}</strong></td>
     <td>{{ postform.message }}</td>

@@ -62,7 +62,7 @@
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
-	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST"> {% csrf_token %}
 	<table>
 	<tr>
 		<td>{% trans "new forum name:" %}</td>
@@ -131,7 +131,7 @@
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
-	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST"> {% csrf_token %}
 	<table>
 	<tr>
 		<td>{% trans "new forum name:" %}</td>
@@ -192,7 +192,7 @@
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td colspan="{% if user.is_superuser or user.is_staff %}5{% else %}4{% endif %}">
-	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST"> {% csrf_token %}
 	<table>
 	<tr>
 		<td>{% trans "new forum name:" %}</td>
@@ -253,7 +253,7 @@
 	{% ifequal editForum forum.pk %}
 	<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	<td colspan="{% if user.is_staff %}5{% else %}4{% endif %}">
-	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST">
+	<form action="/forums/editforum/{{ forum.pk }}/?return={{return|urlencode}}" method="POST"> {% csrf_token %}
 	<table>
 	<tr>
 		<td>{% trans "new forum name:" %}</td>
@@ -285,7 +285,7 @@
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
 <h4 class="module-title">Add new category</h4>
-<form action="/forums/newcategory/" method="GET">
+<form action="/forums/newcategory/" method="GET"> {% csrf_token %}
 <table>
 	<tr>
 		<td>{% trans "Category name:" %}</td> <td><input type="text" name="category" size="34" maxlength="80"></td>
@@ -324,7 +324,7 @@
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
 <h4 class="module-title">Add new forum</h4>
-<form action="/forums/newforum/" method="GET">
+<form action="/forums/newforum/" method="GET"> {% csrf_token %}
 <table>
 	<tr>
 		<td>{% trans "Forum name:" %}</td>

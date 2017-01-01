@@ -6,7 +6,7 @@
 {% block pagetitle %}Chapter visit list{% endblock %}
 
 {% block content %}
-<form action="/teaching/printlist/" method="post">
+<form action="/teaching/printlist/" method="post"> {% csrf_token %}
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}

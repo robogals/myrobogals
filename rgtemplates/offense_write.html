@@ -6,7 +6,7 @@
 {% block pagetitle %}{% trans "Report Offenses" %}{% endblock %}
 
 {% block content %}
-<form action="/forums/post/fileoffenses/{{post.pk}}/" method="POST">
+<form action="/forums/post/fileoffenses/{{post.pk}}/" method="POST"> {% csrf_token %}
 {% if offenseForm.errors %}
 <div class="error">
 {% trans "Please correct the following field(s)" %}:<br>

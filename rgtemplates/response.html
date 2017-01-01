@@ -8,7 +8,7 @@
 {% block content %}
 <p>{{msg}}</p>
 {% if next_url %}
-<form action="{{next_url}}" method="POST">
+<form action="{{next_url}}" method="POST"> {% csrf_token %}
 <input type="submit" value="Yes" />
 </form>
 {% endif %}

@@ -15,7 +15,7 @@
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
 <h4 class="module-title">Search members</h4>
-<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET">
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/" method="GET"> {% csrf_token %}
 {% trans "Username, name, email or mobile:" %} <input type="text" name="search" value="{{search}}">
 {% trans "Status:" %}
 <select name="status">
@@ -54,7 +54,7 @@
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
 <h4 class="module-title">Export to CSV file</h4>
-<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/export/" method="GET">
+<form action="/chapters/{{chapter.myrobogals_url}}/edit/users/export/" method="GET"> {% csrf_token %}
 {% trans "Member status:" %}
 <select name="status">
 {% for memberstatustype in memberstatustypes %}

@@ -5,7 +5,7 @@
 {% block pagetitle %}{% blocktrans with c.name as chapter %}Edit chapter: {{chapter}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<form action="/chapters/{{c.myrobogals_url}}/edit/" method="POST">
+<form action="/chapters/{{c.myrobogals_url}}/edit/" method="POST"> {% csrf_token %}
 <a href="/chapters/{{c.myrobogals_url}}/">{% trans "Return to chapter page" %}</a> | <a href="/chapters/{{c.myrobogals_url}}/edit/users/">{% trans "Manage members" %}</a>
 <div style="margin-top: 8px; margin-bottom: 8px">
 Most options can be modified here, but you will need to contact <strong>support@robogals.org</strong> if you wish to do any of the following:

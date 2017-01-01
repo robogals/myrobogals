@@ -29,7 +29,7 @@
                 {% else %}
                              <h3 class="module-title">{% trans "Login Form" %}</h3>
 <div class="main-login-form">
-    <form action="/login/process/" method="post" name="login" class="form-login">
+    <form action="/login/process/" method="post" name="login" class="form-login"> {% csrf_token %}
                 <div class="username-block">
             <input name="username" type="text" class="inputbox" value="Username or Email" alt="Username or Email" onblur="if(this.value=='') this.value='Username or Email';" onfocus="if(this.value=='Username or Email') this.value='';" />
 

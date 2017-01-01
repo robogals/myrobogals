@@ -10,7 +10,7 @@
 <div class ="error">
 <strong>{% trans "Once a workshop is cancelled it will be removed from the database and you will not be able to edit it again. Only cancel a workshop if you are sure it is not happening." %}</strong>
 </div>
-<form action="/teaching/{{visit_id}}/cancel/" method="POST">
+<form action="/teaching/{{visit_id}}/cancel/" method="POST"> {% csrf_token %}
 {% if cancelform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s):" %}<br>

@@ -5,7 +5,7 @@
 {% block pagetitle %}Confirm deletion of {{userToBeDeleted.get_full_name}}{% endblock %}
 
 {% block content %}
-<form action="/delete/user/{{userToBeDeleted.pk}}/?return={{return|urlencode}}" method="post">
+<form action="/delete/user/{{userToBeDeleted.pk}}/?return={{return|urlencode}}" method="post"> {% csrf_token %}
 <p>
 You should only delete a member if this is a duplicate account, was created accidentally, or is otherwise very insignificant. If this is a former member, we suggest you mark them as 'alumni' rather than deleting the account. You can mark members as 'alumni' in bulk in Chapter &gt; Manage members &gt; Edit member status
 </p>

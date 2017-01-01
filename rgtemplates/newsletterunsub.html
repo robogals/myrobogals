@@ -6,7 +6,7 @@
 {% block pagetitle %}{% blocktrans with c.name as chapter %}Unsubscribe from {{chapter}} newsletter{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<form action="/newsletter/{{c.myrobogals_url}}/unsubscribe/" method="post">
+<form action="/newsletter/{{c.myrobogals_url}}/unsubscribe/" method="post"> {% csrf_token %}
 <table>
   {% if errmsg %}
   <tr>

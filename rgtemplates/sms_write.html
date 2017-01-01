@@ -6,7 +6,7 @@
 {% block pagetitle %}{% trans "Send bulk SMS" %}{% endblock %}
 
 {% block content %}
-<form action="/messages/sms/write/" method="POST" id="fm_sendsms">
+<form action="/messages/sms/write/" method="POST" id="fm_sendsms"> {% csrf_token %}
 {% if smsform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s):" %}<br>

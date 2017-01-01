@@ -95,6 +95,7 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'myrobogals.rgmain.middleware.TimezoneMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -167,3 +168,7 @@ GENDERS = (
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# Used to debug emails without STMP servers set up on local machine
+if DEBUG:
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

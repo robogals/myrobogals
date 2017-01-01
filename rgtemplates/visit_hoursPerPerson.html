@@ -5,7 +5,7 @@
 {% block pagetitle %}{% trans "Enter hours per person" %}{% endblock %}
 
 {% block content %}
-<form action="/teaching/{{visit_id}}/statsHoursPerPerson/" method="POST">
+<form action="/teaching/{{visit_id}}/statsHoursPerPerson/" method="POST"> {% csrf_token %}
 	<table width="400px" style="table-layout:fixed;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 		<col width="100px" />
 		<col width="75px" />

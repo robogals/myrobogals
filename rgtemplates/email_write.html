@@ -43,7 +43,7 @@ function previewEmail() {
 	post_to_url("/messages/previewemail/", {"header": header, "msg": msg}, "post");
 }
 </script>
-<form action="/messages/email/write/" method="POST">
+<form action="/messages/email/write/" method="POST"> {% csrf_token %}
 {% if emailform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s)" %}:<br>

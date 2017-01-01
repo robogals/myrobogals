@@ -8,7 +8,7 @@
 {% block pagetitle %}Confirm deletion of post file{% endblock %}
 
 {% block content %}
-<form action="/forums/deletefile/{{post.pk}}/{{file_id}}/?return={{return|urlencode}}" method="post">
+<form action="/forums/deletefile/{{post.pk}}/{{file_id}}/?return={{return|urlencode}}" method="post"> {% csrf_token %}
 <table width="100%" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
 	<tr style="color:white; background-color:#1366A3">
 		<td width="140">{% trans "Poster" %}</td>

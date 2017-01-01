@@ -10,7 +10,7 @@
 <div class="round5"><div class="moduletable" style="padding-left: 0px; padding-right: 0px"><div class="module-surround">
 <div class="module-grad"></div><div class="module-surround2"></div><div class="module-surround3"></div><div class="module-surround4"></div><div class="module-surround5"></div>
 <div class="module-inner">
-<form action="/profile/contactdirectory/" method="GET">
+<form action="/profile/contactdirectory/" method="GET"> {% csrf_token %}
 <table>
 	<tr>
 		<td>{% trans "Name:" %}</td>

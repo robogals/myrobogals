@@ -6,9 +6,9 @@
 
 {% block content %}
 {% if new %}
-<form action="/teaching/new/" method="POST">
+<form action="/teaching/new/" method="POST"> {% csrf_token %}
 {% else %}
-<form action="/teaching/{{visit_id}}/edit/" method="POST">
+<form action="/teaching/{{visit_id}}/edit/" method="POST"> {% csrf_token %}
 {% endif %}
 <table>
   <tr>

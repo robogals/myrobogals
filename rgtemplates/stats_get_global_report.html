@@ -6,7 +6,7 @@
 {% block pagetitle %}Global workshop reports{% endblock %}
 
 {% block content %}
-<form action="/globalreports/" method="post">
+<form action="/globalreports/" method="post"> {% csrf_token %}
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}

@@ -6,7 +6,7 @@
 {% block pagetitle %}{% trans "Invite/add to school visit" %}{% endblock %}
 
 {% block content %}
-<form action="/teaching/{{visit_id}}/invite/" method="POST">
+<form action="/teaching/{{visit_id}}/invite/" method="POST"> {% csrf_token %}
 {% if inviteform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s):" %}<br>

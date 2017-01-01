@@ -6,7 +6,7 @@
 
 {% block content %}
 {% if showall %}
-<form action="/teaching/list/" method="GET">
+<form action="/teaching/list/" method="GET"> {% csrf_token %}
 {% trans "Filter by chapter:" %} {{chapterform.chapter}}
 <input type="submit" value="{% trans "Go" %}">
 </form>

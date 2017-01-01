@@ -36,7 +36,7 @@
                                     <a href="http://www.rockettheme.com/" title="RocketTheme Joomla Templates Club" id="rocket"></a>
 -->
             <div id="copyright">
-<form action="/i18n/setlang/" method="post">
+<form action="/i18n/setlang/" method="post"> {% csrf_token %}
 <input name="next" type="hidden" value="{{request.path}}" />
 <select name="language">
 {% for lang in LANGUAGES %}

@@ -6,7 +6,7 @@
 {% block pagetitle %}{% blocktrans with conf_name=conf.name %}Email attendees of {{conf_name}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
-<form action="/conferences/{{conf.pk}}/email/" method="POST">
+<form action="/conferences/{{conf.pk}}/email/" method="POST"> {% csrf_token %}
 {% if emailform.errors %}
 <div class="error">
 {% trans "Please correct the following field(s):" %}<br>
