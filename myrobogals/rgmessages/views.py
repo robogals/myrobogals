@@ -28,6 +28,7 @@ from pytz import utc
 from decimal import *
 from operator import itemgetter
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -815,6 +816,7 @@ def api(request):
 	else:
 		return HttpResponse("-1")
 
+@csrf_exempt
 def dlrapi(request):
 	try:
 		msg = SMSRecipient.objects.get(gateway_msg_id=request.GET['msgid'])
