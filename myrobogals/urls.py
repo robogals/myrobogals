@@ -151,11 +151,6 @@ urlpatterns = patterns('',
 	(r'^credits/$', 'myrobogals.rgmain.views.credits'),
 	(r'^support/$', 'myrobogals.rgmain.views.support'),
 
-	# Chapter-based newsletter API
-	(r'^newsletter/(?P<chapterurl>.+)/subscribe/$', 'myrobogals.rgprofile.views.newslettersub'),
-	(r'^newsletter/(?P<chapterurl>.+)/subscribe/done/$', 'myrobogals.rgprofile.views.newslettersubdone'),
-	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/$', 'myrobogals.rgprofile.views.newsletterunsub'),
-	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/done/$', 'myrobogals.rgprofile.views.newsletterunsubdone'),
 	# Careers newsletter API
 	(r'^api/newslettercareers/$', 'myrobogals.rgmessages.views.careersapi'),
 	# Amplifier newsletter API
