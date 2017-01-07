@@ -23,7 +23,6 @@
 {% if user.email_public %}
 <strong>{% trans "Email address:" %}</strong> {% hide_email user.email %}<br />
 {% endif %}
-{% if show_course %}
 {% if user.course %}
 <strong>{% trans "Course:" %}</strong> {{user.course}} at {% if user.university %}{{user.university}}{% endif %}
 {% if user.graduation_year %}
@@ -31,11 +30,11 @@
 {% endif %}
 <br />
 {% endif %}
-{% endif %}
-{% if show_job %}
 {% if user.job_title %}
-<strong>{% trans "Occupation:" %}</strong> {{user.job_title}} at {% if user.company %}{{user.company}}{% endif %}<br />
+<strong>{% trans "Occupation:" %}</strong> {{user.job_title}}<br />
 {% endif %}
+{% if user.company %}
+<strong>{% trans "Employer:" %}</strong> {{user.company}}<br />
 {% endif %}
 {% if current_positions %}
 <br />

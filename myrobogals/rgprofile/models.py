@@ -15,7 +15,6 @@ class MemberStatusType(models.Model):
 	)
 	description = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Chapter, null=True, blank=True)
-	type_of_person = models.IntegerField(choices=PERSONTYPES, default=0)
 	
 	def idstr(self):
 		return str(self.id)
@@ -142,9 +141,9 @@ class User(AbstractUser):
 		n_total = len(ms_list)
 		if n_total == 0:
 			# This member never had a type
-			# Create the type "Student" effective from join date
-			student = MemberStatusType.objects.get(pk=1)
-			ms = MemberStatus(user=self, status_date_start=self.date_joined.date(), status_date_end=None, statusType=student)
+			# Create the type "Volunteer" effective from join date
+			volunteer = MemberStatusType.objects.get(pk=1)
+			ms = MemberStatus(user=self, status_date_start=self.date_joined.date(), status_date_end=None, statusType=volunteer)
 			ms.save()
 			return student
 		else:
@@ -244,3 +243,6 @@ class UserList(models.Model):
 	
 	def __unicode__(self):
 		return self.name
+
+# Import and register the signal handlers in signals.py
+import signals

@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus, MemberStatusType
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
-from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
+from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.rgmain.utils import SelectDateWidget, email_re
@@ -407,14 +407,6 @@ def detail(request, username):
 
 	current_positions = Position.objects.filter(user=u, position_date_end__isnull=True)
 	past_positions = Position.objects.filter(user=u, position_date_end__isnull=False)
-	if u.membertype().type_of_person == 1:  # Student
-		show_course = True
-	else:
-		show_course = False
-	if u.membertype().type_of_person == 2:  # Industry
-		show_job = True
-	else:
-		show_job = False
 	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())).union(set([u])))
 	for account in account_list:
 		subAliasesSet = set(ac for ac in account.aliases.all())
@@ -424,7 +416,7 @@ def detail(request, username):
 			if alias not in account_list:
 				account_list.append(alias)
 	visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
-	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
+	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'visits': visits}, context_instance=RequestContext(request))
 
 @login_required
 def contactdirectory(request):
@@ -606,7 +598,7 @@ class FormPartOne(forms.Form):
 	tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
-	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS, initial=2)
+	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS)
 
 # Privacy settings
 class FormPartTwo(forms.Form):
@@ -652,6 +644,8 @@ class FormPartThree(forms.Form):
 	university = forms.ModelChoiceField(label=_('University'), queryset=University.objects.all(), required=False)
 	course_type = forms.ChoiceField(label=_('Course level'), choices=COURSE_TYPE_CHOICES, required=False)
 	student_type = forms.ChoiceField(label=_('Student type'), choices=STUDENT_TYPE_CHOICES, required=False)
+	job_title = forms.CharField(label=_('Occupation'), max_length=128, required=False)
+	company = forms.CharField(label=_('Employer'), max_length=128, required=False)
 	bio = forms.CharField(label=_('About me (for profile page)'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	#job_title = forms.CharField(_('Job title'), max_length=128, required=False)
 	#company = forms.CharField(_('Company'), max_length=128, required=False)
@@ -788,6 +782,8 @@ def edituser(request, username, chapter=None):
 					u.university = data['university']
 					u.course_type = data['course_type']
 					u.student_type = data['student_type']
+					u.job_title = data['job_title']
+					u.company = data['company']
 					u.bio = data['bio']
 					#u.job_title = data['job_title']
 					#u.company = data['company']
@@ -1251,57 +1247,3 @@ def unilist(request, chapterurl):
 		raise Http404
 	unis = University.objects.all()
 	return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))
-
-class NewsletterForm(forms.Form):
-	first_name = forms.CharField(label=_('First name'), max_length=30)
-	last_name = forms.CharField(label=_('Last name'), max_length=30)
-	email = forms.EmailField(label=_('Email'), max_length=64)
-
-class NewsletterUnForm(forms.Form):
-	email = forms.EmailField(label=_('Email'), max_length=64)
-
-def newslettersub(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	errmsg = ''
-	if request.method == 'POST':
-		newsletterform = NewsletterForm(request.POST)
-		if newsletterform.is_valid():
-			data = newsletterform.cleaned_data
-			try:
-				subtonews(data['first_name'], data['last_name'], data['email'], chapter.pk)
-				return HttpResponseRedirect('/newsletter/' + chapterurl + '/subscribe/done/')
-			except SubToNewsException as e:
-				errmsg = e.errmsg
-	else:
-		if 'email' in request.GET:
-			newsletterform = NewsletterForm(request.GET)
-		else:
-			newsletterform = NewsletterForm()
-	return render_to_response('newslettersub.html', {'newsletterform': newsletterform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
-def newslettersubdone(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	return render_to_response('newslettersubdone.html', {'c': chapter}, context_instance=RequestContext(request))
-
-def newsletterunsub(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	errmsg = ''
-	if request.method == 'POST':
-		newsletterunform = NewsletterUnForm(request.POST)
-		if newsletterunform.is_valid():
-			data = newsletterunform.cleaned_data
-			try:
-				unsubtonews(data['email'], chapter.pk)
-				return HttpResponseRedirect('/newsletter/' + chapterurl + '/unsubscribe/done/')
-			except SubToNewsException as e:
-				errmsg = e.errmsg
-	else:
-		if 'email' in request.GET:
-			newsletterunform = NewsletterUnForm(request.GET)
-		else:
-			newsletterunform = NewsletterUnForm()
-	return render_to_response('newsletterunsub.html', {'newsletterunform': newsletterunform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
-def newsletterunsubdone(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	return render_to_response('newsletterunsubdone.html', {'c': chapter}, context_instance=RequestContext(request))

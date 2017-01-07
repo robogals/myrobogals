@@ -45,6 +45,9 @@ class Timezone(models.Model):
 
 	def tz_obj(self):
 		return timezone(self.description)
+	
+	class Meta:
+		ordering = ['description',]
 
 class MobileRegexCollection(models.Model):
 	description = models.CharField(max_length=64)

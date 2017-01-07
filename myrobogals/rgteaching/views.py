@@ -25,6 +25,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from myrobogals.rgmain.models import Subdivision
 import json, urllib, urllib2, math
 from django.utils.timezone import make_aware, localtime, now
+import math
+from django.utils import timezone
 
 @login_required
 def teachhome(request):
@@ -43,7 +45,7 @@ class SchoolVisitFormOne(forms.Form):
 	start_time = forms.TimeField(label=_('Start time'), initial='10:00:00')
 	end_time = forms.TimeField(label=_('End time'), initial='13:00:00')
 	location = forms.CharField(label=_("Location"), help_text=_("Where the workshop is taking place, at the school or elsewhere (can differ from meeting location, see below)"))
-	allow_rsvp = forms.ChoiceField(label=_("Allowed RSVPs"), choices=ALLOW_RSVP_CHOICES, initial=1)
+	allow_rsvp = forms.ChoiceField(label=_("Allowed RSVPs"), choices=ALLOW_RSVP_CHOICES, initial=0)
 
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
@@ -59,7 +61,7 @@ class SchoolVisitFormOne(forms.Form):
 		start = cleaned_data.get("start_time")
 		end = cleaned_data.get("end_time")
 		if start and end and end <= start:
-			msg = _("Start time must before End time.")
+			msg = _("Start time must be before end time.")
 			self._errors["start_time"] = self.error_class([msg])
 			self._errors["end_time"] = self.error_class([msg])
 			del cleaned_data["start_time"]
@@ -153,9 +155,14 @@ def editvisit(request, visit_id):
 					'location': v.location,
 					'school': v.school_id,
 					'allow_rsvp': v.allow_rsvp}, chapter=formchapter)
+				
+				if v.meeting_time:
+					meeting_time = localtime(v.meeting_time, timezone=chapter.tz_obj()).time()
+				else:
+					meeting_time = v.meeting_time
 				formpart2 = SchoolVisitFormTwo({
 					'meeting_location': v.meeting_location,
-					'meeting_time': localtime(v.meeting_time, timezone=chapter.tz_obj()).time(),
+					'meeting_time': meeting_time,
 					'contact': v.contact,
 					'contact_email': v.contact_email,
 					'contact_phone': v.contact_phone})
@@ -183,8 +190,8 @@ def newvisitwithschool(request, school_id):
 	school = get_object_or_404(School, pk=school_id)
 	v.chapter = request.user.chapter
 	v.creator = request.user
-	v.visit_start = datetime.datetime.now()
-	v.visit_end = datetime.datetime.now()
+	v.visit_start = timezone.now()
+	v.visit_end = timezone.now()
 	v.school = school
 	v.location = "Enter location"
 	v.save()
@@ -1067,10 +1074,8 @@ def stats(request, visit_id):
 				else:
 					person.actual_status = 2
 					person.save()
-						
-			defaultHours =  v.visit_end.hour - v.visit_start.hour
-			if v.visit_end.minute > v.visit_start.minute:
-				defaultHours += 1
+			
+			defaultHours = int(math.ceil((v.visit_end - v.visit_start).total_seconds() / 3600.0))
 			return render_to_response('visit_hoursPerPerson.html', {'attended': data['attended'], 'visit_id': visit_id, 'defaultHours': range(defaultHours)}, context_instance=RequestContext(request))
 		else:
 			request.session['hoursPerPersonStage'] = 1
@@ -1097,7 +1102,7 @@ def reopenvisit(request, visit_id):
 		messages.success(request, message=unicode(_("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of stats more than 6 months old - too risky
-	if (datetime.datetime.now() - v.visit_start) > datetime.timedelta(days=180):
+	if (timezone.now() - v.visit_start) > datetime.timedelta(days=180):
 		messages.success(request, message=unicode(_("- To protect against accidental deletion of old stats, workshops more than six months old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if 'confirm' in request.GET:

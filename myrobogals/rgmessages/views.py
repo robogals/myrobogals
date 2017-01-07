@@ -28,6 +28,7 @@ from pytz import utc
 from decimal import *
 from operator import itemgetter
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 def setmaxuploadfilesize(request):
@@ -298,8 +299,8 @@ class WriteSMSForm(forms.Form):
 		(2, 'Recipients\' timezones'),
 	)
 
-	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("Put your message here.  To opt-out reply 'stop'"))
-	from_type = forms.ChoiceField(choices=((0,"+61429558100 (myRobogals)"),), help_text=_('You can send SMSes from your own number if you <a href="%s">verify your number</a>') % '/profile/mobverify/')
+	body = forms.CharField(widget=forms.Textarea(attrs={'cols': '35', 'rows': '7', 'onkeyup': 'updateTextBoxCounter();'}), initial=_("Put your message here. To opt-out, change your preferences on myRobogals under profile settings"))
+	from_type = forms.ChoiceField(choices=((0,"Robogals"),), help_text=_('You can send SMSes from your own number if you <a href="%s">verify your number</a>') % '/profile/mobverify/')
 	recipients = SMSModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple("Recipients", False, attrs={'rows': 10}), required=False)
 	chapters = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
 	chapters_exec = forms.ModelMultipleChoiceField(queryset=Chapter.objects.all().order_by('name'), widget=FilteredSelectMultiple("Chapters", False, attrs={'rows': 10}), required=False)
@@ -320,7 +321,7 @@ class WriteSMSForm(forms.Form):
 		if user.mobile_verified:
 			self.fields['from_type'].choices = (
 				(1, "+" + user.mobile + " (you)"),
-				(0,"+61429558100 (myRobogals)"),
+				(0,"Robogals"),
 			)
 			self.fields['from_type'].initial = 1
 			self.fields['from_type'].help_text = ''
@@ -370,7 +371,7 @@ def writesms(request):
 					if int(data['from_type']) == 1 and request.user.mobile_verified:
 						message.senderid = str(request.user.mobile)
 					else:
-						message.senderid = '61429558100'
+						message.senderid = 'Robogals'
 					if request.POST['scheduling'] == '1':
 						message.scheduled = True
 						message.scheduled_date = datetime.combine(data['schedule_date'], data['schedule_time'])
@@ -815,6 +816,7 @@ def api(request):
 	else:
 		return HttpResponse("-1")
 
+@csrf_exempt
 def dlrapi(request):
 	try:
 		msg = SMSRecipient.objects.get(gateway_msg_id=request.GET['msgid'])

@@ -13,7 +13,7 @@ urlpatterns = patterns('',
 	(r'^chpass/$', 'django.contrib.auth.views.password_change', {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
 	url(r'^forgotpass/done/$', 'django.contrib.auth.views.password_reset_done', {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
 	(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name': 'password_reset_confirm.html'}),
-	(r'^forgotpass/complete/$', 'django.contrib.auth.views.password_reset_complete', {'template_name': 'password_reset_complete.html'}),
+	url(r'^forgotpass/complete/$', 'django.contrib.auth.views.password_reset_complete', {'template_name': 'password_reset_complete.html'}, name='password_reset_complete'),
 	(r'^forgotpass/$', 'django.contrib.auth.views.password_reset', {'template_name': 'password_reset_form.html', 'email_template_name': 'password_reset_email.html'}),
 	#(r'^unsubscribe/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', 'django.contrib.auth.views.unsubscribe'),
 	(r'^join/$', 'myrobogals.rgchapter.views.joinlist'),
@@ -151,11 +151,6 @@ urlpatterns = patterns('',
 	(r'^credits/$', 'myrobogals.rgmain.views.credits'),
 	(r'^support/$', 'myrobogals.rgmain.views.support'),
 
-	# Chapter-based newsletter API
-	(r'^newsletter/(?P<chapterurl>.+)/subscribe/$', 'myrobogals.rgprofile.views.newslettersub'),
-	(r'^newsletter/(?P<chapterurl>.+)/subscribe/done/$', 'myrobogals.rgprofile.views.newslettersubdone'),
-	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/$', 'myrobogals.rgprofile.views.newsletterunsub'),
-	(r'^newsletter/(?P<chapterurl>.+)/unsubscribe/done/$', 'myrobogals.rgprofile.views.newsletterunsubdone'),
 	# Careers newsletter API
 	(r'^api/newslettercareers/$', 'myrobogals.rgmessages.views.careersapi'),
 	# Amplifier newsletter API

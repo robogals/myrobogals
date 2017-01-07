@@ -1,11 +1,11 @@
-from myrobogals.rgprofile.models import User, PositionType, UserList, MemberStatus, Position, MemberStatusType
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BuiltinUserAdmin
-
 from django import forms
+from django.contrib import admin, messages
+from django.contrib.auth.admin import UserAdmin as BuiltinUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AdminPasswordChangeForm
+from django.http import HttpResponseRedirect
+from myrobogals.rgprofile.models import User, PositionType, UserList, MemberStatus, Position, MemberStatusType
 
 class PositionTypeAdmin(admin.ModelAdmin):
 	list_display = ('description', 'chapter', 'rank')
@@ -47,11 +47,11 @@ class UserAdmin(BuiltinUserAdmin):
 	filter_horizontal = ('aliases',)
 
 	# The admin section add user form doesn't work, so lets just redirect people to our own that does!
-	#def add_view(self, request):
-	#	return HttpResponseRedirect('/chapters/global/edit/users/add/?return=/topsecretarea/auth/user/')
+	def add_view(self, request):
+		return HttpResponseRedirect('/chapters/global/edit/users/add/?return=/topsecretarea/rgprofile/user/')
 
 class MemberStatusTypeAdmin(admin.ModelAdmin):
-	list_display = ('description', 'chapter', 'type_of_person')
+	list_display = ('description', 'chapter')
 	search_fields = ('description', 'chapter')
 
 admin.site.register(User, UserAdmin)
