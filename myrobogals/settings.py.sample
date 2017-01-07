@@ -28,6 +28,14 @@ DATABASES = {
 	}
 }
 
+# Uncomment this to use SQLite instead of MySQL
+#DATABASES = {
+#	'default': {
+#		'ENGINE': 'django.db.backends.sqlite3',
+#		'NAME': ROBOGALS_DIR + '/myrobogals.db',
+#	}
+#}
+
 USE_TZ = True
 TIME_ZONE = 'Etc/UTC'
 DATE_FORMAT = 'D j M y'
