@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from myrobogals.rgprofile.models import User, MemberStatus, MemberStatusType
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
-from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, subtonews, unsubtonews, RgImportCsvException, RgGenAndSendPwException, SubToNewsException
+from myrobogals.rgprofile.functions import importcsv, genandsendpw, any_exec_attr, RgImportCsvException, RgGenAndSendPwException
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgmain.models import University, MobileRegex
 from myrobogals.rgmain.utils import SelectDateWidget, email_re
@@ -1251,57 +1251,3 @@ def unilist(request, chapterurl):
 		raise Http404
 	unis = University.objects.all()
 	return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))
-
-class NewsletterForm(forms.Form):
-	first_name = forms.CharField(label=_('First name'), max_length=30)
-	last_name = forms.CharField(label=_('Last name'), max_length=30)
-	email = forms.EmailField(label=_('Email'), max_length=64)
-
-class NewsletterUnForm(forms.Form):
-	email = forms.EmailField(label=_('Email'), max_length=64)
-
-def newslettersub(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	errmsg = ''
-	if request.method == 'POST':
-		newsletterform = NewsletterForm(request.POST)
-		if newsletterform.is_valid():
-			data = newsletterform.cleaned_data
-			try:
-				subtonews(data['first_name'], data['last_name'], data['email'], chapter.pk)
-				return HttpResponseRedirect('/newsletter/' + chapterurl + '/subscribe/done/')
-			except SubToNewsException as e:
-				errmsg = e.errmsg
-	else:
-		if 'email' in request.GET:
-			newsletterform = NewsletterForm(request.GET)
-		else:
-			newsletterform = NewsletterForm()
-	return render_to_response('newslettersub.html', {'newsletterform': newsletterform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
-def newslettersubdone(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	return render_to_response('newslettersubdone.html', {'c': chapter}, context_instance=RequestContext(request))
-
-def newsletterunsub(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	errmsg = ''
-	if request.method == 'POST':
-		newsletterunform = NewsletterUnForm(request.POST)
-		if newsletterunform.is_valid():
-			data = newsletterunform.cleaned_data
-			try:
-				unsubtonews(data['email'], chapter.pk)
-				return HttpResponseRedirect('/newsletter/' + chapterurl + '/unsubscribe/done/')
-			except SubToNewsException as e:
-				errmsg = e.errmsg
-	else:
-		if 'email' in request.GET:
-			newsletterunform = NewsletterUnForm(request.GET)
-		else:
-			newsletterunform = NewsletterUnForm()
-	return render_to_response('newsletterunsub.html', {'newsletterunform': newsletterunform, 'c': chapter, 'errmsg': errmsg}, context_instance=RequestContext(request))
-
-def newsletterunsubdone(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	return render_to_response('newsletterunsubdone.html', {'c': chapter}, context_instance=RequestContext(request))

@@ -20,12 +20,6 @@ class RgGenAndSendPwException(Exception):
 	def __str__(self):
 		return self.errmsg
 
-class SubToNewsException(Exception):
-	def __init__(self, errmsg):
-		self.errmsg = errmsg
-	def __str__(self):
-		return self.errmsg
-
 def stringval(colname, cell, newuser, defaults):
 	data = cell.strip()
 	if data != "":
@@ -463,46 +457,3 @@ def genandsendpw(user, welcomeemail, chapter):
 
 def any_exec_attr(u):
 	return (u.is_staff or u.has_cur_pos() or u.has_robogals_email())
-
-def subtonews(first_name, last_name, email, chapter_id):
-        cursor = connection.cursor()
-        cursor.execute('SELECT u.id, u.email_chapter_optin FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id))
-        user = cursor.fetchone()
-        if user:
-        	if int(user[1]) == 1:
-        		raise SubToNewsException(_('That email address is already subscribed'))
-        	else:
-        		# reinstate a previous subscriber's subscription
-        		user = User.objects.get(pk=user[0])
-        		user.email_chapter_optin = True
-        		user.first_name = first_name
-        		user.last_name = last_name
-        		user.save()
-        else:
-        	user = User()
-        	columns = ['first_name', 'last_name', 'email']
-        	row = [first_name, last_name, email]
-        	user.username = generate_unique_username(row, columns)
-        	user.first_name = first_name
-        	user.last_name = last_name
-        	user.email = email
-        	user.chapter_id = chapter_id
-        	user.email_chapter_optin = True
-        	user.date_joined = timezone.now()
-		user.save()
-
-		# Must be called after save() because the primary key
-		# is required for these
-		mt = MemberStatus(user_id=user.pk, statusType_id=8)
-		mt.save()
-
-def unsubtonews(email, chapter_id):
-        cursor = connection.cursor()
-        cursor.execute('SELECT u.id FROM rgprofile_user as u, rgprofile_memberstatus as ms WHERE u.email = "' + email + '" AND u.id = ms.user_id AND ms.status_date_end IS NULL AND ms.statusType_id = 8 AND u.chapter_id = ' + str(chapter_id) + ' AND u.email_chapter_optin = 1')
-        user = cursor.fetchone()
-        if user:
-        	user = User.objects.get(pk=user[0])
-        	user.email_chapter_optin = False
-        	user.save()
-        else:
-        	raise SubToNewsException(_('That email address is not subscribed'))
