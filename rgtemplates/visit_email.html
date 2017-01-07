@@ -1,9 +1,9 @@
 {% extends "base_tinymce.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Email invitees of a school visit" %}{% endblock %}
+{% block title %}{% trans "Email workshop invitees" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Email invitees of a school visit" %}{% endblock %}
+{% block pagetitle %}{% trans "Email workshop invitees" %}{% endblock %}
 
 {% block content %}
 <form action="/teaching/{{visit_id}}/email/" method="POST"> {% csrf_token %}

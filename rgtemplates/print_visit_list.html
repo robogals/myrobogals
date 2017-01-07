@@ -1,6 +1,6 @@
 {% load i18n %}
 <html>
-	<head><title>myRobogals school visit list</title></head>
+	<head><title>myRobogals workshop list</title></head>
 	<body>
 		<table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0" style="border: solid 1px">
 		  <tr class="even" style="border: solid 1px">
@@ -8,6 +8,9 @@
 		    <td><strong>{% trans "School" %}</strong></td>
 		    <td><strong>{% trans "Number of girls" %}</strong></td>
 		    <td><strong>{% trans "Type of visit" %}</strong></td>
+{% if showall %}
+		    <td><strong>{% trans "Chapter" %}</strong></td>
+{% endif %}
 		  </tr>
 		{% for v in visits %}
 		{% if v.get_stats %}
@@ -16,6 +19,9 @@
 		    <td>{{v.school}}</td>
 		    <td>{{v.get_num_girls_display}}</td>
 		    <td>{{v.get_type}}</td>
+{% if showall %}
+		    <td>{{v.chapter}}</td>
+{% endif %}
 		  </tr>
 		{% endif %}
 		{% endfor %}

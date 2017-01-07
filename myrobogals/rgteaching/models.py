@@ -6,6 +6,8 @@ from datetime import datetime
 import json, urllib, urllib2
 from django.utils.timezone import localtime
 
+# A school added to myRobogals by a schools manager or similar.
+# A workshop must be linked to a "school"
 class School(models.Model):
 	name = models.CharField(max_length=64)
 	chapter = models.ForeignKey(Chapter)
@@ -23,6 +25,7 @@ class School(models.Model):
 	def __unicode__(self):
 		return self.name
 
+# A school in the schools directory. This data is imported in bulk.
 class DirectorySchool(models.Model):
 	TYPE_CHOICES = (
 		(0, 'Government'),
@@ -69,6 +72,7 @@ class DirectorySchool(models.Model):
 	class Meta:
 		ordering = ('name',)
 
+	# Automatically get latitude-longitude based on the street address
 	def save(self, *args, **kwargs):
 		if (self.latitude == None) or (self.longitude == None):
 			try:
@@ -88,10 +92,12 @@ class DirectorySchool(models.Model):
 				pass
 		super(DirectorySchool, self).save(*args, **kwargs)
 
+# Stores when a chapter has "starred" a school in the directory
 class StarSchoolDirectory(models.Model):
 	school = models.ForeignKey(DirectorySchool)
 	chapter = models.ForeignKey(Chapter)
 
+# Base class for all events (e.g. workshops, training sessions)
 class Event(models.Model):
 	STATUS_CHOICES = (
 		(0, 'Open'),
@@ -124,6 +130,9 @@ class Event(models.Model):
 		end_time_local = localtime(self.visit_end, timezone=self.chapter.tz_obj())
 		return start_time_local.strftime('%B %d, %Y, %I:%M %p') + ' to ' + end_time_local.strftime('%I:%M %p')
 
+# This model represents a workshop. Despite the historic model name "SchoolVisit", the
+# user interface now uses the term "workshop", recognising that not all workshops
+# involve visiting a school.
 class SchoolVisit(Event):
 	school = models.ForeignKey(School)
 	numstudents = models.CharField("Number of girls", max_length=32, blank=True)
@@ -141,12 +150,15 @@ class SchoolVisit(Event):
 	def get_absolute_url(self):
 		return "/teaching/%d/" % self.pk
 	
+	# Returns the attached stats object, if there is one
 	def get_stats(self):
 		try:
 			return self.schoolvisitstats_set.all()[0]
 		except IndexError:
 			return None
-	
+
+	# Returns the type of workshop (e.g. "Robogals career talk")
+	# This type is selected when the stats are entered in
 	def get_type(self):
 		stats = self.get_stats()
 		if stats == None:
@@ -154,6 +166,7 @@ class SchoolVisit(Event):
 		else:
 			return stats.get_visit_type_display()
 	
+	# If stats have been entered, returns the number of girls taught at this workshop
 	def get_num_girls_display(self):
 		stats = self.get_stats()
 		if stats == None:
@@ -164,12 +177,15 @@ class SchoolVisit(Event):
 	class Meta:
 		ordering = ['-visit_start']
 
+# A message left on the event page. A user RSVPing to an event may optionally leave a message.
 class EventMessage(models.Model):
 	event = models.ForeignKey(Event)
 	user = models.ForeignKey(User)
 	date = models.DateTimeField()
 	message = models.TextField("RSVP message")
 
+# Class that inherits from Event, to represent a training session for volunteers.
+# Not currently used.
 class TrainingSession(Event):
 	def __unicode__(self):
 		return "Training session at " + self.location + " by " + str(self.chapter) + " on " + str(self.visit_start.date())
@@ -177,6 +193,7 @@ class TrainingSession(Event):
 	class Meta:
 		verbose_name = "training session"
 
+# Model used to record RSVPs (while event open) and actual attendance (after event closed)
 class EventAttendee(models.Model):
     RSVP_STATUS_CHOICES = (
     	(0, 'N/A'),
@@ -201,30 +218,36 @@ class EventAttendee(models.Model):
     def __unicode__(self):
     	return self.user.get_full_name()
 
+# Types of workshops. These are defined in visit_stats_help.html
+VISIT_TYPES_BASE = (
+	(0, 'Robogals workshop, metro area'),
+	(7, 'Robogals workshop, regional area'),
+	(1, 'Robogals career talk'),
+	(2, 'Robogals event'),
+	(3, 'Non-Robogals workshop'),
+	(4, 'Non-Robogals career talk'),
+	(5, 'Non-Robogals event'),
+	(6, 'Other'),
+)
+
+# Types of reports.
+# This includes some special options like combining metro and regional figures.
 VISIT_TYPES_REPORT = (
-	(-2, 'Robogals robotics workshops, sum of metro and regional'),
-	(0, 'Robogals robotics workshops, metro area'),
-	(7, 'Robogals robotics workshops, regional area'),
+	(-2, 'Robogals workshops, sum of metro and regional'),
+	(0, 'Robogals workshops, metro area'),
+	(7, 'Robogals workshops, regional area'),
 	(1, 'Robogals career talks'),
 	(2, 'Robogals events'),
-	(3, 'Non-Robogals robotics workshops'),
+	(3, 'Non-Robogals workshops'),
 	(4, 'Non-Robogals career talks'),
 	(5, 'Non-Robogals events'),
 	(6, 'Other'),
 	(-1, 'Sum of all categories'),
 )
 
-VISIT_TYPES_BASE = (
-	(0, 'Robogals robotics workshop, metro area'),
-	(7, 'Robogals robotics workshop, regional area'),
-	(1, 'Robogals career talk'),
-	(2, 'Robogals event'),
-	(3, 'Non-Robogals robotics workshop'),
-	(4, 'Non-Robogals career talk'),
-	(5, 'Non-Robogals event'),
-	(6, 'Other'),
-)
-
+# A set of statistics attached to a SchoolVisit (workshop) object.
+# These stats are entered in when the SchoolVisit (workshop) is closed.
+# There should be a maximum of one SchoolVisitStats object for each SchoolVisit object.
 class SchoolVisitStats(models.Model):
 	visit = models.ForeignKey(SchoolVisit, editable=False)
 	visit_type = models.IntegerField(choices=VISIT_TYPES_BASE, null=False)
@@ -240,8 +263,9 @@ class SchoolVisitStats(models.Model):
 	other_girls_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
 	other_boys_first = models.PositiveSmallIntegerField(blank=True, null=True)
 	other_boys_repeat = models.PositiveSmallIntegerField(blank=True, null=True)
-	notes = models.TextField("General Notes", blank=True)
+	notes = models.TextField("General notes", blank=True)
 
+	# Add up the total number of girls taught at this workshop
 	def num_girls(self):
 		sum = 0
 		if self.primary_girls_first:
@@ -258,6 +282,8 @@ class SchoolVisitStats(models.Model):
 			sum += self.other_girls_repeat
 		return sum
 
+	# Add up the total number of girls taught at this workshop,
+	# with repeat visits given a 0.5 weighting
 	def num_girls_weighted(self):
 		sum = 0.0
 		if self.primary_girls_first:
@@ -274,6 +300,7 @@ class SchoolVisitStats(models.Model):
 			sum += (float(self.other_girls_repeat) / 2)
 		return sum
 
+	# The chapter that ran this workshop
 	def chapter(self):
 		return self.visit.chapter
 

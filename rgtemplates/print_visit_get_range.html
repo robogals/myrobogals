@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}Chapter visit list{% endblock %}
+{% block title %}Retrieve printable workshop list{% endblock %}
 
-{% block pagetitle %}Chapter visit list{% endblock %}
+{% block pagetitle %}Retrieve printable workshop list{% endblock %}
 
 {% block content %}
 <form action="/teaching/printlist/" method="post"> {% csrf_token %}
