@@ -97,8 +97,8 @@ function initialize() {
 		position: new google.maps.LatLng({{L1}},{{G1}}),
 		map: map,
 		title: "{{origin}}",
-		icon: "{{MEDIA_URL}}/images/greenMarkerDot.png",
-		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+		icon: "{{ MEDIA_URL }}images/greenMarkerDot.png",
+		shadow: new google.maps.MarkerImage("{{ MEDIA_URL }}images/markerShadow.png",
 											new google.maps.Size(37, 34),
 											new google.maps.Point(0, 0),
 											new google.maps.Point(10, 34))
@@ -131,8 +131,8 @@ function initialize() {
 		position: new google.maps.LatLng({{s.latitude}},{{s.longitude}}),
 		map: map,
 		title: distance_{{s.pk}},
-		icon: "{{MEDIA_URL}}/images/redMarker{{forloop.counter|chr}}.png",
-		shadow: new google.maps.MarkerImage("{{MEDIA_URL}}/images/markerShadow.png",
+		icon: "{{ MEDIA_URL }}images/redMarker{{forloop.counter|chr}}.png",
+		shadow: new google.maps.MarkerImage("{{ MEDIA_URL }}images/markerShadow.png",
 											new google.maps.Size(37, 34),
 											new google.maps.Point(0, 0),
 											new google.maps.Point(10, 34))
@@ -219,9 +219,9 @@ google.maps.event.addDomListener(window, 'load', initialize);
 {% for s in schools.object_list %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 	{% if s.id in star_schools %}
-	<td><a href="/teaching/unstarschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/gold_star.png" alt="Star" height="18" width="18"/></a></td>
+	<td><a href="/teaching/unstarschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/gold_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% else %}
-	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{MEDIA_URL}}/images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
+	<td><a href="/teaching/starschool/?school_id={{s.id}}&chapterurl={{chapterurl}}&return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/empty_star.png" alt="Star" height="18" width="18"/></a></td>
 	{% endif %}
 
 	{% if sch_list %}
