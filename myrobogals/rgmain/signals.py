@@ -27,7 +27,7 @@ def update_timezones(sender, **kwargs):
 		print("Added timezone " + tzone.description)
 
 	if len(timezones_to_remove) == 0:
-		print("Timezones in rgmain_timezone are up to date")
+		print("Timezones in SQL table rgmain_timezone are up to date")
 	else:
 		print("The following timezones need to be manually removed from your database (table rgmain_timezone) after confirming that no chapters use them:")
 		for timezone in timezones_to_remove:
@@ -35,9 +35,10 @@ def update_timezones(sender, **kwargs):
 	
 	print(" ")
 	print("*** IMPORTANT ***")
-	print("Remember to periodically update the pytz package to get the latest timezone definitions")
+	print("Remember to periodically update the pytz package to get the latest timezone definitions:")
+	print("   pip install --upgrade pytz")
 	print(" ")
-	print("Also periodically update MySQL's timezones using the following command. You will need the MySQL root password.")
+	print("Also periodically update MySQL's timezones using the following command. You will need the MySQL root password:")
 	print("   mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql")
 	print(" ")
 
