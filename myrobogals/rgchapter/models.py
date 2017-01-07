@@ -49,7 +49,7 @@ class Chapter(models.Model):
 	city = models.CharField('City/Suburb', max_length=64, blank=True)
 	state = models.CharField('State/Province', max_length=16, help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'", blank=True)
 	postcode = models.CharField('Postcode', max_length=16, blank=True)
-	country = models.ForeignKey(Country, verbose_name="Country", default="AU", blank=True, null=True)
+	country = models.ForeignKey(Country, verbose_name="Country", default="AU")
 	timezone = models.ForeignKey(Timezone, help_text="Timezones are ordered by continent/city. If the chapter's city is not listed, select a city in the same timezone with the same daylight saving rules. Do NOT select an exact offset like GMT+10, as this will not take daylight saving time into account. Note that the UK is not on GMT during summer - select Europe/London to get the correct daylight saving rules for the UK.")
 	faculty_contact = models.CharField('Name', max_length=64, blank=True, help_text="e.g. Professor John Doe")
 	faculty_position = models.CharField('Position', max_length=64, blank=True, help_text="e.g. Associate Dean")
