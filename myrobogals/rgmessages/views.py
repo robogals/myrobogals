@@ -549,6 +549,7 @@ def downloademailfile(request, email_id, file_name):
 		return HttpResponseRedirect('/messages/history/')
 
 @login_required
+@csrf_exempt
 def previewemail(request):
 	if not request.user.is_staff and not request.user.is_superuser:
 		raise Http404

@@ -5,6 +5,8 @@
 
 {% block pagetitle %}{% trans "Email invitees of a school visit" %}{% endblock %}
 
+{% block head %} {{ emailform.media }} {% endblock %}
+
 {% block content %}
 <form action="/teaching/{{visit_id}}/email/" method="POST"> {% csrf_token %}
 {% if emailform.errors %}
