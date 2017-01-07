@@ -407,14 +407,6 @@ def detail(request, username):
 
 	current_positions = Position.objects.filter(user=u, position_date_end__isnull=True)
 	past_positions = Position.objects.filter(user=u, position_date_end__isnull=False)
-	if u.membertype().type_of_person == 1:  # Student
-		show_course = True
-	else:
-		show_course = False
-	if u.membertype().type_of_person == 2:  # Industry
-		show_job = True
-	else:
-		show_job = False
 	account_list = list(set(account for account in u.aliases.all()).union(set(account for account in u.user_aliases.all())).union(set([u])))
 	for account in account_list:
 		subAliasesSet = set(ac for ac in account.aliases.all())
@@ -424,7 +416,7 @@ def detail(request, username):
 			if alias not in account_list:
 				account_list.append(alias)
 	visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
-	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'show_course': show_course, 'show_job': show_job, 'visits': visits}, context_instance=RequestContext(request))
+	return render_to_response('profile_view.html', {'user': u, 'current_positions': current_positions, 'past_positions': past_positions, 'visits': visits}, context_instance=RequestContext(request))
 
 @login_required
 def contactdirectory(request):
@@ -652,6 +644,8 @@ class FormPartThree(forms.Form):
 	university = forms.ModelChoiceField(label=_('University'), queryset=University.objects.all(), required=False)
 	course_type = forms.ChoiceField(label=_('Course level'), choices=COURSE_TYPE_CHOICES, required=False)
 	student_type = forms.ChoiceField(label=_('Student type'), choices=STUDENT_TYPE_CHOICES, required=False)
+	job_title = forms.CharField(label=_('Occupation'), max_length=128, required=False)
+	company = forms.CharField(label=_('Employer'), max_length=128, required=False)
 	bio = forms.CharField(label=_('About me (for profile page)'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	#job_title = forms.CharField(_('Job title'), max_length=128, required=False)
 	#company = forms.CharField(_('Company'), max_length=128, required=False)
@@ -788,6 +782,8 @@ def edituser(request, username, chapter=None):
 					u.university = data['university']
 					u.course_type = data['course_type']
 					u.student_type = data['student_type']
+					u.job_title = data['job_title']
+					u.company = data['company']
 					u.bio = data['bio']
 					#u.job_title = data['job_title']
 					#u.company = data['company']

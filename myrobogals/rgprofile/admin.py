@@ -51,7 +51,7 @@ class UserAdmin(BuiltinUserAdmin):
 	#	return HttpResponseRedirect('/chapters/global/edit/users/add/?return=/topsecretarea/auth/user/')
 
 class MemberStatusTypeAdmin(admin.ModelAdmin):
-	list_display = ('description', 'chapter', 'type_of_person')
+	list_display = ('description', 'chapter')
 	search_fields = ('description', 'chapter')
 
 admin.site.register(User, UserAdmin)
