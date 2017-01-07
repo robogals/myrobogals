@@ -52,7 +52,7 @@
 		<td>{{ forum.number_of_posts }}</td>
 		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser or canDeleteGlobal %}
-		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
 		{% else %}
 			{% if user.is_staff %}
 				<td></td>
@@ -121,7 +121,7 @@
 		<td>{{ forum.number_of_posts }}</td>
 		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if user.is_superuser or canDeleteGlobal %}
-		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
 		{% else %}
 			{% if user.is_staff %}
 				<td></td>
@@ -186,7 +186,7 @@
 		<td>{{ forum.number_of_posts }}</td>
 		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if canDeleteGlobal or user.is_staff %}
-		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}
@@ -247,7 +247,7 @@
 		<td>{{ forum.number_of_posts }}</td>
 		<td>{{ forum.last_post_time|date:_("DATETIME_FORMAT") }}<br />{% if forum.last_post_user %} {% trans "by" %} {{ forum.last_post_user.get_full_name }}{% endif %}</td>
 		{% if canDeleteGlobal or user.is_staff %}
-		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
+		<td><a href="/forums/forum/delete/{{forum.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
 		{% endif %}
 	</tr>
 	{% ifequal editForum forum.pk %}

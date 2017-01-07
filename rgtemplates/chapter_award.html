@@ -16,9 +16,9 @@
 			{% for recipient in recipients %}
 				<ul><li>
 				{% ifequal recipient.award.award_type 0 %}
-				<img src="{{MEDIA_URL}}/images/trophy-g.jpg" width=26 height=34 align=absmiddle>
+				<img src="{{ MEDIA_URL }}images/trophy-g.jpg" width=26 height=34 align=absmiddle>
 				{% else %}
-				<img src="{{MEDIA_URL}}/images/trophy-s.jpg" width=26 height=34 align=absmiddle>
+				<img src="{{ MEDIA_URL }}images/trophy-s.jpg" width=26 height=34 align=absmiddle>
 				{% endifequal %}
 				<a href="/chapters/awards/{{recipient.id}}/">{{recipient.award.award_name}}{% trans " : " %}{{recipient.chapter}}</a>
 				</li></ul></br>

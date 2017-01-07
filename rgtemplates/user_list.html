@@ -44,7 +44,7 @@
 	{% for col in display_columns %}
     <td>{% get_user_attr u col.field_name %}</td>
     {% endfor %}
-	<td><a href="/delete/user/{{u.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}/images/delete.png" alt="Delete" /></a></td>
+	<td><a href="/delete/user/{{u.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
   </tr>
 {% endfor %}
 </table>
