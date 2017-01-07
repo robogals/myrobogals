@@ -243,3 +243,6 @@ class UserList(models.Model):
 	
 	def __unicode__(self):
 		return self.name
+
+# Import and register the signal handlers in signals.py
+import signals
