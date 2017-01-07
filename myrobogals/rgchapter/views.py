@@ -165,6 +165,8 @@ class FormPartFour(forms.Form):
 
 class WelcomeEmailMsgField(forms.CharField):
 	def clean(self, value):
+		if value.strip() == '':
+			value = Chapter._meta.get_field('welcome_email_msg').get_default()
 		try:
 			formatted = value.format(
 				chapter=Chapter.objects.get(pk=1),
@@ -177,11 +179,13 @@ class WelcomeEmailMsgField(forms.CharField):
 class FormPartFive(forms.Form):
 	welcome_email_enable = forms.BooleanField(required=False, label=_("Send a welcome email to new signups"))
 	welcome_email_subject = forms.CharField(required=False, max_length=256)
-	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea)
+	welcome_email_msg = WelcomeEmailMsgField(required=False, widget=forms.Textarea, initial=Chapter._meta.get_field('welcome_email_msg').get_default())
 	welcome_email_html = forms.BooleanField(required=False)
 
 class InviteEmailMsgField(forms.CharField):
 	def clean(self, value):
+		if value.strip() == '':
+			value = Chapter._meta.get_field('invite_email_msg').get_default()
 		try:
 			formatted = value.format(
 				visit=SchoolVisit.objects.all()[0],
@@ -192,7 +196,7 @@ class InviteEmailMsgField(forms.CharField):
 
 class FormPartSix(forms.Form):
 	invite_email_subject = forms.CharField(required=False, max_length=256)
-	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea)
+	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea, initial=Chapter._meta.get_field('invite_email_msg').get_default())
 	invite_email_html = forms.BooleanField(required=False)
 
 @login_required

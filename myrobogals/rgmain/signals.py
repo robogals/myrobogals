@@ -1,5 +1,4 @@
 from django.db.models.signals import post_migrate
-from django.dispatch import receiver
 from myrobogals.rgmain.models import Timezone
 from pytz import all_timezones
 from django.apps import AppConfig

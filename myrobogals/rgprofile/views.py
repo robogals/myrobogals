@@ -598,7 +598,7 @@ class FormPartOne(forms.Form):
 	tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
-	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS, initial=2)
+	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS)
 
 # Privacy settings
 class FormPartTwo(forms.Form):
