@@ -212,7 +212,7 @@ def progresschapter(request):
 	
 	# Special exception for Robogals Rural & Regional Ambassadors programme
 	# to display career talk stats in the progress bar instead of robotics workshops
-	if c.pk == 20:
+	if c.myrobogals_url == 'rrr':
 		careertalkview = True
 		displaycats = [1,]
 	
