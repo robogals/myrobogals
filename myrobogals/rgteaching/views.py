@@ -33,6 +33,7 @@ def teachhome(request):
 	return HttpResponseRedirect('/teaching/list/')
 	#return render_to_response('teaching.html', {}, context_instance=RequestContext(request))
 
+# Forms to create or edit a SchoolVisit (workshop)
 class SchoolVisitFormOne(forms.Form):
 	ALLOW_RSVP_CHOICES = (
 		(0, 'Allow anyone to RSVP'),
@@ -41,12 +42,14 @@ class SchoolVisitFormOne(forms.Form):
 	)
 
 	school = forms.ModelChoiceField(queryset=School.objects.none(), help_text=_('If the school is not listed here, it first needs to be added in Workshops > Add School'))
-	date = forms.DateField(label=_('School visit date'), widget=SelectDateWidget(years=range(2008,datetime.date.today().year + 3)), initial=datetime.date.today())
+	date = forms.DateField(label=_('School visit date'), widget=SelectDateWidget(years=range(2008,datetime.date.today().year + 3)), initial=timezone.now().date())
 	start_time = forms.TimeField(label=_('Start time'), initial='10:00:00')
 	end_time = forms.TimeField(label=_('End time'), initial='13:00:00')
 	location = forms.CharField(label=_("Location"), help_text=_("Where the workshop is taking place, at the school or elsewhere (can differ from meeting location, see below)"))
 	allow_rsvp = forms.ChoiceField(label=_("Allowed RSVPs"), choices=ALLOW_RSVP_CHOICES, initial=0)
 
+	# Here we override the constructor so that the school drop-down menu will only be
+	# populated with this chapter's schools
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
@@ -56,6 +59,7 @@ class SchoolVisitFormOne(forms.Form):
 		else:
 			self.fields["school"].queryset = School.objects.filter(chapter=chapter).order_by('name')
 
+	# Form validation
 	def clean(self):
 		cleaned_data = super(SchoolVisitFormOne, self).clean()
 		start = cleaned_data.get("start_time")
@@ -84,7 +88,8 @@ class SchoolVisitFormThree(forms.Form):
 	tobring = forms.CharField(label=_("To bring"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	otherprep = forms.CharField(label=_("Other preparation"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 	notes = forms.CharField(label=_("Other notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
-		
+
+# View to create or edit a SchoolVisit (workshop)
 @login_required
 def editvisit(request, visit_id):
 	chapter = request.user.chapter
@@ -96,6 +101,7 @@ def editvisit(request, visit_id):
 		else:
 			v = get_object_or_404(SchoolVisit, pk=visit_id)
 			new = False
+		# Only allow users to see workshops from their own chapter
 		if (v.chapter != chapter) and not request.user.is_superuser:
 			raise Http404
 		if request.method == 'POST':
@@ -105,12 +111,15 @@ def editvisit(request, visit_id):
 				formpart1 = SchoolVisitFormOne(request.POST, chapter=chapter)				
 			formpart2 = SchoolVisitFormTwo(request.POST)
 			formpart3 = SchoolVisitFormThree(request.POST)
+			# Create or update a workshop using the validated data from the form
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid():
-				if visit_id == 0:
+				if visit_id == 0:  # visit_id 0 means we're creating a new one
 					v.chapter = chapter
 					v.creator = request.user
 				data = formpart1.cleaned_data
 				v.school = data['school']
+				# Take the user's date and time input and combine it with the
+				# chapter's timezone to create a timezone-aware datetime.
 				v.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']), timezone=chapter.tz_obj())
 				v.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']), timezone=chapter.tz_obj())
 				v.location = data['location']
@@ -147,6 +156,7 @@ def editvisit(request, visit_id):
 				formpart2 = SchoolVisitFormTwo()
 				formpart3 = SchoolVisitFormThree()
 			else:
+				# Populate the form with data from the database
 				formpart1 = SchoolVisitFormOne({
 					'school': v.school,
 					'date': localtime(v.visit_start, timezone=chapter.tz_obj()).date(),
@@ -159,7 +169,7 @@ def editvisit(request, visit_id):
 				if v.meeting_time:
 					meeting_time = localtime(v.meeting_time, timezone=chapter.tz_obj()).time()
 				else:
-					meeting_time = v.meeting_time
+					meeting_time = None
 				formpart2 = SchoolVisitFormTwo({
 					'meeting_location': v.meeting_location,
 					'meeting_time': meeting_time,
@@ -184,6 +194,7 @@ def editvisit(request, visit_id):
 def newvisit(request):
 	return editvisit(request, 0)
 	
+# Create a new workshop with a school already selected.
 @login_required
 def newvisitwithschool(request, school_id):
 	v = SchoolVisit()
@@ -191,12 +202,19 @@ def newvisitwithschool(request, school_id):
 	v.chapter = request.user.chapter
 	v.creator = request.user
 	v.visit_start = timezone.now()
+	v.visit_start.hour = 10
+	v.visit_start.minute = 0
+	v.visit_start.second = 0
 	v.visit_end = timezone.now()
+	v.visit_end.hour = 13
+	v.visit_end.minute = 0
+	v.visit_end.second = 0
 	v.school = school
 	v.location = "Enter location"
 	v.save()
 	return editvisit(request, v.id)
 
+# View workshop details. This page also allows volunteers to RSVP.
 @login_required
 def viewvisit(request, visit_id):
 	chapter = request.user.chapter
@@ -221,6 +239,7 @@ def viewvisit(request, visit_id):
 		user_rsvp_status = 0
 	return render_to_response('visit_view.html', {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending, 'notattending': notattending, 'waitingreply': waitingreply, 'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended, 'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
+# Chapter selector for superusers viewing the workshop list
 class ChapterSelector(forms.Form):
 	chapter = forms.ModelChoiceField(queryset=Chapter.objects.filter(status__in=[0,2]), required=False)
 
@@ -238,6 +257,8 @@ def paginatorRender(request, listOfObjects, sizeOfList):
 
 	return visits
 
+# List all workshops. Superusers will see all workshops globally; other users
+# will only see their own chapter's workshops.
 @login_required
 def listvisits(request):
 	chapter = request.user.chapter
@@ -260,9 +281,10 @@ def listvisits(request):
 	return render_to_response('visit_list.html', {'chapterform': chapterform, 'showall': showall, 'chapter': chapter, 'visits': visits}, context_instance=RequestContext(request))
 
 class VisitSelectorForm(forms.Form):
-	start_date = forms.DateField(label='Visit start date', widget=SelectDateWidget(years=range(20011,datetime.date.today().year + 1)), initial=datetime.date.today())
-	end_date = forms.DateField(label='Visit end date', widget=SelectDateWidget(years=range(2011,datetime.date.today().year + 1)), initial=datetime.date.today())
+	start_date = forms.DateField(label='Start date', widget=SelectDateWidget(years=range(2008,datetime.date.today().year + 1)), initial=timezone.now().date())
+	end_date = forms.DateField(label='End date', widget=SelectDateWidget(years=range(2008,datetime.date.today().year + 1)), initial=timezone.now().date())
 
+# Display a printable list of workshops for a given date range
 @login_required
 def printlistvisits(request):
 	if not request.user.is_staff:
@@ -272,7 +294,10 @@ def printlistvisits(request):
 		if theform.is_valid():
 			formdata = theform.cleaned_data
 			chapter = request.user.chapter
-			visits = SchoolVisit.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']]).order_by('-visit_start')
+			# Interpret the dates as having been entered in the user's local time
+			start_date = make_aware(datetime.datetime.combine(formdata['start_date'], datetime.time.min), timezone=request.user.tz_obj())
+			end_date = make_aware(datetime.datetime.combine(formdata['end_date'], datetime.time.max), timezone=request.user.tz_obj())
+			visits = SchoolVisit.objects.filter(visit_start__range=[start_date, end_date]).order_by('-visit_start')
 			showall = True
 			if not request.user.is_superuser:
 				visits = visits.filter(chapter=chapter)
@@ -285,6 +310,7 @@ class EmailModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
     	return obj.last_name + ", " + obj.first_name
 
+# Invite or add volunteers to a workshop
 class InviteForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False)
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
@@ -292,6 +318,7 @@ class InviteForm(forms.Form):
 	list = forms.ModelChoiceField(queryset=UserList.objects.none(), required=False)
 	action = forms.ChoiceField(choices=((1,_('Invite members')),(2,_('Add members as attending'))),initial=1)
 
+	# Override the constructor to show this chapter's users, user lists, and email template
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
 		del kwargs['user']
@@ -339,15 +366,20 @@ def invitetovisit(request, visit_id):
 					# which we need for entering the recipient entries
 					message.save()
 	
+				# Send to all users who haven't opted out of workshop reminders
 				if request.POST['type'] == '1':
 					users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True)
+				# Send to chapter committee
 				elif request.POST['type'] == '2':
 					users = User.objects.filter(chapter=chapter, is_active=True, is_staff=True)
+				# Send to all trained users who haven't opted out of workshop reminders
 				elif request.POST['type'] == '4':
 					users = User.objects.filter(chapter=chapter, is_active=True, email_reminder_optin=True, trained=True)
+				# Send to a user list
 				elif request.POST['type'] == '5':
 					ul = data['list']
 					users = ul.users.all()
+				# Send to specifically selected users
 				else:
 					users = data['memberselect']
 	
@@ -386,7 +418,8 @@ def invitetovisit(request, visit_id):
 	else:
 		inviteform = InviteForm(None, user=request.user, visit=v)
 	return render_to_response('visit_invite.html', {'inviteform': inviteform, 'visit_id': visit_id, 'error': error}, context_instance=RequestContext(request))
-	
+
+# Form to email workshop attendees	
 class EmailAttendeesForm(forms.Form):
 	SCHEDULED_DATE_TYPES = (
 		(1, 'My timezone'),
@@ -397,6 +430,7 @@ class EmailAttendeesForm(forms.Form):
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	memberselect = EmailModelMultipleChoiceField(queryset=User.objects.none(), widget=FilteredSelectMultiple(_("Recipients"), False, attrs={'rows': 10}), required=False)
 
+	# Override the constructor so that only users who have been invited are shown in the user selector
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
 		del kwargs['user']
@@ -435,21 +469,24 @@ def emailvisitattendees(request, visit_id):
 			# which we need for entering the recipient entries
 			message.save()
 			
-			
 			# Start processing recipient list
-			# Insert choices for attending, not attending etc here
+			# Send to all invitees
 			if request.POST['invitee_type'] == '1':
 				id_list = EventAttendee.objects.filter(event=v.id).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			# Send to invitees who have RSVP'd as attending
 			elif request.POST['invitee_type'] == '2':
 				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=2).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			# Send to invitees who have RSVP'd as not attending
 			elif request.POST['invitee_type'] == '3':
 				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=4).values_list('user_id')
 				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			# Send to invitees who have yet to RSVP
 			elif request.POST['invitee_type'] == '4':
 				id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=1).values_list('user_id')
-				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)	
+				users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
+			# Send to specifically selected users
 			elif request.POST['invitee_type'] == '5':
 				users = data['memberselect']
 
@@ -461,7 +498,6 @@ def emailvisitattendees(request, visit_id):
 				recipient.to_address = one_user.email
 				recipient.save()
 				
-			
 			message.status = 0
 			message.save()
 			
@@ -475,15 +511,17 @@ class CancelForm(forms.Form):
 	subject = forms.CharField(max_length=256, required=False,widget=forms.TextInput(attrs={'size':'40'}))
 	body = forms.CharField(widget=TinyMCE(attrs={'cols': 70}), required=False)
 	
+	# Override the constructor to insert an email message specific to this workshop
 	def __init__(self, *args, **kwargs):
 		user=kwargs['user']
 		del kwargs['user']
 		visit=kwargs['visit']
 		del kwargs['visit']
 		super(CancelForm, self).__init__(*args, **kwargs)
-		self.fields['subject'].initial = "Visit to %s Cancelled" %visit.location
-		self.fields['body'].initial = _("The workshop for %(school)s at %(starttime)s has been cancelled, sorry for any inconvenience." % {'school': visit.school, 'starttime': visit.visit_start})
-		
+		self.fields['subject'].initial = _("Robogals workshop for %(school)s cancelled") % {'school': visit.school}
+		self.fields['body'].initial = _("The workshop for %(school)s on %(visittime)s has been cancelled, sorry for any inconvenience.") % {'school': visit.school, 'visittime': visit.visit_time}
+
+# Cancel a workshop and send an email to all volunteers who had RSVP'd as attending
 @login_required
 def cancelvisit(request, visit_id):
 	if not request.user.is_staff:
@@ -512,7 +550,7 @@ def cancelvisit(request, visit_id):
 			# which we need for entering the recipient entries
 			message.save()
 			
-			#Email everyone who has been invited.
+			# Send to everyone who has been invited
 			id_list = EventAttendee.objects.filter(event=v.id, rsvp_status=2).values_list('user_id')
 			users = User.objects.filter(id__in = id_list, is_active=True, email_reminder_optin=True)
 
@@ -540,7 +578,8 @@ class DeleteForm(forms.Form):
 		school=kwargs['school']
 		del kwargs['school']
 		super(DeleteForm, self).__init__(*args, **kwargs)
-			
+
+# Delete a school. A school can only be deleted if it has no workshops.
 @login_required
 def deleteschool(request, school_id):
 	if not request.user.is_staff:
@@ -562,6 +601,7 @@ def deleteschool(request, school_id):
 		deleteform = DeleteForm(None, user=request.user, school=s)
 	return render_to_response('school_delete.html', {'school': s}, context_instance=RequestContext(request))
 	
+# List all this chapter's schools
 @login_required
 def listschools(request):
 	if not request.user.is_staff:
@@ -570,6 +610,7 @@ def listschools(request):
 	schools = School.objects.filter(chapter=chapter)
 	return render_to_response('schools_list.html', {'chapter': chapter, 'schools': schools}, context_instance=RequestContext(request))
 
+# Populate latitude-longitude in schools directory by converting the address using a Google API
 @login_required
 def filllatlngschdir(request):
 	if request.user.is_superuser:
@@ -612,6 +653,8 @@ def filllatlngschdir(request):
 	messages.success(request, message=unicode(msg))
 	return render_to_response('response.html', {}, context_instance=RequestContext(request))
 
+# Schools directory. This is populated in bulk to allow Robogals chapters
+# to look up schools in their area.
 @login_required
 def schoolsdirectory(request, chapterurl):
 	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
@@ -695,6 +738,8 @@ def schoolsdirectory(request, chapterurl):
 	copied_schools = School.objects.filter(chapter=c).values_list('name', flat=True)
 	return render_to_response('schools_directory.html', {'schools': schools, 'subdivision': Subdivision.objects.all().order_by('id'), 'DirectorySchool': DirectorySchool, 'name': name, 'suburb': suburb, 'school_type': int(school_type), 'school_level': int(school_level), 'school_gender': int(school_gender), 'starstatus': int(starstatus), 'state': int(state), 'star_schools': star_schools, 'chapterurl': chapterurl, 'return': request.path + '?' + request.META['QUERY_STRING'], 'copied_schools': copied_schools, 'distance': distance, 'origin': origin, 'sch_list': sch_list, 'L1': L1, 'G1': G1}, context_instance=RequestContext(request))
 
+# Enable the 'star' next to a school in the schools directory
+# Schools are 'starred' on a chapter-specific basis
 @login_required
 def starschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
@@ -720,6 +765,8 @@ def starschool(request):
 	else:
 		raise Http404
 
+# Disable the 'star' next to a school in the schools directory
+# Schools are 'starred' on a chapter-specific basis
 @login_required
 def unstarschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
@@ -744,6 +791,7 @@ def unstarschool(request):
 	else:
 		raise Http404
 
+# Copy a school from the schools directory into the chapter's school list
 @login_required
 def copyschool(request):
 	if ('school_id' in request.GET) and ('chapterurl' in request.GET):
@@ -798,6 +846,7 @@ class SchoolNameField(forms.CharField):
 		else:
 			return value
 
+# Form to add or edit a school
 class SchoolFormPartOne(forms.Form):
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
@@ -829,6 +878,7 @@ class SchoolFormPartTwo(forms.Form):
 class SchoolFormPartThree(forms.Form):
 	notes = forms.CharField(label=_("Notes"), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
+# View to edit a school, or add a school if called with school_id = 0
 @login_required
 def editschool(request, school_id):
 	chapter = request.user.chapter
@@ -928,7 +978,8 @@ class RSVPForm(forms.Form):
 		visit=kwargs['event']
 		del kwargs['event']
 		super(RSVPForm, self).__init__(*args, **kwargs)
-		
+
+# RSVP to a workshop, with the option to leave a message
 def rsvp(request, event_id, user_id, rsvp_type):
 	e = get_object_or_404(Event, pk=event_id)
 	chapter = request.user.chapter
@@ -965,6 +1016,7 @@ def rsvp(request, event_id, user_id, rsvp_type):
 		rsvpform = RSVPForm(None, user=request.user, event=e)
 	return render_to_response('event_rsvp.html', {'rsvpform': rsvpform, 'title_string': title_string, 'event_id': event_id, 'user_id': user_id, 'rsvp_type': rsvp_type}, context_instance=RequestContext(request))
 
+# Delete an RSVP message from the workshop
 @login_required
 def deletemessage(request, visit_id, message_id):
 	if not request.user.is_staff:
@@ -984,7 +1036,8 @@ def deletemessage(request, visit_id, message_id):
 class StatsModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
     	return obj.last_name + ", " + obj.first_name
-	
+
+# Form for entering workshop stats	
 class SchoolVisitStatsForm(forms.Form):
 	visit_type = forms.ChoiceField(choices=VISIT_TYPES_BASE, required=False, help_text=_('For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % '/teaching/statshelp/')
 	primary_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size':'8'}))
@@ -1006,16 +1059,21 @@ class SchoolVisitStatsForm(forms.Form):
 		cleaned_data = self.cleaned_data
 		return cleaned_data
 	
+	# Override constructor to show only this chapter's users in the list to select who attended,
+	# and by default select those users who had RSVP'd as attending.
 	def __init__(self, *args, **kwargs):
 		visit=kwargs['visit']
 		del kwargs['visit']
 		super(SchoolVisitStatsForm, self).__init__(*args, **kwargs)
 		attending = EventAttendee.objects.filter(rsvp_status=2, event__id=visit.id).values_list('user_id')
-		self.fields['attended'].queryset = User.objects.filter(is_active=True,chapter=visit.school.chapter).order_by('last_name')
+		self.fields['attended'].queryset = User.objects.filter(is_active=True, chapter=visit.school.chapter).order_by('last_name')
 		self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in = attending)]
 		self.fields['visit_type'].initial = ''
 		self.fields['primary_girls_first'].initial = visit.numstudents
 
+# View to enter stats. This workflow contains two pages:
+#  1. Select the type of visit, enter number of students, and select volunteers who attended
+#  2. Select how many hours each volunteer attended
 @login_required
 def stats(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
@@ -1027,10 +1085,12 @@ def stats(request, visit_id):
 		messages.success(request, message=unicode(_("- This workshop is already closed")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	if not request.session.get('hoursPerPersonStage', False):
+		# Page 1: show stats form
 		request.session['hoursPerPersonStage'] = 1
 		form = SchoolVisitStatsForm(None, visit = v)
 		return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
 	if request.method == 'POST' and request.session['hoursPerPersonStage'] == 1:
+		# Post from page 1: save entered stats into database
 		request.session['hoursPerPersonStage'] = 2
 		form = SchoolVisitStatsForm(request.POST, visit = v)
 		if form.is_valid():
@@ -1058,6 +1118,7 @@ def stats(request, visit_id):
 			stats.notes = data['notes']
 			stats.save()
 
+			# Save attendance in database
 			for attendee in data['attended']:
 				list = EventAttendee.objects.filter(event__id=v.id).values_list('user_id', flat=True)
 				if attendee.id not in list:
@@ -1075,6 +1136,7 @@ def stats(request, visit_id):
 					person.actual_status = 2
 					person.save()
 			
+			# Render page 2: enter user-specific volunteering hours
 			defaultHours = int(math.ceil((v.visit_end - v.visit_start).total_seconds() / 3600.0))
 			return render_to_response('visit_hoursPerPerson.html', {'attended': data['attended'], 'visit_id': visit_id, 'defaultHours': range(defaultHours)}, context_instance=RequestContext(request))
 		else:
@@ -1087,6 +1149,7 @@ def stats(request, visit_id):
 		form = SchoolVisitStatsForm(None, visit = v)
 		return render_to_response('visit_stats.html', {'form':form, 'visit_id':visit_id}, context_instance=RequestContext(request))
 
+# Delete stats associated with a visit, and set it back to "open"
 @login_required
 def reopenvisit(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
@@ -1098,10 +1161,10 @@ def reopenvisit(request, visit_id):
 		messages.success(request, message=unicode(_("- This workshop is already open!")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
 	# Don't allow modifying of RRR stats - too many people have access
-	if v.school.chapter.pk == 20 and not request.user.is_superuser:
+	if v.school.chapter.myrobogals_url == 'rrr' and not request.user.is_superuser:
 		messages.success(request, message=unicode(_("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
-	# Don't allow modifying of stats more than 6 months old - too risky
+	# Don't allow modifying of stats more than 6 months old - to limit damage in cases of misuse
 	if (timezone.now() - v.visit_start) > datetime.timedelta(days=180):
 		messages.success(request, message=unicode(_("- To protect against accidental deletion of old stats, workshops more than six months old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
 		return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
@@ -1118,6 +1181,7 @@ def reopenvisit(request, visit_id):
 	else:
 		return render_to_response('visit_reopen.html', {'visit_id': visit_id}, context_instance=RequestContext(request))
 
+# Enter the number of hours volunteered by each volunteer
 @login_required
 def statsHoursPerPerson(request, visit_id):
 	v = get_object_or_404(SchoolVisit, pk=visit_id)
@@ -1145,6 +1209,7 @@ def statsHoursPerPerson(request, visit_id):
 	else:
 		raise Http404
 
+# Display a page showing an explanation of the different stats categories
 @login_required
 def statshelp(request):
 	if not request.user.is_staff:
@@ -1162,6 +1227,7 @@ def xint(n):
 		return 0
 	return int(n)
 
+# Display reporting at a chapter level
 @login_required
 def report_standard(request):
 	# Redirect superusers to global reports
@@ -1187,7 +1253,12 @@ def report_standard(request):
 		theform = ReportSelectorForm(request.POST)
 		if theform.is_valid():
 			formdata = theform.cleaned_data
-			event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=request.user.chapter, status=1).values_list('id',flat=True)
+			
+			# Interpret the dates as having been entered in the user's local time
+			start_date = make_aware(datetime.datetime.combine(formdata['start_date'], datetime.time.min), timezone=request.user.tz_obj())
+			end_date = make_aware(datetime.datetime.combine(formdata['end_date'], datetime.time.max), timezone=request.user.tz_obj())
+			
+			event_id_list = Event.objects.filter(visit_start__range=[start_date, end_date], chapter=request.user.chapter, status=1).values_list('id',flat=True)
 			stats_list = SchoolVisitStats.objects.filter(visit__id__in = event_id_list)
 			event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
 			visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
@@ -1210,6 +1281,8 @@ def report_standard(request):
 			totals['obf'] = 0
 			totals['obr'] = 0
 			event_list = set(event_list)
+			
+			# For each school that had an event (workshop) during the period
 			for school_id in event_list:
 				school = School.objects.get(id = school_id)
 				visited_schools[school.name] = {}
@@ -1227,7 +1300,7 @@ def report_standard(request):
 				visited_schools[school.name]['ogr'] = 0
 				visited_schools[school.name]['obf'] = 0
 				visited_schools[school.name]['obr'] = 0
-				this_schools_visits = SchoolVisitStats.objects.filter(visit__school = school, visit__visit_start__range=[formdata['start_date'],formdata['end_date']], visit__status=1)
+				this_schools_visits = SchoolVisitStats.objects.filter(visit__school = school, visit__visit_start__range=[start_date, end_date], visit__status=1)
 				if int(formdata['visit_type']) == -1:
 					# include all stats categories
 					pass
@@ -1237,6 +1310,8 @@ def report_standard(request):
 				else:
 					# only include specific stats category
 					this_schools_visits = this_schools_visits.filter(visit_type = formdata['visit_type'])
+				
+				# For each visit at this school during the period
 				for each_visit in this_schools_visits:
 					# totals for this school 
 					visited_schools[school.name]['pgf'] += xint(each_visit.primary_girls_first)
@@ -1315,6 +1390,7 @@ def report_standard(request):
 		attendance_sorted = {}
 	return render_to_response('stats_get_report.html',{'theform': theform, 'totals': totals, 'schools': sorted(visited_schools.iteritems()), 'attendance': attendance_sorted},context_instance=RequestContext(request))
 
+# Global workshop reports
 @login_required
 def report_global(request):
 	# Allow superusers to see these reports
@@ -1343,10 +1419,15 @@ def report_global(request):
 			chapter_totals = {}
 			region_totals = {}
 			global_totals = {}
-			request.session['globalReportStartDate'] = formdata['start_date']
-			request.session['globalReportEndDate'] = formdata['end_date']
+			
+			# Interpret the dates as having been entered in the user's local time
+			start_date = make_aware(datetime.datetime.combine(formdata['start_date'], datetime.time.min), timezone=request.user.tz_obj())
+			end_date = make_aware(datetime.datetime.combine(formdata['end_date'], datetime.time.max), timezone=request.user.tz_obj())
+
+			request.session['globalReportStartDate'] = start_date
+			request.session['globalReportEndDate'] = end_date
 			request.session['globalReportVisitType'] = formdata['visit_type']
-			if formdata['start_date'] < datetime.date(2011, 2, 11):
+			if start_date.date() < datetime.date(2011, 2, 11):
 				warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
 			chapters = Chapter.objects.filter(exclude_in_reports=False)
 			for chapter in chapters:
@@ -1357,12 +1438,15 @@ def report_global(request):
 				chapter_totals[chapter.short_en]['repeat'] = 0
 				chapter_totals[chapter.short_en]['girl_workshops'] = 0
 				chapter_totals[chapter.short_en]['weighted'] = 0
-				event_id_list = Event.objects.filter(visit_start__range=[formdata['start_date'],formdata['end_date']], chapter=chapter, status=1).values_list('id',flat=True)
+				event_id_list = Event.objects.filter(visit_start__range=[start_date, end_date], chapter=chapter, status=1).values_list('id',flat=True)
 				event_list = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('school', flat=True)
 				visit_ids = SchoolVisit.objects.filter(event_ptr__in = event_id_list).values_list('id')
 				event_list = set(event_list)
+				
+				# For each school that had an event during the period
 				for school_id in event_list:
-					this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id, visit__visit_start__range=[formdata['start_date'],formdata['end_date']], visit__status=1)
+					# Get all visits at this school during the period
+					this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id = school_id, visit__visit_start__range=[start_date, end_date], visit__status=1)
 					if int(formdata['visit_type']) == -1:
 						# include all stats categories
 						pass
@@ -1380,6 +1464,7 @@ def report_global(request):
 							chapter_totals[chapter.short_en]['workshops'] += 1	
 				chapter_totals[chapter.short_en]['girl_workshops'] += chapter_totals[chapter.short_en]['first'] + chapter_totals[chapter.short_en]['repeat']
 				chapter_totals[chapter.short_en]['weighted'] = chapter_totals[chapter.short_en]['first'] + (float(chapter_totals[chapter.short_en]['repeat'])/2)
+				
 				# Regional and Global Totals
 				if chapter.parent:
 					if chapter.parent.short_en not in region_totals:
@@ -1419,6 +1504,9 @@ def report_global(request):
 	else:
 		return render_to_response('stats_get_global_report.html',{'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),'region_totals': sorted(region_totals.iteritems()),'global': global_totals, 'warning': warning, 'user_chapter_children': set(user_chapter_children)},context_instance=RequestContext(request))
 
+# This view is for when a chapter is clicked on in the global reports to see
+# chapter-specific stats
+# TODO: the URL should use myrobogals_url, not short_en
 @login_required
 def report_global_breakdown(request, chaptershorten):
 	chapter = get_object_or_404(Chapter, short_en=chaptershorten)

@@ -1,9 +1,9 @@
 {% extends "base_tinymce.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Invite/add to school visit" %}{% endblock %}
+{% block title %}{% trans "Invite/add to workshop" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Invite/add to school visit" %}{% endblock %}
+{% block pagetitle %}{% trans "Invite/add to workshop" %}{% endblock %}
 
 {% block content %}
 <form action="/teaching/{{visit_id}}/invite/" method="POST"> {% csrf_token %}
