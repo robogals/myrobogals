@@ -1127,7 +1127,7 @@ def exportusers(request, chapterurl):
 				status_date_end__isnull=True
 			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number', 'user__alt_email', 'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end', 'user__course_type', 'user__student_type').distinct()
 
-		response = HttpResponse(mimetype='text/csv')
+		response = HttpResponse(content_type='text/csv')
 		filename = 'robogals-' + c.myrobogals_url + '-' + str(datetime.date.today()) + '.csv'
 		response['Content-Disposition'] = 'attachment; filename=' + filename
 		csv_data = (('username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'),)
