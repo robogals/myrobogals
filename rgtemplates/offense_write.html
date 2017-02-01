@@ -5,6 +5,8 @@
 
 {% block pagetitle %}{% trans "Report Offenses" %}{% endblock %}
 
+{% block head %} {{ emailform.media }} {% endblock %}
+
 {% block content %}
 <form action="/forums/post/fileoffenses/{{post.pk}}/" method="POST"> {% csrf_token %}
 {% if offenseForm.errors %}

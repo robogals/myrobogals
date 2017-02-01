@@ -5,6 +5,8 @@
 
 {% block pagetitle %}{% trans "Send bulk email" %}{% endblock %}
 
+{% block head %} {{ emailform.media }} {% endblock %}
+
 {% block content %}
 <script>
 function post_to_url(path, params, method) {

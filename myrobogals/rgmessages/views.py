@@ -495,7 +495,7 @@ def serveimg(request, msgid, filename):
 		image_data = open(MEDIA_ROOT + '/images/' + filename, "rb").read()
 	except Exception:
 		raise Http404
-	return HttpResponse(image_data, mimetype="image/jpeg")
+	return HttpResponse(image_data, content_type="image/jpeg")
 	
 def servenewsletter(request, msgid, issue):
 	try:
@@ -549,6 +549,7 @@ def downloademailfile(request, email_id, file_name):
 		return HttpResponseRedirect('/messages/history/')
 
 @login_required
+@csrf_exempt
 def previewemail(request):
 	if not request.user.is_staff and not request.user.is_superuser:
 		raise Http404
