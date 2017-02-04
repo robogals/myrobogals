@@ -2,7 +2,23 @@
 {% load i18n %}
 {% block title %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %} {{u.username}}{% endif %}{% endif %}{% endblock %}
 
-{% block pagetitle %}{% if adduser %}{%trans "Add member" %}{% else %}{% if join %}{% trans "Join" %} {{chapter}}{% else %} {% trans "Edit Profile:" %} {{u.username}}{% endif %}{% endif %}{% endblock %}
+{% block pagetitle %}
+  {% if adduser %}
+    {%trans "Add member" %}
+  {% else %}
+    {% if join %}
+        {% trans "Join" %} 
+        {{chapter}}
+      {% else %}
+        {% trans "Edit Profile:" %} 
+        {{u.username}}
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block header %}
+  <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/profile_edit.css" type="text/css" />
+{% endblock %}
 
 {% block content %}
 <!-- form for editing profile information -->
@@ -45,6 +61,13 @@
   </tr>
   {% endif %}  
 {% endif %}
+
+{% if carderr %}
+  <tr>
+    <td colspan="2"><div class="error">{{ carderr }}</div></td>
+  </tr>
+{% endif %}
+
 {% for field in formpart1 %}
   {% if field.errors %}
   <tr>
@@ -53,9 +76,16 @@
   {% endif %}
   <tr>
     <td width="150">{{ field.label_tag }}{% if field.field.required %} <span style="color: #ff0000">*</span>{% endif %}</td>
-    <td>{{ field }}</td>
+    <td>
+      {{ field }}
+      {% if field.help_text %}
+        <br />
+        <p class="helpText"> {{ field.help_text }} </p>
+      {% endif %}
+    </td>
   </tr>
 {% endfor %}
+
 {% if chpass %}
   {% if pwerr %}
   <tr>
@@ -70,17 +100,28 @@
     <td>{% trans "Confirm new password" %}{% if join %} <span style="color: #ff0000">*</span>{% endif %}</td>
     <td><input type="password" name="password2"></td>
   </tr>
-{% if user.is_staff and not adduser %}
+
+  {% if user.is_staff and not adduser %}
   <tr>
     <td width="150">&nbsp;</td>
     <td><a href="/profile/{{u.username}}/genpw/">{% trans "Generate and email new password" %}</a></td>
   </tr>
+  {% endif %}
 {% endif %}
-{% endif %}
+
   <tr>
     <td style="vertical-align: top">{% trans "Chapter" %} <span style="color: #ff0000">*</span></td>
-    <td style="vertical-align: top">{{ chapter }}{% if not join %}<br /><span style="font-size: 9pt">{% trans "To move to another chapter, please contact support@robogals.org" %}</span>{% endif %}</td>
+    <td style="vertical-align: top">
+      {{ chapter }}
+      {% if not join %}
+        <br />
+        <p class="helpText" >
+          {% trans "To move to another chapter, please contact support@robogals.org" %}
+        </span>
+      {% endif %}
+    </td>
   </tr>
+
 </table>
 </div></div></div></div>
 <div class="round5"><div class="moduletable"><div class="module-surround">
@@ -154,9 +195,11 @@
 <table id="exec-fields-table" style="display: none">
   <tr>
     <td colspan="2">{{ formpart5.security_check}} {{ formpart5.security_check.label_tag }}</td>
-  <tr>
+  </tr>
   <tr>
     <td colspan="2">{{ formpart5.trained }} {{ formpart5.trained.label_tag }}</td>
+  </tr>
+  <tr>
   </tr>
   <tr>
     <td style="vertical-align: top">{{ formpart5.internal_notes.label_tag }}</td>

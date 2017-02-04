@@ -8,6 +8,7 @@ from django.template import RequestContext, Context, loader
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import make_aware, now, localtime
 from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -23,7 +24,7 @@ from myrobogals.rgmain.utils import SelectDateWidget, email_re
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient, SMSMessage, SMSRecipient
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, Event
 from myrobogals.settings import MEDIA_ROOT, MEDIA_URL, GENDERS
-import datetime
+from datetime import datetime, time, date
 from time import time
 import re
 import csv
@@ -213,12 +214,12 @@ def deleteuser(request, userpk):
 						msg = _('Member "%s" is already marked as alumni') % userToBeDeleted.get_full_name()
 					else:
 						if userToBeDeleted.membertype().description != 'Inactive':
-							old_status.status_date_end = datetime.date.today()
+							old_status.status_date_end = date.today()
 							old_status.save()
 						new_status=MemberStatus()
 						new_status.user = userToBeDeleted
 						new_status.statusType = MemberStatusType.objects.get(pk=2)
-						new_status.status_date_start = datetime.date.today()
+						new_status.status_date_start = date.today()
 						new_status.save()
 						msg = _('Member "%s" marked as alumni') % userToBeDeleted.get_full_name()
 				else:
@@ -274,12 +275,12 @@ def editstatus(request, chapterurl):
 							users_already = u.username
 					else:
 						if user.membertype().description != 'Inactive':
-							old_status.status_date_end = datetime.date.today()
+							old_status.status_date_end = date.today()
 							old_status.save()
 						new_status=MemberStatus()
 						new_status.user = u
 						new_status.statusType = MemberStatusType.objects.get(pk=int(status))
-						new_status.status_date_start = datetime.date.today()
+						new_status.status_date_start = date.today()
 						new_status.save()
 						if(users_changed):						
 							users_changed = users_changed + ", " + u.username
@@ -352,7 +353,7 @@ def mobverify(request):
 
 			# Check that we haven't used too many credits
 			sms_this_month = 0
-			sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, 1, 0, 0, 0), status__in=[0, 1])
+			sms_this_month_obj = SMSMessage.objects.filter(date__gte=datetime(now().year, now().month, 1, 0, 0, 0), status__in=[0, 1])
 			for obj in sms_this_month_obj:
 				sms_this_month += obj.credits_used()
 			sms_this_month += message.credits_used()
@@ -376,6 +377,7 @@ def mobverify(request):
 def redirtoeditself(request):
 	return HttpResponseRedirect("/profile/" + request.user.username + "/edit/")
 
+# Shows the profile of your user
 def detail(request, username):
 	u = get_object_or_404(User, username__exact=username)
 	
@@ -445,7 +447,7 @@ class SelectMonthYearWidget(Widget):
 		if years:
 			self.years = years
 		else:
-			this_year = datetime.date.today().year
+			this_year = date.today().year
 			self.years = range(this_year-10, this_year+10)
 
 	def render(self, name, value, attrs=None):
@@ -589,6 +591,9 @@ class FormPartOne(forms.Form):
 		else:
 			del self.fields['tshirt']
 
+	help_text_wccc_number = "Also known as the number that allows you to volunteer with Robogals. Ask an executive member if unsure. When this number is entered, your chapter's executive members will be notifed"
+	help_text_wcc_expiration = "You must also enter an expiration date shown on your card. myRobogals will inform you and your chapter executives when the card is about to expire"
+
 	first_name = forms.CharField(label=_('First name'), max_length=30)
 	last_name = forms.CharField(label=_('Last name'), max_length=30)
 	username = forms.CharField(label=_('Username'), max_length=30)
@@ -599,6 +604,8 @@ class FormPartOne(forms.Form):
 	alt_email = forms.EmailField(label=_('Alternate email'), max_length=64, required=False)
 	mobile = forms.BooleanField()
 	gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS)
+	wwcc_number = forms.CharField(label='WWCC Number', initial=False, required=False, help_text=help_text_wccc_number)
+	wwcc_expiration = forms.DateField(label='Expiration Date', initial=False, required=False, widget=SelectDateWidget(), help_text=help_text_wcc_expiration)
 
 # Privacy settings
 class FormPartTwo(forms.Form):
@@ -618,7 +625,7 @@ class FormPartTwo(forms.Form):
 	dob_public = forms.BooleanField(label=_('Show date of birth in my profile'), required=False)
 	email_public = forms.BooleanField(label=_('Show email address in my profile'), required=False)
 
-# Demographic information
+# Profile information
 class FormPartThree(forms.Form):
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
@@ -681,9 +688,43 @@ class FormPartFive(forms.Form):
 	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
 
+# Sends an email to everyone on the chapter notify list including saving message to database
+def emailmessage(email_subject, email_body, chapter):
+	message = EmailMessage()
+	message.subject = email_subject
+	message.body = email_body
+	message.from_name = "myRobogals"
+	message.from_address = "my@robogals.org"
+	message.reply_address = "my@robogals.org"
+	message.sender = User.objects.get(username='edit')
+	message.html = True
+	message.email_type = 0
+
+	# Message is set to WAIT mode
+	message.status = -1
+	message.save()
+
+	# Creates a list of all users to notify
+	print(chapter.notify_list)
+	if chapter.notify_list != None:
+		users_to_notify = chapter.notify_list.users.all()
+
+		# Email to all users that need to be notified
+		for user in users_to_notify:
+			recipient = EmailRecipient()
+			recipient.message = message
+			recipient.user = user
+			recipient.to_name = user.get_full_name()
+			recipient.to_address = user.email
+			recipient.save()
+			message.status = 0
+			message.save()
+
+# Performs editing an existing as well as adding new user to a chapter
 def edituser(request, username, chapter=None):
 	pwerr = ''
 	usererr = ''
+	carderr = ''
 	new_username = ''
 	if username == '':
 		join = True
@@ -697,32 +738,52 @@ def edituser(request, username, chapter=None):
 		adduser = False
 		if not request.user.is_authenticated():
 			return HttpResponseRedirect("/login/?next=/profile/edit/")
+
+		# Get reference to user
 		u = get_object_or_404(User, username__exact=username)
+
+		# Get user's chapter
 		chapter = u.chapter
+	
+	# Either a superuser, self user or exec of chapter
 	if join or request.user.is_superuser or request.user.id == u.id or (request.user.is_staff and request.user.chapter == u.chapter):
+		# Form submission POST request
 		if request.method == 'POST':
+			# Obtaining the data from the post request
 			formpart1 = FormPartOne(request.POST, chapter=chapter, user_id=u.id)
 			formpart2 = FormPartTwo(request.POST, chapter=chapter)
 			formpart3 = FormPartThree(request.POST, chapter=chapter)
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			formpart5 = FormPartFive(request.POST, chapter=chapter)
+
+			# Checking if the form is valid
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
 				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST)):
 					attempt_modify_exec_fields = True
 				else:
 					attempt_modify_exec_fields = False
+				
+				# Clean data from form1
 				data = formpart1.cleaned_data
+				
+				# Issue new username if a new user or old user changes his username
 				if join or (data['username'] != '' and data['username'] != u.username):
 					new_username = data['username']
+				
+				# If new username, verify the length of the username
 				if new_username:
 					username_len = len(new_username)
 					if username_len < 3:
 						usererr = _('Your username must be 3 or more characters')
 					elif username_len > 30:
 						usererr = _('Your username must be less than 30 characters')
+					
+					# Regex check for words, letters, numbers and underscores only in username
 					matches = re.compile(r'^\w+$').findall(new_username)
 					if matches == []:
 						usererr = _('Your username must contain only letters, numbers and underscores')
+					
+					# See if it already exists in database
 					else:
 						try:
 							usercheck = User.objects.get(username=new_username)
@@ -732,6 +793,7 @@ def edituser(request, username, chapter=None):
 									if len(request.POST['password1']) < 5:
 										pwerr = _('Your password must be at least 5 characters long')
 									else:
+										# Creates, saves and returns a User object
 										u = User.objects.create_user(new_username, '', request.POST['password1'])
 										u.chapter = chapter
 										mt = MemberStatus(user_id=u.pk, statusType_id=1)
@@ -744,36 +806,82 @@ def edituser(request, username, chapter=None):
 									pwerr = _('The password and repeated password did not match. Please try again')
 						else:
 							usererr = _('That username is already taken')
-							
+
+				# Chapter executive accessing the profile and trying to change a password					
 				if request.user.is_staff and request.user != u:
 					if len(request.POST['password1']) > 0:
 						if request.POST['password1'] == request.POST['password2']:
+							# Sets the password if it's the same, doesn't save the user object
 							u.set_password(request.POST['password1'])
 						else:
 							pwerr = _('The password and repeated password did not match. Please try again')
-				if pwerr == '' and usererr == '':
+
+				if data['wwcc_number'] != '' and data['wwcc_expiration'] != '':
+					# Perform all the possible card regex checks
+					match1 = re.compile(r'^\d{7}\w-\d{2}').findall(data['wwcc_number'])	# Victoria
+					match2 = re.compile(r'\d{7}\/\d').findall(data['wwcc_number']) # Queensland
+
+					# All checks fail
+					if match1 == [] and match2 == []:
+						carderr = 'The card number given is incorrect, please check the number again. Include all symbols'
+					
+					# A check passes
+					else:
+						# Check the date, which must be greater than today's date
+						local_time = datetime.date(now())
+						card_expiration = data['wwcc_expiration']
+						
+						# Check if card has expired in their local time
+						if card_expiration < local_time:
+							carderr = 'The card you have entered has already expired'
+						else:
+							valid_card = True
+						
+				else:
+					carderr = 'Please enter both the card number and the expiration date'
+
+				# No password or username errors were encountered
+				if pwerr == '' and usererr == '' and carderr == '':
+					# Form 1 data
 					data = formpart1.cleaned_data
 					u.first_name = data['first_name']
 					u.last_name = data['last_name']
+
 					if new_username:
 						u.username = new_username
+
 					username = data['username']
 					u.email = data['email']
 					u.alt_email = data['alt_email']
+
 					if u.mobile != data['mobile']:
 						u.mobile = data['mobile']
 						u.mobile_verified = False
+
 					u.gender = data['gender']
+
+					if valid_card:
+						u.wwcc_number = data['wwcc_number']
+						u.wwcc_expiration = data['wwcc_expiration']
+						message_subject = u.get_full_name() + ' (' + u.username + ') has submitted a WWCC Number for checking' 
+						message_body = 'Please check the following details for ' + u.get_full_name() + ': <br /> Working with Children Check Number (Or similar): ' + u.wwcc_number + '<br /> Expiration Date: ' + str(u.wwcc_expiration) + '<br /> <br /> When you have verified that the volunteer has a valid card, mark them as "Passed the Police Check" on their profile from the following link: <br /> <br /> ' + 'https://myrobogals.org/profile/' + u.username + '/edit/ <br /> If they haven\'t passed the check, please re-email them at ' + u.email + ' explaining the situation'
+						emailmessage(email_subject=message_subject, email_body=message_body, chapter=chapter)
+
+
 					if 'student_number' in data:
 						u.student_number = data['student_number']
 					if 'union_member' in data:
 						u.union_member = data['union_member']
 					if 'tshirt' in data:
 						u.tshirt = data['tshirt']
+
+					# Form 2 data
 					data = formpart2.cleaned_data
 					u.privacy = data['privacy']
 					u.dob_public = data['dob_public']
 					u.email_public = data['email_public']
+
+					# Form 3 data
 					data = formpart3.cleaned_data
 					u.dob = data['dob']
 					u.course = data['course']
@@ -787,6 +895,8 @@ def edituser(request, username, chapter=None):
 					u.bio = data['bio']
 					#u.job_title = data['job_title']
 					#u.company = data['company']
+
+					# Form 4 data
 					data = formpart4.cleaned_data
 					u.email_reminder_optin = data['email_reminder_optin']
 					u.email_chapter_optin = data['email_chapter_optin']
@@ -794,19 +904,33 @@ def edituser(request, username, chapter=None):
 					u.mobile_marketing_optin = data['mobile_marketing_optin']
 					u.email_newsletter_optin = data['email_newsletter_optin']
 					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
+
+					# Check whether they have permissions to edit exec only fields
 					if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
 						data = formpart5.cleaned_data
 						u.internal_notes = data['internal_notes']
 						u.trained = data['trained']
 						u.security_check = data['security_check']
+
+					# Save user to database	
 					u.save()
+					print(request.POST)
+					
+					# TODO : Is this being used?
 					if 'return' in request.POST:
+						# Renders successful message on page
 						messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
+
+						# Returns rendered page
 						return HttpResponseRedirect(request.POST['return'])
+					
+					# If it's a new user signup
 					elif join:
 						if chapter.welcome_email_enable:
+							# Creates a new EmailMessage object preparing for an email
 							message = EmailMessage()
-							message.subject = chapter.welcome_email_subject
+
+
 							try:
 								message.subject = chapter.welcome_email_subject.format(
 									chapter=chapter,
@@ -814,6 +938,7 @@ def edituser(request, username, chapter=None):
 									plaintext_password=request.POST['password1'])
 							except Exception:
 								message.subject = chapter.welcome_email_subject
+
 							try:
 								message.body = chapter.welcome_email_msg.format(
 									chapter=chapter,
@@ -821,59 +946,64 @@ def edituser(request, username, chapter=None):
 									plaintext_password=request.POST['password1'])
 							except Exception:
 								message.body = chapter.welcome_email_msg
+
+							# Setting defaults	
 							message.from_address = 'my@robogals.org'
 							message.reply_address = 'my@robogals.org'
 							message.from_name = chapter.name
 							message.sender = User.objects.get(username='edit')
 							message.html = chapter.welcome_email_html
+							
+							# Setting message to -1 in the DB shows that the message is in WAIT mode
 							message.status = -1
 							message.save()
+
+							# Prepares message for sending
 							recipient = EmailRecipient()
 							recipient.message = message
 							recipient.user = u
 							recipient.to_name = u.get_full_name()
 							recipient.to_address = u.email
 							recipient.save()
+
+							# Change message to PENIDNG mode, which waits for server to send
 							message.status = 0
 							message.save()
+
+						# Notifies chapter of a new member the user joined on their own
 						if not adduser and chapter.notify_enable and chapter.notify_list:
-							message = EmailMessage()
-							message.subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
-							message.body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
-							message.from_name = "myRobogals"
-							message.from_address = "my@robogals.org"
-							message.reply_address = "my@robogals.org"
-							message.sender = User.objects.get(username='edit')
-							message.html = True
-							message.email_type = 0
-							message.status = -1
-							message.save()
-							users = chapter.notify_list.users.all()
-							for user in users:
-								recipient = EmailRecipient()
-								recipient.message = message
-								recipient.user = user
-								recipient.to_name = user.get_full_name()
-								recipient.to_address = user.email
-								recipient.save()
-							message.status = 0
-							message.save()
+							# Sends an email to every exec on the notify list
+							message_subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
+							message_body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
+							emailmessage(email_subject=message_subject, email_body=message_body, chapter=chapter)
+
+						# Renders welcome page
 						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
 					else:
+						# Renders successfully updated profile message
 						messages.success(request, message=unicode(_("Profile and settings updated!")))
+
+						# Returns rendered page
 						return HttpResponseRedirect("/profile/" + username + "/")
+		
+		# Not POST response
 		else:
+			# If the user is new and joining a chapter
 			if join:
 				formpart1 = FormPartOne(None, chapter=chapter, user_id=0)
 				formpart2 = FormPartTwo(None, chapter=chapter)
 				formpart3 = FormPartThree(None, chapter=chapter)
 				formpart4 = FormPartFour(None, chapter=chapter)
 				formpart5 = FormPartFive(None, chapter=chapter)
+			
+			# Returning the forms with prefilled information about the user fetched from the database if editing user information
 			else:
 				if u.tshirt:
 					tshirt_id = u.tshirt.pk
 				else:
 					tshirt_id = None
+
+				# Data for FormPart1
 				formpart1 = FormPartOne({
 					'first_name': u.first_name,
 					'last_name': u.last_name,
@@ -884,7 +1014,11 @@ def edituser(request, username, chapter=None):
 					'gender': u.gender,
 					'student_number': u.student_number,
 					'union_member': u.union_member,
+					'wwcc_number': u.wwcc_number,
+					'wwcc_expiration': u.wwcc_expiration,
 					'tshirt': tshirt_id}, chapter=chapter, user_id=u.pk)
+					
+				# Data for FormPart2
 				formpart2 = FormPartTwo({
 					'privacy': u.privacy,
 					'dob_public': u.dob_public,
@@ -915,6 +1049,7 @@ def edituser(request, username, chapter=None):
 					'internal_notes': u.internal_notes,
 					'trained': u.trained,
 					'security_check': u.security_check}, chapter=chapter)
+		
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
@@ -924,7 +1059,23 @@ def edituser(request, username, chapter=None):
 
 		chpass = (join or (request.user.is_staff and request.user != u))
 		exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter)
-		return render_to_response('profile_edit.html', {'join': join, 'adduser': adduser, 'chpass': chpass, 'exec_fields': exec_fields, 'formpart1': formpart1, 'formpart2': formpart2, 'formpart3': formpart3, 'formpart4': formpart4, 'formpart5': formpart5, 'u': u, 'chapter': chapter, 'usererr': usererr, 'pwerr': pwerr, 'new_username': new_username, 'return': return_url}, context_instance=RequestContext(request))
+		return render_to_response('profile_edit.html', {'join': join, 
+			'adduser': adduser, 
+			'chpass': chpass, 
+			'exec_fields': exec_fields, 
+			'formpart1': formpart1, 
+			'formpart2': formpart2, 
+			'formpart3': formpart3, 
+			'formpart4': formpart4, 
+			'formpart5': formpart5, 
+			'u': u, 
+			'chapter': chapter, 
+			'usererr': usererr, 
+			'pwerr': pwerr,
+			'carderr': carderr,
+			'new_username': new_username, 
+			'return': return_url}, 
+			context_instance=RequestContext(request))
 	else:
 		raise Http404  # don't have permission to change
 
@@ -1128,7 +1279,7 @@ def exportusers(request, chapterurl):
 			).values('user__username', 'user__first_name', 'user__last_name', 'user__email', 'user__mobile', 'user__course', 'user__university__name', 'user__student_number', 'user__alt_email', 'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end', 'user__course_type', 'user__student_type').distinct()
 
 		response = HttpResponse(content_type='text/csv')
-		filename = 'robogals-' + c.myrobogals_url + '-' + str(datetime.date.today()) + '.csv'
+		filename = 'robogals-' + c.myrobogals_url + '-' + str(date.today()) + '.csv'
 		response['Content-Disposition'] = 'attachment; filename=' + filename
 		csv_data = (('username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number', 'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type', 'student_type'),)
 		for user in users:
