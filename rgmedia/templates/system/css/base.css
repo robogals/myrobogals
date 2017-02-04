@@ -1,0 +1,27 @@
+div.wrapper { margin: 0 auto; width: 982px;padding:0;}
+body { min-width:982px;}
+#inset-block-left { width:0px;padding:0;}
+#inset-block-right { width:0px;padding:0;}
+#maincontent-block { margin-right:0px;margin-left:0px;}
+
+.s-c-s .colmid { left:280px;}
+.s-c-s .colright { margin-left:-280px;}
+.s-c-s .col1pad { margin-left:280px;}
+.s-c-s .col2 { left:0px;width:280px;}
+.s-c-s .col3 { width:0px;}
+
+.s-c-x .colright { left:280px;}
+.s-c-x .col1wrap { right:280px;}
+.s-c-x .col1 { margin-left:280px;}
+.s-c-x .col2 { right:280px;width:280px;}
+
+.x-c-s .colright { margin-left:-0px;}
+.x-c-s .col1 { margin-left:0px;}
+.x-c-s .col3 { left:0px;width:0px;}
+
+.selector-add {
+    background: url({{ MEDIA_URL }}images/selector-add.gif) top center no-repeat;
+}
+.selector-remove {
+    background: url({{ MEDIA_URL }}images/selector-remove.gif) top center no-repeat;
+}

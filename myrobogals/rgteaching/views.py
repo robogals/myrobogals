@@ -24,9 +24,10 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from myrobogals.rgmain.models import Subdivision
 import json, urllib, urllib2, math
+from django.utils import timezone
 from django.utils.timezone import make_aware, localtime, now
 import math
-from django.utils import timezone
+
 
 @login_required
 def teachhome(request):

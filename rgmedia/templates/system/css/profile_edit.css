@@ -1,0 +1,9 @@
+td {
+    vertical-align: text-top;
+}
+
+p.helpText {
+    font-size: 8pt; 
+    color: rgb(124, 124, 124);
+    text-align: justify;
+}
