@@ -27,6 +27,9 @@ def wiki(request):
 def files(request):
 	return render_to_response('files.html', {}, context_instance=RequestContext(request))
 
+def changelogs(request):
+	return render_to_response('changelogs.html', context_instance=RequestContext(request))
+
 # Ensure that date format strings are included in our language file
 def do_nothing_dates(request):
 	USELESS = [

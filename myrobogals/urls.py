@@ -144,6 +144,9 @@ urlpatterns = patterns('',
 	(r'^messages/history/$', 'myrobogals.rgmessages.views.msghistory'),
 	(r'^messages/previewemail/$', 'myrobogals.rgmessages.views.previewemail'),
 	
+	# Changelogs
+	(r'^changelogs/$', 'myrobogals.rgmain.views.changelogs'),
+
 	# Wiki
 	(r'^wiki/$', 'myrobogals.rgmain.views.wiki'),
 
