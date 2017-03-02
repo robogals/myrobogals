@@ -121,6 +121,8 @@ class User(AbstractUser):
 	union_member = models.BooleanField(default=False)
 	tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
 	trained = models.BooleanField(default=False)
+	wwcc_number = models.CharField(max_length=20, blank=True) # TODO: Limit to maximum number of digits required
+	wwcc_expiration = models.DateField(null=True, blank=True)
 	security_check = models.BooleanField(default=False)
 	name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
 	forum_last_act = models.DateTimeField('Forum last activity', auto_now_add=True)
