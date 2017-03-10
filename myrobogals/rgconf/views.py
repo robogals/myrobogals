@@ -11,7 +11,7 @@ from myrobogals.rgconf.models import Conference, ConferenceAttendee, ConferenceP
 from django.core.urlresolvers import reverse
 from myrobogals.rgchapter.models import ShirtSize
 from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
-from myrobogals.rgteaching.views import EmailModelMultipleChoiceField
+from myrobogals.rgteaching.forms import EmailModelMultipleChoiceField
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from tinymce.widgets import TinyMCE
 import re
