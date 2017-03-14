@@ -54,7 +54,7 @@ class SchoolVisitFormOne(SchoolVisitFormOneBase):
     # Here we override the constructor so that the school drop-down menu will only be
     # populated with this chapter's schools
     def __init__(self, *args, **kwargs):
-        chapter = kwargs.pop('chapter', None)
+        chapter = kwargs.pop('chapter')
         super(SchoolVisitFormOne, self).__init__(*args, **kwargs)
         if chapter == None:
             self.fields["school"].queryset = School.objects.all().order_by('name')
@@ -332,11 +332,11 @@ class SchoolVisitStatsFormInstant(SchoolVisitStatsFormBase):
         chapter = kwargs.pop('chapter')
         super(SchoolVisitStatsFormInstant, self).__init__(*args, **kwargs)
 
-        if chapter == None:
-            self.fields['attended'].queryset = User.objects.filter(is_active=True).order_by('last_name');
+        if chapter is None:
+            self.fields['attended'].queryset = User.objects.filter(is_active=True).order_by('last_name')
         else:
             self.fields['attended'].queryset = User.objects.filter(is_active=True, chapter=chapter).order_by(
-                'last_name');
+                'last_name')
 
         self.fields['visit_type'].initial = ''
 
