@@ -1,5 +1,6 @@
 import math
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render_to_response
@@ -22,7 +23,7 @@ def instantvisit(request):
     if not request.user.is_staff and not request.user.is_superuser:
         raise Http404
 
-    if request.method == 'POST' and not request.session.get('hoursPerPersonStage', False):
+    if request.method == 'POST':
         if request.user.is_superuser:
             formpart1 = SchoolVisitFormInstant(request.POST, chapter=None)
             formpart2 = SchoolVisitStatsFormInstant(request.POST, chapter=None)
@@ -30,26 +31,53 @@ def instantvisit(request):
             formpart1 = SchoolVisitFormInstant(request.POST, chapter=chapter)
             formpart2 = SchoolVisitStatsFormInstant(request.POST, chapter=chapter)
 
-        # Valid form
-        if formpart1.is_valid() and formpart2.is_valid():
+        form_school = SchoolFormInstant(request.POST, chapter=chapter, school_id=0)
+
+        # Validate form
+        if formpart1.is_valid() and formpart2.is_valid() and form_school.is_valid():
             data = formpart1.cleaned_data
             data_stats = formpart2.cleaned_data
+            new_school_form = form_school.cleaned_data
 
-            schoolvisit = SchoolVisit()
+            selected_school = data['school']
 
-            schoolvisit.chapter = chapter
-            schoolvisit.creator = request.user
-            schoolvisit.school = data['school']
-            schoolvisit.location = data['location']
-            schoolvisit.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']),
+            school_visit = SchoolVisit()
+            new_school = School()
+
+            # Check if new school was selected, New school equals 0 in value
+            if selected_school == 0:
+                # Check if school exists
+                exist = School.objects.filter(name__iexact=new_school_form['name'], chapter=chapter)
+                if exist:
+                    messages.error(request, message=unicode("School seems to already exist, please recheck list."))
+                    return render_to_response('instant_workshop.html',
+                                              {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+                                              context_instance=RequestContext(request))
+
+                # Create new school after checking it doesn't exist
+                new_school.name = new_school_form['name']
+                new_school.chapter = chapter
+                new_school.address_street = new_school_form['address_street']
+                new_school.address_city = new_school_form['address_city']
+                new_school.address_state = new_school_form['address_state']
+                new_school.address_country = new_school_form['address_country']
+                new_school.save()
+                school_visit.school = new_school
+            else:
+                school_visit.school = selected_school
+
+            school_visit.chapter = chapter
+            school_visit.creator = request.user
+            school_visit.location = data['location']
+            school_visit.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']),
                                                  timezone=chapter.tz_obj())
-            schoolvisit.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']),
+            school_visit.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']),
                                                timezone=chapter.tz_obj())
-            schoolvisit.save()
+            school_visit.save()
 
             # Add the new stats just entered
             stats = SchoolVisitStats()
-            stats.visit = schoolvisit
+            stats.visit = school_visit
             stats.visit_type = data_stats['visit_type']
             stats.primary_girls_first = data_stats['primary_girls_first']
             stats.primary_girls_repeat = data_stats['primary_girls_repeat']
@@ -69,24 +97,24 @@ def instantvisit(request):
             # Save attendance in database
             for attendee in data_stats['attended']:
                 newinvite = EventAttendee()
-                newinvite.event = schoolvisit
+                newinvite.event = school_visit
                 newinvite.user = attendee
                 newinvite.actual_status = 1
                 newinvite.rsvp_status = 0
                 newinvite.save()
 
             # Render page 2: enter user-specific volunteering hours
-            default_hours = int(math.ceil((schoolvisit.visit_end - schoolvisit.visit_start).total_seconds() / 3600.0))
+            default_hours = int(math.ceil((school_visit.visit_end - school_visit.visit_start).total_seconds() / 3600.0))
 
             request.session['hoursPerPersonStage'] = 2
 
-            return render_to_response('visit_hoursPerPerson.html', {'attended': data_stats['attended'], 'visit_id': schoolvisit.id,
+            return render_to_response('visit_hoursPerPerson.html', {'attended': data_stats['attended'], 'visit_id': school_visit.id,
                                                                     'defaultHours': range(default_hours)},
                                       context_instance=RequestContext(request))
 
         # Form is invalid
         else:
-            return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2},
+            return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                       context_instance=RequestContext(request))
     # Happens when someone presses back
     elif request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
@@ -100,6 +128,8 @@ def instantvisit(request):
             formpart1 = SchoolVisitFormInstant(chapter=chapter)
             formpart2 = SchoolVisitStatsFormInstant(chapter=chapter)
 
+        form_school = SchoolFormInstant(chapter=chapter, school_id=0)
+
         # Render clean form
-        return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2},
+        return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                   context_instance=RequestContext(request))

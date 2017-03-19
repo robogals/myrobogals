@@ -491,6 +491,7 @@ def dorsvp(request, event_id, user_id, rsvp_status):
 
 
 # RSVP to a workshop, with the option to leave a message
+@login_required
 def rsvp(request, event_id, user_id, rsvp_type):
     e = get_object_or_404(Event, pk=event_id)
     chapter = request.user.chapter
