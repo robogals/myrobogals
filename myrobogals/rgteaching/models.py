@@ -1,10 +1,13 @@
+import json
+import urllib
+import urllib2
+
 from django.db import models
-from myrobogals.rgprofile.models import User
+from django.utils.timezone import localtime
+
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country, Subdivision
-from datetime import datetime
-import json, urllib, urllib2
-from django.utils.timezone import localtime
+from myrobogals.rgprofile.models import User
 
 
 # A school added to myRobogals by a schools manager or similar.
@@ -25,6 +28,9 @@ class School(models.Model):
     notes = models.TextField(blank=True)
 
     def __unicode__(self):
+        return self.name
+
+    def __str__(self):
         return self.name
 
 

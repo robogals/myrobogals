@@ -64,14 +64,22 @@ class SchoolVisitFormOne(SchoolVisitFormOneBase):
 
 # Form to create or edit a InstantSchoolVisit (instant workshop)
 class SchoolVisitFormInstant(SchoolVisitFormOneBase):
+    school = forms.ChoiceField(choices=[(school.id, school) for school in School.objects.all()],
+                               widget=forms.Select(attrs={'onchange': 'NewSchoolSelect();'}))
+
     def __init__(self, *args, **kwargs):
         chapter = kwargs.pop('chapter')
         super(SchoolVisitFormInstant, self).__init__(*args, **kwargs)
 
-        if chapter == None:
-            self.fields['school'].queryset = School.objects.all().order_by('name')
+        if chapter is None:
+            school_query_set = School.objects.all().order_by('name')
+            query_set_tuple = [(q, q) for q in school_query_set]
+            self.fields['school'].choices = query_set_tuple + [('', '--------------'), ('0', 'New School')]
         else:
-            self.fields['school'].queryset = School.objects.filter(chapter=chapter).order_by('name')
+            school_query_set = School.objects.filter(chapter=chapter).order_by('name')
+            query_set_tuple = [(q, q) for q in school_query_set]
+            self.fields['school'].choices = query_set_tuple + [('', '--------------'), ('0', 'New School')]
+
 
 
 class SchoolVisitFormTwo(forms.Form):
@@ -251,6 +259,13 @@ class SchoolFormPartOne(forms.Form):
     address_postcode = forms.CharField(label=_("Postcode"), required=False,
                                        widget=forms.TextInput(attrs={'size': '30'}))
     address_country = forms.ModelChoiceField(label=_("Country"), queryset=Country.objects.all(), initial='AU')
+
+
+# Adjusted required fields to false, but checking is done in the views
+class SchoolFormInstant(SchoolFormPartOne):
+    name = SchoolNameField(max_length=128, label=_("Name"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
+    address_state = forms.CharField(label=_("State"), required=False, widget=forms.TextInput(attrs={'size': '30'}),
+                                    help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
 
 
 class SchoolFormPartTwo(forms.Form):
