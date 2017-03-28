@@ -2,6 +2,7 @@ import math
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -31,40 +32,53 @@ def instantvisit(request):
             formpart1 = SchoolVisitFormInstant(request.POST, chapter=chapter)
             formpart2 = SchoolVisitStatsFormInstant(request.POST, chapter=chapter)
 
-        form_school = SchoolFormInstant(request.POST, chapter=chapter, school_id=0)
+        form_school = SchoolFormPartOne(request.POST, chapter=chapter, school_id=0)
 
         # Validate form
-        if formpart1.is_valid() and formpart2.is_valid() and form_school.is_valid():
+        if formpart1.is_valid() and formpart2.is_valid():
             data = formpart1.cleaned_data
             data_stats = formpart2.cleaned_data
-            new_school_form = form_school.cleaned_data
 
             selected_school = data['school']
-
             school_visit = SchoolVisit()
             new_school = School()
 
-            # Check if new school was selected, New school equals 0 in value
-            if selected_school == 0:
-                # Check if school exists
-                exist = School.objects.filter(name__iexact=new_school_form['name'], chapter=chapter)
-                if exist:
-                    messages.error(request, message=unicode("School seems to already exist, please recheck list."))
+            # Check if new school was selected, New school equals to 0
+            if selected_school == u'0': # TODO: Check this
+                if form_school.is_valid():
+                    new_school_form = form_school.cleaned_data
+                    print(new_school_form)
+                    # Check if school exists
+                    exist = School.objects.filter(name__iexact=new_school_form['name'], chapter=chapter)
+                    if exist:
+                        messages.error(request, "School seems to already exist, please recheck list.")
+                        return render_to_response('instant_workshop.html',
+                                                  {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+                                                  context_instance=RequestContext(request))
+
+                    # Create new school after checking it doesn't exist
+                    new_school.name = new_school_form['name']
+                    new_school.chapter = chapter
+                    new_school.address_street = new_school_form['address_street']
+                    new_school.address_city = new_school_form['address_city']
+                    new_school.address_state = new_school_form['address_state']
+                    new_school.address_country = new_school_form['address_country']
+                    new_school.save()
+                    school_visit.school = new_school
+                else:
+                    # School form invalid
                     return render_to_response('instant_workshop.html',
                                               {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                               context_instance=RequestContext(request))
-
-                # Create new school after checking it doesn't exist
-                new_school.name = new_school_form['name']
-                new_school.chapter = chapter
-                new_school.address_street = new_school_form['address_street']
-                new_school.address_city = new_school_form['address_city']
-                new_school.address_state = new_school_form['address_state']
-                new_school.address_country = new_school_form['address_country']
-                new_school.save()
-                school_visit.school = new_school
             else:
-                school_visit.school = selected_school
+                try:
+                    previously_visited_school = School.objects.get(name=selected_school)
+                except ObjectDoesNotExist:
+                    messages.error(request, message=unicode("Please select a school from the list or create a new one."))
+                    return render_to_response('instant_workshop.html',
+                                              {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+                                              context_instance=RequestContext(request))
+                school_visit.school = previously_visited_school
 
             school_visit.chapter = chapter
             school_visit.creator = request.user
@@ -128,7 +142,7 @@ def instantvisit(request):
             formpart1 = SchoolVisitFormInstant(chapter=chapter)
             formpart2 = SchoolVisitStatsFormInstant(chapter=chapter)
 
-        form_school = SchoolFormInstant(chapter=chapter, school_id=0)
+        form_school = SchoolFormPartOne(chapter=chapter, school_id=0)
 
         # Render clean form
         return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
