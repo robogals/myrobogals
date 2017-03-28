@@ -73,12 +73,11 @@ class SchoolVisitFormInstant(SchoolVisitFormOneBase):
 
         if chapter is None:
             school_query_set = School.objects.all().order_by('name')
-            query_set_tuple = [(q, q) for q in school_query_set]
-            self.fields['school'].choices = query_set_tuple + [('', '--------------'), ('0', 'New School')]
         else:
             school_query_set = School.objects.filter(chapter=chapter).order_by('name')
-            query_set_tuple = [(q, q) for q in school_query_set]
-            self.fields['school'].choices = query_set_tuple + [('', '--------------'), ('0', 'New School')]
+
+        query_set_tuple = [(q, q) for q in school_query_set]
+        self.fields['school'].choices = query_set_tuple + [('-1', '--------------'), ('0', 'New School')]
 
 
 
@@ -259,13 +258,6 @@ class SchoolFormPartOne(forms.Form):
     address_postcode = forms.CharField(label=_("Postcode"), required=False,
                                        widget=forms.TextInput(attrs={'size': '30'}))
     address_country = forms.ModelChoiceField(label=_("Country"), queryset=Country.objects.all(), initial='AU')
-
-
-# Adjusted required fields to false, but checking is done in the views
-class SchoolFormInstant(SchoolFormPartOne):
-    name = SchoolNameField(max_length=128, label=_("Name"), required=False, widget=forms.TextInput(attrs={'size': '30'}))
-    address_state = forms.CharField(label=_("State"), required=False, widget=forms.TextInput(attrs={'size': '30'}),
-                                    help_text="Use the abbreviation, e.g. 'VIC' not 'Victoria'")
 
 
 class SchoolFormPartTwo(forms.Form):

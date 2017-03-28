@@ -596,7 +596,6 @@ def stats(request, visit_id):
             stats.other_boys_repeat = data['other_boys_repeat']
             stats.notes = data['notes']
             stats.save()
-
             # Save attendance in database
             for attendee in data['attended']:
                 list = EventAttendee.objects.filter(event__id=v.id).values_list('user_id', flat=True)

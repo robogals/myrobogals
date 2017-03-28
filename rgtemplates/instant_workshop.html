@@ -53,7 +53,10 @@
                 {% endif %}
 
                 <tr>
-                    <td style="vertical-align: top; white-space: nowrap" >{{ field.label_tag }}<span style="color: #ff0000">*</span></td>
+                    <td style="vertical-align: top; white-space: nowrap" >
+                        {{ field.label_tag }}
+                        {% if field.field.required %} <span style="color: #ff0000">*</span> {% endif %}
+                    </td>
                     <td>
                         {{ field }}
                         <br />
@@ -65,6 +68,8 @@
 
         <br>
     </div>
+
+    <p><label for="id_visit_type"><b>Visit type:</b></label> {{ form2.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{form2.visit_type.help_text}}{% endautoescape %}</span></p>
 
     <p> <b>Students taught:</b>
     <table width="460px" style="table-layout:fixed;  text-align:center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
@@ -119,12 +124,16 @@
 </form>
 
     <script>
+    console.log('here');
+    // Run script when page loads initially
+    NewSchoolSelect();
+
     // Shows the new school filling in form options
     function NewSchoolSelect() {
         var e = document.getElementById("id_school");
         var newSchool = document.getElementById("newSchoolTable");
         var selected = e.value;
-
+        console.log(selected);
         if(selected == 0) {
             newSchool.style.visibility = "visible";
         } else {
