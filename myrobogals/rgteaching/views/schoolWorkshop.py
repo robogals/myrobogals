@@ -624,7 +624,7 @@ def stats(request, visit_id):
             return render_to_response('visit_stats.html', {'form': form, 'visit_id': visit_id},
                                       context_instance=RequestContext(request))
     elif request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
-        raise Http404   # TODO: double check, get 2 when pressing back on page 2
+        raise Http404   # TODO: Make the same redirect as instant workshop
     else:
         request.session['hoursPerPersonStage'] = 1
         form = SchoolVisitStatsForm(None, visit=v)
