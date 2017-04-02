@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.utils.timezone import make_aware
 
@@ -12,7 +12,7 @@ from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, SchoolVisitStats
 
 """
-Creates and fills in the workshop with stats using 1 form
+Creates and fills in the workshop with stats using a single form
 """
 
 
@@ -24,7 +24,8 @@ def instantvisit(request):
     if not request.user.is_staff and not request.user.is_superuser:
         raise Http404
 
-    if request.method == 'POST':
+    # Sometimes request.session['hoursPerPersonStage'] may equal 1 from editing stats from a closed workshop
+    if request.method == 'POST' and request.session['hoursPerPersonStage'] != 2:
         if request.user.is_superuser:
             formpart1 = SchoolVisitFormInstant(request.POST, chapter=None)
             formpart2 = SchoolVisitStatsFormInstant(request.POST, chapter=None)
@@ -44,7 +45,7 @@ def instantvisit(request):
             new_school = School()
 
             # Check if new school was selected, New school equals to 0
-            if selected_school == u'0': # TODO: Check this
+            if selected_school == u'0':
                 if form_school.is_valid():
                     new_school_form = form_school.cleaned_data
                     print(new_school_form)
@@ -130,9 +131,12 @@ def instantvisit(request):
         else:
             return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                       context_instance=RequestContext(request))
-    # Happens when someone presses back
+
+    # Happens when someone presses back - refer them to the workshop list page to refill stats there
     elif request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
-        raise Http404
+        del request.session['hoursPerPersonStage']
+        messages.info(request, message='An error occurred. Please find your newly created workshop here and refill in your stats.')
+        return redirect('/teaching/list/')
     else:
         # Prepare form
         if request.user.is_superuser:

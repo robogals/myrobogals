@@ -61,11 +61,16 @@
                                                                  </h2>
                                                             </div>
                                                             <!-- article-rel-wrapper -->
-                                                            {% for message in messages %} {% autoescape off %} {% ifequal message.level DEFAULT_MESSAGE_LEVELS.ERROR  %}
-                                                                <div class="error">{{ message }}</div>
-                                                            {% else %}
-                                                                <div class="message">{{ message }}</div>
-                                                            {% endifequal %} {% endautoescape %} {% endfor %} {% block content %} {% endblock %}
+                                                            {% for message in messages %} {% autoescape off %}
+                                                                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                                                                    <div class="error">{{ message }} </div>
+                                                                {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                                                                    <div class="alert">{{ message }} </div>
+                                                                {% else %}
+                                                                    <div class="message">{{ message }} </div>
+                                                                {% endif %} {% endautoescape %}
+                                                            {% endfor %}
+                                                            {% block content %} {% endblock %}
                                                         </div>
                                                         <!-- page -->
                                                     </div>
