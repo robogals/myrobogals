@@ -13,6 +13,5 @@ myrobogals.db
 *.swp
 *.pyc
 *.o
-.pylintrc
 .idea/
 .vscode/
