@@ -48,7 +48,7 @@ def instantvisit(request):
             if selected_school == u'0':
                 if form_school.is_valid():
                     new_school_form = form_school.cleaned_data
-                    print(new_school_form)
+
                     # Check if school exists
                     exist = School.objects.filter(name__iexact=new_school_form['name'], chapter=chapter)
                     if exist:
