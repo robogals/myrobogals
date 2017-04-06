@@ -4,7 +4,7 @@ from django.db import models, connection
 from myrobogals.rgchapter.models import Chapter, DisplayColumn, ShirtSize, NAME_DISPLAYS
 from myrobogals.rgmain.models import University, Timezone
 from myrobogals.settings import GENDERS
-from datetime import date
+from datetime import date, datetime
 from urllib import quote
 
 class MemberStatusType(models.Model):
@@ -121,8 +121,8 @@ class User(AbstractUser):
 	union_member = models.BooleanField(default=False)
 	tshirt = models.ForeignKey(ShirtSize, null=True, blank=True)
 	trained = models.BooleanField(default=False)
-	wwcc_number = models.CharField(max_length=20, blank=True) # TODO: Limit to maximum number of digits required
-	wwcc_expiration = models.DateField(null=True, blank=True)
+	police_check_number = models.CharField(max_length=20, blank=True)
+	police_check_expiration = models.DateField(null=True, blank=True)
 	security_check = models.BooleanField(default=False)
 	name_display = models.IntegerField("Override chapter's name display", choices=NAME_DISPLAYS, blank=True, null=True)
 	forum_last_act = models.DateTimeField('Forum last activity', auto_now_add=True)
@@ -131,7 +131,7 @@ class User(AbstractUser):
 
 	def __unicode__(self):
 		return self.username
-	
+
 	def age(self):
 		return int((date.today() - self.dob).days / 365.25)
 	
@@ -147,7 +147,7 @@ class User(AbstractUser):
 			volunteer = MemberStatusType.objects.get(pk=1)
 			ms = MemberStatus(user=self, status_date_start=self.date_joined.date(), status_date_end=None, statusType=volunteer)
 			ms.save()
-			return student
+			return student # TODO: Check unresolved reference
 		else:
 			# Get all types currently active on this member (should not be more than one)
 			ms_active_list = MemberStatus.objects.filter(user=self, status_date_end__isnull=True).order_by('status_date_start',)
