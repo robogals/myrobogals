@@ -730,6 +730,7 @@ def email_message(email_subject, email_body, chapter):
 			recipient.save()
 			message.status = 0
 			message.save()
+			print('DEBUG: Email sent!')
 
 # Performs editing an existing as well as adding new user to a chapter
 def edituser(request, username, chapter=None):
@@ -856,11 +857,7 @@ def edituser(request, username, chapter=None):
 					if 'tshirt' in data:
 						u.tshirt = data['tshirt']
 
-					# When a user has entered one field but not the other
-					if ('police_check_number' in data and not 'police_check_expiration' in data) or \
-							(not 'police_check_number' in data and 'police_check_expiration' in data):
-						carderr = 'Please enter both the card number and the expiration date'
-					elif 'police_check_number' in data and data['police_check_expiration'] in data:
+					if 'police_check_number' in data:
 						# Check if they've changed their number or date
 						if u.police_check_number != data['police_check_number'] or u.police_check_expiration != data['police_check_expiration']:
 							# Check the date, which must be greater than today's date
@@ -873,122 +870,125 @@ def edituser(request, username, chapter=None):
 							else:
 								# Successful in changing police check number
 								# TODO: Build function that allows input of number and output regex expression to check cards for the chapter
-
 								u.police_check_number = data['police_check_number']
 								u.police_check_expiration = data['police_check_expiration']
-								message_subject = u.get_full_name() + ' (' + u.username + ') has submitted a WWCC Number for checking'
-								message_body = 'Please check the following details for ' + u.get_full_name() + ': <br /> Police check number: ' + u.police_check_number + '<br /> Expiration Date: ' + str(
-									u.police_check_expiration) + '<br /> <br /> When you have verified that the volunteer has a valid card, mark them as "Passed the Police Check" on their profile from the following link: <br /> <br /> ' + 'https://myrobogals.org/profile/' + u.username + '/edit/ <br /> If they haven\'t passed the check, please re-email them at ' + u.email + ' explaining the situation'
+
+								# Send email only if the user has changed/added a police check number instead of removing
+								if data['police_check_number'] != '':
+									message_subject = u.get_full_name() + ' (' + u.username + ') has submitted a WWCC Number for checking'
+									message_body = 'Please check the following details for ' + u.get_full_name() + ': <br /> Police check number: ' + u.police_check_number + '<br /> Expiration Date: ' + str(
+										u.police_check_expiration) + '<br /> <br /> When you have verified that the volunteer has a valid card, mark them as "Passed the Police Check" on their profile from the following link: <br /> <br /> ' + 'https://myrobogals.org/profile/' + u.username + '/edit/ <br /> If they haven\'t passed the check, please re-email them at ' + u.email + ' explaining the situation'
+									email_message(email_subject=message_subject, email_body=message_body, chapter=chapter)
+
+					if carderr == '':
+						# Form 2 data
+						data = formpart2.cleaned_data
+						u.privacy = data['privacy']
+						u.dob_public = data['dob_public']
+						u.email_public = data['email_public']
+
+						# Form 3 data
+						data = formpart3.cleaned_data
+						u.dob = data['dob']
+						u.course = data['course']
+						u.uni_start = data['uni_start']
+						u.uni_end = data['uni_end']
+						u.university = data['university']
+						u.course_type = data['course_type']
+						u.student_type = data['student_type']
+						u.job_title = data['job_title']
+						u.company = data['company']
+						u.bio = data['bio']
+						#u.job_title = data['job_title']
+						#u.company = data['company']
+
+						# Form 4 data
+						data = formpart4.cleaned_data
+						u.email_reminder_optin = data['email_reminder_optin']
+						u.email_chapter_optin = data['email_chapter_optin']
+						u.mobile_reminder_optin = data['mobile_reminder_optin']
+						u.mobile_marketing_optin = data['mobile_marketing_optin']
+						u.email_newsletter_optin = data['email_newsletter_optin']
+						u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
+
+						# Check whether they have permissions to edit exec only fields
+						if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
+							data = formpart5.cleaned_data
+							u.internal_notes = data['internal_notes']
+							u.trained = data['trained']
+							u.security_check = data['security_check']
+
+						# Save user to database
+						u.save()
+
+						if 'return' in request.POST:
+							# Renders successful message on page
+							messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
+
+							# Returns rendered page
+							return HttpResponseRedirect(request.POST['return'])
+
+						# If it's a new user signup
+						elif join:
+							if chapter.welcome_email_enable:
+								# Creates a new EmailMessage object preparing for an email
+								message = EmailMessage()
+
+
+								try:
+									message.subject = chapter.welcome_email_subject.format(
+										chapter=chapter,
+										user=u,
+										plaintext_password=request.POST['password1'])
+								except Exception:
+									message.subject = chapter.welcome_email_subject
+
+								try:
+									message.body = chapter.welcome_email_msg.format(
+										chapter=chapter,
+										user=u,
+										plaintext_password=request.POST['password1'])
+								except Exception:
+									message.body = chapter.welcome_email_msg
+
+								# Setting defaults
+								message.from_address = 'my@robogals.org'
+								message.reply_address = 'my@robogals.org'
+								message.from_name = chapter.name
+								message.sender = User.objects.get(username='edit')
+								message.html = chapter.welcome_email_html
+
+								# Setting message to -1 in the DB shows that the message is in WAIT mode
+								message.status = -1
+								message.save()
+
+								# Prepares message for sending
+								recipient = EmailRecipient()
+								recipient.message = message
+								recipient.user = u
+								recipient.to_name = u.get_full_name()
+								recipient.to_address = u.email
+								recipient.save()
+
+								# Change message to PENIDNG mode, which waits for server to send
+								message.status = 0
+								message.save()
+
+							# Notifies chapter of a new member the user joined on their own
+							if not adduser and chapter.notify_enable and chapter.notify_list:
+								# Sends an email to every exec on the notify list
+								message_subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
+								message_body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
 								email_message(email_subject=message_subject, email_body=message_body, chapter=chapter)
 
-					# Form 2 data
-					data = formpart2.cleaned_data
-					u.privacy = data['privacy']
-					u.dob_public = data['dob_public']
-					u.email_public = data['email_public']
+							# Renders welcome page
+							return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
+						else:
+							# Renders successfully updated profile message
+							messages.success(request, message=unicode(_("Profile and settings updated!")))
 
-					# Form 3 data
-					data = formpart3.cleaned_data
-					u.dob = data['dob']
-					u.course = data['course']
-					u.uni_start = data['uni_start']
-					u.uni_end = data['uni_end']
-					u.university = data['university']
-					u.course_type = data['course_type']
-					u.student_type = data['student_type']
-					u.job_title = data['job_title']
-					u.company = data['company']
-					u.bio = data['bio']
-					#u.job_title = data['job_title']
-					#u.company = data['company']
-
-					# Form 4 data
-					data = formpart4.cleaned_data
-					u.email_reminder_optin = data['email_reminder_optin']
-					u.email_chapter_optin = data['email_chapter_optin']
-					u.mobile_reminder_optin = data['mobile_reminder_optin']
-					u.mobile_marketing_optin = data['mobile_marketing_optin']
-					u.email_newsletter_optin = data['email_newsletter_optin']
-					u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
-
-					# Check whether they have permissions to edit exec only fields
-					if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
-						data = formpart5.cleaned_data
-						u.internal_notes = data['internal_notes']
-						u.trained = data['trained']
-						u.security_check = data['security_check']
-
-					# Save user to database
-					u.save()
-
-					if 'return' in request.POST:
-						# Renders successful message on page
-						messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
-
-						# Returns rendered page
-						return HttpResponseRedirect(request.POST['return'])
-
-					# If it's a new user signup
-					elif join:
-						if chapter.welcome_email_enable:
-							# Creates a new EmailMessage object preparing for an email
-							message = EmailMessage()
-
-
-							try:
-								message.subject = chapter.welcome_email_subject.format(
-									chapter=chapter,
-									user=u,
-									plaintext_password=request.POST['password1'])
-							except Exception:
-								message.subject = chapter.welcome_email_subject
-
-							try:
-								message.body = chapter.welcome_email_msg.format(
-									chapter=chapter,
-									user=u,
-									plaintext_password=request.POST['password1'])
-							except Exception:
-								message.body = chapter.welcome_email_msg
-
-							# Setting defaults
-							message.from_address = 'my@robogals.org'
-							message.reply_address = 'my@robogals.org'
-							message.from_name = chapter.name
-							message.sender = User.objects.get(username='edit')
-							message.html = chapter.welcome_email_html
-
-							# Setting message to -1 in the DB shows that the message is in WAIT mode
-							message.status = -1
-							message.save()
-
-							# Prepares message for sending
-							recipient = EmailRecipient()
-							recipient.message = message
-							recipient.user = u
-							recipient.to_name = u.get_full_name()
-							recipient.to_address = u.email
-							recipient.save()
-
-							# Change message to PENIDNG mode, which waits for server to send
-							message.status = 0
-							message.save()
-
-						# Notifies chapter of a new member the user joined on their own
-						if not adduser and chapter.notify_enable and chapter.notify_list:
-							# Sends an email to every exec on the notify list
-							message_subject = 'New user ' + u.get_full_name() + ' joined ' + chapter.name
-							message_body = 'New user ' + u.get_full_name() + ' joined ' + chapter.name + '<br/>username: ' + u.username + '<br/>full name: ' + u.get_full_name() + '<br/>email: ' + u.email
-							email_message(email_subject=message_subject, email_body=message_body, chapter=chapter)
-
-						# Renders welcome page
-						return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
-					else:
-						# Renders successfully updated profile message
-						messages.success(request, message=unicode(_("Profile and settings updated!")))
-
-						# Returns rendered page
-						return HttpResponseRedirect("/profile/" + username + "/")
+							# Returns rendered page
+							return HttpResponseRedirect("/profile/" + username + "/")
 
 		# Not POST response
 		else:
