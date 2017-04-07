@@ -147,7 +147,7 @@ class User(AbstractUser):
 			volunteer = MemberStatusType.objects.get(pk=1)
 			ms = MemberStatus(user=self, status_date_start=self.date_joined.date(), status_date_end=None, statusType=volunteer)
 			ms.save()
-			return student # TODO: Check unresolved reference
+			return student
 		else:
 			# Get all types currently active on this member (should not be more than one)
 			ms_active_list = MemberStatus.objects.filter(user=self, status_date_end__isnull=True).order_by('status_date_start',)
