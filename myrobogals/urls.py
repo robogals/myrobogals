@@ -138,6 +138,7 @@ urlpatterns = [
 	url(r'^globalreports/$', rgteaching_views.report_global),
 	url(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', rgteaching_views.report_global_breakdown),
 	url(r'^progress/$', rgchapter_views.progresschapter),
+	url(r'^teaching/instantworkshop/$', rgchapter_views.instantvisit),
 
 	# Email & SMS menu
 	url(r'^messages/img/(?P<msgid>\d+)/(?P<filename>.+)$', rgmessages_views.serveimg),
