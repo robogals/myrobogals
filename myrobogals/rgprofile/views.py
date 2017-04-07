@@ -1018,8 +1018,8 @@ def edituser(request, username, chapter=None):
 					'gender': u.gender,
 					'student_number': u.student_number,
 					'union_member': u.union_member,
-					'wwcc_number': u.wwcc_number,
-					'wwcc_expiration': u.wwcc_expiration,
+					'police_check_number': u.police_check_number,
+					'police_check_expiration': u.police_check_expiration,
 					'tshirt': tshirt_id}, chapter=chapter, user_id=u.pk)
 
 				# Data for FormPart2
