@@ -296,18 +296,18 @@ class StatsModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 class SchoolVisitStatsFormBase(forms.Form):
     visit_type = forms.ChoiceField(choices=VISIT_TYPES_BASE, required=False, help_text=_(
         'For an explanation of each type please see <a href="%s" target="_blank">here</a> (opens in new window)') % '/teaching/statshelp/')
-    primary_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    primary_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    primary_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    primary_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    high_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    high_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    high_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    high_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    other_girls_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    other_girls_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    other_boys_first = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
-    other_boys_repeat = forms.IntegerField(required=False, widget=forms.TextInput(attrs={'size': '8'}))
+    primary_girls_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    primary_girls_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    primary_boys_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    primary_boys_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    high_girls_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    high_girls_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    high_boys_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    high_boys_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    other_girls_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    other_girls_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    other_boys_first = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
+    other_boys_repeat = forms.IntegerField(required=False, min_value=0, widget=forms.TextInput(attrs={'size': '8'}))
     attended = StatsModelMultipleChoiceField(queryset=User.objects.none(),
                                              widget=FilteredSelectMultiple(_("Invitees"), False, attrs={'rows': 8}),
                                              required=False)
@@ -326,8 +326,9 @@ class SchoolVisitStatsForm(SchoolVisitStatsFormBase):
         visit = kwargs['visit']
         del kwargs['visit']
         super(SchoolVisitStatsForm, self).__init__(*args, **kwargs)
+
         attending = EventAttendee.objects.filter(rsvp_status=2, event__id=visit.id).values_list('user_id')
-        self.fields['attended'].queryset = User.objects.filter(is_active=True, chapter=visit.school.chapter).order_by(
+        self.fields['attended'].queryset = User.objects.filter(is_active=True, chapter=visit.chapter).order_by(
             'last_name')
         self.fields['attended'].initial = [u.pk for u in User.objects.filter(id__in=attending)]
         self.fields['visit_type'].initial = ''

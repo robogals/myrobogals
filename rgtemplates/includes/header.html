@@ -201,18 +201,18 @@
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/new/"  >
             <span>
-                        {% trans "Create new workshop" %}               
+                        {% trans "Create new event" %}
             </span>
 
         </a>
-        
+        .
         
 </li>
 
                     <li class="item71" >
-            <a class="orphan item bullet" href="/teaching/instantworkshop/"  >
+            <a class="orphan item bullet" href="/teaching/quickentry/"  >
             <span>
-                        {% trans "Create instant workshop" %}               
+                        {% trans "Quick workshop entry" %}
             </span>
 
         </a>
@@ -243,13 +243,13 @@
                 <li class="item147">
                     <a class="orphan item bullet" href="/progress/">
                         <span>{% trans "Progress towards goals" %}</span>
-                    <a>
+                    </a>
                 </li>
 {% if user.is_superuser %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/globalreports/">
                         <span>{% trans "Reporting" %}</span>
-                    <a>
+                    </a>
                 </li>
 {% else %}
 		{% if user.is_staff %}
@@ -257,13 +257,13 @@
 				<li class="item147">
                     <a class="orphan item bullet" href="/globalreports/">
                         <span>{% trans "Reporting" %}</span>
-                    <a>
+                    </a>
                 </li>
 				{% else %}
 				<li class="item147">
                     <a class="orphan item bullet" href="/reports/">
                         <span>{% trans "Reporting" %}</span>
-                    <a>
+                    </a>
                 </li>
                 {% endifequal %}
 		{% endif %}

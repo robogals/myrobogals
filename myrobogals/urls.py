@@ -11,7 +11,7 @@ from myrobogals.rgforums import views as rgforums_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile import views as rgprofile_views
-from myrobogals.rgteaching import views as rgteaching_views
+from myrobogals.rgteaching.views import quickentry, eventvisit, report
 from myrobogals.rgweb import views as rgweb_views
 
 from tinymce import urls as tinymce_urls
@@ -74,71 +74,16 @@ urlpatterns = [
 	url(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/invoice/$', rgconf_views.showinvoice),
 
 	# Forums
-	# url(r'^forums/newcategory/$', rgforums_views.newcategory),
-	# url(r'^forums/newforum/$', rgforums_views.newforum),
-	# url(r'^forums/stickytopic/$', rgforums_views.stickytopic),
-	# url(r'^forums/setmaxuploadfilesize/$', rgforums_views.setmaxuploadfilesize),
-	# url(r'^forums/category/delete/(?P<category_id>\d+)/$', rgforums_views.deletecategory),
-	# url(r'^forums/forum/delete/(?P<forum_id>\d+)/$', rgforums_views.deleteforum),
-	# url(r'^forums/topic/delete/(?P<topic_id>\d+)/$', rgforums_views.deletetopic),
-	# url(r'^forums/post/delete/(?P<post_id>\d+)/$', rgforums_views.deletepost),
-	# url(r'^forums/post/fileoffenses/(?P<post_id>\d+)/$', rgforums_views.fileoffenses),
-	# url(r'^forums/showforumoffenses/(?P<forum_id>\d+)/$', rgforums_views.showforumoffenses),
-	# url(r'^forums/unwatchforum/(?P<forum_id>\d+)/$', rgforums_views.unwatchforum),
-	# url(r'^forums/watchforum/(?P<forum_id>\d+)/$', rgforums_views.watchforum),
-	# url(r'^forums/unwatchtopic/(?P<topic_id>\d+)/$', rgforums_views.unwatchtopic),
-	# url(r'^forums/watchtopic/(?P<topic_id>\d+)/$', rgforums_views.watchtopic),
-	# url(r'^forums/unwatchalltopics/$', rgforums_views.unwatchalltopics),
-	# url(r'^forums/watchmytopics/$', rgforums_views.watchtopicwithmyposts),
-	# url(r'^forums/unwatchall/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', rgforums_views.unwatchall),
-	# url(r'^forums/search/(?P<chapterurl>.+)/$', rgforums_views.search),
-	# url(r'^forums/newtopic/(?P<forum_id>\d+)/$', rgforums_views.newtopic),
-	# url(r'^forums/newpost/(?P<topic_id>\d+)/$', rgforums_views.newpost),
-	# url(r'^forums/editpost/(?P<post_id>\d+)/$', rgforums_views.editpost),
-	# url(r'^forums/upvote/(?P<post_id>\d+)/$', rgforums_views.topicupvote),
-	# url(r'^forums/undoupvote/(?P<post_id>\d+)/$', rgforums_views.topicundoupvote),
-	# url(r'^forums/deletefile/(?P<post_id>\d+)/(?P<file_id>\d+)/$', rgforums_views.deletefile),
-	# url(r'^forums/downloadpostfile/(?P<post_id>\d+)/(?P<file_id>\d+)/$', rgforums_views.downloadpostfile),
-	# url(r'^forums/editforum/(?P<forum_id>\d+)/$', rgforums_views.editforum),
-	# url(r'^forums/topic/(?P<topic_id>\d+)/$', rgforums_views.viewtopic),
-	# url(r'^forums/forum/(?P<forum_id>\d+)/$', rgforums_views.viewforum),
-	# url(r'^forums/$', rgforums_views.forums),
-	# url(r'^forums/(?P<forum_id>\d+)/blacklistuser/(?P<user_id>\d+)/$', rgforums_views.blacklistuser),
-	# url(r'^forums/(?P<forum_id>\d+)/unblacklistuser/(?P<user_id>\d+)/$', rgforums_views.unblacklistuser'),
+	# url(r'^forums/', include('myrobogals.rgforums.urls')),
 
 	# Workshops menu
-	url(r'^teaching/$', rgteaching_views.teachhome),
-	#url(r'^teaching/availability/$', rgteaching_views.availability),
-	#url(r'^teaching/training/$', rgteaching_views.training),
-	url(r'^teaching/list/$', rgteaching_views.listvisits),
-	url(r'^teaching/printlist/$', rgteaching_views.printlistvisits),
-	url(r'^teaching/statshelp/$', rgteaching_views.statshelp),
-	url(r'^teaching/(?P<visit_id>\d+)/$', rgteaching_views.viewvisit),
-	url(r'^teaching/(?P<visit_id>\d+)/deletemessage/(?P<message_id>\d+)/$', rgteaching_views.deletemessage),
-	url(r'^teaching/(?P<visit_id>\d+)/invite/$', rgteaching_views.invitetovisit),
-	url(r'^teaching/(?P<visit_id>\d+)/email/$', rgteaching_views.emailvisitattendees),
-	url(r'^teaching/(?P<visit_id>\d+)/edit/$', rgteaching_views.editvisit),
-	url(r'^teaching/(?P<visit_id>\d+)/stats/$', rgteaching_views.stats),
-	url(r'^teaching/(?P<visit_id>\d+)/statsHoursPerPerson/$', rgteaching_views.statsHoursPerPerson),
-	url(r'^teaching/(?P<visit_id>\d+)/cancel/$', rgteaching_views.cancelvisit),
-	url(r'^teaching/(?P<visit_id>\d+)/reopen/$', rgteaching_views.reopenvisit),
-	url(r'^teaching/(?P<event_id>\d+)/rsvp/(?P<user_id>\d+)/(?P<rsvp_type>.+)/$', rgteaching_views.rsvp),
-	url(r'^teaching/schools/$', rgteaching_views.listschools),
-	url(r'^teaching/unstarschool/$', rgteaching_views.unstarschool),
-	url(r'^teaching/starschool/$', rgteaching_views.starschool),
-	url(r'^teaching/copyschooldir/$', rgteaching_views.copyschool),
-	url(r'^teaching/filllatlngschdir/$', rgteaching_views.filllatlngschdir),
-	url(r'^teaching/schoolsdirectory/(?P<chapterurl>.+)/$', rgteaching_views.schoolsdirectory),
-	url(r'^teaching/schools/(?P<school_id>\d+)/$', rgteaching_views.editschool),
-	url(r'^teaching/schools/(?P<school_id>\d+)/delete/$', rgteaching_views.deleteschool),
-	url(r'^teaching/schools/new/$', rgteaching_views.newschool),
-	url(r'^teaching/(?P<school_id>\d+)/newvisit/$', rgteaching_views.newvisitwithschool),
-	url(r'^teaching/new/$', rgteaching_views.newvisit),
-	url(r'^reports/$', rgteaching_views.report_standard),
-	url(r'^globalreports/$', rgteaching_views.report_global),
-	url(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', rgteaching_views.report_global_breakdown),
+	url(r'^teaching/', include('myrobogals.rgteaching.urls')),
+
+	url(r'^reports/$', report.report_standard),
+	url(r'^globalreports/$', report.report_global),
+	url(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', report.report_global_breakdown),
 	url(r'^progress/$', rgchapter_views.progresschapter),
-	url(r'^teaching/instantworkshop/$', rgchapter_views.instantvisit),
+
 
 	# Email & SMS menu
 	url(r'^messages/img/(?P<msgid>\d+)/(?P<filename>.+)$', rgmessages_views.serveimg),

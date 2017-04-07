@@ -24,6 +24,9 @@ def instantvisit(request):
     if not request.user.is_staff and not request.user.is_superuser:
         raise Http404
 
+    if not request.session.get('hoursPerPersonStage', False):
+        request.session['hoursPerPersonStage'] = 1
+
     # Sometimes request.session['hoursPerPersonStage'] may equal 1 from editing stats from a closed workshop
     if request.method == 'POST' and request.session['hoursPerPersonStage'] != 2:
         if request.user.is_superuser:
@@ -137,17 +140,17 @@ def instantvisit(request):
         del request.session['hoursPerPersonStage']
         messages.info(request, message='An error occurred. Please find your newly created workshop here and refill in your stats.')
         return redirect('/teaching/list/')
+
+    # Prepare form
+    if request.user.is_superuser:
+        formpart1 = SchoolVisitFormInstant(chapter=None)
+        formpart2 = SchoolVisitStatsFormInstant(chapter=None)
     else:
-        # Prepare form
-        if request.user.is_superuser:
-            formpart1 = SchoolVisitFormInstant(chapter=None)
-            formpart2 = SchoolVisitStatsFormInstant(chapter=None)
-        else:
-            formpart1 = SchoolVisitFormInstant(chapter=chapter)
-            formpart2 = SchoolVisitStatsFormInstant(chapter=chapter)
+        formpart1 = SchoolVisitFormInstant(chapter=chapter)
+        formpart2 = SchoolVisitStatsFormInstant(chapter=chapter)
 
-        form_school = SchoolFormPartOne(chapter=chapter, school_id=0)
+    form_school = SchoolFormPartOne(chapter=chapter, school_id=0)
 
-        # Render clean form
-        return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
-                                  context_instance=RequestContext(request))
+    # Render clean form
+    return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+                              context_instance=RequestContext(request))
