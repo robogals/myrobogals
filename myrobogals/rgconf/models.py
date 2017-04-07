@@ -152,7 +152,7 @@ class ConferenceAttendee(models.Model):
 	arrival_time = models.CharField(max_length=64, blank=True)
 	dietary_reqs = models.CharField(max_length=64, blank=True)
 	comments = models.CharField(max_length=128, blank=True)
-	parts_attending = models.ManyToManyField(ConferencePart, blank=True, null=True)
+	parts_attending = models.ManyToManyField(ConferencePart, blank=True)
 	rsvp_time = models.DateTimeField(auto_now_add=True, help_text="Time in conference timezone when this person registered (does not change if RSVP edited)")
 	check_in = models.DateField(null=True, blank=True)
 	check_out = models.DateField(null=True, blank=True)
