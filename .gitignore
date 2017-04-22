@@ -13,3 +13,4 @@ myrobogals.db
 *.swp
 *.pyc
 *.o
+.idea/

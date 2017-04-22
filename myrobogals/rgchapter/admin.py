@@ -19,7 +19,7 @@ class ChapterAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name', 'short', 'short_en', 'myrobogals_url', 'status', 'creation_date', 'university', 'location', 'parent', 'timezone', 'mobile_regexes', 'is_joinable', 'exclude_in_reports', 'name_display', 'latitude', 'longitude')}),
         ('Annual goal', {'fields': ('goal', 'goal_start')}),
-        ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label')}),
+        ('Chapter-specific fields', {'fields': ('student_number_enable', 'student_number_required', 'student_number_label', 'student_union_enable', 'student_union_required', 'student_union_label', 'tshirt_enable', 'tshirt_required', 'tshirt_label', 'police_check_number_enable', 'police_check_number_required', 'police_check_number_label')}),
         ('Welcome email', {'fields': ('welcome_email_enable', 'welcome_email_subject', 'welcome_email_msg', 'welcome_email_html')}),
         ('Default invite email', {'fields': ('invite_email_subject', 'invite_email_msg', 'invite_email_html')}),
         ('Custom pages', {'fields': ('welcome_page', 'join_page')}),
