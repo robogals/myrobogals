@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Create Quick Workshop Entry" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Create Quick Workshop Entry" %}{% endblock %}
+
+{% block content %}
+<form action="/teaching/quickentry/" method="POST">{% csrf_token %}
+    <table>
+  <tr>
+    <td colspan="2"><strong>{% trans "Basic information" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
+  </tr>
+{% for field in form1 %}
+  {% if field.errors %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+  {% if school %}
+  <tr>
+    <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+  </tr>
+  {% endif %}
+
+    <tr>
+        <td style="vertical-align: top; white-space: nowrap" >{{ field.label_tag }}<span style="color: #ff0000">*</span></td>
+        <td>
+            {{ field }}
+            <br />
+            <span style="font-size: 8pt">{{field.help_text}}</span>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+<br>
+
+    <div id="newSchoolTable">
+        <table >
+            <tr>
+                <td colspan="2"><strong>{% trans "Enter in New School Information:" %}</strong><br />{% trans '<span style="color: #ff0000">*</span> required fields' %}</td>
+            </tr>
+            {% for field in schoolform %}
+                {% if field.errors %}
+                    <tr>
+                        <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+                    </tr>
+                {% endif %}
+                {% if school %}
+                    <tr>
+                        <td colspan="2"><div class="error">{% for error in field.errors %}{{error}}{% endfor %}</div></td>
+                    </tr>
+                {% endif %}
+
+                <tr>
+                    <td style="vertical-align: top; white-space: nowrap" >
+                        {{ field.label_tag }}
+                        {% if field.field.required %} <span style="color: #ff0000">*</span> {% endif %}
+                    </td>
+                    <td>
+                        {{ field }}
+                        <br />
+                        <span style="font-size: 8pt">{{field.help_text}}</span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+    </div>
+
+    <p><label for="id_visit_type"><b>Visit type:</b></label> {{ form2.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{form2.visit_type.help_text}}{% endautoescape %}</span></p>
+    {% if form2.errors %}
+	    <div class="error">{% trans "Please correct your entries in the form" %}</div>
+	{% endif %}
+    <p> <b>Students taught:</b>
+    <table width="460px" style="table-layout:fixed;  text-align:center;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="200px" />
+		<col width="200px" />
+		<tr class="odd">
+			<td></td>
+			<td>Girls</td>
+			<td>Boys</td>
+		</tr>
+	</table>
+	<table width="500px" style="table-layout:fixed;" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+		<col width="100px" />
+		<col width="100px" />
+		<col width="100px" />
+		<col width="100px" />
+		<col width="100px" />
+		<tr class="even" style="text-align: center;">
+			<td></td>
+			<td>First</td>
+			<td>Repeat</td>
+			<td>First</td>
+			<td>Repeat</td>
+		</tr>
+		<tr class="odd">
+			<td>Primary School</td>
+			<td>{{ form2.primary_girls_first }}</td>
+			<td>{{ form2.primary_girls_repeat }}</td>
+			<td>{{ form2.primary_boys_first }}</td>
+			<td>{{ form2.primary_boys_repeat }}</td>
+		</tr>
+		<tr class="even">
+			<td>High School</td>
+			<td>{{ form2.high_girls_first }}</td>
+			<td>{{ form2.high_girls_repeat }}</td>
+			<td>{{ form2.high_boys_first }}</td>
+			<td>{{ form2.high_boys_repeat }}</td>
+		</tr>
+		<tr class="odd">
+			<td>Other</td>
+			<td>{{ form2.other_girls_first }}</td>
+			<td>{{ form2.other_girls_repeat }}</td>
+			<td>{{ form2.other_boys_first }}</td>
+			<td>{{ form2.other_boys_repeat }}</td>
+		</tr>
+	</table></p>
+	<p><label for="id_notes">General Notes:</label> <br />{{ form2.notes }}</p>
+	<p><label for="id_notes">Select those volunteers who attended this workshop:</label>{{ form2.attended }}</p><br>
+     <p style="clear: both; font-size: 200%;">
+    <input type="submit" value="Next" />
+</form>
+
+    <script>
+    console.log('here');
+    // Run script when page loads initially
+    NewSchoolSelect();
+
+    // Shows the new school filling in form options
+    function NewSchoolSelect() {
+        var e = document.getElementById("id_school");
+        var newSchool = document.getElementById("newSchoolTable");
+        var selected = e.value;
+        console.log(selected);
+        if(selected == 0) {
+            newSchool.style.visibility = "visible";
+        } else {
+            newSchool.style.visibility = "collapse";
+        }
+    }
+    </script>
+{% endblock %}

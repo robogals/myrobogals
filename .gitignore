@@ -14,3 +14,4 @@ myrobogals.db
 *.pyc
 *.o
 .idea/
+.vscode/

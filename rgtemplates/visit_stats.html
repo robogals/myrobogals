@@ -5,6 +5,7 @@
 {% block pagetitle %}{% trans "Enter workshop statistics" %}{% endblock %}
 
 {% block content %}
+
 <form action="/teaching/{{visit_id}}/stats/" method="POST"> {% csrf_token %}
     {% if form.errors %}
 	<div class="error">{% trans "Please correct your entries in the form" %}</div>
