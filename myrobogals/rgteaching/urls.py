@@ -3,7 +3,7 @@ from views import quickentry, eventvisit, school
 
 urlpatterns = [
     # urls for eventvisit.py functions
-    url(r'^/$', eventvisit.teachhome),
+    url(r'^$', eventvisit.teachhome),
     url(r'^list/$', eventvisit.listvisits),
     url(r'^printlist/$', eventvisit.printlistvisits),
     url(r'^statshelp/$', eventvisit.statshelp),

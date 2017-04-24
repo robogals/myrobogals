@@ -789,8 +789,7 @@ def edituser(request, username, chapter=None):
 
 			# Checking if the form is valid
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
-				print('herethere')
-				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST)):
+				if ('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST):
 					attempt_modify_exec_fields = True
 				else:
 					attempt_modify_exec_fields = False
