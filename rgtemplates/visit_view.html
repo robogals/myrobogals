@@ -9,7 +9,7 @@
 <p><a href="/teaching/list/">{% trans "Return to workshop list" %}</a>
 {% if user.is_staff %}{% ifequal v.status 0 %} | <a href="/teaching/{{v.pk}}/edit/">{% trans "Edit workshop" %}</a>  | <a href="/teaching/{{v.pk}}/invite/">{% trans "Invite or add volunteers" %}</a> | <a href="/teaching/{{v.pk}}/email/">{% trans "Email volunteers" %}</a>
 | <a href="/teaching/{{v.pk}}/stats/">{% trans "Close workshop and enter stats" %}</a> | <a href="/teaching/{{v.pk}}/cancel/">{% trans "Cancel workshop" %}</a>{% endifequal %}
-{% ifequal v.status 1 %} | <a href="/teaching/{{v.pk}}/reopen/">{% trans "Delete stats and re-open workshop" %}</a> | <a href="/teaching/instantworkshop/">{% trans "Enter another instant workshop" %}</a>{% endifequal %}
+{% ifequal v.status 1 %} | <a href="/teaching/{{v.pk}}/reopen/">{% trans "Delete stats and re-open workshop" %}</a> | <a href="/teaching/instantworkshop/">{% trans "Create quick workshop entry" %}</a>{% endifequal %}
 {% endif %}
 </p>
 {% ifequal v.status 0 %}

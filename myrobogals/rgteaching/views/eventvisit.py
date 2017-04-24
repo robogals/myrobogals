@@ -48,11 +48,12 @@ def editvisit(request, visit_id):
                     v.creator = request.user
                 data = formpart1.cleaned_data
                 v.school = data['school']
+                visit_date = data['date']
                 # Take the user's date and time input and combine it with the
                 # chapter's timezone to create a timezone-aware datetime.
-                v.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']),
+                v.visit_start = make_aware(datetime.datetime.combine(visit_date, data['start_time']),
                                            timezone=chapter.tz_obj())
-                v.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']),
+                v.visit_end = make_aware(datetime.datetime.combine(visit_date, data['end_time']),
                                          timezone=chapter.tz_obj())
                 v.location = data['location']
                 v.allow_rsvp = data['allow_rsvp']
@@ -60,7 +61,7 @@ def editvisit(request, visit_id):
                 data = formpart2.cleaned_data
                 v.meeting_location = data['meeting_location']
                 if data['meeting_time']:
-                    v.meeting_time = make_aware(datetime.datetime.combine(data['date'], data['meeting_time']),
+                    v.meeting_time = make_aware(datetime.datetime.combine(visit_date, data['meeting_time']),
                                                 timezone=chapter.tz_obj())
                 else:
                     v.meeting_time = None

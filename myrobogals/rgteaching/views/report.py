@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
@@ -242,10 +244,10 @@ def report_global(request):
                 event_id_list = Event.objects.filter(visit_start__range=[start_date, end_date], chapter=chapter,
                                                      status=1).values_list('id', flat=True)
                 event_list = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('school', flat=True)
-                visit_ids = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('id')
+                # visit_ids = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('id')
                 event_list = set(event_list)
 
-                # For each school that had an event during the period
+                # For each school that had an event during the period, produce a chapter total
                 for school_id in event_list:
                     # Get all visits at this school during the period
                     this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id=school_id,
@@ -274,25 +276,47 @@ def report_global(request):
                 chapter_totals[chapter.short_en]['weighted'] = chapter_totals[chapter.short_en]['first'] + (
                 float(chapter_totals[chapter.short_en]['repeat']) / 2)
 
-                # Regional and Global Totals
+                # Sum chapter total to regional and global totals
                 if chapter.parent:
+                    # Adding regional states to region table
+                    if chapter.parent.id == 1 and chapter.short_en not in region_totals:
+                        region_totals[chapter.short_en] = {}
+
+                    # Initalising variable for parent that isn't in region total yet (AP, EMEA, NA)
                     if chapter.parent.short_en not in region_totals:
                         region_totals[chapter.parent.short_en] = {}
+
+                    # Summing chapter stats to regional and global
                     for key, value in chapter_totals[chapter.short_en].iteritems():
                         if key in region_totals[chapter.parent.short_en]:
-                            region_totals[chapter.parent.short_en][key] += value
+                            if chapter.parent.id == 1:
+                                # Summing regional stats to regional table
+                                region_totals[chapter.short_en][key] += value
+                            else:
+                                # Summing chapter stats to regional table
+                                region_totals[chapter.parent.short_en][key] += value
                         else:
-                            region_totals[chapter.parent.short_en][key] = value
+                            if chapter.parent.id == 1:
+                                region_totals[chapter.short_en][key] = value
+                            else:
+                                region_totals[chapter.parent.short_en][key] = value
+
                         if key in global_totals:
                             global_totals[key] += value
                         else:
                             global_totals[key] = value
+
+                    # Removing regional and special chapters from chapter list
                     if chapter.parent.id == 1:
                         del chapter_totals[chapter.short_en]
                     elif chapter_totals[chapter.short_en]['workshops'] == 0:
                         del chapter_totals[chapter.short_en]
+
+                # Removing global chapter from chapter list
                 elif chapter.id == 1:
                     del chapter_totals[chapter.short_en]
+
+            # Removing global chapter from region list
             del region_totals['Global']
         else:
             totals = {}
@@ -304,11 +328,13 @@ def report_global(request):
         chapter_totals = {}
         region_totals = {}
         global_totals = {}
+
     if request.user.is_superuser or request.user.chapter.id == 1:
         user_chapter_children = Chapter.objects.filter(exclude_in_reports=False).values_list('short_en', flat=True)
     else:
         user_chapter_children = Chapter.objects.filter(parent__pk=request.user.chapter.pk,
                                                        exclude_in_reports=False).values_list('short_en', flat=True)
+
     if printview:
         return render_to_response('print_report.html', {'chapter_totals': sorted(chapter_totals.iteritems()),
                                                         'region_totals': sorted(region_totals.iteritems()),
