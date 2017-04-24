@@ -32,6 +32,7 @@ urlpatterns = [
 	url(r'^join/$', rgchapter_views.joinlist),
 	url(r'^join/(?P<chapterurl>.+)/$', rgprofile_views.joinchapter),
 	url(r'^welcome/(?P<chapterurl>.+)/$', rgmain_views.welcome),
+	url(r'^code/$', rgprofile_views.codeofconduct),
 
 	# Profile menu
 	url(r'^profile/$', rgprofile_views.redirtoself),

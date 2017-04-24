@@ -1,5 +1,6 @@
 import csv
 import operator
+import os
 import re
 from datetime import datetime, time, date
 from time import time
@@ -16,6 +17,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
 from django.utils.dates import MONTHS
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -1138,7 +1140,6 @@ class LoginForm(forms.Form):
 
 
 def show_login(request):
-	print(request.POST)
 	try:
 		next = request.POST['next']
 	except KeyError:
@@ -1147,18 +1148,60 @@ def show_login(request):
 		except KeyError:
 			next = '/'
 
-	print(next)
-
 	if request.method == 'POST':
 		login_form = LoginForm(request.POST)
 
 		if login_form.is_valid():
 			login(request, login_form.user)
-			return HttpResponseRedirect(next)
+			return process_login(request, next)
 	else:
 		login_form = LoginForm()
 
 	return render_to_response('landing.html', {'form': login_form, 'next': next}, context_instance=RequestContext(request))
+
+
+def process_login(request, next):
+	if not request.user.is_authenticated():
+		return HttpResponseRedirect('/login/')
+
+	u = get_object_or_404(User, username__exact=request.user.username)
+
+	# Only redirect if code of conduct form exists
+	if not u.code_of_conduct and os.path.isfile("myrobogals/rgprofile/COCForm.txt"):
+		# Redirect to accept code of conduct form on sign-in
+		return HttpResponseRedirect('/code/')
+
+	else:
+		return HttpResponseRedirect(next)
+
+
+class CodeOfConductForm(forms.Form):
+	code_of_conduct = forms.BooleanField(required=True)
+
+
+@login_required()
+def codeofconduct(request):
+	u = get_object_or_404(User, username__exact=request.user.username)
+
+	coc_form = CodeOfConductForm(request.POST or None)
+
+	if request.method == 'POST':
+		print('here')
+		if coc_form.is_valid():
+			print('valid')
+			data = coc_form.cleaned_data
+			u.code_of_conduct = True
+			u.save()
+			messages.success(request, message='You have successfully accepted the code of conduct form, thanks!')
+			return HttpResponseRedirect('/')
+
+
+	f = open("myrobogals/rgprofile/COCForm.txt", 'r')
+	f_str = f.read()
+	f.close()
+	coc_form_text = format_html(f_str)
+
+	return render_to_response('code_of_conduct.html', {'form': coc_form, 'text': coc_form_text}, context_instance=RequestContext(request))
 
 
 class CSVUploadForm(forms.Form):
