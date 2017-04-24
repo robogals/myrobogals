@@ -498,10 +498,10 @@ var SelectFilter = {
         // <ul class="selector-chooser">
         var selector_chooser = quickElement('ul', selector_div, '');
         selector_chooser.className = 'selector-chooser';
-        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Add'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()');
-        add_link.className = 'selector-add';
-        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from");})()');
-        remove_link.className = 'selector-remove';
+        var selector_add = quickElement('img', quickElement('a', quickElement('li', selector_chooser, ''), '', 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()'), '', 'src', '/rgmedia' + '/images/selector-add.gif');
+        selector_add.className = 'selector-add';
+        var selector_remove = quickElement('img', quickElement('a', quickElement('li', selector_chooser, ''), '', 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from");})()'), '', 'src', '/rgmedia' + '/images/selector-remove.gif');
+        selector_remove.className = 'selector-remove';
 
         // <div class="selector-chosen">
         var selector_chosen = quickElement('div', selector_div, '');

@@ -126,7 +126,6 @@
 </form>
 
     <script>
-    console.log('here');
     // Run script when page loads initially
     NewSchoolSelect();
 
@@ -135,7 +134,7 @@
         var e = document.getElementById("id_school");
         var newSchool = document.getElementById("newSchoolTable");
         var selected = e.value;
-        console.log(selected);
+
         if(selected == 0) {
             newSchool.style.visibility = "visible";
         } else {
