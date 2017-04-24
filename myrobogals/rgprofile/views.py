@@ -11,7 +11,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.forms.widgets import Widget, Select, TextInput
+from django.forms.widgets import Widget, Select, TextInput, PasswordInput
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, loader
@@ -1099,58 +1099,67 @@ def notify_chapter(chapter, u):
 	email_message(email_subject=message_subject, email_body=message_body, chapter=chapter)
 
 
-def show_login(request):
-	try:
-		next = request.POST['next']
-	except KeyError:
-		try:
-			next = request.GET['next']
-		except KeyError:
-			next = '/'
-	return render_to_response('landing.html', {'next': next}, context_instance=RequestContext(request))
+class LoginForm(forms.Form):
+	username = forms.CharField(max_length=255, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username', 'id': 'inputError1'}))
+	password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}), required=True)
 
-def process_login(request):
-	if request.method != 'POST':
-		return HttpResponseRedirect('/login/')
-	try:
-		next = request.POST['next']
-	except KeyError:
-		try:
-			next = request.GET['next']
-		except KeyError:
-			next = '/'
+	user = None
 
-	print(request.POST)
+	def clean(self):
+		cleaned_data = super(LoginForm, self).clean()
+		username = cleaned_data.get('username')
+		password = cleaned_data.get('password')
 
-	username = request.POST['username']
-	password = request.POST['password']
+		email_login = False
+		# Check if they are using email to login
+		if email_re.match(username):
+			try:
+				users = User.objects.filter(email=username)
+				if len(users) > 1:
+					self.add_error('username', 'That email address has multiple users associated with it. Please log in using your username.')
+				else:
+					username = users[0].username
+					email_login = True
+			except User.DoesNotExist:
+				self.add_error('username', 'Invalid email address or password')
 
-	if email_re.match(username):
-		try:
-			users = User.objects.filter(email=username)
-			if len(users) == 0:
-				return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
-			elif len(users) > 1:
-				return render_to_response('login_form.html', {'username': username, 'error': 'That email address has multiple users associated with it. Please log in using your username.', 'next': next}, context_instance=RequestContext(request))
+		user = authenticate(username=username, password=password)
+
+		if user is not None:
+			if user.is_active:
+				self.user = user
 			else:
-				username = users[0].username
-				emaillogin = True
-		except User.DoesNotExist:
-			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
-	else:
-		emaillogin = False
-	user = authenticate(username=username, password=password)
-	if user is not None:
-		if user.is_active:
-			login(request, user)
+				self.add_error('username', 'Your account has been disabled, please contact support')
+		else:
+			if email_login:
+				self.add_error('username', 'Invalid email address or password')
+			else:
+				self.add_error('username', 'Invalid username or password')
+
+
+def show_login(request):
+	print(request.POST)
+	try:
+		next = request.POST['next']
+	except KeyError:
+		try:
+			next = request.GET['next']
+		except KeyError:
+			next = '/'
+
+	print(next)
+
+	if request.method == 'POST':
+		login_form = LoginForm(request.POST)
+
+		if login_form.is_valid():
+			login(request, login_form.user)
 			return HttpResponseRedirect(next)
-		else:
-			return render_to_response('login_form.html', {'username': username, 'error': 'Your account has been disabled', 'next': next}, context_instance=RequestContext(request))
 	else:
-		if emaillogin:
-			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid email address or password', 'next': next}, context_instance=RequestContext(request))
-		else:
-			return render_to_response('login_form.html', {'username': username, 'error': 'Invalid username or password', 'next': next}, context_instance=RequestContext(request))
+		login_form = LoginForm()
+
+	return render_to_response('landing.html', {'form': login_form, 'next': next}, context_instance=RequestContext(request))
+
 
 class CSVUploadForm(forms.Form):
 	csvfile = forms.FileField()

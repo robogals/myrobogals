@@ -22,7 +22,6 @@ urlpatterns = [
 
 	# User functions
 	url(r'^login/$', rgprofile_views.show_login),
-	url(r'^login/process/$', rgprofile_views.process_login),
 	url(r'^logout/$', auth_views.logout, {'next_page': '/'}),
 	url(r'^chpass/$', auth_views.password_change, {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
 	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
