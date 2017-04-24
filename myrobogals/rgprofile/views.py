@@ -1107,7 +1107,7 @@ def show_login(request):
 			next = request.GET['next']
 		except KeyError:
 			next = '/'
-	return render_to_response('login_form.html', {'next': next}, context_instance=RequestContext(request))
+	return render_to_response('landing.html', {'next': next}, context_instance=RequestContext(request))
 
 def process_login(request):
 	if request.method != 'POST':
@@ -1119,8 +1119,12 @@ def process_login(request):
 			next = request.GET['next']
 		except KeyError:
 			next = '/'
+
+	print(request.POST)
+
 	username = request.POST['username']
 	password = request.POST['password']
+
 	if email_re.match(username):
 		try:
 			users = User.objects.filter(email=username)

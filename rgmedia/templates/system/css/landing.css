@@ -1,0 +1,169 @@
+/*
+ * Globals
+ */
+
+/* Links */
+a {
+  color: rgb(200, 200, 200);
+}
+a:focus,
+a:hover {
+  color: #fff;
+}
+
+/* Custom default button */
+.btn-default,
+.btn-default:hover,
+.btn-default:focus {
+  text-shadow: none; /* Prevent inheritance from `body` */
+  border: 1px solid #fff;
+  width: 100%;
+  background: rgb(7, 30, 70);
+  padding: 8px 0px;
+  font-size: 20px;
+  color: rgb(200, 200, 200);
+}
+
+
+/*
+ * Base structure
+ */
+
+html,
+body {
+  height: 100%;
+  background: #333 no-repeat;
+  background-size:100%;
+  font-family: 'Roboto', sans-serif;
+}
+body {
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5);
+  padding-bottom: 200px;
+}
+
+h1{
+  font-size: 450%;
+}
+
+h5{
+  font-size: 100%;
+  color: rgb(200, 200, 200)
+}
+
+/* Extra markup and styles for table-esque vertical and horizontal centering */
+.site-wrapper {
+  display: table;
+  width: 100%;
+  height: 100%; /* For at least Firefox */
+  min-height: 100%;
+  background-color: rgba(5, 30, 100, 0.7);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-box-shadow: inset 0 0 100px rgba(0,0,0,.5);
+          box-shadow: inset 0 0 100px rgba(0,0,0,.5);
+}
+.site-wrapper-inner {
+  display: table-cell;
+  vertical-align: top;
+}
+.cover-container {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.form-control {
+  margin: 10px 0px 10px 0px;
+  background: rgb(7, 30, 70);
+}
+
+.additional-items {
+  width: 100%;
+  margin: 10px 0px;
+  color: rgb(200, 200, 200);
+}
+
+.additional-items .td a{
+  color: rgb(200, 200, 200);
+}
+
+.login-button:hover {
+  background: rgb(7, 50, 100);
+  color: white;
+}
+
+.heading {
+  margin-bottom: 100px;
+}
+
+/* Padding for spacing */
+.inner {
+  padding: 5px;
+}
+
+.row {
+  margin: 20px 0px;
+}
+
+/*
+ * Cover
+ */
+
+.cover {
+  padding: 0 20px;
+}
+.cover .btn-lg {
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.media-icons .fa {
+  padding-right: 5px;
+}
+
+input[type=text], input[type=password] {
+  color: white;
+}
+
+/*
+ * Footer
+ */
+
+.mastfoot {
+  color: #999; /* IE8 proofing */
+  color: rgba(255,255,255,.5);
+}
+
+
+/*
+ * Affix and center
+ */
+
+@media (min-width: 768px) {
+  /* Pull out the header and footer */
+  .mastfoot {
+    position: fixed;
+    bottom: 0;
+  }
+  /* Start the vertical centering */
+  .site-wrapper-inner {
+    vertical-align: middle;
+  }
+  /* Handle the widths */
+  .mastfoot,
+  .cover-container {
+    width: 100%; /* Must be percentage or pixels for horizontal alignment */
+  }
+}
+
+@media (min-width: 992px) {
+  .masthead,
+  .mastfoot,
+  .cover-container {
+    width: 700px;
+  }
+}
