@@ -1,8 +1,8 @@
-from django.core.paginator import Paginator, EmptyPage
-
 """
 Helpful functions for rgteaching views
 """
+
+from django.core.paginator import Paginator, EmptyPage
 
 
 # Creates paginator for tables greater than size 'sizeOfList'

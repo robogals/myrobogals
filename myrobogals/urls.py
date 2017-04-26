@@ -2,26 +2,23 @@ from django.conf.urls import url, include, i18n
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.views.static import serve as static_serve_view
+from tinymce import urls as tinymce_urls
 
 from myrobogals import settings
-
 from myrobogals.rgchapter import views as rgchapter_views
 from myrobogals.rgconf import views as rgconf_views
-from myrobogals.rgforums import views as rgforums_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
-from myrobogals.rgprofile import views as rgprofile_views
-from myrobogals.rgteaching.views import quickentry, eventvisit, report
+from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
+from myrobogals.rgteaching.views import report
 from myrobogals.rgweb import views as rgweb_views
-
-from tinymce import urls as tinymce_urls
 
 urlpatterns = [
 	# Home
 	url(r'^$', rgmain_views.home),
 
 	# User functions
-	url(r'^login/$', rgprofile_views.show_login),
+	url(r'^login/$', profile_login.show_login),
 	url(r'^logout/$', auth_views.logout, {'next_page': '/'}),
 	url(r'^chpass/$', auth_views.password_change, {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
 	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
@@ -30,19 +27,20 @@ urlpatterns = [
 	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form.html', 'email_template_name': 'password_reset_email.html'}),
 	#url(r'^unsubscribe/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', auth_views.unsubscribe),
 	url(r'^join/$', rgchapter_views.joinlist),
-	url(r'^join/(?P<chapterurl>.+)/$', rgprofile_views.joinchapter),
+	url(r'^join/(?P<chapterurl>.+)/$', profile_user.joinchapter),
 	url(r'^welcome/(?P<chapterurl>.+)/$', rgmain_views.welcome),
-	url(r'^code/$', rgprofile_views.codeofconduct),
+	url(r'^code/$', profile_login.codeofconduct),
+	# url(r'^code/help/$', user_views),
 
 	# Profile menu
-	url(r'^profile/$', rgprofile_views.redirtoself),
-	url(r'^profile/contactdirectory/$', rgprofile_views.contactdirectory),
-	url(r'^profile/edit/$', rgprofile_views.redirtoeditself),
-	url(r'^profile/mobverify/$', rgprofile_views.mobverify),
+	url(r'^profile/$', profile_user.redirtoself),
+	url(r'^profile/contactdirectory/$', profile_chapter.contactdirectory),
+	url(r'^profile/edit/$', profile_user.redirtoeditself),
+	url(r'^profile/mobverify/$', profile_user.mobverify),
 	#url(r'^profile/(?P<username>.+)/edit/profileimage/$', 'profileimages.views.upload_profile_image'),
-	url(r'^profile/(?P<username>.+)/edit/$', rgprofile_views.edituser),
-	url(r'^profile/(?P<username>.+)/genpw/$', rgprofile_views.genpw),
-	url(r'^profile/(?P<username>.+)/$', rgprofile_views.detail),
+	url(r'^profile/(?P<username>.+)/edit/$', profile_user.edituser),
+	url(r'^profile/(?P<username>.+)/genpw/$', profile_user.genpw),
+	url(r'^profile/(?P<username>.+)/$', profile_user.detail),
 	
 	# Chapters menu
 	url(r'^chapters/$', rgchapter_views.list),
@@ -50,22 +48,24 @@ urlpatterns = [
 	url(r'^chapters/awards/(?P<award_id>\d+)/$', rgchapter_views.awardsdesc),
 	url(r'^chapters/my/$', rgchapter_views.redirtomy),
 	url(r'^chapters/localtimes/$', rgchapter_views.localtimes),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/edit/$', rgprofile_views.edituserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/$', rgprofile_views.viewlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/add/$', rgprofile_views.adduserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/$', rgprofile_views.listuserlists),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/unis/$', rgprofile_views.unilist),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/$', rgprofile_views.importusershelp),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/$', rgprofile_views.importusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/export/$', rgprofile_views.exportusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/add/$', rgprofile_views.adduser),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/$', rgprofile_views.editusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/$', rgprofile_views.editexecs),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/status/$', rgprofile_views.editstatus),
+	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/edit/$', profile_chapter.edituserlist),
+	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/$', profile_chapter.viewlist),
+	url(r'^chapters/(?P<chapterurl>.+)/lists/add/$', profile_chapter.adduserlist),
+	url(r'^chapters/(?P<chapterurl>.+)/lists/$', profile_chapter.listuserlists),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/unis/$', profile_chapter.unilist),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/$', profile_chapter.importusershelp),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/$', profile_chapter.importusers),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/export/$', profile_chapter.exportusers),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/add/$', profile_chapter.adduser),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/users/$', profile_chapter.editusers),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/$', profile_chapter.editexecs),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/status/$', profile_chapter.editstatus),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/$', rgchapter_views.editchapter),
 	url(r'^chapters/(?P<chapterurl>.+)/websitedetails/$', rgweb_views.websitedetails),
-	url(r'^chapters/(?P<chapterurl>.+)/join/$', rgprofile_views.joinchapter),
+	url(r'^chapters/(?P<chapterurl>.+)/join/$', profile_user.joinchapter),
 	url(r'^chapters/(?P<chapterurl>.+)/$', rgchapter_views.detail),
+
+	# Conferences submenu
 	url(r'^conferences/$', rgconf_views.home),
 	url(r'^conferences/(?P<conf_id>\d+)/$', rgconf_views.rsvplist),
 	url(r'^conferences/(?P<conf_id>\d+)/nametags\.csv$', rgconf_views.nametagscsv),
@@ -124,7 +124,7 @@ urlpatterns = [
 	# Google Maps KML API
 	url(r'^api/chapter-map.kml', rgchapter_views.chaptermap),
 	# Delete user API
-	url(r'^delete/user/(?P<userpk>\d+)/$', rgprofile_views.deleteuser),
+	url(r'^delete/user/(?P<userpk>\d+)/$', profile_chapter.deleteuser),
 
 	# i18n helpers
 	url(r'^i18n/', include(i18n)),

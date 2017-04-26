@@ -12,7 +12,8 @@ from myrobogals.rgmessages.models import EmailMessage, EmailRecipient
 from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import (Event,
                                           EventMessage, SchoolVisit, SchoolVisitStats)
-from tools import paginatorRender
+from myrobogals.rgteaching.functions import paginatorRender
+
 
 @login_required
 def teachhome(request):

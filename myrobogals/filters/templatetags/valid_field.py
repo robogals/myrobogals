@@ -1,9 +1,7 @@
 from django import template
-from django.utils.dateformat import format
-from django.conf import settings
-from django.utils.safestring import mark_safe
-from myrobogals.filters.templatetags.hide_email import hide_email_filter
-from myrobogals.rgprofile.views import HELPINFO
+
+from myrobogals.rgprofile.views.profile_chapter import HELPINFO
+
 
 def is_valid_field(field):
 	for desc, fieldset in HELPINFO:

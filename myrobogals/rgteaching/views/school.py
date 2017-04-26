@@ -14,8 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from myrobogals.rgmain.models import Subdivision
 from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import (DirectorySchool, SchoolVisit, StarSchoolDirectory)
-
-from tools import paginatorRender
+from myrobogals.rgteaching.functions import paginatorRender
 
 
 # Delete a school. A school can only be deleted if it has no workshops.

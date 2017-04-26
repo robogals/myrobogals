@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} Sign Up {% endblock %}
+
+{% block pagetitle %} Sign up myRobogals {% endblock %}
+
+{% block content %}
+    <form action="/join/{{ chapter.myrobogals_url }}/" method="POST"> {% csrf_token %}
+        {% for error in err %}
+                <td colspan="2">
+                    <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>
+                </td>
+        {% endfor %}
+
+        <table>
+            {% for field in signup_form %}
+                {% if field.errors %}
+                    <tr>
+                        <td colspan="2">
+                            <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td width="150">
+                        {{ field.label_tag }}{% if field.field.required %} <span style="color: #ff0000">*</span>{% endif %}
+                    </td>
+                    <td>
+                        {{ field }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+          <tr>
+    <td style="vertical-align: top"> Chapter <span style="color: #ff0000">*</span></td>
+    <td style="vertical-align: top">
+      {{ chapter }}
+    </td>
+  </tr>
+
+        </table>
+
+
+
+        {% for field in conduct_form %}
+            {% if field.errors %}
+                <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>{% endif %}
+            {{ field }} I hereby abide by everything mentioned in the<a href="/codeofconducthelp/" target="_blank"> Robogal's Code of Conduct</a>
+        {% endfor %}
+
+    </form>
+{% endblock %}
