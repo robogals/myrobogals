@@ -1,0 +1,109 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+
+<head>
+    <title>myRobogals - {% block title %}{% trans "Home" %}{% endblock %}</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Intranet of Robogals Global" />
+
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}images/faviconrect.png"/>
+
+    <link rel="stylesheet" href="{{ MEDIA_URL }}plugins/system/rokbox/themes/light/rokbox-style.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/template.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/header-style7.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/emailpendingerror.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/body-light.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/typography.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/system.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/general.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/form.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/rt_moxy_j15/css/menu-fusion.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}django-admin-widgets.css" type="text/css" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/base.css" type="text/css" />
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-myrg.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/django-admin.multiselect.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/core.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/SelectBox.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/textboxcounter.js"></script>
+
+    {% block header %} {% endblock %}
+</head>
+
+<body id="ff-optima" class="f-default style7 body-light head-style7  iehandle">
+    <!-- Begin top section (header/top bar) -->
+    {% include "includes/header.html" %}
+    <!--End top section-->
+    <!--Begin Main Body-->
+    <div id="main-body">
+        <div id="main-content" class="s-c-x">
+            <div class="colmask leftmenu ">
+                <div class="wrapper">
+                    <div class="colmid">
+                        <div class="colright">
+                            
+                            <!--Begin Main Column (col1wrap)-->
+                            <div class="col1wrap">
+                                <div class="col1pad">
+                                    <div class="col1">
+                                        <div id="maincol">
+                                            <div class="bodycontent">
+                                                <div id="maincontent-block">
+                                                    <div class="">
+                                                        <div id="page" class="full-article">
+                                                            <div class="article-rel-wrapper">
+                                                                <h2 class="contentheading">
+                                                                    {% block pagetitle %}{% endblock %}
+                                                                 </h2>
+                                                            </div>
+                                                            <!-- article-rel-wrapper -->
+                                                            {% for message in messages %} {% autoescape off %}
+                                                                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                                                                    <div class="error">{{ message }} </div>
+                                                                {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                                                                    <div class="alert">{{ message }} </div>
+                                                                {% else %}
+                                                                    <div class="message">{{ message }} </div>
+                                                                {% endif %} {% endautoescape %}
+                                                            {% endfor %}
+                                                            {% block content %} {% endblock %}
+                                                        </div>
+                                                        <!-- page -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--End Main Column (col1wrap)-->
+
+                            <!--Begin Left Column (col2)-->
+{#                            {% include "includes/left.html" %}#}
+                            <!--End Left Column (col2)-->
+
+                            <!--Begin Right Column (col3)-->
+                            <!--End Right Column (col3)-->
+                        </div>
+                    </div>
+                    <div style="padding-left: 22px; padding-right: 20px">
+                        {% block noboxcontent %} {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--End Main Body-->
+
+    <!--Begin Bottom Section-->
+    <!--End Bottom Section-->
+    <!--Begin Footer-->
+    {% include "includes/footer.html" %}
+    <!--End Footer-->
+</body>
+
+</html>

@@ -247,9 +247,9 @@ class FormPartOne(forms.Form):
             del self.fields['police_check_number']
             del self.fields['police_check_expiration']
 
+    username = forms.CharField(label=_('Username'), max_length=30)
     first_name = forms.CharField(label=_('First name'), max_length=30)
     last_name = forms.CharField(label=_('Last name'), max_length=30)
-    username = forms.CharField(label=_('Username'), max_length=30)
     email = forms.EmailField(label=_('Email'), max_length=64)
     student_number = StudentNumField(max_length=32)
     union_member = forms.BooleanField()

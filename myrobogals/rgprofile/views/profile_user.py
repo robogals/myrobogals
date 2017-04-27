@@ -22,6 +22,7 @@ from myrobogals.rgprofile.forms import WelcomeEmailFormTwo
 from myrobogals.rgprofile.functions import genandsendpw, RgGenAndSendPwException
 from myrobogals.rgprofile.models import Position
 from myrobogals.rgprofile.models import User, MemberStatus
+from myrobogals.rgprofile.views.profile_login import openconductfile
 from myrobogals.rgteaching.models import EventAttendee
 
 
@@ -53,14 +54,22 @@ def newuser(request, chapter):
     usererr = ''
     carderr = ''
     err = []
-    new_username = ''
-    valid_card = False
 
-    signup_form = FormPartOne(request.POST, chapter=chapter, user_id='')
-    coc_form = CodeOfConductForm(request.POST or None)
+    signup_form = FormPartOne(request.POST or None, chapter=chapter, user_id='')
+
+    coc_form_text = openconductfile()
+
+    if coc_form_text is not None:
+        coc_form = CodeOfConductForm(request.POST or None)
 
     if request.method == 'POST':
-        if signup_form.is_valid() and coc_form.is_valid():
+        # Checks coc_form is assigned before calling is valid
+        if coc_form_text is not None:
+            valid_forms = signup_form.is_valid() and coc_form.is_valid()
+        else:
+            valid_forms = signup_form.is_valid()
+
+        if valid_forms:
             data = signup_form.cleaned_data
 
             new_username = data['username']
@@ -102,7 +111,10 @@ def newuser(request, chapter):
 
                             u.save()
 
-                            return HttpResponseRedirect('/profile/')
+                            if chapter.welcome_email_enable:
+                                welcome_email(request, chapter, u)
+
+                            return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
                     else:
                         pwerr = _('The password and repeated password did not match. Please try again')
                 else:
@@ -111,14 +123,15 @@ def newuser(request, chapter):
             # Compile all the errors into a list
             err = [usererr, pwerr, carderr]
 
-    signup_form = FormPartOne(chapter=chapter, user_id='')
-
-    return render_to_response('sign_up.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err},
-                              context_instance=RequestContext(request))
+    if coc_form_text is not None:
+        return render_to_response('sign_up.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('sign_up.html', {'signup_form': signup_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
 
 
 def conduct_help(request):
-    return render_to_response('conduct_help.html', context_instance=RequestContext(request))
+    coc_form_text = openconductfile()
+    return render_to_response('conduct_help.html', {'text': coc_form_text}, context_instance=RequestContext(request))
 
 
 # Performs editing an existing as well as adding new user to a chapter
@@ -312,47 +325,7 @@ def edituser(request, username, chapter=None):
                     # If it's a new user signup
                     elif join:
                         if chapter.welcome_email_enable:
-                            # Creates a new EmailMessage object preparing for an email
-                            message = EmailMessage()
-
-                            try:
-                                message.subject = chapter.welcome_email_subject.format(
-                                    chapter=chapter,
-                                    user=u,
-                                    plaintext_password=request.POST['password1'])
-                            except Exception:
-                                message.subject = chapter.welcome_email_subject
-
-                            try:
-                                message.body = chapter.welcome_email_msg.format(
-                                    chapter=chapter,
-                                    user=u,
-                                    plaintext_password=request.POST['password1'])
-                            except Exception:
-                                message.body = chapter.welcome_email_msg
-
-                            # Setting defaults
-                            message.from_address = 'my@robogals.org'
-                            message.reply_address = 'my@robogals.org'
-                            message.from_name = chapter.name
-                            message.sender = User.objects.get(username='edit')
-                            message.html = chapter.welcome_email_html
-
-                            # Setting message to -1 in the DB shows that the message is in WAIT mode
-                            message.status = -1
-                            message.save()
-
-                            # Prepares message for sending
-                            recipient = EmailRecipient()
-                            recipient.message = message
-                            recipient.user = u
-                            recipient.to_name = u.get_full_name()
-                            recipient.to_address = u.email
-                            recipient.save()
-
-                            # Change message to PENIDNG mode, which waits for server to send
-                            message.status = 0
-                            message.save()
+                            welcome_email(request, chapter, u)
 
                         # Notifies chapter of a new member the user joined on their own
                         if not adduser and chapter.notify_enable and chapter.notify_list:
@@ -611,6 +584,7 @@ def genpw(request, username):
                               context_instance=RequestContext(request))
 
 
+
 ########################################################################################################################
 # Assist functions for profile_user.py
 ########################################################################################################################
@@ -653,3 +627,47 @@ def notify_chapter(chapter, u):
     message_body = 'Please check the following details for ' + u.get_full_name() + ': <br /> Police check number: ' + u.police_check_number + '<br /> Expiration Date: ' + str(
         u.police_check_expiration) + '<br /> <br /> When you have verified that the volunteer has a valid card, mark them as "Passed the Police Check" on their profile from the following link: <br /> <br /> ' + 'https://myrobogals.org/profile/' + u.username + '/edit/ <br /> If they haven\'t passed the check, please re-email them at ' + u.email + ' explaining the situation'
     email_message(email_subject=message_subject, email_body=message_body, chapter=chapter)
+
+    # Creates a new EmailMessage object preparing for an email
+
+def welcome_email(request, chapter, u):
+    message = EmailMessage()
+
+    try:
+        message.subject = chapter.welcome_email_subject.format(
+            chapter=chapter,
+            user=u,
+            plaintext_password=request.POST['password1'])
+    except Exception:
+        message.subject = chapter.welcome_email_subject
+
+    try:
+        message.body = chapter.welcome_email_msg.format(
+            chapter=chapter,
+            user=u,
+            plaintext_password=request.POST['password1'])
+    except Exception:
+        message.body = chapter.welcome_email_msg
+
+    # Setting defaults
+    message.from_address = 'my@robogals.org'
+    message.reply_address = 'my@robogals.org'
+    message.from_name = chapter.name
+    message.sender = User.objects.get(username='edit')
+    message.html = chapter.welcome_email_html
+
+    # Setting message to -1 in the DB shows that the message is in WAIT mode
+    message.status = -1
+    message.save()
+
+    # Prepares message for sending
+    recipient = EmailRecipient()
+    recipient.message = message
+    recipient.user = u
+    recipient.to_name = u.get_full_name()
+    recipient.to_address = u.email
+    recipient.save()
+
+    # Change message to PENIDNG mode, which waits for server to send
+    message.status = 0
+    message.save()

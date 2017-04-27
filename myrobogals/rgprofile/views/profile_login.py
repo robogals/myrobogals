@@ -70,10 +70,18 @@ def codeofconduct(request):
             messages.success(request, message='You have successfully accepted the code of conduct form, thanks!')
             return HttpResponseRedirect('/')
 
-    f = open("myrobogals/rgprofile/COCForm.txt", 'r')
-    f_str = f.read()
-    f.close()
-    coc_form_text = format_html(f_str)
+    coc_form_text = openconductfile()
 
     return render_to_response('code_of_conduct.html', {'form': coc_form, 'text': coc_form_text},
                               context_instance=RequestContext(request))
+
+
+def openconductfile():
+    try:
+        f = open("myrobogals/rgprofile/COCForm.txt", 'r')
+        f_str = f.read()
+        f.close()
+    except IOError:
+        return None
+
+    return format_html(f_str)

@@ -77,7 +77,7 @@
 								<li><a href="/profile/edit/">Edit profile</a></li>
 								<li><a href="/profile/contactdirectory/">Contacts</a></li>
 								<li role="separator" class="divider"></li>
-								<li><a href="#">Logout</a></li>
+								<li><a href="/logout/">Logout</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -112,7 +112,7 @@
 			<option value="japanese">Japanese</option>
 		</select><br>
 		&copy; Robogals 2010-2017<br>
-				<a href="#">Credits</a> | <a href="#">Support</a> | <a href="#">robogals.org</a></p>
+				<a href="/credits/">Credits</a> | <a href="/support/">Support</a> | <a href="http://robogals.org">robogals.org</a></p>
 			</div>
 		</footer>
 
@@ -120,7 +120,8 @@
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+{#		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>#}
+        <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.js"></script>
 		<script src="{{ MEDIA_URL }}resources/bootstrap/js/bootstrap.min.js"></script>
 	</body>
 </html>

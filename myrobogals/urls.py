@@ -30,7 +30,7 @@ urlpatterns = [
 	url(r'^join/(?P<chapterurl>.+)/$', profile_user.joinchapter),
 	url(r'^welcome/(?P<chapterurl>.+)/$', rgmain_views.welcome),
 	url(r'^code/$', profile_login.codeofconduct),
-	# url(r'^code/help/$', user_views),
+	url(r'^code/help/$', profile_user.conduct_help),
 
 	# Profile menu
 	url(r'^profile/$', profile_user.redirtoself),
