@@ -81,6 +81,7 @@ urlpatterns = [
 
 	url(r'^reports/$', report.report_standard),
 	url(r'^globalreports/$', report.report_global),
+	url(r'^globalreports/old/$', report.report_global_old),  # TESTING PURPOSES ONLY
 	url(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', report.report_global_breakdown),
 	url(r'^progress/$', rgchapter_views.progresschapter),
 
