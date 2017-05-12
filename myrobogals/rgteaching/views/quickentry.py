@@ -47,6 +47,8 @@ def instantvisit(request):
             school_visit = SchoolVisit()
             new_school = School()
 
+            school_visit.created_method = 1
+
             # Check if new school was selected, New school equals to 0
             if selected_school == u'0':
                 if form_school.is_valid():
