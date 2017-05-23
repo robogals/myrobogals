@@ -631,7 +631,8 @@ def reopenvisit(request, visit_id):
             _("- To modify stats for Robogals Rural & Regional please contact support@robogals.org")))
         return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
     # Don't allow modifying of stats more than 1 months old - to limit damage in cases of misuse
-    if (timezone.now() - v.date_modified) > datetime.timedelta(days=30) and not request.user.is_superuser:
+    d = v.visit_end if v.date_modified is None else v.date_modified
+    if (timezone.now() - d) > datetime.timedelta(days=30) and not request.user.is_superuser:
         messages.success(request, message=unicode(_("To protect against accidental deletion of old stats, workshops more than 1 month old cannot be re-opened. If you need to amend these stats please contact support@robogals.org")))
         return HttpResponseRedirect('/teaching/' + str(v.pk) + '/')
     if 'confirm' in request.GET:

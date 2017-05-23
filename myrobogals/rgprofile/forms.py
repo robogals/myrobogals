@@ -418,7 +418,7 @@ class CodeOfConductForm(forms.Form):
     code_of_conduct = forms.BooleanField(required=True)
 
 
-class CSVUploadForm(forms.Form):
+class CSVUsersUploadForm(forms.Form):
     csvfile = forms.FileField()
     updateuser = forms.BooleanField(label=_('Update (instead of create) members if the username already exists'),
                                     required=False)

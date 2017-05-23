@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block header %} <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/import_workshops.css" type="text/css" /> {% endblock %}
+
+{% block title %} Import Workshops {% endblock %}
+
+{% block pagetitle %} Mass Import Workshops {% endblock %}
+
+{% block content %}
+    <p>Please review your data to ensure everything is correct. If you notice something is incorrect or if there's errors, please make the appropriate changes in your CSV file and reupload the file. Otherwise, click submit to continue.</p>
+
+    <p><b> You are about to import a total of {{ workshop_imported }} workshops: </b></p>
+
+    {% if workshops_list %}
+        <table class="simple-table" style="width: 100%;">
+            <tr>
+                <th class="simple-header">Row</th>
+                <th class="simple-header">Summary</th>
+            </tr>
+            {% for workshop in workshops_list %}
+
+                {% for row, value in workshop.text.items  %}
+                    <tr>
+                        <td class="simple-col">{{ row }}</td>
+                        <td class="simple-col">
+                            {{ value }}
+                            <br> Attendees:
+                            <ul>
+                                {% for attendee in workshop.attendees %}
+                                    <li>{{ attendee }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <br>
+
+    <p><b> The following errors are present in your uploaded file. Either correct them and reupload or click submit to continue. </b></p>
+
+        {% if err_msg %}
+            <table class="simple-table">
+            <tr>
+                <th class="simple-header">Row</th>
+                <th class="simple-header">Error Message</th>
+            </tr>
+                {% for row, err in err_msg.items %}
+                    <tr>
+                        <td class="simple-col" style="text-align: center">{{ row }}</td>
+                        <td class="simple-col">{{ err }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+    <form action="" method="POST"> {% csrf_token %}
+        {% for f in form_review %}
+            {% for e in f.errors %}
+                <div class="error">{{ e }}</div>
+            {% endfor %}
+            <p>{{ f }} I confirm that the data is correct</p>
+        {% endfor %}
+
+        <input type="hidden" name="tmppath" value="{{ tmppath }}">
+        <input type="hidden" name="step" value="2"/>
+        <input type="submit" value="submit"/> or <a href="{% url 'import_workshops' %}">Go back</a>
+    </form>
+{% endblock %}

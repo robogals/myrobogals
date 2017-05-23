@@ -1,0 +1,6 @@
+school_id,visit_date,start_time,end_time,location,visit_type_id,primary_girls_first,primary_girls_repeat,primary_boys_first,primary_boys_repeat,high_girls_first,high_girls_repeat,high_boys_first,high_boys_repeat,other_girls_first,other_girls_repeat,other_boys_first,other_boys_repeat,notes,attendees,,
+4,15/7/2017,13:00:00,15:00:00,School,0,20,5,21,0,0,0,0,0,0,0,0,0,,sing12,sing17,
+3,16/7/2017,10:00:00,15:00:00,School,0,10,10,1,0,0,0,0,0,0,0,0,0,,admin,sing4,
+5,17/7/2017,16:00:00,18:00:00,School,1,5,22,3,0,0,0,0,0,0,0,0,0,,sing16,sing14,admin
+6,18/7/2017,9:00:00,10:00:00,School,2,2,23,0,0,11,2,0,0,0,0,0,0,,admin,,
+1,18/7/2017,9:00:00,10:00:00,School,2,2,23,0,0,11,2,0,0,0,0,0,0,,,,

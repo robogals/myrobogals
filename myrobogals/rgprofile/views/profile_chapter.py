@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models import EmailMessage, SMSMessage
-from myrobogals.rgprofile.forms import EditListForm, EditStatusForm, CSVUploadForm, WelcomeEmailForm, DefaultsFormOne, \
+from myrobogals.rgprofile.forms import EditListForm, EditStatusForm, CSVUsersUploadForm, WelcomeEmailForm, DefaultsFormOne, \
     DefaultsFormTwo
 from myrobogals.rgprofile.functions import importcsv, any_exec_attr, RgImportCsvException
 from myrobogals.rgprofile.models import MemberStatusType
@@ -333,13 +333,13 @@ def importusers(request, chapterurl):
     errmsg = None
     if request.method == 'POST':
         if request.POST['step'] == '1':
-            form = CSVUploadForm(request.POST, request.FILES)
+            form = CSVUsersUploadForm(request.POST, request.FILES)
             welcomeform = WelcomeEmailForm(request.POST, chapter=chapter)
             defaultsform1 = DefaultsFormOne(request.POST)
             defaultsform2 = DefaultsFormTwo(request.POST)
             if form.is_valid() and welcomeform.is_valid() and defaultsform1.is_valid() and defaultsform2.is_valid():
                 file = request.FILES['csvfile']
-                tmppath = '/tmp/' + chapter.myrobogals_url + request.user.username + str(time()) + ".csv"
+                tmppath = 'tmp/' + chapter.myrobogals_url + request.user.username + '.csv'
                 destination = open(tmppath, 'w')
                 for chunk in file.chunks():
                     destination.write(chunk)
@@ -411,7 +411,7 @@ def importusers(request, chapterurl):
             del request.session['ignore_email']
             return HttpResponseRedirect('/chapters/' + chapter.myrobogals_url + '/edit/users/')
     else:
-        form = CSVUploadForm()
+        form = CSVUsersUploadForm()
         welcomeform = WelcomeEmailForm(None, chapter=chapter)
         defaultsform1 = DefaultsFormOne()
         defaultsform2 = DefaultsFormTwo()
@@ -429,6 +429,7 @@ def exportusers(request, chapterurl):
         else:
             status = '1'  # Default to student members
 
+        print(status)
         if (status != '0'):
             users = MemberStatus.objects.filter(
                 user__chapter=c,
@@ -447,8 +448,9 @@ def exportusers(request, chapterurl):
                      'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end',
                      'user__course_type', 'user__student_type').distinct()
 
+        print('herr')
         response = HttpResponse(content_type='text/csv')
-        filename = 'robogals-' + c.myrobogals_url + '-' + str(date.today()) + '.csv'
+        filename = c.myrobogals_url + '-users-' + str(date.today()) + '.csv'
         response['Content-Disposition'] = 'attachment; filename=' + filename
         csv_data = (('username', 'first_name', 'last_name', 'email', 'mobile', 'course', 'university', 'student_number',
                      'alt_email', 'date_joined', 'dob', 'gender', 'uni_start', 'uni_end', 'course_type',
@@ -460,6 +462,8 @@ def exportusers(request, chapterurl):
                                     user['user__alt_email'], user['user__date_joined'], user['user__dob'],
                                     user['user__gender'], user['user__uni_start'], user['user__uni_end'],
                                     user['user__course_type'], user['user__student_type']),)
+
+        print('here')
         t = loader.get_template('csv_export.txt')
         c = Context({
             'data': csv_data,
