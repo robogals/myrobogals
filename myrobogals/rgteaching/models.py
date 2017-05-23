@@ -158,6 +158,7 @@ class SchoolVisit(Event):
     WORKSHOP_CREATION_METHOD = (
         (0, 'Event'),
         (1, 'QuickEntry'),
+        (2, 'Import'),
     )
 
     school = models.ForeignKey(School)

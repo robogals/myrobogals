@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %} Import Workshops {% endblock %}
+
+{% block pagetitle %} Mass Import Workshops {% endblock %}
+
+{% block content %}
+    <p>Please download the template spreadsheet and fill it out with your workshops. When finished, upload the spreadsheet back onto this page.</p>
+
+    <h3>Download Links</h3>
+
+    <p><a href="{% url 'download' %}?doc=sample">Download the template spreadsheet</a></p>
+
+    <p><a href="{% url 'download' %}?doc=schoollist">Download your chapter's schools list</a></p>
+
+    <p><a href="{% url 'download' %}?doc=userlist">Download your chapter's users list</a></p>
+
+    <h3>Import Workshop Cheat Sheet</h3>
+
+    <p>Date format must be in the form of <b>dd/mm/yyyy</b> and time format must be <b>hh:mm:ss</b></p>
+
+    <p>School ID must be the same as the ones listed for your chapter. Make sure to use the ID instead of the school name.</p>
+
+    <p>Use the usernames for the volunteers that attended the workshop. List the attendees that attended the workshop in separate cells on the same row</p>
+
+    <p>Every field must be specified except for notes, which can be left blank</p>
+
+    <p>Delete the sample entry in the template spreadsheet. This is to show you how to fill it out. <b>Do not change the order or remove columns.</b></p>
+
+    <p> Visit Type ID Reference: </p>
+        <ul>
+            <li>0 - Robogals workshop, metro area</li>
+            <li>1 - Robogals career talk</li>
+            <li>2 - Robogals event</li>
+            <li>3 - Non-Robogals workshop</li>
+            <li>4 - Non-Robogals career talk</li>
+            <li>5 - Non-Robogals event</li>
+            <li>6 - Other</li>
+            <li>7 - Robogals workshop, regional area</li>
+        </ul>
+
+
+    {%  if errmsg %}
+        {% for error in errmsg %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form action="" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+        <p>
+            {% for f in form %}
+                Upload .CSV file: {{ f }}
+            {% endfor %}
+        </p>
+
+        <input type="hidden" name="step" value="1" />
+        <input type="submit" value="Upload Workshops" />
+    </form>
+{% endblock %}

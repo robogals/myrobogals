@@ -1,0 +1,9 @@
+.simple-table, .simple-header, .simple-col {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px 5px 5px 5px;
+}
+
+.simple-table {
+    width: 100%;
+}

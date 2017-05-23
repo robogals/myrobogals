@@ -18,9 +18,9 @@
                         {% trans "Home" %}               
             </span>
         </a>
-        
-        
-</li>   
+
+
+</li>
 
             <li class="item53 parent root" >
 
@@ -30,22 +30,22 @@
                
             </span>
         </a>
-        
+
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
 
-                            
+
                     <li class="item54" >
             <a class="orphan item bullet" href="/profile/"  >
             <span>
                         {% trans "View profile" %}          
             </span>
         </a>
-        
-        
-</li>   
-                            
+
+
+</li>
+
                     <li class="item146" >
             <a class="orphan item bullet" href="/profile/edit/"  >
             <span>
@@ -53,9 +53,9 @@
                         {% trans "Edit profile" %}               
             </span>
         </a>
-        
-        
-</li>   
+
+
+</li>
 {% if user.is_authenticated %}
 {% if user.is_staff %}
                     <li class="item146" >
@@ -65,16 +65,16 @@
                         {% trans "Contact directory" %}               
             </span>
         </a>
-        
-        
-</li>   
+
+
+</li>
 {% endif %}
 {% endif %}
-                            
+
                             </ul>
         </div>
-        
-</li>   
+
+</li>
             <li class="item64 parent root" >
             <a class="daddy item bullet" href="/chapters/"  >
 
@@ -138,8 +138,8 @@
             </ul>
             </div>
 {% endif %}
-        
-</li>   
+
+</li>
             <li class="item65 parent root" >
 
             <a class="daddy item bullet" href="/teaching/"  >
@@ -153,30 +153,30 @@
             <div class="drop-top"></div>
             <ul class="level2">
 
-<!--                            
+<!--
                     <li class="item66" >
             <a class="orphan item bullet" href="/teaching/availability/"  >
             <span>
-                        Availability               
+                        Availability
             </span>
         </a>
-        
-        
-</li>   
+
+
+</li>
 -->
 <!--
-                            
+
                     <li class="item67" >
             <a class="orphan item bullet" href="/teaching/training/"  >
             <span>
 
-                        Training sessions        
+                        Training sessions
             </span>
         </a>
-        
-        
-</li>   
--->                            
+
+
+</li>
+-->
 
                     <li class="item68" >
             <a class="orphan item bullet" href="/teaching/list/"  >
@@ -184,7 +184,7 @@
                         {% trans "Workshop list" %}          
             </span>
         </a>
-</li>   
+</li>
 
 {% if user.is_staff %}
                     <li class="item68" >
@@ -194,10 +194,10 @@
             </span>
         </a>
 
-        
-        
-</li>   
-                            
+
+
+</li>
+
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/new/"  >
             <span>
@@ -207,16 +207,21 @@
         </a>
 </li>
 
-                    <li class="item71" >
+        <li class="item71" >
             <a class="orphan item bullet" href="/teaching/quickentry/"  >
-            <span>
-                        {% trans "Quick workshop entry" %}
-            </span>
+                <span>
+                    {% trans "Quick workshop entry" %}
+                </span>
+            </a>
+        </li>
 
-        </a>
-        
-        
-</li>   
+        <li class="item71" >
+            <a class="orphan item bullet" href="/teaching/import/" >
+                <span>
+                    {% trans "Mass import workshops" %}
+                </span>
+            </a>
+        </li>
 
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/schools/"  >
@@ -225,9 +230,9 @@
             </span>
 
         </a>
-        
-        
-</li>   
+
+
+</li>
                     <li class="item71" >
             <a class="orphan item bullet" href="/teaching/schoolsdirectory/{{user.chapter.myrobogals_url}}/"  >
             <span>
@@ -235,9 +240,9 @@
             </span>
 
         </a>
-        
-        
-</li>   
+
+
+</li>
                 <li class="item147">
                     <a class="orphan item bullet" href="/progress/">
                         <span>{% trans "Progress towards goals" %}</span>
@@ -270,7 +275,7 @@
                             </ul>
         </div>
 {% endif %}
-</li>   
+</li>
             <li class="item73 parent root" >
             <a class="daddy item bullet" href="#"  >
             <span>
@@ -279,12 +284,12 @@
             </span>
 
         </a>
-{% if user.is_authenticated %}        
+{% if user.is_authenticated %}
             <div class="fusion-submenu-wrapper level2">
             <div class="drop-top"></div>
             <ul class="level2">
 {% if user.is_staff %}
-                            
+
                     <li class="item82" >
             <a class="orphan item bullet" href="/messages/email/write/"  >
             <span>
@@ -292,27 +297,27 @@
             </span>
 
         </a>
-        
-        
-</li>   
-                            
+
+
+</li>
+
                     <li class="item83" >
             <a class="orphan item bullet" href="/messages/sms/write/"  >
             <span>
                         {% trans "Send SMS" %}           
             </span>
         </a>
-</li>   
-{% endif %}        
+</li>
+{% endif %}
                     <li class="item89" >
             <a class="orphan item bullet" href="/messages/history/"  >
             <span>
                         {% trans "Message history" %}    
             </span>
         </a>
-        
-        
-</li>   
+
+
+</li>
 {% if user.is_superuser %}
 
                     <li class="item83" >
@@ -321,14 +326,14 @@
                         {% trans "Newsletter CP" %}           
             </span>
         </a>
-</li>   
-{% endif %}        
-                            
+</li>
+{% endif %}
+
                             </ul>
         </div>
-{% endif %}        
-        
-</li>   
+{% endif %}
+
+</li>
 <!--
             <li class="item152 root" >
             <a class="orphan item bullet" href="/forums/"  >
@@ -360,7 +365,7 @@
                
             </span>
         </a> -->
-</li>  
+</li>
 
     </ul>
 

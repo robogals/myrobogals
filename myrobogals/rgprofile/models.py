@@ -128,6 +128,7 @@ class User(AbstractUser):
 	forum_last_act = models.DateTimeField('Forum last activity', auto_now_add=True)
 	aliases = models.ManyToManyField('User', blank=True, related_name='user_aliases')
 	email_careers_newsletter_AU_optin = models.BooleanField("Subscribe to Robogals Careers Newsletter - Australia", default=False)
+	code_of_conduct = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.username

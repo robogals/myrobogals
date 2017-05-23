@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Robogal's Code of Conduct{% endblock %}
+
+{% block content %}
+
+    <form action="/code/" method="post"> {% csrf_token %}
+        <p>{{ text }}</p>
+
+        <br>
+
+        <p>
+            {% for field in form %}
+                {% if field.errors %}<div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                {{ field }} I hereby abide by everything mentioned in Robogal's Code of Conduct
+            {% endfor %}
+        </p>
+
+        <input type="submit" value="Submit"/>
+    </form>
+
+{% endblock %}
