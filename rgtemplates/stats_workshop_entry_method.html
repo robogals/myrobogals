@@ -1,0 +1,12 @@
+<table class="simple-table">
+    <tr>
+        <th class="simple-header">Method Used</th>
+        <th class="simple-header">Number of Workshops Entered</th>
+    </tr>
+    {% for key, value in workshop_method_totals.items %}
+        <tr>
+            <td class="simple-col">{{ key }}</td>
+            <td class="simple-col">{{ value }}</td>
+        </tr>
+    {% endfor %}
+</table>

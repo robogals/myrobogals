@@ -2,10 +2,11 @@ from operator import itemgetter
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
 from django.utils.timezone import make_aware
 
+from myrobogals.decorators import superuser_or_404
 from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import (Event,
                                           SchoolVisit, SchoolVisitStats)
@@ -246,6 +247,10 @@ def report_global(request):
     warning = ''
     printview = False
     if request.method == 'POST':
+        if request.POST.get('method') == 'workshop_input':
+            theform = ReportSelectorForm()
+            return report_workshop_input_method(request, theform)
+
         chapter_totals = {}
         region_totals = {}
         global_totals = {}
@@ -611,6 +616,18 @@ def report_global_breakdown(request, chaptershorten):
                               {'chapter_totals': sorted(chapter_totals.iteritems()),
                                'attendance': sorted(attendance.iteritems(), key=lambda item: item[1]['weighted'],
                                                     reverse=True)}, context_instance=RequestContext(request))
+
+
+def report_workshop_input_method(request, form):
+    """
+    Reports which method workshops were entered in the database
+    """
+    workshop_method_totals = {}
+    workshop_method_totals.update({'Event Entry': SchoolVisit.objects.filter(created_method=0).count()})
+    workshop_method_totals.update({'Quick Entry': SchoolVisit.objects.filter(created_method=1).count()})
+    workshop_method_totals.update({'Import Entry': SchoolVisit.objects.filter(created_method=2).count()})
+
+    return render(request, 'stats_get_global_report.html', {'workshop_method_totals': workshop_method_totals, 'theform': form})
 
 
 def xint(n):
