@@ -48,24 +48,30 @@
 		<tr class="even" style="">
 			<td><strong>{% trans "Chapter" %}</strong></td>
 			<td><strong>{% trans "Total Workshops" %}</strong></td>
-			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
-			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
-			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
-			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Total Schools" %}</strong></td>
+			<td><strong>{% trans "Unique Girls" %}</strong></td>
+            <td><strong>{% trans "Total Girls" %}</strong></td>
+            <td><strong>{% trans "Weighted girls*" %}</strong></td>
+            <td><strong>{% trans "Unique Boys" %}</strong></td>
+            <td><strong>{% trans "Total Boys" %}</strong></td>
+			<td><strong>{% trans "Weighted boys*" %}</strong></td>
 		</tr>
-		{% for name, chapter in chapter_totals %}
+		{% for chapter_obj in chapter_totals %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
 			<td>{% if name in user_chapter_children %}
-					<a href="/globalreports/breakdown/{{name}}/">{{ name }}</a>
+					<a href="/globalreports/breakdown/{{chapter_obj.chapter.short_en}}/">{{ chapter_obj.chapter.name.short_en }}</a>
 				{% else %}
-					{{ name }}
+					{{ chapter_obj.chapter.short_en }}
 				{% endif %}
 			</td>
-			<td>{{ chapter.workshops }} </td>
-			<td>{{ chapter.schools }}</td>
-			<td>{{ chapter.first }}</td>
-			<td>{{ chapter.girl_workshops }}</td>
-			<td>{{ chapter.weighted }}</td>
+			<td>{{ chapter_obj.workshops }} </td>
+			<td>{{ chapter_obj.schools }}</td>
+			<td>{{ chapter_obj.unique_girls }}</td>
+            <td>{{ chapter_obj.total_girls }}</td>
+            <td>{{ chapter_obj.weighted_girls }}</td>
+            <td>{{ chapter_obj.unique_boys }}</td>
+            <td>{{ chapter_obj.total_boys }}</td>
+			<td>{{ chapter_obj.weighted_boys }}</td>
 		</tr>
 		{% endfor %}
 	</table>
@@ -73,29 +79,40 @@
 		<tr class="even" style="">
 			<td><strong>{% trans "Region" %}</strong></td>
 			<td><strong>{% trans "Total Workshops" %}</strong></td>
-			<td><strong>{% trans "Total Unique Schools" %}</strong></td>
-			<td><strong>{% trans "Total Unique Girls" %}</strong></td>
-			<td><strong>{% trans "Total girl-workshops" %}</strong></td>
-			<td><strong>{% trans "Weighted girl-workshops" %}</strong></td>
+			<td><strong>{% trans "Total Schools" %}</strong></td>
+			<td><strong>{% trans "Unique Girls" %}</strong></td>
+			<td><strong>{% trans "Total Girls" %}</strong></td>
+            <td><strong>{% trans "Weighted girls*" %}</strong></td>
+            <td><strong>{% trans "Unique Boys" %}</strong></td>
+            <td><strong>{% trans "Total Boys" %}</strong></td>
+			<td><strong>{% trans "Weighted boys*" %}</strong></td>
 		</tr>
-		{% for name, region in region_totals %}
+		{% for region_obj in region_totals %}
 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-			<td>{{ name }}</td>
-			<td>{{ region.workshops }} </td>
-			<td>{{ region.schools }}</td>
-			<td>{{ region.first }}</td>
-			<td>{{ region.girl_workshops }}</td>
-			<td>{{ region.weighted }}</td>
+			<td>{{ region_obj.chapter.short_en }}</td>
+			<td>{{ region_obj.workshops }} </td>
+			<td>{{ region_obj.schools }}</td>
+			<td>{{ region_obj.unique_girls }}</td>
+            <td>{{ region_obj.total_girls }}</td>
+            <td>{{ region_obj.weighted_girls }}</td>
+            <td>{{ region_obj.unique_boys }}</td>
+            <td>{{ region_obj.total_boys }}</td>
+			<td>{{ region_obj.weighted_boys }}</td>
 		</tr>
 		{% endfor %}
 		<tr class="{% if region_totals|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="font-weight:bold;">
 			<td>Global</td>
 			<td>{{ global.workshops }} </td>
 			<td>{{ global.schools }}</td>
-			<td>{{ global.first }}</td>
-			<td>{{ global.girl_workshops }}</td>
-			<td>{{ global.weighted }}</td>
+			<td>{{ global.unique_girls }}</td>
+            <td>{{ global.total_girls }}</td>
+            <td>{{ global.weighted_girls }}</td>
+            <td>{{ global.unique_boys }}</td>
+            <td>{{ global.total_boys }}</td>
+			<td>{{ global.weighted_boys }}</td>
 		</tr>
 	</table>
+
+    <p style="color: grey;">* Repeated students have a weight of 1/2 compared to unique students</p>
 {% endif %}
 {% endblock %}

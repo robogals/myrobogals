@@ -2,8 +2,9 @@ import json
 import urllib
 import urllib2
 
+from datetime import datetime
 from django.db import models
-from django.utils.timezone import localtime
+from django.utils.timezone import localtime, now
 
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country, Subdivision
@@ -136,6 +137,12 @@ class Event(models.Model):
     notes = models.TextField(blank=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     allow_rsvp = models.IntegerField(choices=ALLOW_RSVP_CHOICES, default=0)
+    date_modified = models.DateTimeField(blank=True, null=True)
+
+    # Saves the time the event was modified
+    def save(self, *args, **kwargs):
+        self.time_modified = self.chapter.tz_obj().localize(datetime.now())
+        return super(Event, self).save(*args, **kwargs)
 
     @property
     def visit_time(self):
@@ -148,6 +155,12 @@ class Event(models.Model):
 # user interface now uses the term "workshop", recognising that not all workshops
 # involve visiting a school.
 class SchoolVisit(Event):
+    WORKSHOP_CREATION_METHOD = (
+        (0, 'Event'),
+        (1, 'QuickEntry'),
+        (2, 'Import'),
+    )
+
     school = models.ForeignKey(School)
     numstudents = models.CharField("Number of girls", max_length=32, blank=True)
     yearlvl = models.CharField("Year level of girls", max_length=32, blank=True)
@@ -157,6 +170,7 @@ class SchoolVisit(Event):
     tobring = models.TextField("Stuff to bring", blank=True)
     otherprep = models.TextField("Other preparation", blank=True)
     closing_comments = models.TextField("Closing comments", blank=True)
+    created_method = models.IntegerField(choices=WORKSHOP_CREATION_METHOD, default=0)
 
     def __unicode__(self):
         return unicode(self.school) + " on " + str(self.visit_start.date())

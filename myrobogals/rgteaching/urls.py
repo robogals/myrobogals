@@ -1,9 +1,10 @@
 from django.conf.urls import url
-from views import quickentry, eventvisit, school
+
+from views import quickentry, eventvisit, school, import_workshop
 
 urlpatterns = [
     # urls for eventvisit.py functions
-    url(r'^$', eventvisit.teachhome),
+    url(r'^$', eventvisit.teachhome, name='home'),
     url(r'^list/$', eventvisit.listvisits),
     url(r'^printlist/$', eventvisit.printlistvisits),
     url(r'^statshelp/$', eventvisit.statshelp),
@@ -33,4 +34,8 @@ urlpatterns = [
 
     # url for workshop quick entry
     url(r'^quickentry/$', quickentry.instantvisit),
+
+    # url for importing workshops
+    url(r'^import/$', import_workshop.ImportWorkshopView.as_view(), name='import_workshops'),
+    url(r'^import/download/$', import_workshop.download, name='download')
 ]

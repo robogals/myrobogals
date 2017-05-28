@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-
+{% load hide_email %}
 {% block title %}{% trans "Support" %}{% endblock %}
 
 {% block pagetitle %}{% trans "myRobogals Support" %}{% endblock %}
@@ -20,5 +20,6 @@ The myRobogals support team is very happy to help you with a wide range of thing
 </ul>
 <p>To contact us, please email <strong>support@robogals.org</strong>, or lodge a support request <a href="http://support.robogals.org" target="_blank">through our online knowledgebase and support system</a></p>
 <p>Support is available in English only</p>
-<p>For non-IT-related questions about Robogals please see the contact details on <a href="http://www.robogals.org/">robogals.org</a></p>
+    <p>For non-IT-related questions about Robogals please see the contact us at {% hide_email "coo@robogals.org" %}</p>
+
 {% endblock %}

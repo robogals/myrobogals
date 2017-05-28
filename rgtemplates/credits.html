@@ -7,7 +7,7 @@
 
 {% block content %}
 <img src="{{ MEDIA_URL }}images/myrobogals-credits.jpg"><br>
-<strong>&copy; 2010-2013 Robogals Global</strong><br>
+<strong>&copy; 2010-2017 Robogals Global</strong><br>
 <br>
 {% trans "Contributors:" %}<br>
 <a href="/profile/mark/">Mark Parncutt</a><br>
@@ -19,9 +19,9 @@
 <a href="/profile/junee/">Junee Singh</a><br>
 <a href="/profile/spock/">James Li</a><br>
 <a href="https://www.linkedin.com/in/lesing"> Sing Le </a><br>
-<a href='https://www.linkedin.com/in/adam-tizzone-71a374117' > Adam Tizzone </a><br>
 <br>
 {% blocktrans with "Sing Le" as name and "sing@robogals.org"|hide_email as email %}Are you a coder who would like to contribute to building myRobogals? Contact <b>{{name}}</b> on {{email}} to join our software engineering team!{% endblocktrans %}<br>
 <br>
-<a href="http://www.djangoproject.com/"><img src="{{ MEDIA_URL }}djangopowered.gif" border="0"></a>
+<a href="https://www.djangoproject.com/"><img src="{{ MEDIA_URL }}/images/djangopowered.gif" border="0"></a>
+    <a href="https://www.python.org/"><img src="{{ MEDIA_URL }}/images/pythonpowered.png" border="0"></a>
 {% endblock %}

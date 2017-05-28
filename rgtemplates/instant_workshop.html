@@ -33,7 +33,7 @@
 {% endfor %}
 </table>
 
-<br>
+<p><label for="id_visit_type"><b>Visit type:</b></label> {{ form2.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{form2.visit_type.help_text}}{% endautoescape %}</span></p>
 
     <div id="newSchoolTable">
         <table >
@@ -69,7 +69,6 @@
         <br>
     </div>
 
-    <p><label for="id_visit_type"><b>Visit type:</b></label> {{ form2.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{form2.visit_type.help_text}}{% endautoescape %}</span></p>
     {% if form2.errors %}
 	    <div class="error">{% trans "Please correct your entries in the form" %}</div>
 	{% endif %}
@@ -137,8 +136,10 @@
 
         if(selected == 0) {
             newSchool.style.visibility = "visible";
+            newSchool.style.display = "inline";
         } else {
             newSchool.style.visibility = "collapse";
+            newSchool.style.display = "none";
         }
     }
     </script>

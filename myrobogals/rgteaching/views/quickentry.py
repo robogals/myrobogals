@@ -1,3 +1,7 @@
+"""
+Creates and fills in the workshop with stats using a single form
+"""
+
 import math
 
 from django.contrib import messages
@@ -10,10 +14,6 @@ from django.utils.timezone import make_aware
 
 from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import EventAttendee, SchoolVisit, SchoolVisitStats
-
-"""
-Creates and fills in the workshop with stats using a single form
-"""
 
 
 @login_required
@@ -47,6 +47,8 @@ def instantvisit(request):
             school_visit = SchoolVisit()
             new_school = School()
 
+            school_visit.created_method = 1
+
             # Check if new school was selected, New school equals to 0
             if selected_school == u'0':
                 if form_school.is_valid():
@@ -78,7 +80,8 @@ def instantvisit(request):
                 try:
                     previously_visited_school = School.objects.get(name=selected_school)
                 except ObjectDoesNotExist:
-                    messages.error(request, message=unicode("Please select a school from the list or create a new one."))
+                    messages.error(request,
+                                   message=unicode("Please select a school from the list or create a new one."))
                     return render_to_response('instant_workshop.html',
                                               {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                               context_instance=RequestContext(request))
@@ -88,9 +91,9 @@ def instantvisit(request):
             school_visit.creator = request.user
             school_visit.location = data['location']
             school_visit.visit_start = make_aware(datetime.datetime.combine(data['date'], data['start_time']),
-                                                 timezone=chapter.tz_obj())
+                                                  timezone=chapter.tz_obj())
             school_visit.visit_end = make_aware(datetime.datetime.combine(data['date'], data['end_time']),
-                                               timezone=chapter.tz_obj())
+                                                timezone=chapter.tz_obj())
             school_visit.save()
 
             # Add the new stats just entered
@@ -126,19 +129,22 @@ def instantvisit(request):
 
             request.session['hoursPerPersonStage'] = 2
 
-            return render_to_response('visit_hoursPerPerson.html', {'attended': data_stats['attended'], 'visit_id': school_visit.id,
-                                                                    'defaultHours': range(default_hours)},
+            return render_to_response('visit_hoursPerPerson.html',
+                                      {'attended': data_stats['attended'], 'visit_id': school_visit.id,
+                                       'defaultHours': range(default_hours)},
                                       context_instance=RequestContext(request))
 
         # Form is invalid
         else:
-            return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+            return render_to_response('instant_workshop.html',
+                                      {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                                       context_instance=RequestContext(request))
 
     # Happens when someone presses back - refer them to the workshop list page to refill stats there
     elif request.method == 'POST' and request.session['hoursPerPersonStage'] == 2:
         del request.session['hoursPerPersonStage']
-        messages.info(request, message='An error occurred. Please find your newly created workshop here and refill in your stats.')
+        messages.info(request,
+                      message='An error occurred, find your newly created workshop here and refill in your stats.')
         return redirect('/teaching/list/')
 
     # Prepare form
@@ -152,5 +158,6 @@ def instantvisit(request):
     form_school = SchoolFormPartOne(chapter=chapter, school_id=0)
 
     # Render clean form
-    return render_to_response('instant_workshop.html', {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
+    return render_to_response('instant_workshop.html',
+                              {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                               context_instance=RequestContext(request))

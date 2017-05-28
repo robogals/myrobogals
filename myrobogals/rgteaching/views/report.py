@@ -191,9 +191,181 @@ def report_standard(request):
                                'attendance': attendance_sorted}, context_instance=RequestContext(request))
 
 
+class ChapterTotals:
+    def __init__(self, chapter):
+        self.chapter = chapter
+
+        if chapter.parent is not None:
+            self.parent = chapter.parent.name
+        else:
+            self.parent = None
+
+        self.workshops = 0
+        self.schools = 0
+        self.unique_girls = 0
+        self.repeat_girls = 0
+        self.unique_boys = 0
+        self.repeat_boys = 0
+
+    @property
+    def weighted_girls(self):
+        return self.unique_girls + float(self.repeat_girls / 2)
+
+    @property
+    def weighted_boys(self):
+        return self.unique_boys + float(self.repeat_boys / 2)
+
+    @property
+    def total_girls(self):
+        return self.unique_girls + self.repeat_girls
+
+    @property
+    def total_boys(self):
+        return self.unique_boys + self.repeat_boys
+
+
 # Global workshop reports
 @login_required
 def report_global(request):
+    # Allow superusers to see these reports
+    if not request.user.is_superuser:
+        # Allow global and regional exec to see these reports
+        if not request.user.is_staff:
+            raise Http404
+        else:
+            if request.user.chapter.pk == 1:
+                pass
+            elif request.user.chapter.parent:
+                if request.user.chapter.parent.pk == 1:
+                    pass
+                else:
+                    raise Http404
+            else:
+                raise Http404
+
+    warning = ''
+    printview = False
+    if request.method == 'POST':
+        chapter_totals = {}
+        region_totals = {}
+        global_totals = {}
+
+        theform = ReportSelectorForm(request.POST)
+
+        if theform.is_valid():
+            formdata = theform.cleaned_data
+            printview = formdata['printview']
+
+            # Interpret the dates as having been entered in the user's local time
+            start_date = make_aware(datetime.datetime.combine(formdata['start_date'], datetime.time.min),
+                                    timezone=request.user.tz_obj())
+            end_date = make_aware(datetime.datetime.combine(formdata['end_date'], datetime.time.max),
+                                  timezone=request.user.tz_obj())
+
+            request.session['globalReportStartDate'] = start_date
+            request.session['globalReportEndDate'] = end_date
+            request.session['globalReportVisitType'] = formdata['visit_type']
+            if start_date.date() < datetime.date(2011, 2, 11):
+                warning = 'Warning: Australian data prior to 10 September 2010 and UK data prior to 11 February 2011 may not be accurate'
+
+            chapters = Chapter.objects.filter(exclude_in_reports=False)
+
+            chapter_totals = []
+
+            for chapter in chapters:
+                c = ChapterTotals(chapter)
+
+                event_id_list = Event.objects.filter(visit_start__range=[start_date, end_date], chapter=chapter,
+                                                     status=1).values_list('id', flat=True)
+                event_list = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('school', flat=True)
+                # visit_ids = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('id')
+                event_list = set(event_list)
+
+                # For each school that had an event during the period, produce a chapter total
+                for school_id in event_list:
+                    # Get all visits at this school during the period
+                    this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id=school_id, visit__visit_start__range=[start_date, end_date], visit__status=1)
+                    if int(formdata['visit_type']) == -1:
+                        # include all stats categories
+                        pass
+                    elif int(formdata['visit_type']) == -2:
+                        # include both metro and regional robotics workshops
+                        this_schools_visits = this_schools_visits.filter(visit_type__in=[0, 7])
+                    else:
+                        # only include specific stats category
+                        this_schools_visits = this_schools_visits.filter(visit_type=formdata['visit_type'])
+
+                    if this_schools_visits:
+                        c.schools += 1
+                        for each_visit in this_schools_visits:
+                            c.unique_girls += xint(each_visit.primary_girls_first) + xint(each_visit.high_girls_first) + xint(each_visit.other_girls_first)
+                            c.unique_boys += xint(each_visit.primary_boys_first) + xint(each_visit.high_boys_first) + xint(each_visit.other_boys_first)
+                            c.repeat_girls += xint(each_visit.primary_girls_repeat) + xint(each_visit.high_girls_repeat) + xint(each_visit.other_girls_repeat)
+                            c.repeat_boys += xint(each_visit.primary_boys_repeat) + xint(each_visit.high_boys_repeat) + xint(each_visit.other_boys_repeat)
+                            c.workshops += 1
+
+                chapter_totals.append(c)
+
+            # Get region list
+            region_list = list(filter(lambda x: x.parent == 'Robogals Global', chapter_totals))
+
+            # Calculating region totals
+            region_totals = []
+            for region in region_list:
+                region_chapters = list(filter(lambda x: x.parent == region.chapter.name or x.chapter.name == region.chapter.name, chapter_totals))
+                print(region_chapters)
+                region_counts(region, region_chapters)
+                region_totals.append(region)
+
+            # Calculating global total
+            global_totals = next((x for x in chapter_totals if x.parent is None), None)
+            region_counts(global_totals, region_list)
+
+            # Removing duplicates of regional and global from chapter's list
+            chapter_totals = set(chapter_totals).symmetric_difference(region_list)
+            chapter_totals.remove(global_totals)    # Since global_total is a single object
+
+            # Removing all chapters who hasn't got any stats
+            no_stat_chapters = list(filter(lambda x: x.workshops == 0, chapter_totals))
+            chapter_totals = set(chapter_totals).symmetric_difference(no_stat_chapters)
+
+    else:
+        theform = ReportSelectorForm()
+        chapter_totals = {}
+        region_totals = {}
+        global_totals = {}
+
+    if request.user.is_superuser or request.user.chapter.id == 1:
+        user_chapter_children = Chapter.objects.filter(exclude_in_reports=False).values_list('short_en', flat=True)
+    else:
+        user_chapter_children = Chapter.objects.filter(parent__pk=request.user.chapter.pk,
+                                                       exclude_in_reports=False).values_list('short_en', flat=True)
+
+    if printview:
+        return render_to_response('print_report.html', {'chapter_totals': sorted(chapter_totals),
+                                                        'region_totals': sorted(region_totals),
+                                                        'global': global_totals, 'warning': warning},
+                                  context_instance=RequestContext(request))
+    else:
+        return render_to_response('stats_get_global_report.html',
+                                  {'theform': theform, 'chapter_totals': sorted(chapter_totals, key=lambda x: x.chapter.name),
+                                   'region_totals': sorted(region_totals, key=lambda x: x.chapter.name), 'global': global_totals,
+                                   'warning': warning, 'user_chapter_children': set(user_chapter_children)},
+                                  context_instance=RequestContext(request))
+
+
+def region_counts(global_totals, region_list):
+    global_totals.unique_girls = sum(v.unique_girls for v in region_list)
+    global_totals.repeat_girls = sum(v.repeat_girls for v in region_list)
+    global_totals.unique_boys = sum(v.unique_boys for v in region_list)
+    global_totals.repeat_boys = sum(v.repeat_girls for v in region_list)
+    global_totals.workshops = sum(v.workshops for v in region_list)
+    global_totals.schools = sum(v.schools for v in region_list)
+
+
+################################### START DEPRECATED CODE FOR TESTING PURPOSES ONLY ####################################
+@login_required
+def report_global_old(request):
     # Allow superusers to see these reports
     if not request.user.is_superuser:
         # Allow global and regional exec to see these reports
@@ -341,16 +513,18 @@ def report_global(request):
                                                         'global': global_totals, 'warning': warning},
                                   context_instance=RequestContext(request))
     else:
-        return render_to_response('stats_get_global_report.html',
+        return render_to_response('stats_get_global_report_old.html',
                                   {'theform': theform, 'chapter_totals': sorted(chapter_totals.iteritems()),
                                    'region_totals': sorted(region_totals.iteritems()), 'global': global_totals,
                                    'warning': warning, 'user_chapter_children': set(user_chapter_children)},
                                   context_instance=RequestContext(request))
+################################################# END DEPRECATED CODE ##################################################
 
 
 # This view is for when a chapter is clicked on in the global reports to see
 # chapter-specific stats
 # TODO: the URL should use myrobogals_url, not short_en
+# TODO: Not used at the moment - Need to check performance before reusing
 @login_required
 def report_global_breakdown(request, chaptershorten):
     chapter = get_object_or_404(Chapter, short_en=chaptershorten)

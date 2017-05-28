@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %} Sign Up {% endblock %}
+
+{% block pagetitle %} Sign up myRobogals {% endblock %}
+
+{% block content %}
+    <form action="/join/{{ chapter.myrobogals_url }}/" method="POST"> {% csrf_token %}
+
+        {% for error in err %}
+            {% if error != "" %}
+            <td colspan="2">
+               <div class="error">{{ error }}</div>
+            </td>
+            {% endif %}
+        {% endfor %}
+
+        <table>
+            {% for field in signup_form %}
+                {% if field.errors %}
+                    <tr>
+                        <td colspan="2">
+                            <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td width="200">
+                        {{ field.label_tag }}{% if field.field.required %}
+                            <span style="color: #ff0000">*</span>{% endif %}
+                    </td>
+                    <td>
+                        {{ field }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            <tr>
+                <td width="200">Password<span style="color: #ff0000">*</span>
+                </td>
+                <td><input type="password" name="password1"></td>
+            </tr>
+            <tr>
+                <td>Confirm password<span style="color: #ff0000">*</span></td>
+                <td><input type="password" name="password2"></td>
+            </tr>
+
+            <tr>
+                <td style="vertical-align: top"> Chapter <span style="color: #ff0000">*</span></td>
+                <td style="vertical-align: top">
+                    {{ chapter }}
+                </td>
+            </tr>
+        </table>
+
+        {% if conduct_form %}
+            {% for field in conduct_form %}
+                {% if field.errors %}
+                    <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                <p>
+                    {{ field }} I hereby abide by everything mentioned in the<a href="/code/help" target="_blank">
+                    Robogal's Code of Conduct</a>
+                </p>
+            {% endfor %}
+        {% endif %}
+
+        <br>
+
+        <input type="submit" value="Sign Up v(^.^)v"/>
+    </form>
+{% endblock %}
