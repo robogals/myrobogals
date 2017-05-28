@@ -61,9 +61,7 @@ def codeofconduct(request):
     coc_form = CodeOfConductForm(request.POST or None)
 
     if request.method == 'POST':
-        print('here')
         if coc_form.is_valid():
-            print('valid')
             data = coc_form.cleaned_data
             u.code_of_conduct = True
             u.save()

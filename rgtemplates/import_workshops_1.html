@@ -9,11 +9,11 @@
 
     <h3>Download Links</h3>
 
-    <p><a href="{% url 'download' %}?doc=sample">Download the template spreadsheet</a></p>
+    <p><a href="{% url 'teaching:download' %}?doc=sample">Download the template spreadsheet</a></p>
 
-    <p><a href="{% url 'download' %}?doc=schoollist">Download your chapter's schools list</a></p>
+    <p><a href="{% url 'teaching:download' %}?doc=schoollist">Download your chapter's schools list</a></p>
 
-    <p><a href="{% url 'download' %}?doc=userlist">Download your chapter's users list</a></p>
+    <p><a href="{% url 'teaching:download' %}?doc=userlist">Download your chapter's users list</a></p>
 
     <h3>Import Workshop Cheat Sheet</h3>
 
@@ -39,6 +39,8 @@
             <li>7 - Robogals workshop, regional area</li>
         </ul>
 
+
+    <h3>Import Workshops</h3>
 
     {%  if errmsg %}
         {% for error in errmsg %}

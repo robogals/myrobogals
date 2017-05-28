@@ -193,9 +193,11 @@ class StudentNumField(forms.CharField):
                 raise forms.ValidationError(_('This field is required.'))
             else:
                 return ''
-        if User.objects.filter(Q(chapter=self.chapter), ~Q(pk=self.user_id), Q(student_number=value)).count() > 0:
-            raise forms.ValidationError(_(
-                'There is already a member with that student number. Click "forgot password" to the left to recover your existing account, if necessary.'))
+
+        u_id = None if self.user_id == '' else self.user_id
+
+        if User.objects.filter(Q(chapter=self.chapter), ~Q(pk=u_id), Q(student_number=value)).count() > 0:
+            raise forms.ValidationError(_('There is already a member with that student number. Click "forgot password" to the left to recover your existing account, if necessary.'))
         else:
             return value
 

@@ -103,34 +103,30 @@ def newuser(request, chapter):
                             u.is_active = True
                             u.is_staff = False
                             u.is_superuser = False
-                            u.code_of_conduct = True
+                            u.code_of_conduct = True if coc_form_text is not None else False
+
+                            u.first_name = data['first_name']
+                            u.last_name = data['last_name']
+                            u.email = data['email']
+                            u.alt_email = data['alt_email']
+                            u.mobile = data['mobile']
+                            u.mobile_verified = False
+                            u.gender = data['gender']
+
+                            if 'student_number' in data:
+                                u.student_number = data['student_number']
+
+                            if 'union_member' in data:
+                                u.union_member = data['union_member']
+
+                            if 'tshirt' in data:
+                                u.tshirt = data['tshirt']
+
+                            # If chapter has enabled police check (required check is performed in clean() method
                             if 'police_check_number' in data and 'police_check_expiration' in data:
                                 u.police_check_number = data['police_check_number']
                                 u.police_check_expiration = data['police_check_expiration']
                                 notify_chapter(chapter, u)
-
-                                u.first_name = data['first_name']
-                                u.last_name = data['last_name']
-
-                                if new_username:
-                                    u.username = new_username
-
-                                username = data['username']
-                                u.email = data['email']
-                                u.alt_email = data['alt_email']
-
-                                if u.mobile != data['mobile']:
-                                    u.mobile = data['mobile']
-                                    u.mobile_verified = False
-
-                                u.gender = data['gender']
-
-                                if 'student_number' in data:
-                                    u.student_number = data['student_number']
-                                if 'union_member' in data:
-                                    u.union_member = data['union_member']
-                                if 'tshirt' in data:
-                                    u.tshirt = data['tshirt']
 
                             u.save()
 

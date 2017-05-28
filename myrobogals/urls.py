@@ -77,7 +77,7 @@ urlpatterns = [
 	# url(r'^forums/', include('myrobogals.rgforums.urls')),
 
 	# Workshops menu
-	url(r'^teaching/', include('myrobogals.rgteaching.urls')),
+	url(r'^teaching/', include('myrobogals.rgteaching.urls', namespace='teaching')),
 
 	url(r'^reports/$', report.report_standard),
 	url(r'^globalreports/$', report.report_global),
@@ -137,7 +137,7 @@ urlpatterns = [
 
 # If running the local development server - this will serve the media files through it too
 if settings.DEBUG:
-	urlpatterns.append(url(r'^rgmedia/(?P<path>.*)$', static_serve_view, {'document_root': settings.MEDIA_ROOT,}))
+	urlpatterns.append(url(r'^rgmedia/(?P<path>.*)$', static_serve_view, {'document_root': settings.MEDIA_ROOT}))
 
 # Custom view for 500 Internal Server Error
 handler500 = 'myrobogals.rgmain.views.servererror'

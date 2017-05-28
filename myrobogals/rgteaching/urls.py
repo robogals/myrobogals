@@ -4,7 +4,7 @@ from views import quickentry, eventvisit, school, import_workshop
 
 urlpatterns = [
     # urls for eventvisit.py functions
-    url(r'^$', eventvisit.teachhome),
+    url(r'^$', eventvisit.teachhome, name='home'),
     url(r'^list/$', eventvisit.listvisits),
     url(r'^printlist/$', eventvisit.printlistvisits),
     url(r'^statshelp/$', eventvisit.statshelp),

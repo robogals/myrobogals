@@ -24,8 +24,7 @@ class SchoolVisitFormOneBase(forms.Form):
                            initial=timezone.now().date())
     start_time = forms.TimeField(label=_('Start time'), initial='10:00:00')
     end_time = forms.TimeField(label=_('End time'), initial='13:00:00')
-    location = forms.CharField(label=_("Location"), help_text=_(
-        "Where the workshop is taking place, at the school or elsewhere (can differ from meeting location, see below)"))
+    location = forms.CharField(label=_("Location"), help_text=_("Where the workshop takes place, at the school or elsewhere"))
 
     # Form validation
     def clean(self):
@@ -60,6 +59,9 @@ class SchoolVisitFormOne(SchoolVisitFormOneBase):
             self.fields["school"].queryset = School.objects.all().order_by('name')
         else:
             self.fields["school"].queryset = School.objects.filter(chapter=chapter).order_by('name')
+
+            self.fields["location"].help_text += ", (can differ from meeting location, see below)"
+
 
 
 # Form to create or edit a InstantSchoolVisit (instant workshop)

@@ -429,7 +429,6 @@ def exportusers(request, chapterurl):
         else:
             status = '1'  # Default to student members
 
-        print(status)
         if (status != '0'):
             users = MemberStatus.objects.filter(
                 user__chapter=c,
@@ -448,7 +447,6 @@ def exportusers(request, chapterurl):
                      'user__date_joined', 'user__dob', 'user__gender', 'user__uni_start', 'user__uni_end',
                      'user__course_type', 'user__student_type').distinct()
 
-        print('herr')
         response = HttpResponse(content_type='text/csv')
         filename = c.myrobogals_url + '-users-' + str(date.today()) + '.csv'
         response['Content-Disposition'] = 'attachment; filename=' + filename
@@ -463,7 +461,6 @@ def exportusers(request, chapterurl):
                                     user['user__gender'], user['user__uni_start'], user['user__uni_end'],
                                     user['user__course_type'], user['user__student_type']),)
 
-        print('here')
         t = loader.get_template('csv_export.txt')
         c = Context({
             'data': csv_data,

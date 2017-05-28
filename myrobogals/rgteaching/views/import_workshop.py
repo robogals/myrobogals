@@ -5,9 +5,8 @@ from datetime import datetime, date
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import render
@@ -15,13 +14,19 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import make_aware
 from django.views.generic import View
 
+from myrobogals.decorators import staff_or_404
 from myrobogals.rgprofile.models import User
 from myrobogals.rgprofile.views.profile_chapter import exportusers
 from myrobogals.rgteaching.models import SchoolVisit, SchoolVisitStats, EventAttendee, School
 
 
 class CSVWorkshopsUploadForm(forms.Form):
-    csvfile = forms.FileField()
+    csvfile = forms.FileField(widget=forms.FileInput(attrs={'accept': '.csv'}))
+
+
+def check_file_extension(value):
+    if not value.name.endswith('.csv'):
+        raise ValidationError('Please upload a .csv file')
 
 
 class ReviewUploadForm(forms.Form):
@@ -65,7 +70,6 @@ def download(request):
     raise Http404
 
 
-# Class based views
 class ImportWorkshopView(View):
     """
     Mass importing workshop statistics using upload form and converts .CSV file into database entries 
@@ -74,7 +78,7 @@ class ImportWorkshopView(View):
     form_class = CSVWorkshopsUploadForm
 
     @method_decorator(login_required)
-    @method_decorator(staff_member_required)
+    @method_decorator(staff_or_404)
     def post(self, request):
         chapter = request.user.chapter
         step = request.POST['step']
@@ -85,10 +89,10 @@ class ImportWorkshopView(View):
             return self.step_two(request, chapter)
         else:
             messages.error(request, 'An error occurred, please try again.')
-            return HttpResponseRedirect('/teaching/')
+            return HttpResponseRedirect(reverse('teaching:home'))
 
     @method_decorator(login_required)
-    @method_decorator(staff_member_required)
+    @method_decorator(staff_or_404)
     def get(self, request):
         return render(request, 'import_workshops_1.html',
                       {'chapter': request.user.chapter, 'form': self.form_class})
@@ -113,8 +117,14 @@ class ImportWorkshopView(View):
             (workshops_list, workshops_imported, err_msg) = self.import_workshop_csv(request, filerows, False)
 
             if workshops_imported is None:
-                messages.error(request, err_msg)
-                return HttpResponseRedirect('/teaching/')
+                # Rerendering possible error messages
+                if err_msg:
+                    err_str = ''
+                    for key, val in err_msg.iteritems():
+                        err_str += val + '<br>'
+                    messages.error(request, err_str)
+
+                return HttpResponseRedirect(reverse('teaching:home'))
 
             form_review = ReviewUploadForm()
             return render(request, 'import_workshops_2.html',
@@ -137,7 +147,7 @@ class ImportWorkshopView(View):
                 filerows = csv.reader(fp)
             else:
                 messages.error(request, 'An error occurred, please reupload your document')
-                return HttpResponseRedirect(reverse('import_workshops'))
+                return HttpResponseRedirect(reverse('teaching:import_workshops'))
 
             (workshops_list, workshops_imported, err_msg) = self.import_workshop_csv(request, filerows, True)
 
@@ -156,11 +166,10 @@ class ImportWorkshopView(View):
             # Removing uploaded file
             try:
                 os.remove(tmppath)
-                print('Removed file at %s' % tmppath)
             except OSError:
                 pass
 
-            return HttpResponseRedirect('/teaching/')
+            return HttpResponseRedirect(reverse('teaching:home'))
         else:
             # When the user has not reviewed the upload form (clicked the checkbox)
             tmppath = request.POST['tmppath'].replace('\\\\', '\\')
@@ -190,7 +199,7 @@ class ImportWorkshopView(View):
 
                     # Check to see there are an appropriate number of columns in the header
                     if len(columns) < 20:
-                        err_msg.append('You are missing a column in your .csv table. Please correct the error and try again.')
+                        err_msg.update({str(row_idx): 'You are missing columns in your .csv table. Please correct the error and try again.'})
                         workshops_imported = None
                         return workshop_list, workshops_imported, err_msg
 
@@ -216,6 +225,10 @@ class ImportWorkshopView(View):
                     if i > 19: i = 19
 
                     if 'Attendees' in colname:
+                        if i != 19:
+                            err_msg.update({str(row_idx): 'There was an incorrect number of items in this row, please check your columns from template again'})
+                            break
+
                         # ASSUMPTION: The remaining columns in a row are all volunteer usernames
                         data_filled_correctly = True
                         attendee = EventAttendee()
@@ -228,7 +241,11 @@ class ImportWorkshopView(View):
                             # Try to find in the user exists
                             u = User.objects.get(username__exact=col)
                         except ObjectDoesNotExist:
-                            attendee_errors.update({str(row_idx): 'Could not find %s and has not been added to the %s workshop' % (col, school_visit.school)})
+                            try:
+                                attendee_errors[str(row_idx)] += '<br>Could not find %s and has not been added to the workshop' % col
+                            except KeyError:
+                                attendee_errors.update({str(row_idx): 'Could not find %s and has not been added to the workshop' % col})
+
                             continue
 
                         attendee.user = u
@@ -316,7 +333,8 @@ class ImportWorkshopView(View):
                         elif colname == 'Notes':
                             stats.notes = col
                         else:
-                            pass
+                            err_msg.update({str(row_idx): "Column not recognised, use the column names provided in the template and reupload your file."})
+                            return workshop_list, workshops_imported, err_msg
 
                 # Only check for existence and save when data is filled correctly
                 if data_filled_correctly:
