@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block header %} <link rel="stylesheet" href="{{ MEDIA_URL }}templates/system/css/import_workshops.css" type="text/css" /> {% endblock %}
+
 {% block title %}Global workshop reports{% endblock %}
 
 {% block pagetitle %}Global workshop reports{% endblock %}
 
 {% block content %}
+<h3>Global Workshop Reporting</h3>
+<p>Retrieve workshop statistics entered by chapters globally</p>
 <form action="/globalreports/" method="post"> {% csrf_token %}
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
@@ -16,7 +20,7 @@
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.start_date.name }}">{{ theform.start_date.label }}</label>
 						</td>
 						<td>
-                                {{ theform.start_date }} 
+                                {{ theform.start_date }}
                         </td>
 					</tr>
 					<tr>
@@ -24,11 +28,11 @@
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.end_date.name }}">{{ theform.end_date.label }}</label>
 						</td>
 						<td>
-                                {{ theform.end_date }} 
+                                {{ theform.end_date }}
                         </td>
 					</tr>
 				</table>
-						
+
                         <div>
                                 <label class="label-left" style="width:120px;" for="id_{{ theform.visit_type.name }}">{{ theform.visit_type.label }}</label>
                                 {{ theform.visit_type }}<br /><span style="font-size: 9pt">{% autoescape off %}{{theform.visit_type.help_text}}{% endautoescape %}</span>
@@ -44,75 +48,17 @@
 {% endif %}
 
 {% if chapter_totals %}
-	<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
-		<tr class="even" style="">
-			<td><strong>{% trans "Chapter" %}</strong></td>
-			<td><strong>{% trans "Total Workshops" %}</strong></td>
-			<td><strong>{% trans "Total Schools" %}</strong></td>
-			<td><strong>{% trans "Unique Girls" %}</strong></td>
-            <td><strong>{% trans "Total Girls" %}</strong></td>
-            <td><strong>{% trans "Weighted girls*" %}</strong></td>
-            <td><strong>{% trans "Unique Boys" %}</strong></td>
-            <td><strong>{% trans "Total Boys" %}</strong></td>
-			<td><strong>{% trans "Weighted boys*" %}</strong></td>
-		</tr>
-		{% for chapter_obj in chapter_totals %}
-		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-			<td>{% if name in user_chapter_children %}
-					<a href="/globalreports/breakdown/{{chapter_obj.chapter.short_en}}/">{{ chapter_obj.chapter.name.short_en }}</a>
-				{% else %}
-					{{ chapter_obj.chapter.short_en }}
-				{% endif %}
-			</td>
-			<td>{{ chapter_obj.workshops }} </td>
-			<td>{{ chapter_obj.schools }}</td>
-			<td>{{ chapter_obj.unique_girls }}</td>
-            <td>{{ chapter_obj.total_girls }}</td>
-            <td>{{ chapter_obj.weighted_girls }}</td>
-            <td>{{ chapter_obj.unique_boys }}</td>
-            <td>{{ chapter_obj.total_boys }}</td>
-			<td>{{ chapter_obj.weighted_boys }}</td>
-		</tr>
-		{% endfor %}
-	</table>
-	<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
-		<tr class="even" style="">
-			<td><strong>{% trans "Region" %}</strong></td>
-			<td><strong>{% trans "Total Workshops" %}</strong></td>
-			<td><strong>{% trans "Total Schools" %}</strong></td>
-			<td><strong>{% trans "Unique Girls" %}</strong></td>
-			<td><strong>{% trans "Total Girls" %}</strong></td>
-            <td><strong>{% trans "Weighted girls*" %}</strong></td>
-            <td><strong>{% trans "Unique Boys" %}</strong></td>
-            <td><strong>{% trans "Total Boys" %}</strong></td>
-			<td><strong>{% trans "Weighted boys*" %}</strong></td>
-		</tr>
-		{% for region_obj in region_totals %}
-		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-			<td>{{ region_obj.chapter.short_en }}</td>
-			<td>{{ region_obj.workshops }} </td>
-			<td>{{ region_obj.schools }}</td>
-			<td>{{ region_obj.unique_girls }}</td>
-            <td>{{ region_obj.total_girls }}</td>
-            <td>{{ region_obj.weighted_girls }}</td>
-            <td>{{ region_obj.unique_boys }}</td>
-            <td>{{ region_obj.total_boys }}</td>
-			<td>{{ region_obj.weighted_boys }}</td>
-		</tr>
-		{% endfor %}
-		<tr class="{% if region_totals|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="font-weight:bold;">
-			<td>Global</td>
-			<td>{{ global.workshops }} </td>
-			<td>{{ global.schools }}</td>
-			<td>{{ global.unique_girls }}</td>
-            <td>{{ global.total_girls }}</td>
-            <td>{{ global.weighted_girls }}</td>
-            <td>{{ global.unique_boys }}</td>
-            <td>{{ global.total_boys }}</td>
-			<td>{{ global.weighted_boys }}</td>
-		</tr>
-	</table>
+    {% include "stats_workshop_breakdown.html" %}
+{% endif %}
 
-    <p style="color: grey;">* Repeated students have a weight of 1/2 compared to unique students</p>
+<h3>Workshop Input Method</h3>
+<p>Displays which method of entering workshops our users use the most</p>
+<form action="/globalreports/" method="post"> {% csrf_token %}
+    <input type="hidden" name="method" value="workshop_input" />
+    <input type="submit" value="Fetch Workshop Method Report" />
+</form>
+
+{% if workshop_method_totals %}
+    <p>{% include "stats_workshop_entry_method.html" %}</p>
 {% endif %}
 {% endblock %}

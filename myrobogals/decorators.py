@@ -18,3 +18,19 @@ def staff_or_404(view_func):
             raise Http404
 
     return wraps(view_func)(_checklogin)
+
+
+def superuser_or_404(view_func):
+    """
+    Decorator for views that checks that the user is logged in and is a staff
+    member, raising a 404 if necessary.
+    """
+    def _checklogin(request, *args, **kwargs):
+        if request.user.is_active and request.user.is_superuser:
+            # The user is valid. Continue to the admin page.
+            return view_func(request, *args, **kwargs)
+
+        else:
+            raise Http404
+
+    return wraps(view_func)(_checklogin)
