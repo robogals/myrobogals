@@ -392,13 +392,11 @@ class LoginForm(forms.Form):
         # Check if they are using email to login
         if email_re.match(username):
             try:
-                users = User.objects.filter(email=username)
-                if len(users) > 1:
-                    self.add_error('username',
-                                   'That email address has multiple users associated with it. Please log in using your username.')
-                else:
-                    username = users[0].username
-                    email_login = True
+                u = User.objects.get(email=username)
+                username = u.username
+                email_login = True
+            except User.MultipleObjectsReturned:
+                    self.add_error('username', 'That email address has multiple users associated with it. Please log in using your username.')
             except User.DoesNotExist:
                 self.add_error('username', 'Invalid email address or password')
 

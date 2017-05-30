@@ -56,7 +56,7 @@ def download(request):
 
                 w.writerow(['School ID', 'School'])
                 for s in schools_list:
-                    w.writerow([str(s.id), str(s)])
+                    w.writerow([str(s.id), s.name.encode('ascii', 'ignore')])
 
         elif g == 'userlist':
             return exportusers(request, request.user.chapter.myrobogals_url)
@@ -143,7 +143,7 @@ class ImportWorkshopView(View):
             tmppath = request.POST['tmppath'].replace('\\\\', '\\')
 
             if os.path.exists(tmppath):
-                fp = open(tmppath, 'rb')
+                fp = open(tmppath, 'rU')
                 filerows = csv.reader(fp)
             else:
                 messages.error(request, 'An error occurred, please reupload your document')
@@ -173,7 +173,7 @@ class ImportWorkshopView(View):
         else:
             # When the user has not reviewed the upload form (clicked the checkbox)
             tmppath = request.POST['tmppath'].replace('\\\\', '\\')
-            fp = open(tmppath, 'r')
+            fp = open(tmppath, 'rU')
             filerows = csv.reader(fp)
 
             (workshops_list, workshops_imported, err_msg) = self.import_workshop_csv(request, filerows, False)
@@ -255,9 +255,9 @@ class ImportWorkshopView(View):
                     else:
                         if colname == 'School ID':
                             try:
-                                school_visit.school = School.objects.get(pk=int(col), chapter=request.user.chapter)
+                                school_visit.school = School.objects.get(pk=sint(col), chapter=request.user.chapter)
                             except ObjectDoesNotExist:
-                                err_msg.update({str(row_idx): 'School ID %s does not exist in your schools database' % col})
+                                err_msg.update({str(row_idx): "That school ID does not exist in your schools database, please check again from your schools list. If they don't exist, add them in the Schools tab and try again"})
                                 break
 
                         elif colname == 'Visit Date':
@@ -277,8 +277,12 @@ class ImportWorkshopView(View):
                             try:
                                 t = datetime.strptime(col, '%H:%M:%S').time()
                             except ValueError:
-                                err_msg.update({str(row_idx): 'The start time specified (%s) is not in the correct format' % col})
-                                break
+                                try:
+                                    # Try another format cause excel -_-
+                                    t = datetime.strptime(col, '%H:%M').time()
+                                except ValueError:
+                                    err_msg.update({str(row_idx): 'The start time specified (%s) is not in the correct format' % col})
+                                    break
 
                             school_visit.visit_start = make_aware(datetime.combine(date, t), timezone=request.user.chapter.tz_obj())
                         elif colname == 'End Time':
@@ -286,8 +290,12 @@ class ImportWorkshopView(View):
                             try:
                                 t = datetime.strptime(col, '%H:%M:%S').time()
                             except ValueError:
-                                err_msg.update({str(row_idx): 'The end time specified (%s) is not in the correct format' % col})
-                                break
+                                try:
+                                    # Try another format cause excel -_-
+                                    t = datetime.strptime(col, '%H:%M').time()
+                                except ValueError:
+                                    err_msg.update({str(row_idx): 'The end time specified (%s) is not in the correct format' % col})
+                                    break
 
                             school_visit.visit_end = make_aware(datetime.combine(date, t), timezone=request.user.chapter.tz_obj())
 
