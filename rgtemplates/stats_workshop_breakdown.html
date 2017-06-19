@@ -1,5 +1,5 @@
 {% load i18n %}
-
+<h2>Summary</h2>
 <table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
     <tr class="even" style="">
         <td><strong>{% trans "Chapter" %}</strong></td>
@@ -15,7 +15,7 @@
     {% for chapter_obj in chapter_totals %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
         <td>{% if name in user_chapter_children %}
-                <a href="/globalreports/breakdown/{{chapter_obj.chapter.short_en}}/">{{ chapter_obj.chapter.name.short_en }}</a>
+                <a href="{% url 'reports:global_breakdown' chapter_obj.chapter.short_en %}">{{ chapter_obj.chapter.name.short_en }}</a>
             {% else %}
                 {{ chapter_obj.chapter.short_en }}
             {% endif %}
@@ -68,5 +68,54 @@
         <td>{{ global.weighted_boys }}</td>
     </tr>
 </table>
-
 <p style="color: grey;">* Repeated students have a weight of 1/2 compared to unique students</p>
+
+<h2>Extended Breakdown</h2>
+<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+    <tr class="even" style="">
+        <td><strong>{% trans "Chapter" %}</strong></td>
+        <td><strong>{% trans "Avg. # Workshops Per Venue" %}</strong></td>
+        <td><strong>{% trans "% Schools with Repeat Workshops" %}</strong></td>
+        <td><strong>{% trans "% Unique Females Reached" %}</strong></td>
+        <td><strong>{% trans "% Totals Females Reached" %}</strong></td>
+    </tr>
+    {% for chapter_obj in chapter_totals %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        <td>{% if name in user_chapter_children %}
+                <a href="{% url 'reports:global_breakdown' chapter_obj.chapter.short_en %}">{{ chapter_obj.chapter.name.short_en }}</a>
+            {% else %}
+                {{ chapter_obj.chapter.short_en }}
+            {% endif %}
+        </td>
+        <td>{{ chapter_obj.average_workshops_per_venue }} </td>
+        <td>{{ chapter_obj.repeat_schools_percentage }}</td>
+        <td>{{ chapter_obj.unqiue_females_reached_percentage }}</td>
+        <td>{{ chapter_obj.total_females_reached_percentage }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<table style="text-align: center; margin-top:20px" cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">
+    <tr class="even" style="">
+        <td><strong>{% trans "Region" %}</strong></td>
+        <td><strong>{% trans "Avg. # Workshops Per Venue" %}</strong></td>
+        <td><strong>{% trans "% Schools with Repeat Workshops" %}</strong></td>
+        <td><strong>{% trans "% Unique Females Reached" %}</strong></td>
+        <td><strong>{% trans "% Totals Females Reached" %}</strong></td>
+    </tr>
+    {% for region_obj in region_totals %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        <td>{{ region_obj.chapter.short_en }}</td>
+        <td>{{ region_obj.average_workshops_per_venue }} </td>
+        <td>{{ region_obj.repeat_schools_percentage }}</td>
+        <td>{{ region_obj.unqiue_females_reached_percentage }}</td>
+        <td>{{ region_obj.total_females_reached_percentage }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="{% if region_totals|length|divisibleby:2 %}odd{% else %}even{% endif %}" style="font-weight:bold;">
+        <td>Global</td>
+        <td>{{ global.average_workshops_per_venue }} </td>
+        <td>{{ global.repeat_schools_percentage }}</td>
+        <td>{{ global.unqiue_females_reached_percentage }}</td>
+        <td>{{ global.total_females_reached_percentage }}</td>
+    </tr>
+</table>

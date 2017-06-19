@@ -1,12 +1,13 @@
+from __future__ import division
 from operator import itemgetter
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext
 from django.utils.timezone import make_aware
 
-from myrobogals.decorators import superuser_or_404
 from myrobogals.rgteaching.forms import *
 from myrobogals.rgteaching.models import (Event,
                                           SchoolVisit, SchoolVisitStats)
@@ -16,22 +17,93 @@ View for global reporting
 """
 
 
+@login_required
+def progresschapter(request):
+    chapter_sum = 0.0
+    child_sum = 0.0
+    root_sum = 0.0
+    grandchildren_display = []
+    listing = []
+    displaycats = [0, 7]
+    careertalkview = False
+
+    if request.user.is_superuser or request.user.is_staff:
+        c = Chapter.objects.get(pk=1)
+    else:
+        raise Http404
+
+    # Special exception for Robogals Rural & Regional Ambassadors programme
+    # to display career talk stats in the progress bar instead of robotics workshops
+    if c.myrobogals_url == 'rrr':
+        careertalkview = True
+        displaycats = [1, ]
+
+    children = Chapter.objects.filter(parent=c).filter(goal__gt=0)
+    for child in children:
+        grandchildren = Chapter.objects.filter(parent=child).filter(goal__gt=0)
+        for grandchild in grandchildren:
+            school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild,
+                                                            visit__visit_start__range=[grandchild.goal_start_tzaware,
+                                                                                       timezone.now()],
+                                                            visit_type__in=displaycats)
+            for school_visit in school_visits:
+                chapter_sum = chapter_sum + school_visit.num_girls_weighted()
+            grandchildren_display.append((grandchild, chapter_sum))
+            chapter_sum = 0.0
+            school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild,
+                                                            visit__visit_start__range=[child.goal_start_tzaware,
+                                                                                       timezone.now()],
+                                                            visit_type__in=displaycats)
+            for school_visit in school_visits:
+                child_sum = child_sum + school_visit.num_girls_weighted()
+            school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild,
+                                                            visit__visit_start__range=[c.goal_start_tzaware,
+                                                                                       timezone.now()],
+                                                            visit_type__in=displaycats)
+            for school_visit in school_visits:
+                root_sum = root_sum + school_visit.num_girls_weighted()
+        school_visits = SchoolVisitStats.objects.filter(visit__chapter=child,
+                                                        visit__visit_start__range=[child.goal_start_tzaware,
+                                                                                   timezone.now()],
+                                                        visit_type__in=displaycats)
+        for school_visit in school_visits:
+            child_sum = child_sum + school_visit.num_girls_weighted()
+
+        listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
+        grandchildren_display = []
+        child_sum = 0
+        school_visits = SchoolVisitStats.objects.filter(visit__chapter=child,
+                                                        visit__visit_start__range=[c.goal_start_tzaware,
+                                                                                   timezone.now()],
+                                                        visit_type__in=displaycats)
+        for school_visit in school_visits:
+            root_sum = root_sum + school_visit.num_girls_weighted()
+    school_visits = SchoolVisitStats.objects.filter(visit__chapter=c,
+                                                    visit__visit_start__range=[c.goal_start_tzaware, timezone.now()],
+                                                    visit_type__in=displaycats)
+    for school_visit in school_visits:
+        root_sum = root_sum + school_visit.num_girls_weighted()
+    return render_to_response('chapter_progress.html',
+                              {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300,
+                               'careertalkview': careertalkview}, context_instance=RequestContext(request))
+
+
 # Display reporting at a chapter level
 @login_required
 def report_standard(request):
     # Redirect superusers to global reports
     if request.user.is_superuser:
-        return HttpResponseRedirect('/globalreports/')
+        return HttpResponseRedirect(reverse('reports:global'))
     else:
         # Redirect global and regional exec to global reports
         if not request.user.is_staff:
             raise Http404  # Don't allow ordinary users to see any reports
         else:
             if request.user.chapter.pk == 1:
-                return HttpResponseRedirect('/globalreports/')
+                return HttpResponseRedirect(reverse('reports:global'))
             elif request.user.chapter.parent:
                 if request.user.chapter.parent.pk == 1:
-                    return HttpResponseRedirect('/globalreports/')
+                    return HttpResponseRedirect(reverse('reports:global'))
                 else:
                     pass
             else:
@@ -203,10 +275,12 @@ class ChapterTotals:
 
         self.workshops = 0
         self.schools = 0
+        self.repeat_schools = 0
         self.unique_girls = 0
         self.repeat_girls = 0
         self.unique_boys = 0
         self.repeat_boys = 0
+
 
     @property
     def weighted_girls(self):
@@ -223,6 +297,42 @@ class ChapterTotals:
     @property
     def total_boys(self):
         return self.unique_boys + self.repeat_boys
+
+    @property
+    def unqiue_females_reached_percentage(self):
+        if self.unique_girls + self.unique_boys == 0:
+            return 0
+
+        return ffloat((self.unique_girls / (self.unique_girls + self.unique_boys)) * 100)
+
+    @property
+    def total_females_reached_percentage(self):
+        if self.total_girls + self.total_boys == 0:
+            return 0
+
+        return ffloat(self.total_girls / (self.total_girls + self.total_boys) * 100)
+
+    @property
+    def repeat_schools_percentage(self):
+        if self.schools == 0:
+            return 0
+
+        print(self.chapter)
+        print(self.repeat_schools)
+        print(self.schools)
+        print('')
+        return ffloat((self.repeat_schools / self.schools) * 100)
+
+    @property
+    def average_workshops_per_venue(self):
+        if self.schools == 0:
+            return 0
+        #
+        # print(self.chapter)
+        # print(self.workshops)
+        # print(self.schools)
+        # print('\n')
+        return ffloat(self.workshops / self.schools)
 
 
 # Global workshop reports
@@ -283,13 +393,16 @@ def report_global(request):
                 event_id_list = Event.objects.filter(visit_start__range=[start_date, end_date], chapter=chapter,
                                                      status=1).values_list('id', flat=True)
                 event_list = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('school', flat=True)
-                # visit_ids = SchoolVisit.objects.filter(event_ptr__in=event_id_list).values_list('id')
                 event_list = set(event_list)
 
                 # For each school that had an event during the period, produce a chapter total
                 for school_id in event_list:
                     # Get all visits at this school during the period
                     this_schools_visits = SchoolVisitStats.objects.filter(visit__school__id=school_id, visit__visit_start__range=[start_date, end_date], visit__status=1)
+                    print(this_schools_visits.__len__())
+                    if this_schools_visits.__len__() > 1:
+                        c.repeat_schools += 1
+
                     if int(formdata['visit_type']) == -1:
                         # include all stats categories
                         pass
@@ -318,7 +431,6 @@ def report_global(request):
             region_totals = []
             for region in region_list:
                 region_chapters = list(filter(lambda x: x.parent == region.chapter.name or x.chapter.name == region.chapter.name, chapter_totals))
-                print(region_chapters)
                 region_counts(region, region_chapters)
                 region_totals.append(region)
 
@@ -366,6 +478,7 @@ def region_counts(global_totals, region_list):
     global_totals.repeat_boys = sum(v.repeat_girls for v in region_list)
     global_totals.workshops = sum(v.workshops for v in region_list)
     global_totals.schools = sum(v.schools for v in region_list)
+    global_totals.repeat_schools = sum(v.repeat_schools for v in region_list)
 
 
 ################################### START DEPRECATED CODE FOR TESTING PURPOSES ONLY ####################################
@@ -635,3 +748,10 @@ def xint(n):
         return 0
     return int(n)
 
+
+def ffloat(n):
+    """
+    Simple function to return floats as 2 decimal places
+    Note: floats are returned as strings
+    """
+    return "{0:.2f}".format(n)

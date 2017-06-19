@@ -5,7 +5,7 @@
 {% block pagetitle %}Workshop reports{% endblock %}
 
 {% block content %}
-<form action="/reports/" method="post"> {% csrf_token %}
+<form action="{% url 'reports:standard' %}" method="post"> {% csrf_token %}
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}

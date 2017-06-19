@@ -10,7 +10,7 @@
 {% block content %}
 <h3>Global Workshop Reporting</h3>
 <p>Retrieve workshop statistics entered by chapters globally</p>
-<form action="/globalreports/" method="post"> {% csrf_token %}
+<form action="{% url 'reports:global' %}" method="post"> {% csrf_token %}
                         {% if theform.errors %}
                                 <span class="alert">{{ theform.errors }}</span>
                         {% endif %}
@@ -53,7 +53,7 @@
 
 <h3>Workshop Input Method</h3>
 <p>Displays which method of entering workshops our users use the most</p>
-<form action="/globalreports/" method="post"> {% csrf_token %}
+<form action="{% url 'reports:global' %}" method="post"> {% csrf_token %}
     <input type="hidden" name="method" value="workshop_input" />
     <input type="submit" value="Fetch Workshop Method Report" />
 </form>
