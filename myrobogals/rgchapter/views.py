@@ -199,56 +199,6 @@ class FormPartSix(forms.Form):
 	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea, initial=Chapter._meta.get_field('invite_email_msg').get_default())
 	invite_email_html = forms.BooleanField(required=False)
 
-@login_required
-def progresschapter(request):
-	chapter_sum = 0.0
-	child_sum = 0.0
-	root_sum = 0.0
-	grandchildren_display = []
-	listing = []
-	displaycats = [0, 7]
-	careertalkview = False
-
-	if request.user.is_superuser or request.user.is_staff:
-		c = Chapter.objects.get(pk=1)
-	else:
-		raise Http404
-	
-	# Special exception for Robogals Rural & Regional Ambassadors programme
-	# to display career talk stats in the progress bar instead of robotics workshops
-	if c.myrobogals_url == 'rrr':
-		careertalkview = True
-		displaycats = [1,]
-	
-	children = Chapter.objects.filter(parent=c).filter(goal__gt=0)
-	for child in children:
-		grandchildren = Chapter.objects.filter(parent=child).filter(goal__gt=0)
-		for grandchild in grandchildren:
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[grandchild.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-			for school_visit in school_visits:
-				chapter_sum = chapter_sum + school_visit.num_girls_weighted()
-			grandchildren_display.append((grandchild, chapter_sum))
-			chapter_sum = 0.0
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-			for school_visit in school_visits:
-				child_sum = child_sum + school_visit.num_girls_weighted()
-			school_visits = SchoolVisitStats.objects.filter(visit__chapter=grandchild, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-			for school_visit in school_visits:
-				root_sum = root_sum + school_visit.num_girls_weighted()
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[child.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-		for school_visit in school_visits:
-			child_sum = child_sum + school_visit.num_girls_weighted()
-
-		listing.append({'child': (child, child_sum), 'grandchildren': grandchildren_display})
-		grandchildren_display = []
-		child_sum = 0
-		school_visits = SchoolVisitStats.objects.filter(visit__chapter=child, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-		for school_visit in school_visits:
-			root_sum = root_sum + school_visit.num_girls_weighted()
-	school_visits = SchoolVisitStats.objects.filter(visit__chapter=c, visit__visit_start__range=[c.goal_start_tzaware, timezone.now()], visit_type__in=displaycats)
-	for school_visit in school_visits:
-		root_sum = root_sum + school_visit.num_girls_weighted()
-	return render_to_response('chapter_progress.html', {'root_chapter': (c, root_sum), 'listing': listing, 'bar_length_px': 300, 'careertalkview': careertalkview}, context_instance=RequestContext(request))
 
 @login_required
 def editchapter(request, chapterurl):

@@ -10,7 +10,6 @@ from myrobogals.rgconf import views as rgconf_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
-from myrobogals.rgteaching.views import report
 from myrobogals.rgweb import views as rgweb_views
 
 urlpatterns = [
@@ -79,12 +78,8 @@ urlpatterns = [
 	# Workshops menu
 	url(r'^teaching/', include('myrobogals.rgteaching.urls', namespace='teaching')),
 
-	url(r'^reports/$', report.report_standard),
-	url(r'^globalreports/$', report.report_global),
-	url(r'^globalreports/old/$', report.report_global_old),  # TESTING PURPOSES ONLY
-	url(r'^globalreports/breakdown/(?P<chaptershorten>.+)/$', report.report_global_breakdown),
-	url(r'^progress/$', rgchapter_views.progresschapter),
-
+	# Reporting metrics
+	url(r'^reports/', include('myrobogals.rgreport.urls', namespace='reports')),
 
 	# Email & SMS menu
 	url(r'^messages/img/(?P<msgid>\d+)/(?P<filename>.+)$', rgmessages_views.serveimg),

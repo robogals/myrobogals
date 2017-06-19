@@ -16,7 +16,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-ALLOWED_HOSTS = ['my.robogals.org',]
+ALLOWED_HOSTS = []
 
 DATABASES = {
 	'default': {
@@ -158,6 +158,7 @@ INSTALLED_APPS = (
 	'myrobogals.filters',
 	'myrobogals.rgforums',
 	'myrobogals.rgconf',
+	'myrobogals.rgreport',
 	'tinymce',
 )
 
