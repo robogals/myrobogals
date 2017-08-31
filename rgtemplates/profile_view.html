@@ -4,37 +4,37 @@
 
 {% comment %}{% load profile_filters %}{% endcomment %}
 
-{% block title %}{% blocktrans with user.get_full_name as name %}Profile - {{name}}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans with user_profile.get_full_name as name %}Profile - {{name}}{% endblocktrans %}{% endblock %}
 
-{% block pagetitle %}{% blocktrans with user.get_full_name as name %}Profile: {{name}}{% endblocktrans %}{% endblock %}
+{% block pagetitle %}{% blocktrans with user_profile.get_full_name as name %}Profile: {{name}}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 <!--
-{% if user.photo %}
-<img src="{{user.photo.url}}" style="float: right">
+{% if user_profile.photo %}
+<img src="{{user_profile.photo.url}}" style="float: right">
 {% endif %}
 -->
-<strong>{% trans "Chapter:" %}</strong> <a href="/chapters/{{user.chapter.myrobogals_url}}/">{{user.chapter}}</a><br />
-<strong>{% trans "Joined:" %}</strong> {{user.date_joined_local|date:_("DATE_FORMAT_NODAY")}}<br />
-<strong>{% trans "Membership type:" %}</strong> {{user.membertype}}<br />
-{% if user.dob_public %}
-<strong>{% trans "Date of birth:" %}</strong> {{user.dob|date:_("DATE_FORMAT_NODAY")}} ({% blocktrans with user.age as age %}age {{age}}{% endblocktrans %})<br />
+<strong>{% trans "Chapter:" %}</strong> <a href="/chapters/{{user_profile.chapter.myrobogals_url}}/">{{user_profile.chapter}}</a><br />
+<strong>{% trans "Joined:" %}</strong> {{user_profile.date_joined_local|date:_("DATE_FORMAT_NODAY")}}<br />
+<strong>{% trans "Membership type:" %}</strong> {{user_profile.membertype}}<br />
+{% if user_profile.dob_public %}
+<strong>{% trans "Date of birth:" %}</strong> {{user_profile.dob|date:_("DATE_FORMAT_NODAY")}} ({% blocktrans with user_profile.age as age %}age {{age}}{% endblocktrans %})<br />
 {% endif %}
-{% if user.email_public %}
-<strong>{% trans "Email address:" %}</strong> {% hide_email user.email %}<br />
+{% if user_profile.email_public %}
+<strong>{% trans "Email address:" %}</strong> {% hide_email user_profile.email %}<br />
 {% endif %}
-{% if user.course %}
-<strong>{% trans "Course:" %}</strong> {{user.course}} at {% if user.university %}{{user.university}}{% endif %}
-{% if user.graduation_year %}
-(completing {{user.graduation_year}})
+{% if user_profile.course %}
+<strong>{% trans "Course:" %}</strong> {{user_profile.course}} at {% if user_profile.university %}{{user_profile.university}}{% endif %}
+{% if user_profile.graduation_year %}
+(completing {{user_profile.graduation_year}})
 {% endif %}
 <br />
 {% endif %}
-{% if user.job_title %}
-<strong>{% trans "Occupation:" %}</strong> {{user.job_title}}<br />
+{% if user_profile.job_title %}
+<strong>{% trans "Occupation:" %}</strong> {{user_profile.job_title}}<br />
 {% endif %}
-{% if user.company %}
-<strong>{% trans "Employer:" %}</strong> {{user.company}}<br />
+{% if user_profile.company %}
+<strong>{% trans "Employer:" %}</strong> {{user_profile.company}}<br />
 {% endif %}
 {% if current_positions %}
 <br />
@@ -52,9 +52,9 @@
 {% if not current_positions and not past_positions %}
 <br />
 {% endif %}
-{% if user.bio %}
+{% if user_profile.bio %}
 <strong>{% trans "About me:" %}</strong><br />
-{{ user.bio }}<br />
+{{ user_profile.bio }}<br />
 <br />
 {% endif %}
 {% if visits %}

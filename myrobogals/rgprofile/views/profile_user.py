@@ -500,7 +500,7 @@ def detail(request, username):
                 account_list.append(alias)
     visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
     return render_to_response('profile_view.html',
-                              {'user': u, 'current_positions': current_positions, 'past_positions': past_positions,
+                              {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions,
                                'visits': visits}, context_instance=RequestContext(request))
 
 
