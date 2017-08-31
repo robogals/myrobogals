@@ -164,7 +164,7 @@ def edituser(request, username, chapter=None):
     if username == '':
         join = True
         u = User()
-        if request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter):
+        if request.user.is_superuser or (request.user.is_staff and hierarchicalexec(request.user, chapter)):
             adduser = True
         else:
             adduser = False
@@ -182,7 +182,7 @@ def edituser(request, username, chapter=None):
 
     # Either a superuser, self user or exec of chapter
     if join or request.user.is_superuser or request.user.id == u.id or (
-        request.user.is_staff and request.user.chapter == u.chapter):
+        request.user.is_staff and hierarchicalexec(request.user, chapter)):
         # Form submission POST request
         if request.method == 'POST':
             # Obtaining the data from the post request
@@ -324,7 +324,7 @@ def edituser(request, username, chapter=None):
                     u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
 
                     # Check whether they have permissions to edit exec only fields
-                    if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
+                    if attempt_modify_exec_fields and (request.user.is_superuser or hierarchicalexec(request.user, u.chapter)):
                         data = formpart5.cleaned_data
                         u.internal_notes = data['internal_notes']
                         u.trained = data['trained']
@@ -434,7 +434,7 @@ def edituser(request, username, chapter=None):
             return_url = ''
 
         chpass = (join or (request.user.is_staff and request.user != u))
-        exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter)
+        exec_fields = request.user.is_superuser or (request.user.is_staff and hierarchicalexec(request.user, chapter))
 
         return render_to_response('profile_edit.html', {'join': join,
                                                         'adduser': adduser,
@@ -460,13 +460,9 @@ def edituser(request, username, chapter=None):
 # Shows the profile of your user
 def detail(request, username):
     u = get_object_or_404(User, username__exact=username)
-    user_chapter = request.user.chapter
-
-    #True if the requesting user is in the user's chapter, regional team or global team
-    in_chapter_hierarchy = (u.chapter == user_chapter or u.chapter.parent == user_chapter or u.chapter.parent.parent == user_chapter)
 
     #Only show edit link to superusers or chapter/regional/global executives.
-    showEdit = request.user.is_superuser or (request.user.is_staff and in_chapter_hierarchy)
+    showEdit = request.user.is_superuser or (request.user.is_staff and hierarchicalexec(request.user, u.chapter))
 
     # Privacy setting
     private = False
@@ -478,12 +474,12 @@ def detail(request, username):
     elif u.privacy >= 5:
         if not request.user.is_authenticated():
             private = True
-        elif not in_chapter_hierarchy:
+        elif not hierarchicalexec(request.user, u.chapter):
             private = True
     else:
         if not request.user.is_authenticated():
             private = True
-        elif not in_chapter_hierarchy:
+        elif not hierarchicalexec(request.user, u.chapter):
             private = True
         elif not request.user.is_staff:
             private = True
@@ -582,7 +578,7 @@ def mobverify(request):
 def genpw(request, username):
     user = get_object_or_404(User, username__exact=username)
     chapter = user.chapter
-    if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
+    if not (request.user.is_superuser or (request.user.is_staff and hierarchicalexec(request.user, chapter))):
         raise Http404
     if 'return' in request.GET:
         return_url = request.GET['return']
@@ -696,3 +692,15 @@ def welcome_email(request, chapter, u):
     # Change message to PENIDNG mode, which waits for server to send
     message.status = 0
     message.save()
+
+def hierarchicalexec(execuser, targetchapter):
+    """
+    Returns true if execuser is in a chapter that is a transitive parent of the targetchapter.
+
+    Example: Global -> APAC -> {Melbourne, Brisbane, Perth, ..}
+    If an execuser is in the APAC chapter, this will return true for APAC, and all children of APAC.
+    If an execuser is in the Global chapter, this will return true for Global, and descendents children of Global.
+    """
+    return execuser.chapter == targetchapter or execuser.chapter == targetchapter.parent or execuser.chapter == targetchapter.parent.parent
+
+
