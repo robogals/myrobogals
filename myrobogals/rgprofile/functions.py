@@ -473,4 +473,4 @@ def genandsendpw(user, welcomeemail, chapter):
 
 
 def any_exec_attr(u):
-    return (u.is_staff or u.has_cur_pos() or u.has_robogals_email())
+    return (u.is_staff or u.has_cur_pos())
