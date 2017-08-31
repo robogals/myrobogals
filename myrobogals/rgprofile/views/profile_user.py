@@ -460,9 +460,13 @@ def edituser(request, username, chapter=None):
 # Shows the profile of your user
 def detail(request, username):
     u = get_object_or_404(User, username__exact=username)
+    user_chapter = request.user.chapter
 
-    #Only show edit link to superusers or chapter executives.
-    showEdit = request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter))
+    #True if the requesting user is in the user's chapter, regional team or global team
+    in_chapter_hierarchy = (u.chapter == user_chapter or u.chapter.parent == user_chapter or u.chapter.parent.parent == user_chapter)
+
+    #Only show edit link to superusers or chapter/regional/global executives.
+    showEdit = request.user.is_superuser or (request.user.is_staff and in_chapter_hierarchy)
 
     # Privacy setting
     private = False
@@ -474,12 +478,12 @@ def detail(request, username):
     elif u.privacy >= 5:
         if not request.user.is_authenticated():
             private = True
-        elif not (request.user.chapter == u.chapter):
+        elif not in_chapter_hierarchy:
             private = True
     else:
         if not request.user.is_authenticated():
             private = True
-        elif not (request.user.chapter == u.chapter):
+        elif not in_chapter_hierarchy:
             private = True
         elif not request.user.is_staff:
             private = True
