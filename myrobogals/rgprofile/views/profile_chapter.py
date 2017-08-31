@@ -56,7 +56,6 @@ def viewlist(request, chapterurl, list_id):
         users = users.order_by('last_name', 'first_name')
         display_columns = l.display_columns.all()
 
-        print users
         return render_to_response('list_user_list.html',
                                   {'userlist': l, 'list_id': list_id, 'users': users, 'search': search, 'chapter': c,
                                    'display_columns': display_columns,
