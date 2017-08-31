@@ -40,7 +40,7 @@
   </tr>
 {% for u in users %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
+    <td><a href="/profile/{{u.username}}">{{u.username}}</a></td>
 	{% for col in display_columns %}
     <td>{% get_user_attr u col.field_name %}</td>
     {% endfor %}
