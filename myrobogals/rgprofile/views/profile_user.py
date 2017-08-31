@@ -461,6 +461,9 @@ def edituser(request, username, chapter=None):
 def detail(request, username):
     u = get_object_or_404(User, username__exact=username)
 
+    #Only show edit link to superusers or chapter executives.
+    showEdit = request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter))
+
     # Privacy setting
     private = False
     if u.privacy >= 20:
@@ -500,7 +503,7 @@ def detail(request, username):
                 account_list.append(alias)
     visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
     return render_to_response('profile_view.html',
-                              {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions,
+                              {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions, 'showEdit': showEdit,
                                'visits': visits}, context_instance=RequestContext(request))
 
 
