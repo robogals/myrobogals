@@ -3,7 +3,7 @@ import math
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render_to_response, redirect, render
 from django.template import RequestContext
 from django.utils.timezone import localtime, make_aware, now
 from django.utils.translation import ugettext_lazy as _
@@ -17,7 +17,59 @@ from myrobogals.rgteaching.functions import paginatorRender
 
 @login_required
 def teachhome(request):
-    return HttpResponseRedirect('/teaching/list/')
+    chapter = request.user.chapter
+    displaycats = [1, ]
+
+    # Chapter's progress
+    school_visits = SchoolVisitStats.objects.filter(visit__chapter=chapter,
+                                                    visit__visit_start__range=[chapter.goal_start_tzaware,
+                                                                               timezone.now()],
+                                                    visit_type__in=displaycats)
+
+    setattr(chapter, 'sum', 0)
+    for school_visit in school_visits:
+        chapter.sum = chapter.sum + school_visit.num_girls_weighted()
+
+    setattr(chapter, 'sum_percent', 'width:' + str(chapter.sum/chapter.goal*100) + '%')
+
+    # Small list of upcoming workshops
+    upcoming_events = SchoolVisit.objects.filter(chapter=chapter, status=0)[:5]
+
+    # Small list of Recently finished workshops
+    past_events = SchoolVisit.objects.filter(chapter=chapter, status=1)[:5]
+
+    # Reports active
+    return render(request, 'teaching_home-v2.html', {'chapter': chapter, 'upcoming_events': upcoming_events, 'past_events': past_events})
+
+    # return HttpResponseRedirect('/teaching/list/')
+
+
+# List all workshops. Superusers will see all workshops globally; other users
+# will only see their own chapter's workshops.
+@login_required
+def listvisits(request):
+    items_per_page = 25
+
+    chapter = request.user.chapter
+    if request.user.is_superuser:
+        schoolvisits = SchoolVisit.objects.all()
+        showall = True
+        chapterform = ChapterSelector(request.GET)
+        visits = paginatorRender(request, schoolvisits, items_per_page)
+
+        if chapterform.is_valid():
+            chapter_filter = chapterform.cleaned_data['chapter']
+            if chapter_filter:
+                schoolvisits = schoolvisits.filter(chapter=chapter_filter)
+                visits = paginatorRender(request, schoolvisits, items_per_page)
+    else:
+        schoolvisits = SchoolVisit.objects.filter(chapter=chapter)
+        visits = paginatorRender(request, schoolvisits, items_per_page)
+        showall = False
+        chapterform = None
+    return render_to_response('visit_list-v2.html',
+                              {'chapterform': chapterform, 'showall': showall, 'chapter': chapter, 'visits': visits},
+                              context_instance=RequestContext(request))
 
 
 # View to create or edit a SchoolVisit (workshop)
@@ -177,37 +229,12 @@ def viewvisit(request, visit_id):
         user_attended = (ea.actual_status == 1)
     except IndexError:
         user_rsvp_status = 0
-    return render_to_response('visit_view.html',
+    return render_to_response('visit_view-v2.html',
                               {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending,
                                'notattending': notattending, 'waitingreply': waitingreply,
                                'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended,
                                'eventmessages': eventmessages}, context_instance=RequestContext(request))
 
-
-# List all workshops. Superusers will see all workshops globally; other users
-# will only see their own chapter's workshops.
-@login_required
-def listvisits(request):
-    chapter = request.user.chapter
-    if request.user.is_superuser:
-        schoolvisits = SchoolVisit.objects.all()
-        showall = True
-        chapterform = ChapterSelector(request.GET)
-        visits = paginatorRender(request, schoolvisits, 75)
-
-        if chapterform.is_valid():
-            chapter_filter = chapterform.cleaned_data['chapter']
-            if chapter_filter:
-                schoolvisits = schoolvisits.filter(chapter=chapter_filter)
-                visits = paginatorRender(request, schoolvisits, 75)
-    else:
-        schoolvisits = SchoolVisit.objects.filter(chapter=chapter)
-        visits = paginatorRender(request, schoolvisits, 75)
-        showall = False
-        chapterform = None
-    return render_to_response('visit_list.html',
-                              {'chapterform': chapterform, 'showall': showall, 'chapter': chapter, 'visits': visits},
-                              context_instance=RequestContext(request))
 
 
 # Display a printable list of workshops for a given date range

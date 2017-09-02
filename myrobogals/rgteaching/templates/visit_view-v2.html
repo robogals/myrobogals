@@ -1,0 +1,183 @@
+{% extends "base-v2.html" %}
+{% load i18n %}
+{% load tz %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "View Event" %}{% endblock %}
+
+{% block pagetitle %}{{ v.school }}{% endblock %}
+
+{% block content %}
+  {% ifequal v.status 0 %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {% ifequal user_rsvp_status 0 %}
+        {% ifequal v.allow_rsvp 0 %}
+          {% trans "You have not RSVP'd to this event. Your RSVP:" %} <a href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/yes/">{% trans "attending" %}</a> | <a
+            href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/no/">{% trans "not attending" %}</a>
+        {% else %}
+          <p>{% trans "This is a closed event. You must be invited to RSVP." %}</p>
+        {% endifequal %}
+      {% else %}
+        {% ifequal user_rsvp_status 1 %}
+          <p>{% trans "You have been invited to this event but have not yet RSVP'd. Your RSVP:" %} <a
+              href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/yes/">{% trans "attending" %}</a> | <a href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/no/">{% trans "not attending" %}</a></p>
+        {% else %}
+          {% ifequal user_rsvp_status 2 %}
+            <p>{% trans "Your RSVP status is" %} <strong>{% trans "attending" %}</strong>. <a
+                href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/no/">{% trans "Change to not attending" %}</a></p>
+          {% else %}
+            {% ifequal user_rsvp_status 4 %}
+              <p>{% trans "Your RSVP status is" %} <strong> {% trans "not attending" %}</strong>. <a
+                  href="/teaching/{{ v.pk }}/rsvp/{{ user.pk }}/yes/">{% trans "Change to attending" %}</a></p>
+            {% endifequal %}
+          {% endifequal %}
+        {% endifequal %}
+      {% endifequal %}
+    </div>
+  {% else %}
+    <div class="tile">
+      {% ifequal v.status 1 %}
+        {% if user_attended %}
+          <p class="attend-yes">{% trans "This event is over. You attended this event." %}</p>
+        {% else %}
+          <p class="attend-unconf">{% trans "This event is over." %}</p>
+        {% endif %}
+      {% else %}
+        {% ifequal v.status 2 %}
+          <p class="attend-no">{% trans "This event has been cancelled" %}</p>
+        {% endifequal %}
+      {% endifequal %}
+    </div>
+  {% endifequal %}
+
+  <div class="row">
+    <div class="col-6">
+      <div class="tile">
+        <h2 class="rg-page-header">
+          Event Information
+        </h2>
+        <p>
+          <i class="fa fa-clock-o fa-lg" style="margin-right: 20px" aria-hidden="true"></i>{{ v.visit_start|date:_("DATE_FORMAT") }}
+          at {{ v.visit_start|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT") }}
+          to
+          {{ v.visit_end|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT") }}
+        </p>
+        <p>
+          <span><i class="fa fa-map-marker fa-lg" style="margin-right: 25px" aria-hidden="true"></i>{{ v.location }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="tile">
+        <h2 class="rg-page-header">
+          Attendees
+          <a href="#" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true"><i class="fa fa-list" aria-hidden="true"></i> {% trans "See All" %}</a>
+        </h2>
+
+        <table class="dashboard-table" align="center">
+          <tr>
+            <td class="dashboard-data"><b>10</b></td>
+            <td class="dashboard-data"><b>3</b></td>
+            <td class="dashboard-data"><b>5</b></td>
+          </tr>
+          <tr>
+            <td class="dashboard-footer">ATTENDING</td>
+            <td class="dashboard-footer">INTERESTED</td>
+            <td class="dashboard-footer">NOT GOING</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Event Specific Information
+      <a href="#" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true"><i class="fa fa-pencil" aria-hidden="true"></i> {% trans "Edit" %}</a>
+    </h2>
+
+    <table cellpadding="5" cellspacing="0">
+      <tr>
+        <td colspan="2"><strong>{% trans "Basic information" %}</strong></td>
+      </tr>
+      <tr>
+        <td>{% trans "School" %}</td>
+        <td>{{ v.school }}</td>
+      </tr>
+      {% if user.is_superuser %}
+        <tr>
+          <td>{% trans "Chapter" %}</td>
+          <td>{{ v.chapter }}</td>
+        </tr>
+      {% endif %}
+      <tr>
+        <td>{% trans "Date" %}</td>
+        <td>{{ v.visit_start|timezone:v.chapter.tz_obj|date:_("DATE_FORMAT_LONG") }}</td>
+      </tr>
+      <tr>
+        <td>{% trans "Time" %}</td>
+        <td>{{ v.visit_start|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT") }} - {{ v.visit_end|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT") }}</td>
+      </tr>
+      <tr>
+        <td>{% trans "Location" %}</td>
+        <td>{{ v.location }}</td>
+      </tr>
+      {% ifnotequal v.notes "" %}
+        <tr>
+          <td>{% trans "Notes" %}</td>
+          <td>{{ v.notes }}</td>
+        </tr>
+      {% endifnotequal %}
+      {% if v.meeting_location != "" or v.meeting_time != None or v.contact != "" or v.contact_email != "" or v.contact_phone != "" %}
+        <tr>
+          <td colspan="2"><strong>&nbsp;<br/>{% trans "Info for volunteers" %}</strong></td>
+        </tr>
+      {% endif %}
+      {% ifnotequal v.meeting_location "" %}
+        <tr>
+          <td>{% trans "Meeting location" %}</td>
+          <td>{{ v.meeting_location }}<br/><span>{% trans "Where people will meet at university to go as a group to the school, if applicable" %}</span></td>
+        </tr>
+      {% endifnotequal %}
+      {% ifnotequal v.meeting_time None %}
+        <tr>
+          <td>{% trans "Meeting time" %}</td>
+          <td>{{ v.meeting_time|timezone:v.chapter.tz_obj|date:_("TIME_FORMAT") }}</td>
+        </tr>
+      {% endifnotequal %}
+      {% ifnotequal v.contact "" %}
+        <tr>
+          <td>{% trans "Contact person" %}</td>
+          <td>{{ v.contact }}</td>
+        </tr>
+      {% endifnotequal %}
+      {% ifnotequal v.contact_email "" %}
+        <tr>
+          <td>{% trans "Email" %}</td>
+          <td>{{ v.contact_email }}</td>
+        </tr>
+      {% endifnotequal %}
+      {% ifnotequal v.contact_phone "" %}
+        <tr>
+          <td>{% trans "Phone" %}</td>
+          <td>{{ v.contact_phone }}<br/><span>{% trans "Call this number if you get lost!" %}</span></td>
+        </tr>
+      {% endifnotequal %}
+    </table>
+
+  </div>
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Comments
+      <a href="#" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true"><i class="fa fa-comment" aria-hidden="true"></i>
+        {% trans "Add Comment" %}</a>
+    </h2>
+  </div>
+{% endblock %}

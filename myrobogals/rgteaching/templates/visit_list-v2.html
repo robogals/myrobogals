@@ -1,0 +1,73 @@
+{% extends "base-v2.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Workshops and events" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Workshops and events" %}{% endblock %}
+
+{% block content %}
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="#">Home</a></li>
+  <li class="breadcrumb-item"><a href="#">Library</a></li>
+  <li class="breadcrumb-item active">Data</li>
+</ol>
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Events List
+      {% if user.is_staff %}
+        <a href="#" style="float:right; margin-top:-3px;" class="btn btn-primary btn-sm" role="button" aria-pressed="true">{% trans "NEW EVENT" %}</a>
+      {% endif %}
+    </h2>
+
+      {% if showall %}
+        <form action="/teaching/list/" method="GET"> {% csrf_token %}
+          {{ chapterform.chapter|add_class:"custom-select" }}
+          <button type="submit" class="btn btn-primary btn-sm">Filter Events</button>
+        </form>
+      {% endif %}
+  </p>
+
+    <table class="table table-hover table-sm">
+      <thead class="rg-thead-inverse">
+      <tr>
+        <th>School</th>
+        <th>Date</th>
+        <th>Status</th>
+        {% if showall %}
+          <th>Chapter</th>
+        {% endif %}
+        <th>
+          View
+        </th>
+      </tr>
+      </thead>
+      {% for v in visits %}
+
+        <tr>
+          <th scope="row">{{ v.school }}</th>
+          <td>{{ v.visit_start|date:_("DATE_FORMAT") }}</td>
+          <td>{{ v.get_status_display }}</td>
+          {% if showall %}
+            <td>{{ v.chapter }}</td>
+          {% endif %}
+          <td><a href="/teaching/{{ v.pk }}/">{% trans "View" %}</a></td>
+        </tr>
+      {% endfor %}
+    </table>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if visits.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ visits.previous_page_number }}">Previous</a></li>
+        {% endif %}
+
+        <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+        <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
+        {#    <li class="page-item"><a class="page-link" href="?page={{visits.last_page_number}}">{{visits.last_page_number}}</a></li>#}
+        {#    <li class="page-item"><a class="page-link" href="?page={{visits.next_page_number}}">Next</a></li>#}
+      </ul>
+    </nav>
+  </div>
+
+{% endblock %}

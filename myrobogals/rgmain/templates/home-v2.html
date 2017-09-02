@@ -1,0 +1,93 @@
+{% extends "base-v2.html" %}
+
+{% block pagetitle %}
+    Welcome Back, Sing
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col">
+        <div class="tile">
+            <h2 class="rg-page-header">
+                Quick links
+            </h2>
+
+            <ul>
+                <li>Check in</li>
+                <li>Create an event</li>
+                <li>Enter in stats</li>
+                <li>View my progress</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="tile">
+            <h2 class="rg-page-header">
+                Message Board
+            </h2>
+
+            <p>
+                myRobogals is our global intranet and record-keeping tool, designed to simplify many of Robogals' day-to-day tasks including organising school visits, maintaining a member
+                database, communicating with members, storing records reliably for future generations and easily collecting statistics on a global scale!
+            </p>
+            <p>
+                If you need any assistance, just email <a href="mailto:support@robogals.org">support@robogals.org</a> to get in touch with the myRobogals support team. Also don't hesitate to request
+                new features - most of the features in myRobogals exist because someone like you requested them.
+            </p>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="tile">
+            <h2 class="rg-page-header">
+                Upcoming Workshops
+            </h2>
+
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Larry</td>
+                    <td>the Bird</td>
+                    <td>@twitter</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <div class="col-xs-12">
+        <div class="tile">
+            <h2 class="rg-page-header">
+                Your Progress
+            </h2>
+
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

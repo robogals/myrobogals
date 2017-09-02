@@ -1,0 +1,171 @@
+{% extends "base-v2.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}{% trans "Report Summary" %}{% endblock %}
+
+{% block pagetitle %}{% trans "Report Summary" %}{% endblock %}
+
+{% block content %}
+
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Your Chapter's Progress
+    </h2>
+
+    <div class="text-muted">
+      Chapter's Target: {{ chapter.goal }}
+    </div>
+
+    <div class="progress">
+      <div class="progress-bar bg-success-secondary" role="progressbar" style="{{ chapter.sum_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+      {{ chapter.sum }}
+    </div>
+
+    <div class="text-muted">
+      Started: {{ chapter.goal_start }}
+    </div>
+
+  </div>
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Upcoming Events
+      <button type="button" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">
+        {% trans "NEW EVENT" %}
+      </button>
+    </h2>
+
+    <table class="table table-striped">
+      <thead class="rg-thead-inverse">
+      <tr>
+        <th>Event</th>
+        <th>Start</th>
+        <th>End</th>
+        <th style="text-align: center;">Attending</th>
+        <th style="text-align: center;">Privacy</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {% for e in upcoming_events %}
+        <tr>
+          <th scope="row">{{ e.school }}</th>
+          <td>{{ e.visit_start }}</td>
+          <td>{{ e.visit_end }}</td>
+          <td style="text-align: center;">10</td>
+          <td style="text-align: center;">Private</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="#">See all upcoming events</a>
+  </div>
+
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Recent Events
+      <a href="#" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">{% trans "ENTER STATS" %}</a>
+    </h2>
+
+    <table class="table table-striped">
+      <thead class="rg-thead-inverse">
+      <tr>
+        <th>Event</th>
+        <th>Date</th>
+        <th style="text-align: center;">Attended</th>
+        <th style="text-align: center;">Stats</th>
+        <th style="text-align: center;">Action</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {% for e in upcoming_events %}
+        <tr>
+          <th scope="row">{{ e.school }}</th>
+          <td>{{ e.visit_end }}</td>
+          <td style="text-align: center;">8</td>
+          <td style="text-align: center;">22</td>
+          <td style="text-align: center;"><a href="#">View</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="#">See all past events</a>
+  </div>
+
+  <!-- Create new event modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Create New Event</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group row">
+              <label for="recipient-name" class="form-control-label col-2">Event</label>
+              <div class="col-10">
+                <input placeholder="Enter the school or event's name" type="text" class="form-control" id="recipient-name" >
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="recipient-name" class="form-control-label col-2">Location</label>
+              <div class="col-10">
+                <input placeholder="The location where the event is being held" type="text" class="form-control" id="recipient-name">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="recipient-name" class="form-control-label col-2">Date</label>
+              <div class="col-10">
+                <input type="text" class="form-control" id="recipient-name">
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="recipient-name" class="form-control-label col-2">Time</label>
+              <div class="col-5">
+                <input type="text" class="form-control" id="recipient-name">
+              </div>
+              <div class="col-5">
+                <input type="text" class="form-control" id="recipient-name">
+              </div>
+            </div>
+
+            <div class="form-check">
+              <label class="form-check-label">
+                <input type="checkbox" class="form-check-input">
+                Recurring Event
+              </label>
+            </div>
+
+            <div class="form-group row">
+              <label for="message-text" class="form-control-label col-2">Description:</label>
+              <div class="col-10">
+                <textarea class="form-control" id="message-text"></textarea>
+              </div>
+            </div>
+
+            <div class="form-check">
+              <label class="form-check-label">
+                <input type="checkbox" class="form-check-input">
+                Specify Additional Information
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Create event</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Create new event modal -->
+{% endblock %}
