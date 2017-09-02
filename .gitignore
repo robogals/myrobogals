@@ -8,7 +8,6 @@ rgmedia/email_uploads
 scripts/send_email_mandrill.php
 core
 tags
-static
 myrobogals.db
 *.swp
 *.pyc
