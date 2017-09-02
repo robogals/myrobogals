@@ -1,11 +1,16 @@
+html, body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 100px;
-     background-color: #E9ECEF
+    margin-bottom: 100px;
+    background-color: #E9ECEF
 }
 
 .navbar {
@@ -13,24 +18,33 @@ body {
     z-index: 1030;
 }
 
+.navbar-nav {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 80px;
-  line-height: 80px; /* Vertically center the text there */
-  background-color: #18499f;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    line-height: 80px; /* Vertically center the text there */
+    background-color: #18499f;
 }
 
 body > .page-title {
-    padding-top: 80px;
-    padding-bottom: 20px;
-    padding-left: 20px;
+    padding: 65px 0 10px 15px;
     background-color: #FFFFFF;
-    position:absolute;
+    position: absolute;
     top: 0;
     right: 0;
     left: 0;
+}
+
+.breadcrumb {
+    padding: .75rem .65rem;
+    margin-bottom: 0;
 }
 
 .text-muted {
@@ -39,19 +53,19 @@ body > .page-title {
 }
 
 h1 {
-    font-size: 35px;
+    font-size: 30px;
     color: #333333
 }
 
 h2 {
-    font-size: 25px;
+    font-size: 20px;
     color: #333333
 }
 
 .tile {
     background-color: #FFFFFF;
-    padding: 10px 30px 10px 30px;
-    margin-bottom: 20px;
+    padding: 5px 20px 5px 20px;
+    margin-bottom: 10px;
 }
 
 .rg-page-header {
@@ -66,7 +80,7 @@ h2 {
 }
 
 .btn-secondary {
-    background-color:#ff8f00;
+    background-color: #ff8f00;
     border-color: #ff8f00;
 }
 
@@ -81,7 +95,7 @@ h2 {
 }
 
 .main-body {
-    margin-top: 100px
+    margin-top: 65px
 }
 
 .rg-thead-inverse {
