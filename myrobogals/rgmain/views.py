@@ -6,9 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from myrobogals.rgchapter.models import Chapter
 
+
 @login_required
 def home(request):
-    return render_to_response('home.html', {'is_home': True}, context_instance=RequestContext(request))
+    return render_to_response('home-v2.html', {'is_home': True}, context_instance=RequestContext(request))
 
 
 def servererror(request):
