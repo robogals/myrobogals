@@ -25,7 +25,7 @@ from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgprofile.views.profile_login import openconductfile
 from myrobogals.rgteaching.models import EventAttendee
 
-from myrobogals.utils import hierarchicalexec
+from myrobogals.permissionUtils import *
 
 
 def joinchapter(request, chapterurl):
