@@ -25,6 +25,8 @@ from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgprofile.views.profile_login import openconductfile
 from myrobogals.rgteaching.models import EventAttendee
 
+from myrobogals.utils import hierarchicalexec
+
 
 def joinchapter(request, chapterurl):
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
@@ -692,15 +694,5 @@ def welcome_email(request, chapter, u):
     # Change message to PENIDNG mode, which waits for server to send
     message.status = 0
     message.save()
-
-def hierarchicalexec(execuser, targetchapter):
-    """
-    Returns true if execuser is in a chapter that is a transitive parent of the targetchapter.
-
-    Example: Global -> APAC -> {Melbourne, Brisbane, Perth, ..}
-    If an execuser is in the APAC chapter, this will return true for APAC, and all children of APAC.
-    If an execuser is in the Global chapter, this will return true for Global, and descendents children of Global.
-    """
-    return execuser.chapter == targetchapter or execuser.chapter == targetchapter.parent or execuser.chapter == targetchapter.parent.parent
 
 
