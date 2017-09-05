@@ -20,17 +20,16 @@
 <div style="text-align: center">{% trans "Current members:" %} <strong>{% thous chapter.membercount_student %}</strong>
 <br>{% trans "All-time members:" %} <strong>{% thous chapter.membercount %}</strong></div>
 </div>
-{% if user.is_staff %}{% ifequal user.chapter chapter %}
+
+{% if showEdit %}
 <div style="background: #CCCCCC; padding: 10px; width: 220px; margin-left: 15px">
 <div style="text-align: center"><a href="edit/">{% trans "Edit this chapter" %}</a><br /><a href="edit/users/">{% trans "Manage members" %}</a></div>
 </div>
-{% else %}
-{% if user.is_superuser %}
-<div style="background: #CCCCCC; padding: 10px; width: 220px; margin-left: 15px">
-<div style="text-align: center"><a href="edit/">{% trans "Edit this chapter" %}</a><br /><a href="edit/users/">{% trans "Manage members" %}</a></div>
+
+{% endif %}
 </div>
-{% endif %}{% endifequal %}{% endif %}
-</div>
+
+
 {% if chapter.photo %}
 <img src="{{chapter.photo.url}}" style="margin-bottom: 15px"><br />
 {% endif %}

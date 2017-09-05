@@ -463,7 +463,7 @@ def detail(request, username):
     u = get_object_or_404(User, username__exact=username)
 
     #Only show edit link to superusers or chapter/regional/global executives.
-    showEdit = request.user.is_superuser or is_executive_or_higher(request.user, chapter)
+    showEdit = request.user.is_superuser or is_executive_or_higher(request.user, u.chapter)
 
     # Privacy setting
     private = False
@@ -480,7 +480,7 @@ def detail(request, username):
     else:
         if not request.user.is_authenticated():
             private = True
-        elif not is_executive_or_higher(request.user, u.chapter)
+        elif not is_executive_or_higher(request.user, u.chapter):
             private = True
         elif not request.user.is_staff:
             private = True
