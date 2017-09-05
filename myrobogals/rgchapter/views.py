@@ -208,7 +208,6 @@ class FormPartSix(forms.Form):
 @login_required
 def editchapter(request, chapterurl):
 	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	print 'not 404d yet'
 	if request.user.is_superuser or is_executive_or_higher(request.user, c):
 		if request.method == 'POST':
 			formpart1 = FormPartOne(request.POST, chapter=c)

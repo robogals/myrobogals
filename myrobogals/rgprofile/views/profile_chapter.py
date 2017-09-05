@@ -11,6 +11,7 @@ from time import time
 from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, Http404
@@ -19,6 +20,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
+
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models import EmailMessage, SMSMessage
@@ -26,7 +28,7 @@ from myrobogals.rgprofile.forms import EditListForm, EditStatusForm, CSVUsersUpl
     DefaultsFormTwo
 from myrobogals.rgprofile.functions import importcsv, any_exec_attr, RgImportCsvException
 from myrobogals.rgprofile.models import MemberStatusType
-from myrobogals.rgprofile.models import Position
+from myrobogals.rgprofile.models import Position, PositionType
 from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgprofile.views.profile_user import edituser
@@ -245,6 +247,35 @@ def editexecs(request, chapterurl):
                                   context_instance=RequestContext(request))
     else:
         raise Http404
+
+
+@login_required
+def remove_exec(request, chapterurl):
+    """
+    Removes an executive, marks their position as ending today.
+    """
+    print 'iurl:', chapterurl
+    chapter = get_object_or_404(Chapter, myrobogals_url__exact='melbourne')#chapterurl)
+
+    if not (request.user.is_superuser or is_regional_or_higher(request.user, chapter)):
+        raise Http404
+
+    if not ('username' in request.GET and 'positionType' in request.GET):
+        #TODO ERROR
+        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
+    user = get_object_or_404(User, username__exact=request.GET.get('username', None))
+    positionType = PositionType.objects.filter(description=request.GET.get('positionType', None)).first()
+    
+    if not positionType:
+        #TODO ERROR
+        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
+    #End all positions that match the chapter, user and description - there should only be one
+    Position.objects.filter(user=user, positionType=positionType, positionChapter=chapter).update(position_date_end=date.today())
+
+    return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
 
 
 # Changing members in the chapter to a different status
