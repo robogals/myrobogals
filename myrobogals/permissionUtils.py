@@ -30,6 +30,12 @@ def is_president(user, chapter):
 			return True
 	return False
 
+def is_any_executive(user):
+	"""
+	Returns true if the has an executive role at any level.
+	"""
+	return user.has_cur_pos()
+
 
 def is_executive(user, chapter):
 	"""
