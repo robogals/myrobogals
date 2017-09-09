@@ -209,14 +209,14 @@ class AddExecutiveForm(forms.Form):
 	Form for adding an exec to a chapter.
 	"""
 	user = forms.ModelChoiceField(queryset=User.objects.none(), required=True)
-	positionType = forms.ModelChoiceField(queryset=PositionType.objects.none(), required=True)
+	position_type = forms.ModelChoiceField(queryset=PositionType.objects.none(), required=True)
 
 	def __init__(self, *args, **kwargs):
 		chapter=kwargs['chapter']
 		del kwargs['chapter']
 		super(AddExecutiveForm, self).__init__(*args, **kwargs)
 		self.fields['user'].queryset = User.objects.filter(chapter=chapter)
-		self.fields['positionType'].queryset = PositionType.objects.all()
+		self.fields['position_type'].queryset = PositionType.objects.all()
 
 
 @login_required

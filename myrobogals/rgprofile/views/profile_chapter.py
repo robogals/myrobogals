@@ -244,11 +244,11 @@ def editexecs(request, chapterurl):
         add_executive_form = AddExecutiveForm(request.POST, chapter=chapter)
         if add_executive_form.is_valid():
             data = add_executive_form.cleaned_data
-            positionType = data.get('positionType', None)
+            position_type = data.get('position_type', None)
             user = data.get('user', None)
 
-            if positionType and user:
-                Position.objects.create(user=user, positionType=positionType, positionChapter=chapter, position_date_start=date.today())
+            if position_type and user:
+                Position.objects.create(user=user, positionType=position_type, positionChapter=chapter, position_date_start=date.today())
             return HttpResponseRedirect("/chapters/" + chapter.myrobogals_url + "/edit/execs/")
 
     #Only Regional+ can add or remove executive members.
@@ -275,19 +275,19 @@ def remove_exec(request, chapterurl):
     if not (request.user.is_superuser or is_regional_or_higher(request.user, chapter)):
         raise Http404
 
-    if not ('username' in request.GET and 'positionType' in request.GET):
+    if not ('username' in request.GET and 'position_type' in request.GET):
         #TODO ERROR
         return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
 
     user = get_object_or_404(User, username__exact=request.GET.get('username', None))
-    positionType = PositionType.objects.filter(description=request.GET.get('positionType', None)).first()
+    position_type = PositionType.objects.filter(description=request.GET.get('position_type', None)).first()
     
-    if not positionType:
+    if not position_type:
         #TODO ERROR
         return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
 
     #End all positions that match the chapter, user and description - there should only be one
-    Position.objects.filter(user=user, positionType=positionType, positionChapter=chapter).update(position_date_end=date.today())
+    Position.objects.filter(user=user, positionType=position_type, positionChapter=chapter).update(position_date_end=date.today())
 
     return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
 
