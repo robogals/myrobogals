@@ -1,7 +1,7 @@
 import datetime
 import StringIO
 
-from myrobogals.rgprofile.models import Position, UserList
+from myrobogals.rgprofile.models import Position, UserList, PositionType
 from myrobogals.rgteaching.models import SchoolVisitStats, SchoolVisit
 from myrobogals.rgprofile.models import User
 from myrobogals.rgchapter.models import Chapter
@@ -203,6 +203,20 @@ class FormPartSix(forms.Form):
 	invite_email_subject = forms.CharField(required=False, max_length=256)
 	invite_email_msg = InviteEmailMsgField(required=False, widget=forms.Textarea, initial=Chapter._meta.get_field('invite_email_msg').get_default())
 	invite_email_html = forms.BooleanField(required=False)
+
+class AddExecutiveForm(forms.Form):
+	"""
+	Form for adding an exec to a chapter.
+	"""
+	user = forms.ModelChoiceField(queryset=User.objects.none(), required=True)
+	positionType = forms.ModelChoiceField(queryset=PositionType.objects.none(), required=True)
+
+	def __init__(self, *args, **kwargs):
+		chapter=kwargs['chapter']
+		del kwargs['chapter']
+		super(AddExecutiveForm, self).__init__(*args, **kwargs)
+		self.fields['user'].queryset = User.objects.filter(chapter=chapter)
+		self.fields['positionType'].queryset = PositionType.objects.all()
 
 
 @login_required

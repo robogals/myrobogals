@@ -22,6 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 from myrobogals.rgchapter.models import Chapter
+from myrobogals.rgchapter.views import AddExecutiveForm
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models import EmailMessage, SMSMessage
 from myrobogals.rgprofile.forms import EditListForm, EditStatusForm, CSVUsersUploadForm, WelcomeEmailForm, DefaultsFormOne, \
@@ -235,18 +236,33 @@ def deleteuser(request, userpk):
 
 @login_required
 def editexecs(request, chapterurl):
-    c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if request.user.is_superuser or is_executive_or_higher(request.user, c):
-        users = User.objects.filter(chapter=c)
-
-
-        officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')
-
-        return render_to_response('exec_list.html', {'officers': officers, 'chapter': c,
-                                                     'return': request.path},
-                                  context_instance=RequestContext(request))
-    else:
+    chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
+    if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
+    add_executive_form = None
+    if request.method == 'POST':
+        add_executive_form = AddExecutiveForm(request.POST, chapter=chapter)
+        if add_executive_form.is_valid():
+            data = add_executive_form.cleaned_data
+            positionType = data.get('positionType', None)
+            user = data.get('user', None)
+
+            if positionType and user:
+                Position.objects.create(user=user, positionType=positionType, positionChapter=chapter, position_date_start=date.today())
+            return HttpResponseRedirect("/chapters/" + chapter.myrobogals_url + "/edit/execs/")
+
+    #Only Regional+ can add or remove executive members.
+    edit_permissions = is_regional_or_higher(request.user, chapter)
+
+    if edit_permissions and not add_executive_form:
+        add_executive_form = AddExecutiveForm(chapter=chapter)
+
+    officers = Position.objects.filter(positionChapter=chapter).filter(position_date_end=None).order_by('positionType__rank')
+
+    return render_to_response('exec_list.html', {'officers': officers, 'chapter': chapter, 'add_executive_form': add_executive_form,
+                                                 'edit_permissions': edit_permissions, 'return': request.path},
+                              context_instance=RequestContext(request))
+
 
 
 @login_required
@@ -254,7 +270,6 @@ def remove_exec(request, chapterurl):
     """
     Removes an executive, marks their position as ending today.
     """
-    print 'iurl:', chapterurl
     chapter = get_object_or_404(Chapter, myrobogals_url__exact='melbourne')#chapterurl)
 
     if not (request.user.is_superuser or is_regional_or_higher(request.user, chapter)):
