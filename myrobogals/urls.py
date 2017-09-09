@@ -10,7 +10,6 @@ from myrobogals.rgconf import views as rgconf_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
-from myrobogals.rgweb import views as rgweb_views
 
 urlpatterns = [
 	# Home
@@ -40,29 +39,6 @@ urlpatterns = [
 	url(r'^profile/(?P<username>.+)/edit/$', profile_user.edituser),
 	url(r'^profile/(?P<username>.+)/genpw/$', profile_user.genpw),
 	url(r'^profile/(?P<username>.+)/$', profile_user.detail),
-	
-	# Chapters menu
-	url(r'^chapters/$', rgchapter_views.list),
-	url(r'^chapters/awards/$', rgchapter_views.awards),
-	url(r'^chapters/awards/(?P<award_id>\d+)/$', rgchapter_views.awardsdesc),
-	url(r'^chapters/my/$', rgchapter_views.redirtomy),
-	url(r'^chapters/localtimes/$', rgchapter_views.localtimes),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/edit/$', profile_chapter.edituserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/$', profile_chapter.viewlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/add/$', profile_chapter.adduserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/$', profile_chapter.listuserlists),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/unis/$', profile_chapter.unilist),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/$', profile_chapter.importusershelp),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/$', profile_chapter.importusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/export/$', profile_chapter.exportusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/add/$', profile_chapter.adduser),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/$', profile_chapter.editusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/$', profile_chapter.editexecs),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/status/$', profile_chapter.editstatus),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/$', rgchapter_views.editchapter),
-	url(r'^chapters/(?P<chapterurl>.+)/websitedetails/$', rgweb_views.websitedetails),
-	url(r'^chapters/(?P<chapterurl>.+)/join/$', profile_user.joinchapter),
-	url(r'^chapters/(?P<chapterurl>.+)/$', rgchapter_views.detail),
 
 	# Conferences submenu
 	url(r'^conferences/$', rgconf_views.home),
@@ -74,6 +50,9 @@ urlpatterns = [
 
 	# Forums
 	# url(r'^forums/', include('myrobogals.rgforums.urls')),
+
+	# Chapters menu
+	url(r'^chapters/', include('myrobogals.rgchapter.urls', namespace='chapters')),
 
 	# Workshops menu
 	url(r'^teaching/', include('myrobogals.rgteaching.urls', namespace='teaching')),
