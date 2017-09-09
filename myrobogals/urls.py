@@ -57,6 +57,7 @@ urlpatterns = [
 	url(r'^chapters/(?P<chapterurl>.+)/edit/users/export/$', profile_chapter.exportusers),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/users/add/$', profile_chapter.adduser),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/users/$', profile_chapter.editusers),
+	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/remove/$', profile_chapter.remove_exec),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/$', profile_chapter.editexecs),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/status/$', profile_chapter.editstatus),
 	url(r'^chapters/(?P<chapterurl>.+)/edit/$', rgchapter_views.editchapter),

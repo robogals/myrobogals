@@ -11,6 +11,7 @@ from time import time
 from django.contrib import messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, Http404
@@ -19,6 +20,7 @@ from django.template import Context, loader
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 
+
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import University
 from myrobogals.rgmessages.models import EmailMessage, SMSMessage
@@ -26,13 +28,16 @@ from myrobogals.rgprofile.forms import EditListForm, EditStatusForm, CSVUsersUpl
     DefaultsFormTwo
 from myrobogals.rgprofile.functions import importcsv, any_exec_attr, RgImportCsvException
 from myrobogals.rgprofile.models import MemberStatusType
-from myrobogals.rgprofile.models import Position
+from myrobogals.rgprofile.models import Position, PositionType
 from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgprofile.models import UserList
 from myrobogals.rgprofile.views.profile_user import edituser
 from myrobogals.rgteaching.models import Event
 from myrobogals.rgteaching.models import EventAttendee
 from myrobogals.settings import MEDIA_URL
+
+from myrobogals.permissionUtils import *
+
 
 
 @login_required
@@ -44,7 +49,7 @@ def adduser(request, chapterurl):
 @login_required
 def viewlist(request, chapterurl, list_id):
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, c):
         l = get_object_or_404(UserList, pk=list_id, chapter=c)
         users = l.users
         search = ''
@@ -85,7 +90,7 @@ def edituserlist(request, chapterurl, list_id):
     else:
         new = False
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, chapter):
         if new:
             l = UserList()
         else:
@@ -129,7 +134,7 @@ def edituserlist(request, chapterurl, list_id):
 def editusers(request, chapterurl):
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
     memberstatustypes = MemberStatusType.objects.all()
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, c):
         search = ''
         searchsql = ''
         if 'search' in request.GET:
@@ -167,7 +172,7 @@ def editusers(request, chapterurl):
 @login_required
 def deleteuser(request, userpk):
     userToBeDeleted = get_object_or_404(User, pk=userpk)
-    if request.user.is_superuser or (request.user.is_staff and (userToBeDeleted.chapter == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, userToBeDeleted.chapter):
         msg = ''
         old_status = userToBeDeleted.memberstatus_set.get(status_date_end__isnull=True)
         canNotDelete = False
@@ -231,7 +236,7 @@ def deleteuser(request, userpk):
 @login_required
 def editexecs(request, chapterurl):
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, c):
         users = User.objects.filter(chapter=c)
 
 
@@ -244,12 +249,41 @@ def editexecs(request, chapterurl):
         raise Http404
 
 
+@login_required
+def remove_exec(request, chapterurl):
+    """
+    Removes an executive, marks their position as ending today.
+    """
+    print 'iurl:', chapterurl
+    chapter = get_object_or_404(Chapter, myrobogals_url__exact='melbourne')#chapterurl)
+
+    if not (request.user.is_superuser or is_regional_or_higher(request.user, chapter)):
+        raise Http404
+
+    if not ('username' in request.GET and 'positionType' in request.GET):
+        #TODO ERROR
+        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
+    user = get_object_or_404(User, username__exact=request.GET.get('username', None))
+    positionType = PositionType.objects.filter(description=request.GET.get('positionType', None)).first()
+    
+    if not positionType:
+        #TODO ERROR
+        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
+    #End all positions that match the chapter, user and description - there should only be one
+    Position.objects.filter(user=user, positionType=positionType, positionChapter=chapter).update(position_date_end=date.today())
+
+    return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+
+
+
 # Changing members in the chapter to a different status
 @login_required
 def editstatus(request, chapterurl):
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
     memberstatustypes = MemberStatusType.objects.all()
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, c):
         users = []
         if request.method == 'POST':
             ulform = EditStatusForm(request.POST, user=request.user)
@@ -307,7 +341,7 @@ def editstatus(request, chapterurl):
 
 @login_required
 def contactdirectory(request):
-    if not request.user.is_staff:
+    if not is_any_executive(request.user):
         raise Http404
     results = []
     name = ''
@@ -325,7 +359,7 @@ def contactdirectory(request):
 def importusers(request, chapterurl):
     # initial value to match the default value
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
+    if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
     errmsg = None
     if request.method == 'POST':
@@ -420,7 +454,7 @@ def importusers(request, chapterurl):
 @login_required
 def exportusers(request, chapterurl):
     c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if request.user.is_superuser or (request.user.is_staff and (c == request.user.chapter)):
+    if request.user.is_superuser or is_executive_or_higher(request.user, c):
         if 'status' in request.GET:
             status = request.GET['status']
         else:
@@ -534,7 +568,7 @@ HELPINFO = (
 @login_required
 def importusershelp(request, chapterurl):
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
+    if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
     return render_to_response('import_users_help.html', {'HELPINFO': HELPINFO},
                               context_instance=RequestContext(request))
@@ -543,7 +577,7 @@ def importusershelp(request, chapterurl):
 @login_required
 def unilist(request, chapterurl):
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-    if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
+    if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
     unis = University.objects.all()
     return render_to_response('uni_ids_list.html', {'unis': unis}, context_instance=RequestContext(request))

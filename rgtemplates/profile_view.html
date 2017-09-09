@@ -57,6 +57,10 @@
 {{ user_profile.bio }}<br />
 <br />
 {% endif %}
+{% if showEdit %}
+<strong><a href="/profile/{{user_profile.username}}/edit/?return={{return|urlencode}}">Edit User</a></strong><br />
+<br />
+{% endif %}
 {% if visits %}
 <strong>{% trans "Workshops and events attended:" %}</strong><br />
 <table cellpadding="5" border="1" rules="NONE" frame="BOX" cellspacing="0">

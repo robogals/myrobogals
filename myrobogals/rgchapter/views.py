@@ -1,3 +1,6 @@
+import datetime
+import StringIO
+
 from myrobogals.rgprofile.models import Position, UserList
 from myrobogals.rgteaching.models import SchoolVisitStats, SchoolVisit
 from myrobogals.rgprofile.models import User
@@ -16,8 +19,9 @@ from myrobogals.rgchapter.models import REGION_CHOICES
 from django.db import connection
 from django.db.models import Q
 from django.utils import timezone
-import datetime
-import StringIO
+
+from myrobogals.permissionUtils import *
+
 
 def list(request):
 	listing = []
@@ -82,7 +86,8 @@ def detail(request, chapterurl):
 	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')
 	recipients = AwardRecipient.objects.filter(chapter=c)
-	return render_to_response('chapter_detail.html', {'chapter': c, 'officers': officers, 'recipients': recipients}, context_instance=RequestContext(request))
+	showEdit = request.user.is_superuser or is_executive_or_higher(request.user, c)
+	return render_to_response('chapter_detail.html', {'chapter': c, 'officers': officers, 'showEdit': showEdit, 'recipients': recipients}, context_instance=RequestContext(request))
 
 @login_required
 def redirtomy(request):
@@ -203,7 +208,7 @@ class FormPartSix(forms.Form):
 @login_required
 def editchapter(request, chapterurl):
 	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	if (request.user.is_staff and request.user.chapter == c) or request.user.is_superuser:
+	if request.user.is_superuser or is_executive_or_higher(request.user, c):
 		if request.method == 'POST':
 			formpart1 = FormPartOne(request.POST, chapter=c)
 			formpart2 = FormPartTwo(request.POST)

@@ -25,6 +25,8 @@ from myrobogals.rgprofile.models import User, MemberStatus
 from myrobogals.rgprofile.views.profile_login import openconductfile
 from myrobogals.rgteaching.models import EventAttendee
 
+from myrobogals.permissionUtils import *
+
 
 def joinchapter(request, chapterurl):
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
@@ -164,7 +166,7 @@ def edituser(request, username, chapter=None):
     if username == '':
         join = True
         u = User()
-        if request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter):
+        if request.user.is_superuser or is_executive_or_higher(request.user, chapter):
             adduser = True
         else:
             adduser = False
@@ -181,8 +183,7 @@ def edituser(request, username, chapter=None):
         chapter = u.chapter
 
     # Either a superuser, self user or exec of chapter
-    if join or request.user.is_superuser or request.user.id == u.id or (
-        request.user.is_staff and request.user.chapter == u.chapter):
+    if join or request.user.is_superuser or request.user.id == u.id or is_executive_or_higher(request.user, chapter):
         # Form submission POST request
         if request.method == 'POST':
             # Obtaining the data from the post request
@@ -250,7 +251,7 @@ def edituser(request, username, chapter=None):
                             usererr = _('That username is already taken')
 
                 # Chapter executive accessing the profile and trying to change a password
-                if request.user.is_staff and request.user != u:
+                if is_executive_or_higher(request.user, chapter) and request.user != u:
                     if len(request.POST['password1']) > 0:
                         if request.POST['password1'] == request.POST['password2']:
                             # Sets the password if it's the same, doesn't save the user object
@@ -324,7 +325,7 @@ def edituser(request, username, chapter=None):
                     u.email_careers_newsletter_AU_optin = data['email_careers_newsletter_AU_optin']
 
                     # Check whether they have permissions to edit exec only fields
-                    if attempt_modify_exec_fields and (request.user.is_superuser or request.user.is_staff):
+                    if attempt_modify_exec_fields and (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
                         data = formpart5.cleaned_data
                         u.internal_notes = data['internal_notes']
                         u.trained = data['trained']
@@ -433,8 +434,8 @@ def edituser(request, username, chapter=None):
         else:
             return_url = ''
 
-        chpass = (join or (request.user.is_staff and request.user != u))
-        exec_fields = request.user.is_superuser or (request.user.is_staff and request.user.chapter == chapter)
+        chpass = (join or (is_executive_or_higher(request.user, chapter) and request.user != u))
+        exec_fields = request.user.is_superuser or is_executive_or_higher(request.user, chapter)
 
         return render_to_response('profile_edit.html', {'join': join,
                                                         'adduser': adduser,
@@ -461,6 +462,9 @@ def edituser(request, username, chapter=None):
 def detail(request, username):
     u = get_object_or_404(User, username__exact=username)
 
+    #Only show edit link to superusers or chapter/regional/global executives.
+    showEdit = request.user.is_superuser or is_executive_or_higher(request.user, u.chapter)
+
     # Privacy setting
     private = False
     if u.privacy >= 20:
@@ -471,12 +475,12 @@ def detail(request, username):
     elif u.privacy >= 5:
         if not request.user.is_authenticated():
             private = True
-        elif not (request.user.chapter == u.chapter):
+        elif not is_executive_or_higher(request.user, u.chapter):
             private = True
     else:
         if not request.user.is_authenticated():
             private = True
-        elif not (request.user.chapter == u.chapter):
+        elif not is_executive_or_higher(request.user, u.chapter):
             private = True
         elif not request.user.is_staff:
             private = True
@@ -500,7 +504,7 @@ def detail(request, username):
                 account_list.append(alias)
     visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
     return render_to_response('profile_view.html',
-                              {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions,
+                              {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions, 'showEdit': showEdit,
                                'visits': visits}, context_instance=RequestContext(request))
 
 
@@ -575,7 +579,7 @@ def mobverify(request):
 def genpw(request, username):
     user = get_object_or_404(User, username__exact=username)
     chapter = user.chapter
-    if not (request.user.is_superuser or (request.user.is_staff and (chapter == request.user.chapter))):
+    if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
     if 'return' in request.GET:
         return_url = request.GET['return']
@@ -689,3 +693,5 @@ def welcome_email(request, chapter, u):
     # Change message to PENIDNG mode, which waits for server to send
     message.status = 0
     message.save()
+
+
