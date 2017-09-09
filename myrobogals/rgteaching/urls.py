@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^list/$', eventvisit.listvisits, name='listvisits'),
     url(r'^printlist/$', eventvisit.printlistvisits),
     url(r'^statshelp/$', eventvisit.statshelp),
-    url(r'^(?P<visit_id>\d+)/$', eventvisit.viewvisit),
+    url(r'^(?P<visit_id>\d+)/$', eventvisit.viewvisit, name='viewvisit'),
     url(r'^(?P<visit_id>\d+)/deletemessage/(?P<message_id>\d+)/$', eventvisit.deletemessage),
     url(r'^(?P<visit_id>\d+)/invite/$', eventvisit.invitetovisit),
     url(r'^(?P<visit_id>\d+)/email/$', eventvisit.emailvisitattendees),
@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^schools/new/$', school.newschool),
 
     # url for workshop quick entry
-    url(r'^quickentry/$', quickentry.instantvisit),
+    url(r'^quickentry/$', quickentry.instantvisit, name='quickentry'),
 
     # url for importing workshops
     url(r'^import/$', import_workshop.ImportWorkshopView.as_view(), name='import_workshops'),

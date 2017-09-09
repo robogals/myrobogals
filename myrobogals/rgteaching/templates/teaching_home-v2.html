@@ -1,10 +1,11 @@
 {% extends "base-v2.html" %}
 {% load i18n %}
+{% load tz %}
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Report Summary" %}{% endblock %}
+{% block title %}{% trans "Events Summary" %}{% endblock %}
 
-{% block pagetitle %}{% trans "Report Summary" %}{% endblock %}
+{% block pagetitle %}{% trans "Events Summary" %}{% endblock %}
 
 {% block content %}
 
@@ -41,8 +42,8 @@
       <thead class="rg-thead-inverse">
       <tr>
         <th>Event</th>
-        <th>Start</th>
-        <th>End</th>
+        <th>Date</th>
+        <th>Time</th>
         <th style="text-align: center;">Attending</th>
         <th style="text-align: center;">Privacy</th>
       </tr>
@@ -51,9 +52,9 @@
       <tbody>
       {% for e in upcoming_events %}
         <tr>
-          <th scope="row">{{ e.school }}</th>
-          <td>{{ e.visit_start }}</td>
-          <td>{{ e.visit_end }}</td>
+          <th scope="row"><a href="{% url 'teaching:viewvisit' e.id %}">{{ e.school }}</a></th>
+          <td>{{ e.visit_start|date:_("DATE_FORMAT") }}</td>
+          <td>{{ e.visit_start|date:_("TIME_FORMAT") }} to {{ e.visit_end|date:_("TIME_FORMAT") }}</td>
           <td style="text-align: center;">10</td>
           <td style="text-align: center;">Private</td>
         </tr>
@@ -67,7 +68,9 @@
   <div class="tile">
     <h2 class="rg-page-header">
       Recent Events
-      <a href="#" style="float:right; margin-top:-3px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">{% trans "ENTER STATS" %}</a>
+      <a href="{% url "teaching:import_workshops" %}" style="float:right; margin-top:-3px; margin-left: 5px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">
+        {% trans "IMPORT WORKSHOPS" %}</a>
+      <a href="{% url "teaching:quickentry" %}" style="float:right; margin-top:-3px; margin-left: 5px;" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">{% trans "QUICK ENTRY" %}</a>
     </h2>
 
     <table class="table table-striped">
@@ -112,7 +115,7 @@
             <div class="form-group row">
               <label for="recipient-name" class="form-control-label col-2">Event</label>
               <div class="col-10">
-                <input placeholder="Enter the school or event's name" type="text" class="form-control" id="recipient-name" >
+                <input placeholder="Enter the school or event's name" type="text" class="form-control" id="recipient-name">
               </div>
             </div>
             <div class="form-group row">
@@ -123,18 +126,26 @@
             </div>
             <div class="form-group row">
               <label for="recipient-name" class="form-control-label col-2">Date</label>
-              <div class="col-10">
-                <input type="text" class="form-control" id="recipient-name">
+              <div class="input-group date col-5" data-provide="datepicker">
+                <input type="text" class="form-control" value="12-02-2012">
+                <div class="input-group-addon">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="col-5">
+
               </div>
             </div>
 
             <div class="form-group row">
               <label for="recipient-name" class="form-control-label col-2">Time</label>
-              <div class="col-5">
-                <input type="text" class="form-control" id="recipient-name">
+              <div class="input-group bootstrap-timepicker timepicker col-5">
+                <input id="timepicker1" type="text" class="form-control input-small">
+                <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
               </div>
-              <div class="col-5">
-                <input type="text" class="form-control" id="recipient-name">
+              <div class="input-group bootstrap-timepicker timepicker col-5">
+                <input id="timepicker2" type="text" class="form-control input-small">
+                <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
               </div>
             </div>
 
@@ -168,4 +179,22 @@
     </div>
   </div>
   <!-- Create new event modal -->
+{% endblock %}
+
+{% block script %}
+  <script>
+      $('.datepicker').datepicker();
+      $('#timepicker1').timepicker({
+          icons: {
+              up: 'fa fa-chevron-up',
+              down: 'fa fa-chevron-down'
+          }
+      });
+      $('#timepicker2').timepicker({
+          icons: {
+              up: 'fa fa-chevron-up',
+              down: 'fa fa-chevron-down'
+          }
+      });
+  </script>
 {% endblock %}

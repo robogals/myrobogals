@@ -1,7 +1,9 @@
+import os
+
 # The directory where you checked out the "myrobogals" repo,
 # which is one level above this directory.
 # Do not put a trailing slash.
-ROBOGALS_DIR = '/Users/mark/Dev/robogals'
+ROBOGALS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #
 #
@@ -10,6 +12,10 @@ ROBOGALS_DIR = '/Users/mark/Dev/robogals'
 #
 
 DEBUG = True
+
+# Logs users out within a day
+SESSION_COOKIE_AGE = 86400
+SESSION_SAVE_EVERY_REQUEST = True
 
 ADMINS = (
 	('myRobogals', 'my@robogals.org'),
@@ -55,6 +61,8 @@ SITE_ID = 1
 
 USE_I18N = True
 
+SECRET_KEY = 'kl;h45yrfgu;y;08op2534mj23kjjljk4ilk'
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = ROBOGALS_DIR + '/rgmedia'
@@ -64,25 +72,29 @@ MEDIA_ROOT = ROBOGALS_DIR + '/rgmedia'
 # The default '/rgmedia' will work when using the Django dev server and debug = True
 MEDIA_URL = '/rgmedia/'
 
-# Path and URL for static directory introduced in Django 1.4
-STATIC_ROOT = ROBOGALS_DIR + '/static'
+# Path and URL for where the static files are being served from
+# e.g. my.robogals.org/{STATIC_URL}/path-to-file
 STATIC_URL = '/static/'
 
-# Directory for uploaded profile images
-PROFILE_IMAGE_UPLOAD_DIR = 'profilepics/'
+# Location to all of the individual apps that have static files
+STATICFILES_DIRS = [
+	os.path.join(ROBOGALS_DIR, "static"),
+	os.path.join(ROBOGALS_DIR, "rgprofile/static"),
+	os.path.join(ROBOGALS_DIR, "rgmain/static"),
+]
 
-# Maximum size for uploaded images in kilobytes
-PROFILE_IMAGE_MAX_SIZE = 512
-
-# The default profile image for users who haven't uploaded one yet
-PROFILE_IMAGE_DEFAULT = 'profilepics/default.png'
-
-SECRET_KEY = 'kl;h45yrfgu;y;08op2534mj23kjjljk4ilk'
+# Where collectstatic will store all the static files when 'python manage.py collectstatic' is ran
+STATIC_ROOT = ROBOGALS_DIR + '/staticfiles'
 
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
-		'DIRS': [ROBOGALS_DIR + '/rgtemplates',],
+		'DIRS': [
+			ROBOGALS_DIR + '/templates',
+			ROBOGALS_DIR + 'myrobogals/rgmain/templates',
+			ROBOGALS_DIR + 'myrobogals/rgteaching/templates',
+			ROBOGALS_DIR + '/rgtemplates'
+		],
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': [
@@ -160,6 +172,7 @@ INSTALLED_APPS = (
 	'myrobogals.rgconf',
 	'myrobogals.rgreport',
 	'tinymce',
+	'widget_tweaks',
 )
 
 AUTH_USER_MODEL = 'rgprofile.User'
@@ -176,6 +189,16 @@ GENDERS = (
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# Directory for uploaded profile images
+PROFILE_IMAGE_UPLOAD_DIR = 'profilepics/'
+
+# Maximum size for uploaded images in kilobytes
+PROFILE_IMAGE_MAX_SIZE = 512
+
+# The default profile image for users who haven't uploaded one yet
+PROFILE_IMAGE_DEFAULT = 'profilepics/default.png'
+
 
 # Used to debug emails without STMP servers set up on local machine
 if DEBUG:

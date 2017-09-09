@@ -9,7 +9,10 @@
 
   <title>myRobogals - {% block title %}{% endblock %}</title>
 
+  <!-- 3rd party css-->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css"/>
 
   <!-- Bootstrap core CSS -->
   <link href="{% static "font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
@@ -18,6 +21,7 @@
 
   <!-- Custom styles for this template -->
   <link href="{% static "bootstrap/css/sticky-footer-navbar.css" %} " rel="stylesheet">
+  {#  <link href="{% static "bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css" %}"#}
 
   {% block header %} {% endblock %}
 </head>
@@ -35,16 +39,22 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">EVENTS</a>
-        </li>
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link thick-font" href="#">CHAPTER</a>
         </li>
         <li class="nav-item active">
+          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">EVENTS</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">REPORTS</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link thick-font" href="#">FORUMS</a>
         </li>
-        <li class="nav-item dropdown active">
+        <li class="nav-item">
+          <a class="nav-link thick-font" href="#">WIKI</a>
+        </li>
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DROPDOWN</a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
             <a class="dropdown-item" href="#">Action</a>
@@ -56,13 +66,15 @@
 
       <ul class="nav navbar-nav navbar-right">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"
-                                                                                                                                                             aria-hidden="true"></i><span
+          <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg" aria-hidden="true"></i><span
               class="caret"></span></a></a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
             <a class="dropdown-item" href="#">View Profile</a>
+            <a class="dropdown-item" href="#">Edit Profile</a>
+            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Contact Directory</a>
             <a class="dropdown-item" href="#">Support & FAQ</a>
+            <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Logout</a>
           </div>
         </li>
@@ -115,5 +127,10 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/popper.js"></script>
 <script src="{% static "bootstrap-v4/js/bootstrap.min.js" %}"></script>
+<script src="{% static "bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js" integrity="sha256-bmXHkMKAxMZgr2EehOetiN/paT9LXp0KKAKnLpYlHwE="
+        crossorigin="anonymous"></script>
+<script src="{% static "bootstrap-typeahead/js/bootstrap3-typeahead.min.js" %}"></script>
+{% block script %} {% endblock %}
 </body>
 </html>
