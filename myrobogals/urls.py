@@ -11,6 +11,7 @@ from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
 from myrobogals.rgweb import views as rgweb_views
+from myrobogals.rgprofile.forms import PasswordResetForm
 
 urlpatterns = [
 	# Home
@@ -23,7 +24,7 @@ urlpatterns = [
 	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
 	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm.html'}),
 	url(r'^forgotpass/complete/$', auth_views.password_reset_complete, {'template_name': 'password_reset_complete.html'}, name='password_reset_complete'),
-	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form.html', 'email_template_name': 'password_reset_email.html'}),
+	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form-v2.html', 'email_template_name': 'password_reset_email.html', 'password_reset_form': PasswordResetForm}),
 	#url(r'^unsubscribe/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', auth_views.unsubscribe),
 	url(r'^join/$', rgchapter_views.joinlist),
 	url(r'^join/(?P<chapterurl>.+)/$', profile_user.joinchapter),
