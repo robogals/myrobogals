@@ -1,0 +1,20 @@
+{% extends "base-v2.html" %}
+
+{% block title %} Chapter Dashboard{% endblock %}
+
+{% block pagetitle %} Chapter Dashboard {% endblock %}
+
+{% block content %}
+  <div class="tile">
+    <h2 class="rg-page-header">
+      Quick Links
+    </h2>
+
+    <ul>
+      <li><a href="{% url 'chapters:manage_members' request.user.chapter.myrobogals_url %}">Manage Members</a></li>
+      <li><a href="{% url 'chapters:edit_chapter' request.user.chapter.myrobogals_url %}">Edit Chapter</a></li>
+      <li><a href="{% url 'chapters:view_chapter' request.user.chapter.myrobogals_url %}">View Chapter</a></li>
+      <li><a href="#">Manage Executive List</a></li>
+    </ul>
+  </div>
+{% endblock %}

@@ -4,7 +4,7 @@ from myrobogals.rgprofile.models import User
 from myrobogals.rgchapter.models import Chapter
 from myrobogals.rgmain.models import Country
 from django.template import RequestContext, Context, loader
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django import forms
@@ -78,6 +78,14 @@ def localtimes(request):
 				listing.append({'super': superchapter, 'chapters': chapters_display})
 	return render_to_response('timezone_listing.html', {'listing': listing, 'globalchapter': globalchapter}, context_instance=RequestContext(request))
 
+
+def home(request, chapterurl):
+	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
+	recipients = AwardRecipient.objects.filter(chapter=c)
+	return render(request, 'chapter_home.html', {'chapter': c, 'recipients': recipients})
+
+
+# TODO: Replace this view with marketing page
 def detail(request, chapterurl):
 	c = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
 	officers = Position.objects.filter(positionChapter=c).filter(position_date_end=None).order_by('positionType__rank')
