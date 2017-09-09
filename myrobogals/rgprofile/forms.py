@@ -10,6 +10,7 @@ from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.forms import  PasswordResetForm as PassResetFrm
 
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmain.models import University, MobileRegex
@@ -412,7 +413,9 @@ class LoginForm(forms.Form):
                 self.add_error('username', 'Invalid email address or password')
             else:
                 self.add_error('username', 'Invalid username or password')
-
+class PasswordResetForm(PassResetFrm):
+    email = forms.CharField(max_length=255, required=True, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Email', 'id': 'inputError1'}))
 
 class CodeOfConductForm(forms.Form):
     code_of_conduct = forms.BooleanField(required=True)
