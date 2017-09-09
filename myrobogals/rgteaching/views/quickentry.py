@@ -158,6 +158,6 @@ def instantvisit(request):
     form_school = SchoolFormPartOne(chapter=chapter, school_id=0)
 
     # Render clean form
-    return render_to_response('instant_workshop.html',
+    return render_to_response('quick_entry-v2.html',
                               {'form1': formpart1, 'form2': formpart2, 'schoolform': form_school},
                               context_instance=RequestContext(request))
