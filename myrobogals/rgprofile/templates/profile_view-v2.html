@@ -1,14 +1,42 @@
 {% extends "base-v2.html" %}
+
+{% block title %} Title here{% endblock %}
+
+{% block pagetitle %} Title here {% endblock %}
+
+{% block content %}
 <div class="row">
     <div class="col-4">
       <div class="card">
-        <img src="..\media\images\profile_placeholder.jpg" alt="profile pic" width="304" height="236">
+        <img src="{{ MEDIA_URL }}/images/profile_placeholder.jpg" alt="profile pic" width="304" height="236">
         <h1>Full name</h1>
         <h2>Chapter</h2>
         <h3>Position</h3>
       </div>
     </div>
     <div class="col-8">
+            <div class="tile">
+        <h2 class="rg-page-header">
+          Title heading here
+        </h2>
+        I believe every human has a finite number of heartbeats. I don't intend to waste any of mine
+
+        To go places and do things that have never been done before – that’s what living is all about.
+
+        As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.
+      </div>
+
+            <div class="tile">
+        <h2 class="rg-page-header">
+          Title heading here
+        </h2>
+        I believe every human has a finite number of heartbeats. I don't intend to waste any of mine
+
+        To go places and do things that have never been done before – that’s what living is all about.
+
+        As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.
+      </div>
+
       <div class="card">
         <div class="card-body">
           <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we intend to win.</p>
@@ -31,6 +59,7 @@
           </div>
         </div>
       </div>
+
       <div class="card">
         <div class="card-body">
           <div class="position">
@@ -82,3 +111,10 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+  // Include javascript here to edit your DOM if you need to
+  </script>
+{% endblock %}
