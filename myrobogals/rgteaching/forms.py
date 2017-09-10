@@ -15,6 +15,56 @@ from myrobogals.rgteaching.models import (VISIT_TYPES_BASE, VISIT_TYPES_REPORT,
                                           EventAttendee, School)
 
 
+class NewEventForm(forms.Form):
+    """
+    v2 Modal New Event Form
+    """
+    # event = forms.ModelChoiceField(label=_('Event'), queryset=School.objects.none())
+    event = forms.CharField(label=_('Event'))
+    location = forms.CharField(label=_("Location"))
+    date = forms.DateField(label=_('Date'))
+    start_time = forms.CharField(label=_('Start Time'), initial='10:00:00')
+    end_time = forms.CharField(label=_('End Time'), initial='13:00:00')
+    notes = forms.CharField(label=_("Description"), widget=forms.Textarea, required=False)
+
+    def clean_start_time(self):
+        data = self.cleaned_data['start_time']
+        dt = datetime.datetime.strptime(data, '%I:%M %p')
+        return dt.time()
+
+    def clean_end_time(self):
+        data = self.cleaned_data['end_time']
+        dt = datetime.datetime.strptime(data, '%I:%M %p')
+        return dt.time()
+
+
+# TODO: duplicate of SchoolVisitFormTwo & SchoolVisitFormThree, requires refactoring of code
+class NewEventFormAdditionFields(forms.Form):
+    """
+    v2 Modal new event form addition information
+    """
+    meeting_location = forms.CharField(label=_("Meeting location"), help_text=_(
+        "Where people will meet at university to go as a group to the school, if applicable"), initial=_("N/A"),
+                                       required=False)
+    meeting_time = forms.TimeField(label=_("Meeting time"),
+                                   help_text=_("What time people can meet to go to the school"), initial="09:30:00",
+                                   required=False)
+    contact = forms.CharField(label=_("Contact person"), max_length=128, required=False)
+    contact_email = forms.CharField(label=_("Email"), max_length=128, required=False)
+    contact_phone = forms.CharField(label=_("Phone"), max_length=32, required=False,
+                                    help_text=_("Mobile number to call if people get lost"))
+    numstudents = forms.CharField(label=_("Expected number of students"), required=False)
+    yearlvl = forms.CharField(label=_("Year level"), required=False)
+    numrobots = forms.CharField(label=_("Number of robots to bring"), required=False)
+    lessonnum = forms.CharField(label=_("Lesson number"), required=False)
+    toprint = forms.CharField(label=_("To print"), required=False,
+                              widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+    tobring = forms.CharField(label=_("To bring"), required=False,
+                              widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+    otherprep = forms.CharField(label=_("Other preparation"), required=False,
+                                widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+
+
 # Base class for SchoolVisitForm
 class SchoolVisitFormOneBase(forms.Form):
     school = forms.ModelChoiceField(queryset=School.objects.none(), help_text=_(
@@ -63,7 +113,6 @@ class SchoolVisitFormOne(SchoolVisitFormOneBase):
             self.fields["location"].help_text += ", (can differ from meeting location, see below)"
 
 
-
 # Form to create or edit a InstantSchoolVisit (instant workshop)
 class SchoolVisitFormInstant(SchoolVisitFormOneBase):
     school = forms.ChoiceField(choices=[(school.id, school) for school in School.objects.all()],
@@ -80,7 +129,6 @@ class SchoolVisitFormInstant(SchoolVisitFormOneBase):
 
         query_set_tuple = [(q, q) for q in school_query_set]
         self.fields['school'].choices = query_set_tuple + [('-1', '--------------'), ('0', 'New School')]
-
 
 
 class SchoolVisitFormTwo(forms.Form):

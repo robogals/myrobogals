@@ -128,3 +128,7 @@ h2 {
 .dashboard-footer:first-child, .dashboard-data:first-child {
     border-left: none;
 }
+
+.alert {
+    font-size: 15px;
+}

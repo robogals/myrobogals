@@ -47,7 +47,7 @@
           <a class="nav-link thick-font" href="{% url 'teaching:home' %}">EVENTS</a>
         </li>
         <li class="nav-item {% active_nav request 'reports' %}">
-          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">REPORTS</a>
+          <a class="nav-link thick-font" href="{% url 'reports:standard' %}">REPORTS</a>
         </li>
         <li class="nav-item {% active_nav request 'forums' %}">
           <a class="nav-link thick-font" href="#">FORUMS</a>
@@ -99,11 +99,11 @@
 
   {% for message in messages %} {% autoescape off %}
     {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-      <div class="error">{{ message }} </div>
+      <div class="alert alert-danger"><strong>Oops,</strong> {{ message }} </div>
     {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-      <div class="alert">{{ message }} </div>
+      <div class="alert alert-info"><strong>FYI,</strong> {{ message }} </div>
     {% else %}
-      <div class="message">{{ message }} </div>
+      <div class="alert alert-success"><strong>Success!</strong> {{ message }}</div>
     {% endif %} {% endautoescape %}
   {% endfor %}
 
