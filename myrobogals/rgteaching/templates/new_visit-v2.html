@@ -1,0 +1,31 @@
+{% extends "base-v2.html" %}
+
+{% block title %} New Event {% endblock %}
+{% block pagetitle %} Create New Event{% endblock %}
+
+{% block content %}
+  <div class="tile">
+    <h2 class="rg-page-header">
+      New Event
+    </h2>
+    {% include "includes/new_event.html" %}
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+      $('.datepicker').datepicker();
+      $('#timepicker1').timepicker({
+          icons: {
+              up: 'fa fa-chevron-up',
+              down: 'fa fa-chevron-down'
+          }
+      });
+      $('#timepicker2').timepicker({
+          icons: {
+              up: 'fa fa-chevron-up',
+              down: 'fa fa-chevron-down'
+          }
+      });
+  </script>
+{% endblock %}

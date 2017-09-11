@@ -1,15 +1,6 @@
 import os
 
-# The directory where you checked out the "myrobogals" repo,
-# which is one level above this directory.
-# Do not put a trailing slash.
 ROBOGALS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-#
-#
-# No need to change anything below here
-#
-#
 
 DEBUG = True
 

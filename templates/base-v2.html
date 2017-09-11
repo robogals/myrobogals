@@ -1,4 +1,5 @@
 {% load static %}
+{% load nav %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,19 +40,19 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link thick-font" href="#">CHAPTER</a>
+        <li class="nav-item {% active_nav request 'chapters' %}">
+          <a class="nav-link thick-font" href="{% url 'chapters:home' request.user.chapter.myrobogals_url %}">CHAPTER</a>
         </li>
-        <li class="nav-item active">
+        <li class="nav-item {% active_nav request 'teaching' %}">
           <a class="nav-link thick-font" href="{% url 'teaching:home' %}">EVENTS</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">REPORTS</a>
+        <li class="nav-item {% active_nav request 'reports' %}">
+          <a class="nav-link thick-font" href="{% url 'reports:standard' %}">REPORTS</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% active_nav request 'forums' %}">
           <a class="nav-link thick-font" href="#">FORUMS</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% active_nav request 'wiki' %}">
           <a class="nav-link thick-font" href="#">WIKI</a>
         </li>
         <li class="nav-item dropdown">
@@ -98,11 +99,11 @@
 
   {% for message in messages %} {% autoescape off %}
     {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-      <div class="error">{{ message }} </div>
+      <div class="alert alert-danger"><strong>Oops,</strong> {{ message }} </div>
     {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-      <div class="alert">{{ message }} </div>
+      <div class="alert alert-info"><strong>FYI,</strong> {{ message }} </div>
     {% else %}
-      <div class="message">{{ message }} </div>
+      <div class="alert alert-success"><strong>Success!</strong> {{ message }}</div>
     {% endif %} {% endautoescape %}
   {% endfor %}
 

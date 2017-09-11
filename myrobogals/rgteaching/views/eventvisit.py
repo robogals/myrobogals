@@ -2,6 +2,7 @@ import math
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render
 from django.template import RequestContext
@@ -19,6 +20,7 @@ from myrobogals.rgteaching.functions import paginatorRender
 def teachhome(request):
     chapter = request.user.chapter
     displaycats = [1, ]
+    context_instance = {}
 
     # Chapter's progress
     school_visits = SchoolVisitStats.objects.filter(visit__chapter=chapter,
@@ -26,22 +28,87 @@ def teachhome(request):
                                                                                timezone.now()],
                                                     visit_type__in=displaycats)
 
-    setattr(chapter, 'sum', 0)
-    for school_visit in school_visits:
-        chapter.sum = chapter.sum + school_visit.num_girls_weighted()
+    if request.method == 'POST':
+        e = new_event(request)
+        if 'event_id' in e:
+            messages.success(request, "Event created successfully")
+            return HttpResponseRedirect(reverse('teaching:viewvisit', kwargs={'visit_id': e['event_id']}))
+        else:
+            print(e['event_form'])
+            return render(request, 'new_visit-v2.html', {'event_form': e['event_form'], 'event_form_extra': e['event_form_extra']})
 
-    setattr(chapter, 'sum_percent', 'width:' + str(chapter.sum/chapter.goal*100) + '%')
+    else:
+        setattr(chapter, 'sum', 0)
+        for school_visit in school_visits:
+            chapter.sum = chapter.sum + school_visit.num_girls_weighted()
 
-    # Small list of upcoming workshops
-    upcoming_events = SchoolVisit.objects.filter(chapter=chapter, status=0)[:5]
+        setattr(chapter, 'sum_percent', 'width:' + str(chapter.sum / chapter.goal * 100) + '%')
+        context_instance['chapter'] = chapter
 
-    # Small list of Recently finished workshops
-    past_events = SchoolVisit.objects.filter(chapter=chapter, status=1)[:5]
+        # Small list of upcoming workshops
+        upcoming_events = SchoolVisit.objects.filter(chapter=chapter, status=0)[:5]
+        context_instance['upcoming_events'] = upcoming_events
 
-    # Reports active
-    return render(request, 'teaching_home-v2.html', {'chapter': chapter, 'upcoming_events': upcoming_events, 'past_events': past_events})
+        # Small list of Recently finished workshops
+        past_events = SchoolVisit.objects.filter(chapter=chapter, status=1)[:5]
+        context_instance['past_events'] = past_events
 
-    # return HttpResponseRedirect('/teaching/list/')
+        # New events form for modal
+        e = new_event(request)
+        context_instance['event_form'] = e['event_form']
+        context_instance['event_form_extra'] = e['event_form_extra']
+
+    return render(request, 'teaching_home-v2.html', context_instance)
+
+
+def new_event(request):
+    """ 
+    :param request: 
+    :return: GET(1): blank event form
+    :return: POST(2): database ID corresponding to new event, or errors if failed
+    """
+    if request.method == 'POST':
+        event_form = NewEventForm(request.POST)
+        event_form_extra = NewEventFormAdditionFields(request.POST)
+        chapter = request.user.chapter
+
+        if event_form.is_valid():
+            form = event_form.cleaned_data
+            v = SchoolVisit()
+
+            v.chapter = chapter
+            v.creator = request.user
+            v.status = 0            # Not necessary
+            v.created_method = 0    # Not necessary
+            v.date_modified = make_aware(datetime.datetime.now(), timezone=chapter.tz_obj())  # Check
+
+            visit_date = form['date']
+            # Take the user's date and time input and combine it with the
+            # chapter's timezone to create a timezone-aware datetime.
+            v.visit_start = make_aware(datetime.datetime.combine(visit_date, form['start_time']), timezone=chapter.tz_obj())
+            v.visit_end = make_aware(datetime.datetime.combine(visit_date, form['end_time']), timezone=chapter.tz_obj())
+
+            # Need to create the school if it doesn't exist
+            v.school = School.objects.get(id=1)  # form['event']
+            v.location = form['location']
+            v.notes = form['notes']
+            # privacy
+            v.allow_rsvp = 0       # Not necessary
+
+            # TODO: Additional information fields here
+            v.save()
+            return {'event_id': v.id}
+
+    else:
+        event_form = NewEventForm()
+        event_form_extra = NewEventFormAdditionFields()
+
+    return {'event_form': event_form, 'event_form_extra': event_form_extra}
+
+
+@login_required
+def newvisit(request):
+    return editvisit(request, 0)
 
 
 # List all workshops. Superusers will see all workshops globally; other users
@@ -180,11 +247,6 @@ def editvisit(request, visit_id):
                                    'chapter': chapter, 'visit_id': visit_id}, context_instance=RequestContext(request))
     else:
         raise Http404  # don't have permission to change
-
-
-@login_required
-def newvisit(request):
-    return editvisit(request, 0)
 
 
 # Create a new workshop with a school already selected.

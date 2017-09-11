@@ -107,73 +107,11 @@
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Create New Event</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times</span>
           </button>
         </div>
         <div class="modal-body">
-          <form>
-            <div class="form-group row">
-              <label for="recipient-name" class="form-control-label col-2">Event</label>
-              <div class="col-10">
-                <input placeholder="Enter the school or event's name" type="text" class="form-control" id="recipient-name">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="recipient-name" class="form-control-label col-2">Location</label>
-              <div class="col-10">
-                <input placeholder="The location where the event is being held" type="text" class="form-control" id="recipient-name">
-              </div>
-            </div>
-            <div class="form-group row">
-              <label for="recipient-name" class="form-control-label col-2">Date</label>
-              <div class="input-group date col-5" data-provide="datepicker">
-                <input type="text" class="form-control" value="12-02-2012">
-                <div class="input-group-addon">
-                  <i class="fa fa-calendar" aria-hidden="true"></i>
-                </div>
-              </div>
-              <div class="col-5">
-
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <label for="recipient-name" class="form-control-label col-2">Time</label>
-              <div class="input-group bootstrap-timepicker timepicker col-5">
-                <input id="timepicker1" type="text" class="form-control input-small">
-                <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
-              </div>
-              <div class="input-group bootstrap-timepicker timepicker col-5">
-                <input id="timepicker2" type="text" class="form-control input-small">
-                <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
-              </div>
-            </div>
-
-            <div class="form-check">
-              <label class="form-check-label">
-                <input type="checkbox" class="form-check-input">
-                Recurring Event
-              </label>
-            </div>
-
-            <div class="form-group row">
-              <label for="message-text" class="form-control-label col-2">Description:</label>
-              <div class="col-10">
-                <textarea class="form-control" id="message-text"></textarea>
-              </div>
-            </div>
-
-            <div class="form-check">
-              <label class="form-check-label">
-                <input type="checkbox" class="form-check-input">
-                Specify Additional Information
-              </label>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Create event</button>
+          {% include "includes/new_event.html" %}
         </div>
       </div>
     </div>
@@ -198,3 +136,4 @@
       });
   </script>
 {% endblock %}
+
