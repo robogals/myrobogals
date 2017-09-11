@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import  PasswordResetForm as PassResetFrm
+from django.contrib.auth.forms import  SetPasswordForm as SetPassFrm
 
 from myrobogals.rgchapter.models import DisplayColumn, ShirtSize
 from myrobogals.rgmain.models import University, MobileRegex
@@ -414,9 +415,13 @@ class LoginForm(forms.Form):
             else:
                 self.add_error('username', 'Invalid username or password')
 class PasswordResetForm(PassResetFrm):
-    email = forms.CharField(max_length=255, required=True, widget=forms.TextInput(
+    email = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Email', 'id': 'inputError1'}))
-
+class SetPasswordFrom(SetPassFrm):
+    new_password1 = forms.CharField(label=_("New password"),
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'New Password'}))
+    new_password2 = forms.CharField(label=_("New password confirmation"),
+                                    widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'Confirm Password'}))
 class CodeOfConductForm(forms.Form):
     code_of_conduct = forms.BooleanField(required=True)
 
