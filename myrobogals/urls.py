@@ -10,7 +10,10 @@ from myrobogals.rgconf import views as rgconf_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
-from myrobogals.rgprofile.forms import PasswordResetForm
+
+from myrobogals.rgweb import views as rgweb_views
+from myrobogals.rgprofile.forms import PasswordResetForm, SetPasswordFrom
+
 
 
 urlpatterns = [
@@ -21,10 +24,10 @@ urlpatterns = [
 	url(r'^login/$', profile_login.show_login),
 	url(r'^logout/$', auth_views.logout, {'next_page': '/'}),
 	url(r'^chpass/$', auth_views.password_change, {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
-	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
-	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm.html'}),
-	url(r'^forgotpass/complete/$', auth_views.password_reset_complete, {'template_name': 'password_reset_complete.html'}, name='password_reset_complete'),
-	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form-v2.html', 'email_template_name': 'password_reset_email.html', 'password_reset_form': PasswordResetForm}),
+	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done_v2.html'}, name='password_reset_done'),
+	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm_v2.html', 'set_password_form': SetPasswordFrom}),
+	url(r'^forgotpass/complete/$', auth_views.password_reset_complete, {'template_name': 'password_reset_complete_v2.html'}, name='password_reset_complete'),
+	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form_v2.html', 'email_template_name': 'password_reset_email.html', 'password_reset_form': PasswordResetForm}),
 	#url(r'^unsubscribe/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', auth_views.unsubscribe),
 	url(r'^join/$', rgchapter_views.joinlist),
 	url(r'^join/(?P<chapterurl>.+)/$', profile_user.joinchapter),
@@ -117,3 +120,4 @@ if settings.DEBUG:
 
 # Custom view for 500 Internal Server Error
 handler500 = 'myrobogals.rgmain.views.servererror'
+
