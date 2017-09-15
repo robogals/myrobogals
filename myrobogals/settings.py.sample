@@ -15,22 +15,22 @@ MANAGERS = ADMINS
 
 ALLOWED_HOSTS = []
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',
-		'NAME': 'myrobogals',
-		'USER': 'myrobogals',
-		'PASSWORD': 'myrobogals'
-	}
-}
-
-# Uncomment this to use SQLite instead of MySQL
 #DATABASES = {
 #	'default': {
-#		'ENGINE': 'django.db.backends.sqlite3',
-#		'NAME': ROBOGALS_DIR + '/myrobogals.db',
+#		'ENGINE': 'django.db.backends.mysql',
+#		'NAME': 'myrobogals',
+#		'USER': 'myrobogals',
+#		'PASSWORD': 'myrobogals'
 #	}
 #}
+
+# Uncomment this to use SQLite instead of MySQL
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': ROBOGALS_DIR + '/myrobogals.db',
+	}
+}
 
 USE_TZ = True
 TIME_ZONE = 'Etc/UTC'
@@ -84,6 +84,7 @@ TEMPLATES = [
 			ROBOGALS_DIR + '/templates',
 			ROBOGALS_DIR + 'myrobogals/rgmain/templates',
 			ROBOGALS_DIR + 'myrobogals/rgteaching/templates',
+			ROBOGALS_DIR + 'myrobogals/rgprofile/templates',
 			ROBOGALS_DIR + '/rgtemplates'
 		],
 		'APP_DIRS': True,
