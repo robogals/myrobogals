@@ -1,120 +1,141 @@
 {% extends "base-v2.html" %}
 
-{% block title %} Title here{% endblock %}
+{% block title %} Profile {% endblock %}
 
-{% block pagetitle %} Title here {% endblock %}
+{% block pagetitle %}{{ request.user.first_name }} {{ request.user.last_name }} {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-4">
-      <div class="card">
-        <img src="{{ MEDIA_URL }}/images/profile_placeholder.jpg" alt="profile pic" width="304" height="236">
-        <h1>Full name</h1>
-        <h2>Chapter</h2>
-        <h3>Position</h3>
+  <div class="row">
+    <div class="col-3">
+      <div class="card" style="border: 1px solid #AAAAAA;">
+        <img class="card-img-top" style="border-radius: 360px; padding: 20px; " src="{{ MEDIA_URL }}/images/profile_placeholder.jpg">
+        <div class="card-body" style="text-align: center">
+          <h2 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})</h2>
+          <p class="card-text">
+            {{ request.user.chapter }}
+            <br/>
+            Training Manager
+          </p>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 3 mins ago</small>
+        </div>
       </div>
     </div>
-    <div class="col-8">
-            <div class="tile">
+
+    <div class="col-9">
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #5876D0">
         <h2 class="rg-page-header">
-          Title heading here
+          Introduce Yourself!
         </h2>
-        I believe every human has a finite number of heartbeats. I don't intend to waste any of mine
+        <p>
+          Hello, World! Bianca is a recent graduate from Monash University and studied mechtronics engineering and science, with majors in computer science and mathematics. She is hoping to apply her
+          technical
+          knowledge and creative flair to different opportunities that comes his way and gain insights and expert knowledge from industry leaders.
+        </p>
 
-        To go places and do things that have never been done before – that’s what living is all about.
-
-        As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.
+        <p>
+          Bianca is also very passionate about diversity and equality and currently holds the training manager position for a non-for-profit organisation called Robogals, which inspires females in
+          primary and
+          high schools
+          to
+          pursue a career in STEM related fields.
+        </p>
       </div>
 
-            <div class="tile">
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f44183">
         <h2 class="rg-page-header">
-          Title heading here
+          Volunteering Statistics
         </h2>
-        I believe every human has a finite number of heartbeats. I don't intend to waste any of mine
-
-        To go places and do things that have never been done before – that’s what living is all about.
-
-        As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we intend to win.</p>
-          <div class="card-footer" role="tab" id="headingOne">
-            <h5 class="mb-0">
-              <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                ...
-              </a>
-            </h5>
-          </div>
-
-          <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
-            <div class="card-body">
-              I believe every human has a finite number of heartbeats. I don't intend to waste any of mine
-
-              To go places and do things that have never been done before – that’s what living is all about.
-
-              As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm, living object looked so fragile, so delicate, that if you touched it with a finger it would crumble and fall apart. Seeing this has to change a man.
-            </div>
-          </div>
+        <canvas id="myChart"></canvas>
+        <div class="row" style="margin-top: 30px">
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">124</strong> <div>Hours Volunteered</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">32</strong> <div>Schools</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">74</strong> <div>Students Taught</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">8</strong> <div>Killed</div></div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-body">
-          <div class="position">
-          <h3 class="card-title">
-            Position <small class="text-muted">at Chapter </small>
-          </h3>
-          <h4 class="card-text"> March 2015-present</h4>
-          <p class="card-text">breif description of what you do in this position. The Earth was small, light blue, and so touchingly alone, our home that must be defended like a holy relic. </p>
-        </div>
-        <div class="position">
-        <h3 class="card-title">
-          Position <small class="text-muted">at Chapter </small>
-        </h3>
-        <h4 class="card-text"> March 2014-March 2015</h4>
-        <p class="card-text">breif description of what you do in this position. The Earth was small, light blue, and so touchingly alone, our home that must be defended like a holy relic. </p>
-        </div>
-          <div class="card-footer" role="tab" id="headingOne">
-            <h5 class="mb-0">
-              <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                ...
-              </a>
-            </h5>
-          </div>
-
-          <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
-            <div class="card-body">
-              <div class="position">
-              <h3 class="card-title">
-                Position <small class="text-muted">at Chapter </small>
-              </h3>
-              <h4 class="card-text"> March 2014-March 2015</h4>
-              <p class="card-text">breif description of what you do in this position. The Earth was small, light blue, and so touchingly alone, our home that must be defended like a holy relic. </p>
-            </div>
-            <div class="position">
-                    <h3 class="card-title">
-                      Position <small class="text-muted">at Chapter </small>
-                    </h3>
-                    <h4 class="card-text"> March 2014-March 2015</h4>
-                    <p class="card-text">breif description of what you do in this position. The Earth was small, light blue, and so touchingly alone, our home that must be defended like a holy relic. </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #7d42f4">
+        <h2 class="rg-page-header">
+          Robogals Experience
+        </h2>
+        <h2 class="card-title">
+          <strong>Development Officer</strong>
+          <small class="text-muted">at {{ request.user.chapter }}</small>
+        </h2>
+        <h2 class="card-text"> March 2015 - present</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
+        <h2 class="card-title">
+          <strong>Training Manager</strong>
+          <small class="text-muted">at {{ request.user.chapter }}</small>
+        </h2>
+        <h2 class="card-text"> March 2013 - April 2015</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
+        <h2 class="card-title">
+          <strong>Aeronautical Engineering and Rocket Science</strong>
+          <small class="text-muted">at SpaceX University</small>
+        </h2>
+        <h2 class="card-text"> June 2012 - Present</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
       </div>
-      <div class="card">
-        <h3 class="card-title">Course/Position <small class="text-muted"> at University/Employer</small></h3>
-        <h4 class="card-text"> March 2013-present</h4>
-        <p class="card-text">breif description of what you do in this position. The Earth was small, light blue, and so touchingly alone, our home that must be defended like a holy relic. </p>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f46a41">
+        <h2 class="rg-page-header">
+          Achievements
+        </h2>
+        <span class="badge badge-pill badge-primary">Attended first workshop</span>
+        <span class="badge badge-pill badge-secondary">Posted first article</span>
+        <span class="badge badge-pill badge-success">Yolo'd hard</span>
+        <span class="badge badge-pill badge-danger">Lead volunteer</span>
+        <span class="badge badge-pill badge-warning">Executive position</span>
+        <span class="badge badge-pill badge-info">Regional position</span>
+        <span class="badge badge-pill badge-dark">Global position</span>
+      </div>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f4df41">
+        <h2 class="rg-page-header">
+          Endorsements
+        </h2>
+        Too linkedin ish?
+      </div>
+
     </div>
   </div>
-</div>
+
 {% endblock %}
 
 {% block script %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
   <script>
-  // Include javascript here to edit your DOM if you need to
+      var ctx = document.getElementById("myChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September"],
+              datasets: [{
+                  label: 'Students taught',
+                  data: [12, 19, 20, 31, 32, 40, 41, 50, 70],
+                  borderColor: 'rgb(255, 70, 90)',
+                  backgroundColor: 'rgb(255, 210, 218)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true
+                      }
+                  }]
+              }
+          }
+      });
   </script>
 {% endblock %}

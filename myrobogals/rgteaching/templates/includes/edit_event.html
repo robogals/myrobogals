@@ -1,26 +1,11 @@
 {% load widget_tweaks %}
 
-<form action="{% url 'teaching:home' %}" method="post"> {% csrf_token %}
-  <div class="form-group">
-    <div class="row">
-      <div class="col-9"></div>
-      <div class="col-3">{{ event_form.privacy|add_class:"form-control" }}</div>
-    </div>
-  </div>
-
+<form action="{% url 'teaching:viewvisit' id %}" method="post"> {% csrf_token %}
   <div class="form-group row">
     <label for="recipient-name" class="form-control-label col-2">Event</label>
     <div class="col-10">
-      {% if not event_form.event.errors %}
-        {{ event_form.event|add_class:"form-control typeahead"|attr:"placeholder:Enter the school or event's name"|attr:"autocomplete:off" }}
-      {% else %}
-        {{ event_form.event|add_class:"form-control is-invalid"|attr:"placeholder:Enter the school or event's name data-provide:typeahead" }}
-        <div class="invalid-feedback">
-          {% for error in event_form.event.errors %}
-            {{ error }}
-          {% endfor %}
-        </div>
-      {% endif %}
+      <!-- Smartypants...-->
+      {{ event_form.event|add_class:"form-control"|attr:"disabled"}}
     </div>
   </div>
 
@@ -35,6 +20,7 @@
           {% for error in event_form.location.errors %}
             {{ error }}
           {% endfor %}
+        </div>
         </div>
       {% endif %}
     </div>
@@ -103,13 +89,6 @@
     </div>
   </div>
 
-  <div class="form-check">
-    <label class="form-check-label">
-      <input type="checkbox" class="form-check-input"/>
-      Recurring Event
-    </label>
-  </div>
-
   <div class="form-group row">
     <label for="message-text" class="form-control-label col-2">Details:</label>
     <div class="col-10">
@@ -117,8 +96,7 @@
     </div>
   </div>
 
-  <button type="submit" class="btn btn-primary">Create event</button>
+  <button type="submit" class="btn btn-primary">Save</button>
 
 </form>
-
 

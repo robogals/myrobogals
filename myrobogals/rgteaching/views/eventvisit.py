@@ -67,12 +67,17 @@ def new_event(request):
     :return: GET(1): blank event form
     :return: POST(2): database ID corresponding to new event, or errors if failed
     """
-    if request.method == 'POST':
-        event_form = NewEventForm(request.POST)
-        event_form_extra = NewEventFormAdditionFields(request.POST)
-        chapter = request.user.chapter
+    chapter = request.user.chapter
 
-        if event_form.is_valid():
+    if request.method == 'POST':
+        if request.user.is_superuser:
+            event_form = NewEventForm(request.POST, chapter=None)
+        else:
+            event_form = NewEventForm(request.POST, chapter=chapter)
+
+        event_form_extra = NewEventFormAdditionFields(request.POST)
+
+        if event_form.is_valid() and event_form_extra.is_valid():
             form = event_form.cleaned_data
             v = SchoolVisit()
 
@@ -88,22 +93,99 @@ def new_event(request):
             v.visit_start = make_aware(datetime.datetime.combine(visit_date, form['start_time']), timezone=chapter.tz_obj())
             v.visit_end = make_aware(datetime.datetime.combine(visit_date, form['end_time']), timezone=chapter.tz_obj())
 
-            # Need to create the school if it doesn't exist
-            v.school = School.objects.get(id=1)  # form['event']
+            v.yearlvl = form['yearlvl']
+
+            # TODO: Need to create the school if it doesn't exist
+            v.school = form['event']
             v.location = form['location']
             v.notes = form['notes']
-            # privacy
+            v.privacy = form['privacy']
             v.allow_rsvp = 0       # Not necessary
 
-            # TODO: Additional information fields here
             v.save()
             return {'event_id': v.id}
 
     else:
-        event_form = NewEventForm()
+        if request.user.is_superuser:
+            event_form = NewEventForm(chapter=None)
+        else:
+            event_form = NewEventForm(chapter=chapter)
+
         event_form_extra = NewEventFormAdditionFields()
 
     return {'event_form': event_form, 'event_form_extra': event_form_extra}
+
+
+# View workshop details. This page also allows volunteers to RSVP.
+@login_required
+def viewvisit(request, visit_id):
+    chapter = request.user.chapter
+
+    v = get_object_or_404(SchoolVisit, pk=visit_id)
+    if (v.chapter != chapter) and not request.user.is_superuser:
+        raise Http404
+
+    if request.user.is_superuser:
+        chapter_filter = None
+    else:
+        chapter_filter = chapter
+
+    # The event has been edited
+    if request.method == 'POST':
+        event_form = NewEventForm(request.POST, chapter=chapter_filter)
+
+        if event_form.is_valid():
+            form = event_form.cleaned_data
+
+            visit_date = form['date']
+            v.visit_start = make_aware(datetime.datetime.combine(visit_date, form['start_time']), timezone=chapter.tz_obj())
+            v.visit_end = make_aware(datetime.datetime.combine(visit_date, form['end_time']), timezone=chapter.tz_obj())
+            v.yearlvl = form['yearlvl']
+            v.notes = form['notes']
+            v.save()
+
+            messages.success(request, 'Event Information Successfully Updated')
+            return HttpResponseRedirect(reverse('teaching:viewvisit', kwargs={'visit_id': v.id}))
+    else:
+        start_date = datetime.datetime.strftime(v.visit_start, '%m/%d/%Y')
+        start_time = datetime.datetime.strftime(v.visit_start, '%I:%M %p')
+        end_time = datetime.datetime.strftime(v.visit_end, '%I:%M %p')
+
+        event_form = NewEventForm({
+            'event': v.school,
+            'location': v.location,
+            'date': start_date,
+            'start_time': start_time,
+            'end_time': end_time,
+            'yearlvl': v.yearlvl,
+            'notes': v.notes
+        }, chapter=chapter_filter)
+
+        # print(event_form)
+        # setattr(event_form, 'event_name', v.school)
+
+    attended = EventAttendee.objects.filter(event=v, actual_status=1)
+    attending = EventAttendee.objects.filter(event=v, rsvp_status=2)
+    notattending = EventAttendee.objects.filter(event=v, rsvp_status=4)
+    waitingreply = EventAttendee.objects.filter(event=v, rsvp_status=1)
+    user_attended = False
+    eventmessages = EventMessage.objects.filter(event=v)
+    try:
+        stats = SchoolVisitStats.objects.get(visit=v)
+    except:
+        stats = None
+    try:
+        ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
+        user_rsvp_status = ea.rsvp_status
+        user_attended = (ea.actual_status == 1)
+    except IndexError:
+        user_rsvp_status = 0
+    return render_to_response('visit_view-v2.html',
+                              {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending,
+                               'notattending': notattending, 'waitingreply': waitingreply,
+                               'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended,
+                               'eventmessages': eventmessages, 'event_form': event_form,
+                               'id': v.id}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -266,37 +348,6 @@ def newvisitwithschool(request, school_id):
     v.save()
     c = get_object_or_404(SchoolVisit, pk=v.id)
     return editvisit(request, v.id)
-
-
-# View workshop details. This page also allows volunteers to RSVP.
-@login_required
-def viewvisit(request, visit_id):
-    chapter = request.user.chapter
-    v = get_object_or_404(SchoolVisit, pk=visit_id)
-    if (v.chapter != chapter) and not request.user.is_superuser:
-        raise Http404
-    attended = EventAttendee.objects.filter(event=v, actual_status=1)
-    attending = EventAttendee.objects.filter(event=v, rsvp_status=2)
-    notattending = EventAttendee.objects.filter(event=v, rsvp_status=4)
-    waitingreply = EventAttendee.objects.filter(event=v, rsvp_status=1)
-    user_attended = False
-    eventmessages = EventMessage.objects.filter(event=v)
-    try:
-        stats = SchoolVisitStats.objects.get(visit=v)
-    except:
-        stats = None
-    try:
-        ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
-        user_rsvp_status = ea.rsvp_status
-        user_attended = (ea.actual_status == 1)
-    except IndexError:
-        user_rsvp_status = 0
-    return render_to_response('visit_view-v2.html',
-                              {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending,
-                               'notattending': notattending, 'waitingreply': waitingreply,
-                               'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended,
-                               'eventmessages': eventmessages}, context_instance=RequestContext(request))
-
 
 
 # Display a printable list of workshops for a given date range

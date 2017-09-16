@@ -123,6 +123,11 @@ class Event(models.Model):
         (2, 'Do not allow anyone to RSVP'),
     )
 
+    PRIVACY_CHOICES = (
+        (0, 'Private'),
+        (1, 'Public')
+    )
+
     chapter = models.ForeignKey(Chapter)
     creator = models.ForeignKey(User)
     visit_start = models.DateTimeField("Start")
@@ -138,6 +143,7 @@ class Event(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     allow_rsvp = models.IntegerField(choices=ALLOW_RSVP_CHOICES, default=0)
     date_modified = models.DateTimeField(blank=True, null=True)
+    privacy = models.IntegerField(choices=PRIVACY_CHOICES, default=0)
 
     # Saves the time the event was modified
     def save(self, *args, **kwargs):

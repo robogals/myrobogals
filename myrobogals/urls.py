@@ -21,8 +21,8 @@ urlpatterns = [
 	url(r'^$', rgmain_views.home),
 
 	# User functions
-	url(r'^login/$', profile_login.show_login),
-	url(r'^logout/$', auth_views.logout, {'next_page': '/'}),
+	url(r'^login/$', profile_login.show_login, name='login'),
+	url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 	url(r'^chpass/$', auth_views.password_change, {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
 	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done_v2.html'}, name='password_reset_done'),
 	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm_v2.html', 'set_password_form': SetPasswordFrom}),
@@ -36,7 +36,7 @@ urlpatterns = [
 	url(r'^code/help/$', profile_user.conduct_help),
 
 	# Profile menu
-	url(r'^profile/$', profile_user.redirtoself),
+	url(r'^profile/$', profile_user.redirtoself, name='profile'),
 	url(r'^profile/contactdirectory/$', profile_chapter.contactdirectory),
 	url(r'^profile/edit/$', profile_user.redirtoeditself),
 	url(r'^profile/mobverify/$', profile_user.mobverify),
@@ -54,7 +54,7 @@ urlpatterns = [
 	url(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/invoice/$', rgconf_views.showinvoice),
 
 	# Forums
-	# url(r'^forums/', include('myrobogals.rgforums.urls')),
+	url(r'^forums/', include('myrobogals.rgforums.urls')),
 
 	# Chapters menu
 	url(r'^chapters/', include('myrobogals.rgchapter.urls', namespace='chapters')),
