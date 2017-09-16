@@ -1133,6 +1133,7 @@ def viewtopic(request, topic_id):
 	request.user.forum_last_act = datetime.datetime.now()
 	request.user.save()
 	t = get_object_or_404(Topic, pk=topic_id)
+	print(t.post_set)
 	f = t.forum
 	g = f.category
 	c = g.chapter
@@ -1160,23 +1161,25 @@ def viewtopic(request, topic_id):
 		t.save()
 	posts_ls = t.post_set.all()
 	posts_list = []
+
 	for post in posts_ls:
 		if request.user.is_superuser:
-			posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+			posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now(
+				tz=request.user.chapter.tz_obj())-datetime.timedelta(hours=1))) else 'offline'))
 		elif post.posted_by.privacy >= 20:
 			posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
 		elif post.posted_by.privacy >= 10:
 			if not request.user.is_authenticated():
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			else:
-				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now(tz=request.user.chapter.tz_obj())-datetime.timedelta(hours=1))) else 'offline'))
 		elif post.posted_by.privacy >= 5:
 			if not request.user.is_authenticated():
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			elif not (request.user.chapter == post.posted_by.chapter):
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			else:
-				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now(tz=request.user.chapter.tz_obj())-datetime.timedelta(hours=1))) else 'offline'))
 		else:
 			if not request.user.is_authenticated():
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
@@ -1185,7 +1188,7 @@ def viewtopic(request, topic_id):
 			elif not request.user.is_staff:
 				posts_list.append((False, post, Post.objects.filter(posted_by = post.posted_by).count()))
 			else:
-				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now()-datetime.timedelta(hours=1))) else 'offline'))
+				posts_list.append((True, post, Post.objects.filter(posted_by = post.posted_by).count(), 'online' if (post.posted_by.forum_last_act > (datetime.datetime.now(tz=request.user.chapter.tz_obj())-datetime.timedelta(hours=1))) else 'offline'))
 	paginator = Paginator(posts_list, 10)
 	page = request.GET.get('page')
 	try:

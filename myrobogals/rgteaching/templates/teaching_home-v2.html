@@ -21,7 +21,6 @@
 
     <div class="progress">
       <div class="progress-bar bg-success-secondary" role="progressbar" style="{{ chapter.sum_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
-      {{ chapter.sum }}
     </div>
 
     <div class="text-muted">
@@ -62,7 +61,6 @@
       </tbody>
     </table>
 
-    <a href="#">See all upcoming events</a>
   </div>
 
   <div class="tile">
@@ -97,7 +95,7 @@
       </tbody>
     </table>
 
-    <a href="#">See all past events</a>
+    <a href="{% url "teaching:listvisits" %}">See all events</a>
   </div>
 
   <!-- Create new event modal -->
