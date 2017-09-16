@@ -1,0 +1,102 @@
+{% load widget_tweaks %}
+
+<form action="{% url 'teaching:viewvisit' id %}" method="post"> {% csrf_token %}
+  <div class="form-group row">
+    <label for="recipient-name" class="form-control-label col-2">Event</label>
+    <div class="col-10">
+      <!-- Smartypants...-->
+      {{ event_form.event|add_class:"form-control"|attr:"disabled"}}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="recipient-name" class="form-control-label col-2">Location</label>
+    <div class="col-10">
+      {% if not event_form.location.errors %}
+        {{ event_form.location|add_class:"form-control"|attr:"The location where the event is being held" }}
+      {% else %}
+        {{ event_form.location|add_class:"form-control is-invalid"|attr:"The location where the event is being held" }}
+        <div class="invalid-feedback">
+          {% for error in event_form.location.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="recipient-name" class="form-control-label col-2">Date</label>
+    {% if not event_form.date.errors %}
+      <div class="input-group date col-5" data-provide="datepicker">
+        {{ event_form.date|add_class:"form-control" }}
+        <div class="input-group-addon">
+          <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+      </div>
+    {% else %}
+      <div class="input-group date col-5" data-provide="datepicker">
+        {{ event_form.date|add_class:"form-control is-invalid" }}
+        <div class="input-group-addon">
+          <i class="fa fa-calendar" aria-hidden="true"></i>
+        </div>
+      </div>
+      <div class="invalid-feedback" style="display: block;">
+        {% for error in event_form.date.errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="form-group row">
+    <label for="recipient-name" class="form-control-label col-2">Time</label>
+    <div class="input-group bootstrap-timepicker timepicker col-5">
+      {% if not event_form.start_time.errors %}
+        {{ event_form.start_time|add_class:"form-control input-small"|attr:"id:timepicker1" }}
+        <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+      {% else %}
+        {{ event_form.start_time|add_class:"form-control input-small is-invalid"|attr:"id:timepicker1" }}
+        <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+        <div class="invalid-feedback">
+          {% for error in event_form.start_time.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="input-group bootstrap-timepicker timepicker col-5">
+      {% if not event_form.end_time.errors %}
+        {{ event_form.end_time|add_class:"form-control input-small"|attr:"id:timepicker2" }}
+        <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+      {% else %}
+        {{ event_form.end_time|add_class:"form-control input-small is-invalid"|attr:"id:timepicker2" }}
+        <span class="input-group-addon"><i class="fa fa-clock-o" aria-hidden="true"></i></span>
+        <div class="invalid-feedback">
+          {% for error in event_form.end_time.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="message-text" class="form-control-label col-2">Year Level:</label>
+    <div class="col-10">
+      {{ event_form.yearlvl|add_class:"form-control" }}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="message-text" class="form-control-label col-2">Details:</label>
+    <div class="col-10">
+      {{ event_form.notes|add_class:"form-control" }}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+
+</form>
+

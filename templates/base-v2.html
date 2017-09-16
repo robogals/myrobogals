@@ -1,4 +1,5 @@
 {% load static %}
+{% load nav %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,7 +11,8 @@
   <title>myRobogals - {% block title %}{% endblock %}</title>
 
   <!-- 3rd party css-->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+{#  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">#}
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css"/>
 
@@ -39,28 +41,20 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link thick-font" href="#">CHAPTER</a>
+        <li class="nav-item {% active_nav request 'chapters' %}">
+          <a class="nav-link thick-font" href="{% url 'chapters:home' request.user.chapter.myrobogals_url %}">CHAPTER</a>
         </li>
-        <li class="nav-item active">
+        <li class="nav-item {% active_nav request 'teaching' %}">
           <a class="nav-link thick-font" href="{% url 'teaching:home' %}">EVENTS</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link thick-font" href="{% url 'teaching:home' %}">REPORTS</a>
+        <li class="nav-item {% active_nav request 'reports' %}">
+          <a class="nav-link thick-font" href="{% url 'reports:standard' %}">REPORTS</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% active_nav request 'forums' %}">
           <a class="nav-link thick-font" href="#">FORUMS</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% active_nav request 'wiki' %}">
           <a class="nav-link thick-font" href="#">WIKI</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">DROPDOWN</a>
-          <div class="dropdown-menu" aria-labelledby="dropdown01">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
-          </div>
         </li>
       </ul>
 
@@ -69,13 +63,13 @@
           <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg" aria-hidden="true"></i><span
               class="caret"></span></a></a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
-            <a class="dropdown-item" href="#">View Profile</a>
+            <a class="dropdown-item" href="{% url "profile" %}">View Profile</a>
             <a class="dropdown-item" href="#">Edit Profile</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Contact Directory</a>
             <a class="dropdown-item" href="#">Support & FAQ</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Logout</a>
+            <a class="dropdown-item" href="{% url "logout" %}">Logout</a>
           </div>
         </li>
       </ul>
@@ -98,11 +92,11 @@
 
   {% for message in messages %} {% autoescape off %}
     {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-      <div class="error">{{ message }} </div>
+      <div class="alert alert-danger"><strong>Oops,</strong> {{ message }} </div>
     {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-      <div class="alert">{{ message }} </div>
+      <div class="alert alert-info"><strong>FYI,</strong> {{ message }} </div>
     {% else %}
-      <div class="message">{{ message }} </div>
+      <div class="alert alert-success"><strong>Success!</strong> {{ message }}</div>
     {% endif %} {% endautoescape %}
   {% endfor %}
 

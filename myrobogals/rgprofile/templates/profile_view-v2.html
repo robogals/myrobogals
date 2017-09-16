@@ -1,0 +1,141 @@
+{% extends "base-v2.html" %}
+
+{% block title %} Profile {% endblock %}
+
+{% block pagetitle %}{{ request.user.first_name }} {{ request.user.last_name }} {% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-3">
+      <div class="card" style="border: 1px solid #AAAAAA;">
+        <img class="card-img-top" style="border-radius: 360px; padding: 20px; " src="{{ MEDIA_URL }}/images/profile_placeholder.jpg">
+        <div class="card-body" style="text-align: center">
+          <h2 class="card-title">{{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})</h2>
+          <p class="card-text">
+            {{ request.user.chapter }}
+            <br/>
+            Training Manager
+          </p>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 3 mins ago</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-9">
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #5876D0">
+        <h2 class="rg-page-header">
+          Introduce Yourself!
+        </h2>
+        <p>
+          Hello, World! Bianca is a recent graduate from Monash University and studied mechtronics engineering and science, with majors in computer science and mathematics. She is hoping to apply her
+          technical
+          knowledge and creative flair to different opportunities that comes his way and gain insights and expert knowledge from industry leaders.
+        </p>
+
+        <p>
+          Bianca is also very passionate about diversity and equality and currently holds the training manager position for a non-for-profit organisation called Robogals, which inspires females in
+          primary and
+          high schools
+          to
+          pursue a career in STEM related fields.
+        </p>
+      </div>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f44183">
+        <h2 class="rg-page-header">
+          Volunteering Statistics
+        </h2>
+        <canvas id="myChart"></canvas>
+        <div class="row" style="margin-top: 30px">
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">124</strong> <div>Hours Volunteered</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">32</strong> <div>Schools</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">74</strong> <div>Students Taught</div></div>
+          <div class="col-3" style="display: flex; flex-direction: column; align-items: center"><strong style="font-size: 35px">8</strong> <div>Killed</div></div>
+        </div>
+      </div>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #7d42f4">
+        <h2 class="rg-page-header">
+          Robogals Experience
+        </h2>
+        <h2 class="card-title">
+          <strong>Development Officer</strong>
+          <small class="text-muted">at {{ request.user.chapter }}</small>
+        </h2>
+        <h2 class="card-text"> March 2015 - present</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
+        <h2 class="card-title">
+          <strong>Training Manager</strong>
+          <small class="text-muted">at {{ request.user.chapter }}</small>
+        </h2>
+        <h2 class="card-text"> March 2013 - April 2015</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
+        <h2 class="card-title">
+          <strong>Aeronautical Engineering and Rocket Science</strong>
+          <small class="text-muted">at SpaceX University</small>
+        </h2>
+        <h2 class="card-text"> June 2012 - Present</h2>
+        <p class="card-text">Short description about you. We choose to go to the moon in this decade and do the other things, not because they are easy, but because they are hard, because that goal
+          will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one which we
+          intend to win. </p>
+      </div>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f46a41">
+        <h2 class="rg-page-header">
+          Achievements
+        </h2>
+        <span class="badge badge-pill badge-primary">Attended first workshop</span>
+        <span class="badge badge-pill badge-secondary">Posted first article</span>
+        <span class="badge badge-pill badge-success">Yolo'd hard</span>
+        <span class="badge badge-pill badge-danger">Lead volunteer</span>
+        <span class="badge badge-pill badge-warning">Executive position</span>
+        <span class="badge badge-pill badge-info">Regional position</span>
+        <span class="badge badge-pill badge-dark">Global position</span>
+      </div>
+
+      <div class="tile" style="border: 1px solid #AAAAAA; border-top-width: .5rem; border-radius: .25rem; border-top-color: #f4df41">
+        <h2 class="rg-page-header">
+          Endorsements
+        </h2>
+        Too linkedin ish?
+      </div>
+
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+  <script>
+      var ctx = document.getElementById("myChart").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: ["January", "Febuary", "March", "April", "May", "June", "July", "August", "September"],
+              datasets: [{
+                  label: 'Students taught',
+                  data: [12, 19, 20, 31, 32, 40, 41, 50, 70],
+                  borderColor: 'rgb(255, 70, 90)',
+                  backgroundColor: 'rgb(255, 210, 218)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  yAxes: [{
+                      ticks: {
+                          beginAtZero: true
+                      }
+                  }]
+              }
+          }
+      });
+  </script>
+{% endblock %}

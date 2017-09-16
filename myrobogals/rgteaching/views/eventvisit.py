@@ -2,6 +2,7 @@ import math
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response, redirect, render
 from django.template import RequestContext
@@ -19,6 +20,7 @@ from myrobogals.rgteaching.functions import paginatorRender
 def teachhome(request):
     chapter = request.user.chapter
     displaycats = [1, ]
+    context_instance = {}
 
     # Chapter's progress
     school_visits = SchoolVisitStats.objects.filter(visit__chapter=chapter,
@@ -26,22 +28,169 @@ def teachhome(request):
                                                                                timezone.now()],
                                                     visit_type__in=displaycats)
 
-    setattr(chapter, 'sum', 0)
-    for school_visit in school_visits:
-        chapter.sum = chapter.sum + school_visit.num_girls_weighted()
+    if request.method == 'POST':
+        e = new_event(request)
+        if 'event_id' in e:
+            messages.success(request, "Event created successfully")
+            return HttpResponseRedirect(reverse('teaching:viewvisit', kwargs={'visit_id': e['event_id']}))
+        else:
+            print(e['event_form'])
+            return render(request, 'new_visit-v2.html', {'event_form': e['event_form'], 'event_form_extra': e['event_form_extra']})
 
-    setattr(chapter, 'sum_percent', 'width:' + str(chapter.sum/chapter.goal*100) + '%')
+    else:
+        setattr(chapter, 'sum', 0)
+        for school_visit in school_visits:
+            chapter.sum = chapter.sum + school_visit.num_girls_weighted()
 
-    # Small list of upcoming workshops
-    upcoming_events = SchoolVisit.objects.filter(chapter=chapter, status=0)[:5]
+        setattr(chapter, 'sum_percent', 'width:' + str(chapter.sum / chapter.goal * 100) + '%')
+        context_instance['chapter'] = chapter
 
-    # Small list of Recently finished workshops
-    past_events = SchoolVisit.objects.filter(chapter=chapter, status=1)[:5]
+        # Small list of upcoming workshops
+        upcoming_events = SchoolVisit.objects.filter(chapter=chapter, status=0)[:5]
+        context_instance['upcoming_events'] = upcoming_events
 
-    # Reports active
-    return render(request, 'teaching_home-v2.html', {'chapter': chapter, 'upcoming_events': upcoming_events, 'past_events': past_events})
+        # Small list of Recently finished workshops
+        past_events = SchoolVisit.objects.filter(chapter=chapter, status=1)[:5]
+        context_instance['past_events'] = past_events
 
-    # return HttpResponseRedirect('/teaching/list/')
+        # New events form for modal
+        e = new_event(request)
+        context_instance['event_form'] = e['event_form']
+        context_instance['event_form_extra'] = e['event_form_extra']
+
+    return render(request, 'teaching_home-v2.html', context_instance)
+
+
+def new_event(request):
+    """ 
+    :param request: 
+    :return: GET(1): blank event form
+    :return: POST(2): database ID corresponding to new event, or errors if failed
+    """
+    chapter = request.user.chapter
+
+    if request.method == 'POST':
+        if request.user.is_superuser:
+            event_form = NewEventForm(request.POST, chapter=None)
+        else:
+            event_form = NewEventForm(request.POST, chapter=chapter)
+
+        event_form_extra = NewEventFormAdditionFields(request.POST)
+
+        if event_form.is_valid() and event_form_extra.is_valid():
+            form = event_form.cleaned_data
+            v = SchoolVisit()
+
+            v.chapter = chapter
+            v.creator = request.user
+            v.status = 0            # Not necessary
+            v.created_method = 0    # Not necessary
+            v.date_modified = make_aware(datetime.datetime.now(), timezone=chapter.tz_obj())  # Check
+
+            visit_date = form['date']
+            # Take the user's date and time input and combine it with the
+            # chapter's timezone to create a timezone-aware datetime.
+            v.visit_start = make_aware(datetime.datetime.combine(visit_date, form['start_time']), timezone=chapter.tz_obj())
+            v.visit_end = make_aware(datetime.datetime.combine(visit_date, form['end_time']), timezone=chapter.tz_obj())
+
+            v.yearlvl = form['yearlvl']
+
+            # TODO: Need to create the school if it doesn't exist
+            v.school = form['event']
+            v.location = form['location']
+            v.notes = form['notes']
+            v.privacy = form['privacy']
+            v.allow_rsvp = 0       # Not necessary
+
+            v.save()
+            return {'event_id': v.id}
+
+    else:
+        if request.user.is_superuser:
+            event_form = NewEventForm(chapter=None)
+        else:
+            event_form = NewEventForm(chapter=chapter)
+
+        event_form_extra = NewEventFormAdditionFields()
+
+    return {'event_form': event_form, 'event_form_extra': event_form_extra}
+
+
+# View workshop details. This page also allows volunteers to RSVP.
+@login_required
+def viewvisit(request, visit_id):
+    chapter = request.user.chapter
+
+    v = get_object_or_404(SchoolVisit, pk=visit_id)
+    if (v.chapter != chapter) and not request.user.is_superuser:
+        raise Http404
+
+    if request.user.is_superuser:
+        chapter_filter = None
+    else:
+        chapter_filter = chapter
+
+    # The event has been edited
+    if request.method == 'POST':
+        event_form = NewEventForm(request.POST, chapter=chapter_filter)
+
+        if event_form.is_valid():
+            form = event_form.cleaned_data
+
+            visit_date = form['date']
+            v.visit_start = make_aware(datetime.datetime.combine(visit_date, form['start_time']), timezone=chapter.tz_obj())
+            v.visit_end = make_aware(datetime.datetime.combine(visit_date, form['end_time']), timezone=chapter.tz_obj())
+            v.yearlvl = form['yearlvl']
+            v.notes = form['notes']
+            v.save()
+
+            messages.success(request, 'Event Information Successfully Updated')
+            return HttpResponseRedirect(reverse('teaching:viewvisit', kwargs={'visit_id': v.id}))
+    else:
+        start_date = datetime.datetime.strftime(v.visit_start, '%m/%d/%Y')
+        start_time = datetime.datetime.strftime(v.visit_start, '%I:%M %p')
+        end_time = datetime.datetime.strftime(v.visit_end, '%I:%M %p')
+
+        event_form = NewEventForm({
+            'event': v.school,
+            'location': v.location,
+            'date': start_date,
+            'start_time': start_time,
+            'end_time': end_time,
+            'yearlvl': v.yearlvl,
+            'notes': v.notes
+        }, chapter=chapter_filter)
+
+        # print(event_form)
+        # setattr(event_form, 'event_name', v.school)
+
+    attended = EventAttendee.objects.filter(event=v, actual_status=1)
+    attending = EventAttendee.objects.filter(event=v, rsvp_status=2)
+    notattending = EventAttendee.objects.filter(event=v, rsvp_status=4)
+    waitingreply = EventAttendee.objects.filter(event=v, rsvp_status=1)
+    user_attended = False
+    eventmessages = EventMessage.objects.filter(event=v)
+    try:
+        stats = SchoolVisitStats.objects.get(visit=v)
+    except:
+        stats = None
+    try:
+        ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
+        user_rsvp_status = ea.rsvp_status
+        user_attended = (ea.actual_status == 1)
+    except IndexError:
+        user_rsvp_status = 0
+    return render_to_response('visit_view-v2.html',
+                              {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending,
+                               'notattending': notattending, 'waitingreply': waitingreply,
+                               'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended,
+                               'eventmessages': eventmessages, 'event_form': event_form,
+                               'id': v.id}, context_instance=RequestContext(request))
+
+
+@login_required
+def newvisit(request):
+    return editvisit(request, 0)
 
 
 # List all workshops. Superusers will see all workshops globally; other users
@@ -182,11 +331,6 @@ def editvisit(request, visit_id):
         raise Http404  # don't have permission to change
 
 
-@login_required
-def newvisit(request):
-    return editvisit(request, 0)
-
-
 # Create a new workshop with a school already selected.
 @login_required
 def newvisitwithschool(request, school_id):
@@ -204,37 +348,6 @@ def newvisitwithschool(request, school_id):
     v.save()
     c = get_object_or_404(SchoolVisit, pk=v.id)
     return editvisit(request, v.id)
-
-
-# View workshop details. This page also allows volunteers to RSVP.
-@login_required
-def viewvisit(request, visit_id):
-    chapter = request.user.chapter
-    v = get_object_or_404(SchoolVisit, pk=visit_id)
-    if (v.chapter != chapter) and not request.user.is_superuser:
-        raise Http404
-    attended = EventAttendee.objects.filter(event=v, actual_status=1)
-    attending = EventAttendee.objects.filter(event=v, rsvp_status=2)
-    notattending = EventAttendee.objects.filter(event=v, rsvp_status=4)
-    waitingreply = EventAttendee.objects.filter(event=v, rsvp_status=1)
-    user_attended = False
-    eventmessages = EventMessage.objects.filter(event=v)
-    try:
-        stats = SchoolVisitStats.objects.get(visit=v)
-    except:
-        stats = None
-    try:
-        ea = EventAttendee.objects.filter(event=visit_id, user=request.user)[0]
-        user_rsvp_status = ea.rsvp_status
-        user_attended = (ea.actual_status == 1)
-    except IndexError:
-        user_rsvp_status = 0
-    return render_to_response('visit_view-v2.html',
-                              {'chapter': chapter, 'v': v, 'stats': stats, 'attended': attended, 'attending': attending,
-                               'notattending': notattending, 'waitingreply': waitingreply,
-                               'user_rsvp_status': user_rsvp_status, 'user_attended': user_attended,
-                               'eventmessages': eventmessages}, context_instance=RequestContext(request))
-
 
 
 # Display a printable list of workshops for a given date range

@@ -483,7 +483,7 @@ def detail(request, username):
             if alias not in account_list:
                 account_list.append(alias)
     visits = EventAttendee.objects.filter(user__in=account_list, actual_status=1).order_by('-event__visit_start')
-    return render_to_response('profile_view.html',
+    return render_to_response('profile_view-v2.html',
                               {'user_profile': u, 'current_positions': current_positions, 'past_positions': past_positions,
                                'visits': visits}, context_instance=RequestContext(request))
 

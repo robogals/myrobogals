@@ -1,5 +1,5 @@
 html, body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 14px;
 }
 
@@ -127,4 +127,8 @@ h2 {
 
 .dashboard-footer:first-child, .dashboard-data:first-child {
     border-left: none;
+}
+
+.alert {
+    font-size: 15px;
 }

@@ -10,20 +10,24 @@ from myrobogals.rgconf import views as rgconf_views
 from myrobogals.rgmain import views as rgmain_views
 from myrobogals.rgmessages import views as rgmessages_views
 from myrobogals.rgprofile.views import profile_chapter, profile_user, profile_login
+
 from myrobogals.rgweb import views as rgweb_views
+from myrobogals.rgprofile.forms import PasswordResetForm, SetPasswordFrom
+
+
 
 urlpatterns = [
 	# Home
 	url(r'^$', rgmain_views.home),
 
 	# User functions
-	url(r'^login/$', profile_login.show_login),
-	url(r'^logout/$', auth_views.logout, {'next_page': '/'}),
+	url(r'^login/$', profile_login.show_login, name='login'),
+	url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 	url(r'^chpass/$', auth_views.password_change, {'template_name': 'password_change_form.html', 'post_change_redirect': '/profile'}),
-	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done.html'}, name='password_reset_done'),
-	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm.html'}),
-	url(r'^forgotpass/complete/$', auth_views.password_reset_complete, {'template_name': 'password_reset_complete.html'}, name='password_reset_complete'),
-	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form.html', 'email_template_name': 'password_reset_email.html'}),
+	url(r'^forgotpass/done/$', auth_views.password_reset_done, {'template_name': 'password_reset_done_v2.html'}, name='password_reset_done'),
+	url(r'^forgotpass/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, {'template_name': 'password_reset_confirm_v2.html', 'set_password_form': SetPasswordFrom}),
+	url(r'^forgotpass/complete/$', auth_views.password_reset_complete, {'template_name': 'password_reset_complete_v2.html'}, name='password_reset_complete'),
+	url(r'^forgotpass/$', auth_views.password_reset, {'template_name': 'password_reset_form_v2.html', 'email_template_name': 'password_reset_email.html', 'password_reset_form': PasswordResetForm}),
 	#url(r'^unsubscribe/(?P<uidb36>.+)/(?P<token>.+)/(?P<step>\d)/$', auth_views.unsubscribe),
 	url(r'^join/$', rgchapter_views.joinlist),
 	url(r'^join/(?P<chapterurl>.+)/$', profile_user.joinchapter),
@@ -32,7 +36,7 @@ urlpatterns = [
 	url(r'^code/help/$', profile_user.conduct_help),
 
 	# Profile menu
-	url(r'^profile/$', profile_user.redirtoself),
+	url(r'^profile/$', profile_user.redirtoself, name='profile'),
 	url(r'^profile/contactdirectory/$', profile_chapter.contactdirectory),
 	url(r'^profile/edit/$', profile_user.redirtoeditself),
 	url(r'^profile/mobverify/$', profile_user.mobverify),
@@ -40,29 +44,6 @@ urlpatterns = [
 	url(r'^profile/(?P<username>.+)/edit/$', profile_user.edituser),
 	url(r'^profile/(?P<username>.+)/genpw/$', profile_user.genpw),
 	url(r'^profile/(?P<username>.+)/$', profile_user.detail),
-	
-	# Chapters menu
-	url(r'^chapters/$', rgchapter_views.list),
-	url(r'^chapters/awards/$', rgchapter_views.awards),
-	url(r'^chapters/awards/(?P<award_id>\d+)/$', rgchapter_views.awardsdesc),
-	url(r'^chapters/my/$', rgchapter_views.redirtomy),
-	url(r'^chapters/localtimes/$', rgchapter_views.localtimes),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/edit/$', profile_chapter.edituserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/(?P<list_id>\d+)/$', profile_chapter.viewlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/add/$', profile_chapter.adduserlist),
-	url(r'^chapters/(?P<chapterurl>.+)/lists/$', profile_chapter.listuserlists),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/unis/$', profile_chapter.unilist),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/help/$', profile_chapter.importusershelp),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/import/$', profile_chapter.importusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/export/$', profile_chapter.exportusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/add/$', profile_chapter.adduser),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/users/$', profile_chapter.editusers),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/execs/$', profile_chapter.editexecs),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/status/$', profile_chapter.editstatus),
-	url(r'^chapters/(?P<chapterurl>.+)/edit/$', rgchapter_views.editchapter),
-	url(r'^chapters/(?P<chapterurl>.+)/websitedetails/$', rgweb_views.websitedetails),
-	url(r'^chapters/(?P<chapterurl>.+)/join/$', profile_user.joinchapter),
-	url(r'^chapters/(?P<chapterurl>.+)/$', rgchapter_views.detail),
 
 	# Conferences submenu
 	url(r'^conferences/$', rgconf_views.home),
@@ -73,7 +54,10 @@ urlpatterns = [
 	url(r'^conferences/(?P<conf_id>\d+)/(?P<username>.+)/invoice/$', rgconf_views.showinvoice),
 
 	# Forums
-	# url(r'^forums/', include('myrobogals.rgforums.urls')),
+	url(r'^forums/', include('myrobogals.rgforums.urls')),
+
+	# Chapters menu
+	url(r'^chapters/', include('myrobogals.rgchapter.urls', namespace='chapters')),
 
 	# Workshops menu
 	url(r'^teaching/', include('myrobogals.rgteaching.urls', namespace='teaching')),
@@ -136,3 +120,4 @@ if settings.DEBUG:
 
 # Custom view for 500 Internal Server Error
 handler500 = 'myrobogals.rgmain.views.servererror'
+

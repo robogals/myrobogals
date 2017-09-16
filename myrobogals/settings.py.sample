@@ -1,15 +1,6 @@
 import os
 
-# The directory where you checked out the "myrobogals" repo,
-# which is one level above this directory.
-# Do not put a trailing slash.
 ROBOGALS_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-#
-#
-# No need to change anything below here
-#
-#
 
 DEBUG = True
 
@@ -24,22 +15,22 @@ MANAGERS = ADMINS
 
 ALLOWED_HOSTS = []
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',
-		'NAME': 'myrobogals',
-		'USER': 'myrobogals',
-		'PASSWORD': 'myrobogals'
-	}
-}
-
-# Uncomment this to use SQLite instead of MySQL
 #DATABASES = {
 #	'default': {
-#		'ENGINE': 'django.db.backends.sqlite3',
-#		'NAME': ROBOGALS_DIR + '/myrobogals.db',
+#		'ENGINE': 'django.db.backends.mysql',
+#		'NAME': 'myrobogals',
+#		'USER': 'myrobogals',
+#		'PASSWORD': 'myrobogals'
 #	}
 #}
+
+# Uncomment this to use SQLite instead of MySQL
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': ROBOGALS_DIR + '/myrobogals.db',
+	}
+}
 
 USE_TZ = True
 TIME_ZONE = 'Etc/UTC'
@@ -93,6 +84,7 @@ TEMPLATES = [
 			ROBOGALS_DIR + '/templates',
 			ROBOGALS_DIR + 'myrobogals/rgmain/templates',
 			ROBOGALS_DIR + 'myrobogals/rgteaching/templates',
+			ROBOGALS_DIR + 'myrobogals/rgprofile/templates',
 			ROBOGALS_DIR + '/rgtemplates'
 		],
 		'APP_DIRS': True,
