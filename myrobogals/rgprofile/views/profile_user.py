@@ -91,51 +91,35 @@ def newuser(request, chapter):
                 try:
                     User.objects.get(username=new_username)
                 except User.DoesNotExist:
-                    if request.POST['password1'] == request.POST['password2']:
-                        if len(request.POST['password1']) < 5:
-                            pwerr = _('Your password must be at least 5 characters long')
-                        else:
-                            # Creates, saves and returns a User object
-                            u = User.objects.create_user(new_username, '', request.POST['password1'])
-                            u.chapter = chapter
-                            mt = MemberStatus(user_id=u.pk, statusType_id=1)
-                            mt.save()
-                            u.is_active = True
-                            u.is_staff = False
-                            u.is_superuser = False
-                            u.code_of_conduct = True if coc_form_text is not None else False
-
-                            u.first_name = data['first_name']
-                            u.last_name = data['last_name']
-                            u.email = data['email']
-                            u.alt_email = data['alt_email']
-                            u.mobile = data['mobile']
-                            u.mobile_verified = False
-                            u.gender = data['gender']
-
-                            if 'student_number' in data:
-                                u.student_number = data['student_number']
-
-                            if 'union_member' in data:
-                                u.union_member = data['union_member']
-
-                            if 'tshirt' in data:
-                                u.tshirt = data['tshirt']
-
-                            # If chapter has enabled police check (required check is performed in clean() method
-                            if 'police_check_number' in data and 'police_check_expiration' in data:
-                                u.police_check_number = data['police_check_number']
-                                u.police_check_expiration = data['police_check_expiration']
-                                notify_chapter(chapter, u)
-
-                            u.save()
-
-                            if chapter.welcome_email_enable:
-                                welcome_email(request, chapter, u)
-
-                            return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
+                    if len(request.POST['password1']) < 5:
+                        pwerr = _('Your password must be at least 5 characters long')
                     else:
-                        pwerr = _('The password and repeated password did not match. Please try again')
+                        # Creates, saves and returns a User object
+                        u = User.objects.create_user(new_username, '', request.POST['password1'])
+                        u.chapter = chapter
+                        mt = MemberStatus(user_id=u.pk, statusType_id=1)
+                        mt.save()
+                        u.is_active = True
+                        u.is_staff = False
+                        u.is_superuser = False
+                        u.code_of_conduct = True if coc_form_text is not None else False
+
+                        u.first_name = data['first_name']
+                        u.last_name = data['last_name']
+                        u.email = data['email']
+                        u.gender = data['gender']
+                        # If chapter has enabled police check (required check is performed in clean() method
+                        if 'police_check_number' in data and 'police_check_expiration' in data:
+                            u.police_check_number = data['police_check_number']
+                            u.police_check_expiration = data['police_check_expiration']
+                            notify_chapter(chapter, u)
+
+                        u.save()
+
+                        if chapter.welcome_email_enable:
+                            welcome_email(request, chapter, u)
+
+                        return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
                 else:
                     usererr = _('That username is already taken')
 
@@ -143,9 +127,9 @@ def newuser(request, chapter):
             err = [usererr, pwerr, carderr]
 
     if coc_form_text is not None:
-        return render_to_response('sign_up.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
+        return render_to_response('sign_up-v2.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
     else:
-        return render_to_response('sign_up.html', {'signup_form': signup_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
+        return render_to_response('sign_up-v2.html', {'signup_form': signup_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
 
 
 def conduct_help(request):
