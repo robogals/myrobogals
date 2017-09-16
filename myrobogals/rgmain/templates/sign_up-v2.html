@@ -16,6 +16,14 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
+<!-- override style for form formatting -->
+<style>
+.form-control {
+  margin: 0px 0px 0px 0px;
+  background: rgb(7, 30, 70);
+}
+</style>
+
 <body style="background: url('{{ MEDIA_URL }}images/low-poly-wallpaper-22.png');">
 <div class="site-wrapper">
     <div class="site-wrapper-inner">
@@ -27,6 +35,7 @@
                 </div>
                 <!--start of work in progress -->
                 <form action="/join/{{ chapter.myrobogals_url }}/" method="post">  {% csrf_token %}
+
                     <!-- prints out error messages if problem with values entered in the fields -->
                     {% for error in err %}
                         {% if error != "" %}
@@ -36,91 +45,97 @@
                         {% endif %}
                     {% endfor %}
 
-                    <div class="input-group-lg form-group {% if signup_form.first_name.errors %}has-error{% endif %}">
-                        {% if signup_form.first_name.errors %}
-                            <div class="error">{% for error in signup_form.first_name.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
-                        {{ signup_form.first_name|add_class:"form-control"|attr:"placeholder:First name"}}
-                    </div>
-                    <div class="input-group-lg form-group {% if signup_form.last_name.errors %}has-error{% endif %}">
-                        {% if signup_form.last_name.errors %}
-                            <div class="error">{% for error in signup_form.last_name.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
-                        {{ signup_form.last_name|add_class:"form-control"|attr:"placeholder:Last name"}}
-                    </div>
-                    <div class="input-group-lg form-group {% if signup_form.username.errors %}has-error{% endif %}">
-                        {% if signup_form.username.errors %}
-                            <div class="error">{% for error in signup_form.username.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
-                        {{ signup_form.username|add_class:"form-control"|attr:"placeholder:Username"}}
-                    </div>
-                    <div class="input-group-lg form-group">
-                        <input type="password" name="password1" class="form-control" placeholder="Password" aria-describedby="basic-addon1">
-                    </div>
-                    <div class="input-group-lg form-group {% if signup_form.email.errors %}has-error{% endif %}">
-                        {% if signup_form.email.errors %}
-                            <div class="error">{% for error in signup_form.email.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
-                        {{ signup_form.email|add_class:"form-control"|attr:"placeholder:Email"}}
-                    </div>
-                    <div class="input-group-lg form-group {% if signup_form.gender.errors %}has-error{% endif %}">
-                        {% if signup_form.gender.errors %}
-                            <div class="error">{% for error in signup_form.gender.errors %}{{ error }}{% endfor %}</div>
-                        {% endif %}
-                        {{ signup_form.gender|add_class:"form-control"|attr:"placeholder:Gender"}}
-                    </div>
-
-                    <!--
-                    {% for field in signup_form %}
-                        <div class="input-group-lg form-group {% if field.errors %}has-error{% endif %}">
-                            {% if field.errors %}
+                    <div class="row">
+                        <!-- first name -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6 {% if signup_form.first_name.errors %}has-error{% endif %}" style="padding-left: 0px;">
+                            {% if signup_form.first_name.errors %}
                                 <div class="error">{% for error in signup_form.first_name.errors %}{{ error }}{% endfor %}</div>
                             {% endif %}
-                            <input type = "text" name="{{field.name}}" class="form-control" placeholder="{{field.label}}" aria-describedby="basic-addon1">
+                            {{ signup_form.first_name|add_class:"form-control"|attr:"placeholder:First Name"}}
                         </div>
-                    {% endfor %}
-                    -->
-                    <!-- might need to modify field -->
+                        <!-- last name  -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6 {% if signup_form.last_name.errors %}has-error{% endif %}" style="padding-right: 0px;">
+                            {% if signup_form.last_name.errors %}
+                                <div class="error">{% for error in signup_form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.last_name|add_class:"form-control"|attr:"placeholder:Last Name"}}
+                        </div>
+                        <!-- usernanme -->
+                        <div class="input-group-lg form-group {% if signup_form.username.errors %}has-error{% endif %}">
+                            {% if signup_form.username.errors %}
+                                <div class="error">{% for error in signup_form.username.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.username|add_class:"form-control"|attr:"placeholder:Username"}}
+                        </div>
+                        <!-- password -->
+                        <div class="input-group-lg form-group">
+                            <input type="password" name="password1" class="form-control" placeholder="Password" aria-describedby="basic-addon1">
+                        </div>
+                        <!-- email -->
+                        <div class="input-group-lg form-group {% if signup_form.email.errors %}has-error{% endif %}">
+                            {% if signup_form.email.errors %}
+                                <div class="error">{% for error in signup_form.email.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.email|add_class:"form-control"|attr:"placeholder:Email"}}
+                        </div>
+                        <!-- mobile optional field -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6" style="padding-left: 0px {% if signup_form.mobile.errors %}has-error{% endif %}">
+                            {% if signup_form.mobile.errors %}
+                                <div class="error">{% for error in signup_form.mobile.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.mobile|add_class:"form-control"|attr:"placeholder:Mobile"}}
+                        </div>
+                        <!-- gender -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6" style="padding-right: 0px {% if signup_form.gender.errors %}has-error{% endif %}">
+                            {% if signup_form.gender.errors %}
+                                <div class="error">{% for error in signup_form.gender.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.gender|add_class:"form-control"|attr:"placeholder:Gender"}}
+                        </div><!-- /input-group -->
+
                     {% if conduct_form %}
                         {% for field in conduct_form %}
                             {% if field.errors %}
                                 <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>{% endif %}
                             <p>
-                                {{ field }} I hereby abide by everything mentioned in the<a href="/code/help" target="_blank">
-                                Robogal's Code of Conduct</a>
+                                {{ field }} I agree to the <a href="/code/help" target="_blank">
+                                Robogal's Code of Conduct</a></label>
                             </p>
                         {% endfor %}
                     {% endif %}
-
-                    <input type="submit" name="Submit" class="btn btn-md btn-default" value="Join!" />
-                    <div class="checkbox">
-                      <label><input type="checkbox" value="">I agree to the <a href="/code/help" target="_blank">
-                      Robogal's Code of Conduct</a></label>
-                    </div>
+                    <input type="submit" name="Submit" class="btn btn-md btn-default" value="Join {{ chapter }}!" />
+                </div><!-- /.row -->
                 </form>
                 <!--end of work in progress -->
-            </div>
 
-            <!--Footer -->
-            <!-- removed masterfoot for formatting -->
-            <div>
-                <div class="media-icons">
-                    <a href="https://www.facebook.com/robogals/"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i></a>
-                    <a href="https://twitter.com/robogals"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i></a>
-                    <a href="https://www.instagram.com/robogals/"><i class="fa fa-instagram fa-2x" aria-hidden="true"></i></a>
-                    <a href="https://www.linkedin.com/company-beta/873367/"><i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i></a>
-                    <a href="https://github.com/robogals/myrobogals"><i class="fa fa-github-square fa-2x" aria-hidden="true"></i></a>
-                </div>
-                <div class="inner">
-                    <p>
-                        <a href="/credits/">Credits</a> | <a href="http://robogals.org">robogals.org</a>
-                        <br>
-                        <i class="fa fa-copyright" aria-hidden="true"></i> Robogals 2010-2017
-                    </p>
-                <!-- </div> -->
+            <div class="row">
+                <div class="col-md-4"><a href="/login/">Login</a></div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3"><a href="/support/">Contact Us &amp; FAQ</a></div>
+            </div>
+        </div>
+
+        <!--Footer -->
+        <div class="mastfoot">
+            <div class="media-icons">
+                <a href="https://www.facebook.com/robogals/"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i></a>
+                <a href="https://twitter.com/robogals"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i></a>
+                <a href="https://www.instagram.com/robogals/"><i class="fa fa-instagram fa-2x" aria-hidden="true"></i></a>
+                <a href="https://www.linkedin.com/company-beta/873367/"><i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i></a>
+                <a href="https://github.com/robogals/myrobogals"><i class="fa fa-github-square fa-2x" aria-hidden="true"></i></a>
+            </div>
+            <div class="inner">
+                <p>
+                    <a href="/credits/">Credits</a> | <a href="http://robogals.org">robogals.org</a>
+                    <br>
+                    <i class="fa fa-copyright" aria-hidden="true"></i> Robogals 2010-2017
+                </p>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script src="{{ MEDIA_URL }}js/jquery.js"></script>

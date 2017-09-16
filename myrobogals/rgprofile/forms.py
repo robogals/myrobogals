@@ -218,6 +218,8 @@ class FormPartOne(forms.Form):
         user_id = kwargs['user_id']
         del kwargs['user_id']
         super(FormPartOne, self).__init__(*args, **kwargs)
+        self.fields['mobile'] = MobileField(label=_('Mobile phone'), max_length=20, required=False,
+                                            widget=MobileTextInput(), chapter=chapter)
 
         if chapter.police_check_number_enable:
             self.fields['police_check_number'].label = chapter.police_check_number_label
@@ -234,6 +236,7 @@ class FormPartOne(forms.Form):
     email = forms.EmailField(label=_('Email'), max_length=64)
     #tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
     gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS)
+    mobile = forms.BooleanField()
     police_check_number = forms.CharField(help_text=_(
         "Also known as the number that allows you to volunteer with Robogals. Ask an executive member if unsure. When this number is entered, your chapter's executive members will be notified"))
     police_check_expiration = forms.DateField(widget=SelectDateWidget(), help_text=_(
