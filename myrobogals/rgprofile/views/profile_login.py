@@ -15,6 +15,7 @@ from django.utils.html import format_html
 
 from myrobogals.rgprofile.forms import LoginForm, CodeOfConductForm
 from myrobogals.rgprofile.models import User
+from myrobogals.settings import ROBOGALS_DIR
 
 
 def show_login(request):
@@ -46,7 +47,8 @@ def process_login(request, next):
     u = get_object_or_404(User, username__exact=request.user.username)
 
     # Only redirect if code of conduct form exists
-    if not u.code_of_conduct and os.path.isfile("myrobogals/rgprofile/COCForm.txt"):
+    print(ROBOGALS_DIR + "/myrobogals/rgprofile/COCForm.txt")
+    if not u.code_of_conduct and os.path.isfile(ROBOGALS_DIR + "/myrobogals/rgprofile/COCForm.txt"):
         # Redirect to accept code of conduct form on sign-in
         return HttpResponseRedirect('/code/')
 
@@ -76,7 +78,7 @@ def codeofconduct(request):
 
 def openconductfile():
     try:
-        f = open("myrobogals/rgprofile/COCForm.txt", 'r')
+        f = open(ROBOGALS_DIR + "/myrobogals/rgprofile/COCForm.txt", 'r')
         f_str = f.read()
         f.close()
     except IOError:
