@@ -47,7 +47,6 @@ def process_login(request, next):
     u = get_object_or_404(User, username__exact=request.user.username)
 
     # Only redirect if code of conduct form exists
-    print(ROBOGALS_DIR + "/myrobogals/rgprofile/COCForm.txt")
     if not u.code_of_conduct and os.path.isfile(ROBOGALS_DIR + "/myrobogals/rgprofile/COCForm.txt"):
         # Redirect to accept code of conduct form on sign-in
         return HttpResponseRedirect('/code/')
