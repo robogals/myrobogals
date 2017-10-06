@@ -14,5 +14,4 @@ myrobogals.db
 *.o
 .idea/
 .vscode/
-COCForm.txt
 tmp/

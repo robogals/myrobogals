@@ -1,7 +1,6 @@
 from django.db import models
 from pytz import timezone
 
-
 class University(models.Model):
     name = models.CharField(max_length=64)
 
@@ -74,7 +73,6 @@ class MobileRegex(models.Model):
 
     class Meta:
         verbose_name_plural = 'Mobile regexes'
-
 
 # Import and register the signal handlers in signals.py
 import signals

@@ -160,6 +160,8 @@ class MobileField(forms.CharField):
     #    - strips leading digits
     #    - prepends the country code if needed
     def clean(self, value):
+        if value == None:
+            return
         num = value.strip().replace(' ', '').replace('+', '')
         if num == '':
             return ''
@@ -209,8 +211,59 @@ class ShirtChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return obj.size_long
 
+class FormPartOne(forms.Form):
+    def __init__(self, *args, **kwargs):
+        chapter = kwargs['chapter']
+        del kwargs['chapter']
+        user_id = kwargs['user_id']
+        del kwargs['user_id']
+        super(FormPartOne, self).__init__(*args, **kwargs)
+        self.fields['mobile'] = MobileField(label=_('Mobile phone'), max_length=20, required=False,
+                                            widget=MobileTextInput(), chapter=chapter)
+
+        if chapter.police_check_number_enable:
+            self.fields['police_check_number'].label = chapter.police_check_number_label
+            self.fields['police_check_expiration'].label = 'Expiration Date'
+            self.fields['police_check_number'].required = chapter.police_check_number_required
+            self.fields['police_check_expiration'].required = chapter.police_check_number_required
+        else:
+            del self.fields['police_check_number']
+            del self.fields['police_check_expiration']
+
+    first_name = forms.CharField(label=_('First name'), max_length=30)
+    last_name = forms.CharField(label=_('Last name'), max_length=30)
+    username = forms.CharField(label=_('Username'), max_length=30)
+    email = forms.EmailField(label=_('Email'), max_length=64)
+    #tshirt = ShirtChoiceField(queryset=ShirtSize.objects.none())
+    gender = forms.ChoiceField(label=_('Gender'), choices=GENDERS)
+    mobile = forms.BooleanField()
+    police_check_number = forms.CharField(help_text=_(
+        "Also known as the number that allows you to volunteer with Robogals. Ask an executive member if unsure. When this number is entered, your chapter's executive members will be notified"))
+    police_check_expiration = forms.DateField(widget=SelectDateWidget(), help_text=_(
+        "You must also enter an expiration date shown on your card. myRobogals will inform you and your chapter executives when the card is about to expire"))
+
+
+    def clean(self):
+        cleaned_data = super(FormPartOne, self).clean()
+        police_check_number = cleaned_data.get("police_check_number")
+        police_check_expiration = cleaned_data.get("police_check_expiration")
+
+        if police_check_number and police_check_expiration:
+            # Only check expiration date if field is required and the user has entered a p/c number
+            if self.fields['police_check_expiration'].required or police_check_number != '':
+                local_time = datetime.date(now())
+
+                # Check if card has expired in their local time only if they've made changes
+                if police_check_expiration < local_time:
+                    self.add_error('police_check_expiration', 'The card you have entered has already expired')
+            else:
+                cleaned_data["police_check_expiration"] = None
+
+        return cleaned_data
 
 # Personal information
+"""
+# Full version
 class FormPartOne(forms.Form):
     def __init__(self, *args, **kwargs):
         chapter = kwargs['chapter']
@@ -283,7 +336,7 @@ class FormPartOne(forms.Form):
                 cleaned_data["police_check_expiration"] = None
 
         return cleaned_data
-
+"""
 
 # Privacy settings
 class FormPartTwo(forms.Form):

@@ -1,0 +1,180 @@
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>myRobogals</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ MEDIA_URL }}resources/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{{ MEDIA_URL }}resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ MEDIA_URL }}templates/system/css/landing.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body style="background: url('{{ MEDIA_URL }}images/low-poly-wallpaper-22.png');">
+<div class="site-wrapper">
+    <div class="site-wrapper-inner">
+        <div class="cover-container">
+            <div class="inner cover">
+                <div class="heading" style="margin-bottom: 0px;">
+                    <h1 class="cover-heading">myRobogals</h1>
+                    <h5 class="cover-quote" id="quote"></h5>
+                </div>
+                <!--start of work in progress -->
+                <form action="/join/{{ chapter.myrobogals_url }}/" method="post">  {% csrf_token %}
+
+                    <!-- prints out error messages if problem with values entered in the fields -->
+                    {% for error in err %}
+                        {% if error != "" %}
+                        <td colspan="2">
+                           <div class="error">{{ error }}</div>
+                        </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="row">
+                        <!-- first name -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6 {% if signup_form.first_name.errors %}has-error{% endif %}" style="padding-left: 0px;">
+                            {% if signup_form.first_name.errors %}
+                                <div class="error">{% for error in signup_form.first_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.first_name|add_class:"form-control"|attr:"placeholder:First Name"}}
+                        </div>
+                        <!-- last name  -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6 {% if signup_form.last_name.errors %}has-error{% endif %}" style="padding-right: 0px;">
+                            {% if signup_form.last_name.errors %}
+                                <div class="error">{% for error in signup_form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.last_name|add_class:"form-control"|attr:"placeholder:Last Name"}}
+                        </div>
+                        <!-- usernanme -->
+                        <div class="input-group-lg form-group {% if signup_form.username.errors %}has-error{% endif %}">
+                            {% if signup_form.username.errors %}
+                                <div class="error">{% for error in signup_form.username.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.username|add_class:"form-control"|attr:"placeholder:Username"}}
+                        </div>
+                        <!-- password -->
+                        <div class="input-group-lg form-group">
+                            <input type="password" name="password1" class="form-control" placeholder="Password" aria-describedby="basic-addon1">
+                        </div>
+                        <!-- email -->
+                        <div class="input-group-lg form-group {% if signup_form.email.errors %}has-error{% endif %}">
+                            {% if signup_form.email.errors %}
+                                <div class="error">{% for error in signup_form.email.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.email|add_class:"form-control"|attr:"placeholder:Email"}}
+                        </div>
+                        <!-- mobile optional field -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6" style="padding-left: 0px {% if signup_form.mobile.errors %}has-error{% endif %}">
+                            {% if signup_form.mobile.errors %}
+                                <div class="error">{% for error in signup_form.mobile.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.mobile|add_class:"form-control"|attr:"placeholder:Mobile"}}
+                        </div>
+                        <!-- gender -->
+                        <div class="input-group-lg form-group col-xs-6 col-md-6" style="padding-right: 0px {% if signup_form.gender.errors %}has-error{% endif %}">
+                            {% if signup_form.gender.errors %}
+                                <div class="error">{% for error in signup_form.gender.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                            {{ signup_form.gender|add_class:"form-control"|attr:"placeholder:Gender"}}
+                        </div><!-- /input-group -->
+
+                    {% if conduct_form %}
+                        {% for field in conduct_form %}
+                            {% if field.errors %}
+                                <div class="error">{% for error in field.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            <p>
+                                {{ field }} I agree to the <a href="/code/help" target="_blank">
+                                Robogal's Code of Conduct</a></label>
+                            </p>
+                        {% endfor %}
+                    {% endif %}
+                    <input type="submit" name="Submit" class="btn btn-md btn-default" value="Join {{ chapter }}!" />
+                </div><!-- /.row -->
+                </form>
+                <!--end of work in progress -->
+
+            <div class="row">
+                <div class="col-md-4"><a href="/login/">Login</a></div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3"></div>
+                <div class="col-md-1"></div>
+                <div class="col-md-3"><a href="/support/">Contact Us &amp; FAQ</a></div>
+            </div>
+        </div>
+
+        <!--Footer -->
+        <div class="mastfoot">
+            <div class="media-icons">
+                <a href="https://www.facebook.com/robogals/"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i></a>
+                <a href="https://twitter.com/robogals"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i></a>
+                <a href="https://www.instagram.com/robogals/"><i class="fa fa-instagram fa-2x" aria-hidden="true"></i></a>
+                <a href="https://www.linkedin.com/company-beta/873367/"><i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i></a>
+                <a href="https://github.com/robogals/myrobogals"><i class="fa fa-github-square fa-2x" aria-hidden="true"></i></a>
+            </div>
+            <div class="inner">
+                <p>
+                    <a href="/credits/">Credits</a> | <a href="http://robogals.org">robogals.org</a>
+                    <br>
+                    <i class="fa fa-copyright" aria-hidden="true"></i> Robogals 2010-2017
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="{{ MEDIA_URL }}js/jquery.js"></script>
+<script src="{{ MEDIA_URL }}resources/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    quote = document.getElementById("quote");
+
+    num = getRandomInt(0, 1000);
+
+    switch (num) {
+        case 1:
+            quote.innerText = "Hello World!";
+            break;
+        case 2:
+            quote.innerText = "Making Robogals great again";
+            break;
+        case 3:
+            quote.innerText = "Changing the world one girl at a time";
+            break;
+        case 4:
+            quote.innerText = "#Changethegame";
+            break;
+        case 5:
+            quote.innerText = "xoxoGossipGals";
+            break;
+        case 6:
+            quote.innerText = "The login button will break your computer";
+            break;
+        case 7:
+            quote.innerText = "We still matter";
+            break;
+        case 8:
+            quote.innerText = "myRobogals is great, please use it more";
+            break;
+        case 9:
+            quote.innerText = "Yes, you are at the right myRobogals";
+            break;
+        default:
+            quote.innerText = "Robogal's global intranet and record keeping tool"
+    }
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+</script>
+</body>
+</html>

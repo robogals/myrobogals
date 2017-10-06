@@ -91,6 +91,91 @@ def newuser(request, chapter):
                 try:
                     User.objects.get(username=new_username)
                 except User.DoesNotExist:
+                    if len(request.POST['password1']) < 5:
+                        pwerr = _('Your password must be at least 5 characters long')
+                    else:
+                        # Creates, saves and returns a User object
+                        u = User.objects.create_user(new_username, '', request.POST['password1'])
+                        u.chapter = chapter
+                        mt = MemberStatus(user_id=u.pk, statusType_id=1)
+                        mt.save()
+                        u.is_active = True
+                        u.is_staff = False
+                        u.is_superuser = False
+                        u.code_of_conduct = True if coc_form_text is not None else False
+
+                        u.first_name = data['first_name']
+                        u.last_name = data['last_name']
+                        u.email = data['email']
+                        u.mobile = data['mobile']
+                        u.mobile_verified = False
+                        u.gender = data['gender']
+                        # If chapter has enabled police check (required check is performed in clean() method
+                        if 'police_check_number' in data and 'police_check_expiration' in data:
+                            u.police_check_number = data['police_check_number']
+                            u.police_check_expiration = data['police_check_expiration']
+                            notify_chapter(chapter, u)
+
+                        u.save()
+
+                        if chapter.welcome_email_enable:
+                            welcome_email(request, chapter, u)
+
+                        return HttpResponseRedirect("/welcome/" + chapter.myrobogals_url + "/")
+                else:
+                    usererr = _('That username is already taken')
+
+            # Compile all the errors into a list
+            err = [usererr, pwerr, carderr]
+
+    if coc_form_text is not None:
+        return render_to_response('sign_up-v2.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('sign_up-v2.html', {'signup_form': signup_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
+
+"""
+def newuser(request, chapter):
+    pwerr = ''
+    usererr = ''
+    carderr = ''
+    err = []
+
+    signup_form = FormPartOne(request.POST or None, chapter=chapter, user_id='')
+
+    coc_form_text = openconductfile()
+
+    if coc_form_text is not None:
+        coc_form = CodeOfConductForm(request.POST or None)
+
+    if request.method == 'POST':
+        # Checks coc_form is assigned before calling is valid
+        if coc_form_text is not None:
+            valid_forms = signup_form.is_valid() and coc_form.is_valid()
+        else:
+            valid_forms = signup_form.is_valid()
+
+        if valid_forms:
+            data = signup_form.cleaned_data
+
+            new_username = data['username']
+
+            # Checking validity of length
+            username_len = len(new_username)
+            if username_len < 3:
+                usererr = _('Your username must be 3 or more characters')
+            elif username_len > 30:
+                usererr = _('Your username must be less than 30 characters')
+
+            # Regex check for words, letters, numbers and underscores only in username
+            matches = re.compile(r'^\w+$').findall(new_username)
+            if matches == []:
+                usererr = _('Your username must contain only letters, numbers and underscores')
+
+            # See if it already exists in database
+            else:
+                try:
+                    User.objects.get(username=new_username)
+                except User.DoesNotExist:
                     if request.POST['password1'] == request.POST['password2']:
                         if len(request.POST['password1']) < 5:
                             pwerr = _('Your password must be at least 5 characters long')
@@ -146,7 +231,7 @@ def newuser(request, chapter):
         return render_to_response('sign_up.html', {'signup_form': signup_form, 'conduct_form': coc_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
     else:
         return render_to_response('sign_up.html', {'signup_form': signup_form, 'chapter': chapter, 'err': err}, context_instance=RequestContext(request))
-
+"""
 
 def conduct_help(request):
     coc_form_text = openconductfile()
