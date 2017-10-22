@@ -78,7 +78,7 @@ def instantvisit(request):
                                               context_instance=RequestContext(request))
             else:
                 try:
-                    previously_visited_school = School.objects.get(name=selected_school)
+                    previously_visited_school = School.objects.get(name=selected_school, chapter=chapter)
                 except ObjectDoesNotExist:
                     messages.error(request,
                                    message=unicode("Please select a school from the list or create a new one."))
