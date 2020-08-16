@@ -43,8 +43,8 @@ from myrobogals.permissionUtils import *
 
 @login_required
 def adduser(request, chapterurl):
-	chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
-	return edituser(request, '', chapter)
+    chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
+    return edituser(request, '', chapter)
 
 
 @login_required
@@ -239,8 +239,12 @@ def editexecs(request, chapterurl):
     chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
     if not (request.user.is_superuser or is_executive_or_higher(request.user, chapter)):
         raise Http404
+
+    # only regional or higher can add or remove executive members
+    edit_permissions = is_regional_or_higher(request.user, chapter)
+
     add_executive_form = None
-    if request.method == 'POST':
+    if edit_permissions and request.method == 'POST':
         add_executive_form = AddExecutiveForm(request.POST, chapter=chapter)
         if add_executive_form.is_valid():
             data = add_executive_form.cleaned_data
@@ -249,10 +253,9 @@ def editexecs(request, chapterurl):
 
             if position_type and user:
                 Position.objects.create(user=user, positionType=position_type, positionChapter=chapter, position_date_start=date.today())
+                user.is_staff = True
+                user.save()
             return HttpResponseRedirect("/chapters/" + chapter.myrobogals_url + "/edit/execs/")
-
-    #Only Regional+ can add or remove executive members.
-    edit_permissions = is_regional_or_higher(request.user, chapter)
 
     if edit_permissions and not add_executive_form:
         add_executive_form = AddExecutiveForm(chapter=chapter)
@@ -264,33 +267,31 @@ def editexecs(request, chapterurl):
                               context_instance=RequestContext(request))
 
 
-
 @login_required
-def remove_exec(request, chapterurl):
+def remove_exec(request, chapterurl, username):
     """
     Removes an executive, marks their position as ending today.
     """
-    chapter = get_object_or_404(Chapter, myrobogals_url__exact='melbourne')#chapterurl)
+
+    chapter = get_object_or_404(Chapter, myrobogals_url__exact=chapterurl)
+    user = get_object_or_404(User, username__exact=username, chapter=chapter)
 
     if not (request.user.is_superuser or is_regional_or_higher(request.user, chapter)):
         raise Http404
 
-    if not ('username' in request.GET and 'position_type' in request.GET):
-        #TODO ERROR
-        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+    # end all current positions in this chapter
+    positions = Position.objects.filter(user=user, position_date_end=None, positionChapter=chapter).update(position_date_end=date.today())
 
-    user = get_object_or_404(User, username__exact=request.GET.get('username', None))
-    position_type = PositionType.objects.filter(description=request.GET.get('position_type', None)).first()
-    
-    if not position_type:
-        #TODO ERROR
-        return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
+    # if user has no other positions (e.g. in global/regional), remove their is_staff flag
+    other_positions = Position.objects.filter(user=user, position_date_end=None)
+    if not other_positions:
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
 
-    #End all positions that match the chapter, user and description - there should only be one
-    Position.objects.filter(user=user, positionType=position_type, positionChapter=chapter).update(position_date_end=date.today())
+    messages.success(request, message=unicode(_("User %(username)s has been retired as an executive") % {'username': user.username}))
 
     return HttpResponseRedirect('/chapters/' + chapterurl + '/edit/execs/')
-
 
 
 # Changing members in the chapter to a different status

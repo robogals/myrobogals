@@ -29,7 +29,7 @@
     <td>{% get_user_attr officer.user "email" %}</td>
     <td>{% get_user_attr officer.user "is_staff" %}</td>
     <td>{% get_user_attr officer.user "has_cur_pos" %}</td>
-    {% if edit_permissions %}<td><a href="/chapters/{{chapter.myrobogals_url}}/edit/execs/remove/?username={{officer.user.username}}&position_type={{officer.positionType}}">Remove Executive</a></td> {% endif %}
+    {% if edit_permissions %}<td><a href="/chapters/{{chapter.myrobogals_url}}/edit/execs/remove/{{officer.user.username}}/">Remove Executive</a></td> {% endif %}
   </tr>
 {% endfor %}
 </table>

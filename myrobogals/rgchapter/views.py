@@ -216,7 +216,7 @@ class AddExecutiveForm(forms.Form):
 		del kwargs['chapter']
 		super(AddExecutiveForm, self).__init__(*args, **kwargs)
 		self.fields['user'].queryset = User.objects.filter(chapter=chapter)
-		self.fields['position_type'].queryset = PositionType.objects.all()
+		self.fields['position_type'].queryset = PositionType.objects.filter(Q(chapter=chapter) | Q(chapter__isnull=True))
 
 
 @login_required
