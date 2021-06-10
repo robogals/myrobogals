@@ -1,4 +1,4 @@
-django==1.8.17
+django==2.2.24
 mysql-python
 pytz
 django-tinymce==2.5.0
